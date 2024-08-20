@@ -1,90 +1,31 @@
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { SessionName } from "../../../../types/Session"
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { FaFilter } from "react-icons/fa";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { MdOpenInNew } from "react-icons/md";
+import { TEAMS } from "@/lib/dummy"
+import { DataTable } from "@/components/TeamListTable/data-table"
+import { columns, TeamColumn } from "@/components/TeamListTable/columns"
 
 
-interface TeamListRowType {
-  songName: string
-  songArtist: string
-  leaderName: string
-  requiredSessions: SessionName[]
-  cover_url: string
-}
+const rows: TeamColumn[] = TEAMS.map((team) => ({
+  id: team.id,
+  songName: team.song.name,
+  songArtist: team.song.artist,
+  leaderName: team.leader.name,
+  requiredSessions: team.song.unsatisfied_sessions,
+  cover_url: team.song.cover_url ?? team.song.original_url,
+  is_freshmanFixed: team.is_freshmanFixed
+}))
 
-type TeamStatus = "모집 완료" | "모집 중"
-const TeamListRow = ({ songName, songArtist, leaderName, requiredSessions, cover_url }: TeamListRowType) => {
-  const status: TeamStatus = requiredSessions.length === 0 ? "모집 완료" : "모집 중"
-  return (
-    <TableRow className="p-0">
-      <TableCell>
-        <p>{songName}</p>
-        <span className="text-slate-400 truncate">{songArtist}</span>
-      </TableCell>
-      <TableCell>{leaderName}</TableCell>
-      <TableCell>
-        <div className="flex gap-1">
-          {requiredSessions.map((session) => (
-            <SessionBadge sessionName={session} />
-          ))}
-        </div>
-      </TableCell>
-      <TableCell>
-        <StatusBadge status={status} />
-      </TableCell>
-      <TableCell>
-        <Link href={cover_url}><MdOpenInNew size={24} /></Link>
-      </TableCell>
-    </TableRow>
-  )
-}
-
-const SessionBadge = ({ sessionName }: { sessionName: SessionName }) => {
-  return (
-    <Badge className="rounded-lg">{sessionName}</Badge>
-  )
-}
-
-
-const StatusBadge = ({ status }: { status: TeamStatus }) => {
-  const className = status === "모집 완료" ?
-  "bg-red-100 border-destructive text-destructive font-bold"
-  :
-  "bg-green-100 border-green-600 text-green-600 font-bold"
-  return (
-    <Badge
-      variant="outline"
-      className={cn(className, "border rounded-lg")}>
-      {status}
-    </Badge>
-  )
-}
-
+// TODO: column visible 선택 기능 -> 세션별 지원자 확인 할 수 있게
+// TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
+// TODO: column 너비 조절
+// TODO: 필터 -> Dialog로 처리
+// TODO: Footer 맨 밑으로 내리기
+// TODO: Pagination에서 1,2,3,4,5 등 추가
+// TODO: DataTable Header 색상 변경
+// TODO: Primary, Secondary 색상 설정
 const TeamList = () => {
   return (
-    <>
-      TeamList
-    </>
+    <div className="container">
+      <DataTable columns={columns} data={rows} />
+    </div>
   )
 }
 
