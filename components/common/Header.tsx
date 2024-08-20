@@ -15,9 +15,9 @@ const HeaderLink = ({ children, href }: { children: React.ReactNode, href:string
 
 const Header = ({ position }: { position: 'sticky' | 'fixed' }) => {
   const menuItems: { text: string, href: string }[] = [
-    { text: "공지사항", href: "notices" },
+    { text: "공지사항", href: "/notices" },
     { text: "공연팀 생성", href: "/"},
-    { text: "세션 지원", href: "/"},
+    { text: "세션 지원", href: "/teams"},
     { text: "사진앨범", href: "/"},
   ]
   return (
