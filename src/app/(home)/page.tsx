@@ -1,8 +1,8 @@
 import { Ma_Shan_Zheng } from "next/font/google"
 import { Island_Moments } from "next/font/google"
 import { cn } from "@/lib/utils"
-import Header from "../../../components/common/Header"
-import Footer from "../../../components/common/Footer"
+import Header from "../../components/common/Header"
+import Footer from "../../components/common/Footer"
 
 const MaShanZheng = Ma_Shan_Zheng({subsets: ['latin'], weight: "400"})
 const IslandMoments = Island_Moments({subsets: ['latin'], weight: '400'})

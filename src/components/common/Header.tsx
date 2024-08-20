@@ -1,24 +1,14 @@
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
-
-const HeaderLink = ({ children, href }: { children: React.ReactNode, href:string }) => {
-  return (
-    <Link
-      href={href}
-      className="font-extrabold text-gray-300"
-      >
-      {children}
-    </Link>
-  )
-}
+import NavLink from "@/components/common/NavLink"
 
 const Header = ({ position }: { position: 'sticky' | 'fixed' }) => {
   const menuItems: { text: string, href: string }[] = [
     { text: "공지사항", href: "/notices" },
-    { text: "공연팀 생성", href: "/"},
+    { text: "공연팀 생성", href: "/teams/create"},
     { text: "세션 지원", href: "/teams"},
-    { text: "사진앨범", href: "/"},
+    { text: "사진앨범", href: "/gallery"},
   ]
   return (
     <header
@@ -33,7 +23,7 @@ const Header = ({ position }: { position: 'sticky' | 'fixed' }) => {
         {/* MenuItems */}
         <div className="flex justify-around w-1/2">
           {menuItems.map((menuItem) => (
-            <HeaderLink key={menuItem.text} href={menuItem.href}>{menuItem.text}</HeaderLink>
+            <NavLink key={menuItem.text} href={menuItem.href}>{menuItem.text}</NavLink>
           ))}
         </div>
 

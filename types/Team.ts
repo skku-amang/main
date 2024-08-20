@@ -3,12 +3,14 @@ import { Performance } from "./Performance"
 import { Session } from "./Session"
 
 export type Team = {
+  id: number
   name: string
   description: string
   is_private: boolean
   leader: User
   performance: Performance
   song: Song
+  is_freshmanFixed: boolean
 }
 
 export type Song = {
