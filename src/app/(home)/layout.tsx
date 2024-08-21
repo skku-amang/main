@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "../globals.css";
+import "@/app/globals.css";
+import React from "react";
+import HeightPopulatedBody from "@/components/common/HeightPopulatedBody";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,10 +20,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
-      <body className={inter.className}>
-        {children}
-      </body>
+    <html lang="en">
+      <HeightPopulatedBody
+        headerHeight="4rem"
+        footerHeight="5rem"
+        className={inter.className}
+        style={{
+          backgroundImage: `url('Music band_pixabay 1.png')`,
+          backgroundPosition: 'center',
+          filter: "brightness(100%)" }}
+      >
+        <div className="container">
+          {children}
+        </div>
+      </HeightPopulatedBody>
     </html>
   );
 }

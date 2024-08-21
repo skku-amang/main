@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
-import { cn } from "@/lib/utils";
 import React from "react";
+import HeightPopulatedBody from "@/components/common/HeightPopulatedBody";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,28 +14,6 @@ export const metadata: Metadata = {
   }
 };
 
-const HeightPopulatedBody = (
-  { headerHeight, footerHeight, children }:
-  { headerHeight: string, footerHeight: string, children: React.ReactNode }
-) => {
-  return (
-    <body className={cn(inter.className, "h-screen")}>
-      <Header position="fixed" height={headerHeight} />
-      <div
-        className="h-auto"
-        style={{
-          paddingTop: headerHeight,
-          minHeight: "100%",
-          paddingBottom: footerHeight
-        }}
-      >{children}
-      </div>
-      <Footer height={footerHeight} />
-      </body>
-  );
-};
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,6 +24,7 @@ export default function RootLayout({
       <HeightPopulatedBody
         headerHeight="4rem"
         footerHeight="5rem"
+        className={inter.className}
       >
         <div className="container">
           {children}
