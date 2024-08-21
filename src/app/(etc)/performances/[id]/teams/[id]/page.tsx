@@ -1,5 +1,5 @@
 import { TEAMS } from "@/lib/dummy"
-import { Team } from "../../../../../types/Team"
+import { Team } from "../../../../../../../types/Team"
 
 const TeamDetail = ({ params }: { params: { id: string } }) => {
   const teamData: Team = TEAMS[+params.id]
