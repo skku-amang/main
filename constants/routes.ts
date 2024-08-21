@@ -3,36 +3,7 @@ export interface Route {
   url: string | ((...args: string[]) => string)
 }
 
-interface Performance {
-  CREATE: Route
-  LIST: Route
-  DETAIL: {
-    index: Route
-    TEAM: Team
-  }
-  EDIT: Route
-}
-
-interface Team {
-  CREATE: Route
-  LIST: Route
-  DETAIL: Route
-  EDIT: Route
-}
-
-interface Mypage {
-  INDEX: Route
-}
-
-interface Routes {
-  HOME: Route
-  LOGIN: Route
-  SIGNUP: Route
-  PERFORMANCE: Performance
-  MYPAGE: Mypage
-}
-
-const ROUTES: Routes = {
+const ROUTES = {
   HOME: {
     name: 'Home',
     url: '/'
@@ -45,14 +16,32 @@ const ROUTES: Routes = {
     name: 'Sign up',
     url: '/signup'
   },
+  NOTICE: {
+    CREATE: {
+      name: '공지사항 생성',
+      url: '/notices/create'
+    },
+    LIST: {
+      name: '공지사항 목록',
+      url: '/notices/'
+    },
+    DETAIL: {
+      name: '공지사항 상세',
+      url: (id: string) => `/notices/${id}`
+    },
+    EDIT: {
+      name: '공지사항 수정',
+      url: (id: string) => `/notices/${id}/edit`
+    }
+  },
   PERFORMANCE: {
     CREATE: {
       name: '공연 생성',
-      url: '/performaces/create'
+      url: '/performances/create'
     },
     LIST: {
       name: '공연 목록',
-      url: '/performaces/'
+      url: '/performances/'
     },
     DETAIL: {
       index: {
@@ -70,11 +59,11 @@ const ROUTES: Routes = {
         },
         DETAIL: {
           name: '팀 상세',
-          url: (performanceId: string, id: string) => `/performances/${performanceId}/teams/${id}`
+          url: (performanceId: string, teamId: string) => `/performances/${performanceId}/teams/${teamId}`
         },
         EDIT: {
           name: '팀 수정',
-          url: (performanceId: string, id: string) => `/performances/${performanceId}/teams/${id}`
+          url: (performanceId: string, teamId: string) => `/performances/${performanceId}/teams/${teamId}`
         }
       }
     },
@@ -82,6 +71,10 @@ const ROUTES: Routes = {
       name: '공연 수정',
       url: (id: string) => `/performances/${id}/edit`
     },
+  },
+  GALLERY: {
+    name: '갤러리',
+    url: '/gallery'
   },
   MYPAGE: {
     INDEX: {
