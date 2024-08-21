@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import React from "react";
 import HeightPopulatedBody from "@/components/common/HeightPopulatedBody";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
       <HeightPopulatedBody
         headerHeight="4rem"
         footerHeight="5rem"
-        className={inter.className}
+        className={cn(inter.className, "overflow-hidden")}
         style={{
           backgroundImage: `url('Music band_pixabay 1.png')`,
           backgroundPosition: 'center',

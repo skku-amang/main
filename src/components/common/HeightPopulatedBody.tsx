@@ -11,7 +11,7 @@ const HeightPopulatedBody = (
   }
 ) => {
   return (
-    <body className={cn(className, "h-screen overflow-hidden")} style={style}>
+    <body className={cn(className, "h-screen")} style={style}>
       <Header position="fixed" height={headerHeight} />
       <div
         className="h-auto"
