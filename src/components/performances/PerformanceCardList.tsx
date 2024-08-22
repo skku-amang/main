@@ -7,25 +7,19 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { CiCirclePlus } from "react-icons/ci";
-import { useEffect, useState } from "react"
+import { memo, useMemo, useState } from "react"
 import React from "react"
 import PerformanceCard from "./PerformanceCard"
-import { Performance } from "../../../types/Performance"
+
+const MemoPerformanceCard = memo(PerformanceCard)
 
 const PerformanceList = () => {
-  const performances = generateDummys(10, createPerformance)
-  const [filteredList, setFilteredList] = useState<Performance[]>([])
+  const performances = useMemo(() => generateDummys(10, createPerformance), []);
   const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    setFilteredList(performances)
-  }, [])
-
-  useEffect(() => {
-    setFilteredList(
-      performances.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-    );
-  }, [query]);
+  const filteredList = useMemo(() => {
+    return performances.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+  }, [performances, query]);
 
   return (
     <div className="mb-10">
@@ -49,15 +43,15 @@ const PerformanceList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {filteredList.map((p) => (
           <div key={p.id} className="w-full flex justify-center">
-            <PerformanceCard
+            <MemoPerformanceCard
               id={p.id}
               name={p.name}
               representativeSrc={p.representativeImage}
               location={p.location}
               startDatetime={p.start_datetime}
               endDatetime={p.end_datetime}
-              />
-            </div>
+            />
+          </div>
         ))}
       </div>
     </div>

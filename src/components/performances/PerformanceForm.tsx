@@ -57,7 +57,7 @@ const PerformanceForm = () => {
             name={formValues.name || "공연 이름"}
             representativeSrc={formValues.representativeImage ? URL.createObjectURL(formValues.representativeImage) : "/no-image.svg"}
             description={formValues.description}
-            location={formValues.location || "공연 위치"}
+            location={formValues.location || "미정"}
             startDatetime={formValues.start_datetime || new Date()}
             endDatetime={formValues.end_datetime || new Date()}
             className="shadow-2xl hover:cursor-pointer"
