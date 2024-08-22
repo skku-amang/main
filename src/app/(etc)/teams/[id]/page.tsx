@@ -4,19 +4,17 @@ import { createTeam } from '@/lib/dummy/Team';
 
 interface Props {
   params: {
-    performanceId: number;
-    teamId: number;
+    id: number;
   };
 }
 
 const TeamDetail = ({ params }: Props) => {
-  const { performanceId, teamId } = params;
-  const team = createTeam(teamId)
+  const { id } = params;
+  const team = createTeam(id)
   
   return (
     <div>
-      <h1>Performance ID: {performanceId}</h1>
-      <h2>Team ID: {teamId}</h2>
+      <h2>Team ID: {id}</h2>
       <DescribeToJSX data={team} level={0} />
     </div>
   );

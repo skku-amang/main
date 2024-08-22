@@ -36,7 +36,7 @@ const PerformanceCard = ({ id, name, representativeSrc, description, location, s
   return (
     <Card style={{ width }} className={cn("overflow-hidden", className)}>
       {id ?
-        <Link href={ROUTES.PERFORMANCE.DETAIL.index.url(id.toString())}>
+        <Link href={ROUTES.PERFORMANCE.DETAIL.url(id.toString())}>
           <RepresentativeImage alt={`${name} 이미지`} src={representativeSrc} width={width} height={height} />
         </Link>
         :

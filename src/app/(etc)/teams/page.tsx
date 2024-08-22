@@ -2,6 +2,8 @@ import { TeamListDataTable } from "@/components/TeamListTable/data-table"
 import { columns, TeamColumn } from "@/components/TeamListTable/columns"
 import { generateDummys } from "@/lib/dummy"
 import { createTeam } from "@/lib/dummy/Team"
+import { createPerformance } from "@/lib/dummy/Performance"
+import { Badge } from "@/components/ui/badge"
 
 const TEAMS = generateDummys(45, createTeam)
 const rows: TeamColumn[] = TEAMS.map((team) => ({
@@ -23,8 +25,26 @@ const rows: TeamColumn[] = TEAMS.map((team) => ({
 // TODO: DataTable Header 색상 변경
 // TODO: Primary, Secondary 색상 설정
 const TeamList = () => {
+  const activePerformances = generateDummys(3, createPerformance)
+
   return (
     <div className="container">
+      {/* 팀 배너 */}
+      <div className="flex flex-col justify-center items-center">
+        <h2 className="text-4xl font-extrabold text-gray-600 mt-24">공연팀 목록</h2>
+        <p className="my-8 font-bold">Performances</p>
+        <div className="flex gap-x-4 mb-10">
+          {activePerformances.map(p => (
+            <Badge
+              key={p.id}
+              className="py-1 px-6 text-md rounded-xl shadow-sm shadow-slate-500 text-black bg-slate-100 font-normal">
+              {p.name}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* 팀 목록 테이블 */}
       <TeamListDataTable columns={columns} data={rows} />
     </div>
   )

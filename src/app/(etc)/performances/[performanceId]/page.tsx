@@ -2,7 +2,7 @@ import { createPerformance } from "@/lib/dummy/Performance"
 import Image from "next/image"
 import { FaClock } from "react-icons/fa";
 import { IoLocationSharp } from "react-icons/io5";
-import TeamList from "./teams/page";
+import TeamList from "../../teams/page";
 import { Badge } from "@/components/ui/badge";
 import { generateDummys } from "@/lib/dummy";
 import ROUTES from "../../../../../constants/routes";
@@ -56,7 +56,7 @@ const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
         <p className="text-sm mb-2 font-bold">모집 중인 공연</p>
         <div className="flex gap-x-2">
           {relatedPerformances.map(p => (
-            <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL.index.url(p.id.toString())}>
+            <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}>
               <Badge className="p-2 px-3 bg-slate-200 text-black">
                 {p.name}
               </Badge>

@@ -44,33 +44,31 @@ const ROUTES = {
       url: '/performances/'
     },
     DETAIL: {
-      index: {
-        name: '공연 상세',
-        url: (id: string) => `/performances/${id}`
-      },
-      TEAM: {
-        CREATE: {
-          name: '팀 생성',
-          url: (performanceId: string) => `/performances/${performanceId}/teams/create`
-        },
-        LIST: {
-          name: '팀 생성',
-          url: (performanceId: string) => `/performances/${performanceId}/teams`
-        },
-        DETAIL: {
-          name: '팀 상세',
-          url: (performanceId: string, teamId: string) => `/performances/${performanceId}/teams/${teamId}`
-        },
-        EDIT: {
-          name: '팀 수정',
-          url: (performanceId: string, teamId: string) => `/performances/${performanceId}/teams/${teamId}`
-        }
-      }
+      name: '공연 상세',
+      url: (id: string) => `/performances/${id}`
     },
     EDIT: {
       name: '공연 수정',
       url: (id: string) => `/performances/${id}/edit`
     },
+  },
+  TEAM: {
+    CREATE: {
+      name: '팀 생성',
+      url: '/teams/create'
+    },
+    LIST: {
+      name: '팀 생성',
+      url: '/teams'
+    },
+    DETAIL: {
+      name: '팀 상세',
+      url: (id: string) => `/teams/${id}`
+    },
+    EDIT: {
+      name: '팀 수정',
+      url: (id: string) => `/teams/${id}`
+    }
   },
   GALLERY: {
     name: '갤러리',

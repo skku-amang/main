@@ -8,7 +8,7 @@ export const HeaderInner = () => {
   const menuItems: { name: string, url: string }[] = [
     { name: "공지사항", url: ROUTES.NOTICE.LIST.url },
     { name: "공연목록", url: ROUTES.PERFORMANCE.LIST.url },
-    { name: "세션지원", url: "/teams"},
+    { name: "세션지원", url: ROUTES.TEAM.LIST.url },
     { name: "사진앨범", url: ROUTES.GALLERY.url },
   ]
 
