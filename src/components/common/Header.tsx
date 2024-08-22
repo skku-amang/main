@@ -5,11 +5,11 @@ import NavLink from "@/components/common/NavLink"
 import ROUTES from "../../../constants/routes"
 
 export const HeaderInner = () => {
-  const menuItems: { name: string, url: string }[] = [
-    { name: "공지사항", url: ROUTES.NOTICE.LIST.url },
-    { name: "공연목록", url: ROUTES.PERFORMANCE.LIST.url },
-    { name: "세션지원", url: ROUTES.TEAM.LIST.url },
-    { name: "사진앨범", url: ROUTES.GALLERY.url },
+  const menuItems: { name: string, url: string, active: boolean }[] = [
+    { name: "공지사항", url: ROUTES.NOTICE.LIST.url, active: false },
+    { name: "공연목록", url: ROUTES.PERFORMANCE.LIST.url, active: true },
+    { name: "세션지원", url: ROUTES.TEAM.LIST.url, active: true },
+    { name: "사진앨범", url: ROUTES.GALLERY.url, active: false },
   ]
 
   return (
@@ -25,7 +25,7 @@ export const HeaderInner = () => {
           {/* MenuItems */}
           <div className="flex justify-around w-1/2">
             {menuItems.map((menuItem) => (
-              <NavLink key={menuItem.name} href={menuItem.url}>{menuItem.name}</NavLink>
+              <NavLink key={menuItem.name} href={menuItem.url} active={menuItem.active}>{menuItem.name}</NavLink>
             ))}
           </div>
 
