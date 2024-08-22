@@ -1,7 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Song, Team } from "../../../types/Team";
-import dummySessions from "./Session";
-import { getRandomElements } from "../utils";
+import dummySessions, { getRandomSessions } from "./Session";
 import { createUser } from "./User";
 import { createPerformance } from "./Performance";
 
@@ -12,8 +11,8 @@ export const createSong = (): Song => ({
   cover_artist: faker.person.fullName(),
   original_url: faker.internet.url(),
   cover_url: faker.internet.url(),
-  satisfied_sessions: getRandomElements(dummySessions, 1, 3),
-  unsatisfied_sessions: getRandomElements(dummySessions, 1, 3)
+  satisfied_sessions: getRandomSessions(),
+  unsatisfied_sessions: getRandomSessions()
 });
 
 export const createTeam = (id: number): Team => ({

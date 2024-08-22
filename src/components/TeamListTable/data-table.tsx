@@ -32,7 +32,7 @@ interface DataTableProps<TValue> {
   data: TeamColumn[]
 }
 
-export function DataTable<TValue>({
+export function TeamListDataTable<TValue>({
   columns,
   data,
 }: DataTableProps<TValue>) {

@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/TeamListTable/data-table"
+import { TeamListDataTable } from "@/components/TeamListTable/data-table"
 import { columns, TeamColumn } from "@/components/TeamListTable/columns"
 import { generateDummys } from "@/lib/dummy"
 import { createTeam } from "@/lib/dummy/Team"
@@ -25,7 +25,7 @@ const rows: TeamColumn[] = TEAMS.map((team) => ({
 const TeamList = () => {
   return (
     <div className="container">
-      <DataTable columns={columns} data={rows} />
+      <TeamListDataTable columns={columns} data={rows} />
     </div>
   )
 }
