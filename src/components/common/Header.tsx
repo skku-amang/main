@@ -13,33 +13,38 @@ export const HeaderInner = () => {
   ]
 
   return (
-    <nav className="flex lg:w-[1280px] items-center justify-between mx-auto">
-      {/* Logo */}
-      <Link href="/" className="w-32 flex justify-center">
-        <Image src="/Logo.png" alt="logo" width={47} height={47} />
-      </Link>
+    <>
+      {/* Tablet & Desktop */}
+      <nav className="invisible md:visible flex items-center w-full px-10">
+        <div className="flex items-center w-full lg:w-[1280px] justify-between mx-auto">
+          {/* Logo */}
+          <Link href="/">
+            <Image src="/Logo.png" alt="logo" width={47} height={47} />
+          </Link>
 
-      {/* MenuItems */}
-      <div className="flex justify-around w-1/2">
-        {menuItems.map((menuItem) => (
-          <NavLink key={menuItem.name} href={menuItem.url}>{menuItem.name}</NavLink>
-        ))}
-      </div>
+          {/* MenuItems */}
+          <div className="flex justify-around w-1/2">
+            {menuItems.map((menuItem) => (
+              <NavLink key={menuItem.name} href={menuItem.url}>{menuItem.name}</NavLink>
+            ))}
+          </div>
 
-      {/* Personal */}
-      <div
-        className="flex justify-center gap-x-5 w-64 text-gray-700 font-bold">
-        <Link href="/login" style={{ color: "#BEBEBE" }}>로그인</Link>
-        |
-        <Link href="/signup" style={{ color: "#BEBEBE" }}>회원가입</Link>
-      </div>
-    </nav>
+          {/* Personal */}
+          <div
+            className="flex justify-center gap-x-5 text-gray-700 font-bold">
+            <Link href="/login" style={{ color: "#BEBEBE" }}>로그인</Link>
+            |
+            <Link href="/signup" style={{ color: "#BEBEBE" }}>회원가입</Link>
+          </div>
+        </div>
+      </nav>
+    </>
   )
 }
 const Header = ({ position, height }: { position: 'sticky' | 'fixed', height: string }) => {
   return (
     <header
-      className={cn(position, "w-full flex justify-center top-0")}
+      className={cn(position, "w-full flex justify-center top-0 backdrop-blur")}
       style={{ height }}
     >
       <HeaderInner />

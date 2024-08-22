@@ -29,7 +29,8 @@ export default function RootLayout({
         style={{
           backgroundImage: `url('Music band_pixabay 1.png')`,
           backgroundPosition: 'center',
-          filter: "brightness(100%)" }}
+          backgroundSize: 'cover'
+        }}
       >
         <div className="container">
           {children}

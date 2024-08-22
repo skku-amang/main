@@ -1,0 +1,28 @@
+import { faker } from "@faker-js/faker";
+import { Song, Team } from "../../../types/Team";
+import dummySessions from "./Session";
+import { getRandomElements } from "../utils";
+import { createUser } from "./User";
+import { createPerformance } from "./Performance";
+
+export const createSong = (): Song => ({
+  name: faker.lorem.words(),
+  artist: faker.person.fullName(),
+  cover_name: faker.lorem.words(),
+  cover_artist: faker.person.fullName(),
+  original_url: faker.internet.url(),
+  cover_url: faker.internet.url(),
+  satisfied_sessions: getRandomElements(dummySessions, 1, 3),
+  unsatisfied_sessions: getRandomElements(dummySessions, 1, 3)
+});
+
+export const createTeam = (id: number): Team => ({
+  id,
+  name: faker.company.name(),
+  description: faker.lorem.paragraph(),
+  is_private: faker.datatype.boolean(),
+  leader: createUser(id),
+  performance: createPerformance(id),
+  song: createSong(),
+  is_freshmanFixed: faker.datatype.boolean()
+});

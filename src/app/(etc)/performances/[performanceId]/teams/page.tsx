@@ -1,8 +1,9 @@
-import { TEAMS } from "@/lib/dummy"
 import { DataTable } from "@/components/TeamListTable/data-table"
 import { columns, TeamColumn } from "@/components/TeamListTable/columns"
+import { generateDummys } from "@/lib/dummy"
+import { createTeam } from "@/lib/dummy/Team"
 
-
+const TEAMS = generateDummys(45, createTeam)
 const rows: TeamColumn[] = TEAMS.map((team) => ({
   id: team.id,
   songName: team.song.name,
