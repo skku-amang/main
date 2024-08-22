@@ -4,11 +4,9 @@ import { FaYoutube } from "react-icons/fa";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-const Footer = ({ position }: { position: 'sticky' | 'fixed' }) => {
+export const FooterInner = () => {
   return (
-    <footer
-      className={cn(position, "w-full bottom-0 flex justify-center h-24 items-center gap-x-10")}
-    >
+    <div className="w-full bottom-0 flex justify-center items-center gap-x-10">
       <Link href="/">
         <Image src="/Logo.png" alt="logo" width={47} height={47} />
       </Link>
@@ -24,6 +22,20 @@ const Footer = ({ position }: { position: 'sticky' | 'fixed' }) => {
           <FaInstagram size={30} style={{ color: "#BEBEBE" }} />
         </Link>
       </div>
+    </div>
+  )
+}
+
+const Footer = ({ className, height }: { className?: string, height: string }) => {
+  return (
+    <footer
+      className={cn(className)}
+      style={{
+        height,
+        transform : "translateY(-100%)"
+      }}
+    >
+      <FooterInner />
     </footer>
   )
 }

@@ -42,15 +42,17 @@ const SessionBadge = ({ session }: { session: Session }) => {
 
 const StatusBadge = ({ status }: { status: TeamStatus }) => {
   const className = status === "모집 완료" ?
-  "bg-red-100 border-destructive text-destructive font-bold"
+  "bg-red-100 border-destructive text-destructive "
   :
-  "bg-green-100 border-green-600 text-green-600 font-bold"
+  "bg-green-100 border-green-600 text-green-600 "
   return (
-    <Badge
-      variant="outline"
-      className={cn(className, "border rounded-lg")}>
-      {status}
-    </Badge>
+    <div className="flex justify-center">
+      <Badge
+        variant="outline"
+        className={cn(className, "border rounded-lg font-bold")}>
+        {status}
+      </Badge>
+    </div>
   )
 }
 
@@ -90,7 +92,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "status",
-    header: ({ column }) => <SortButton column={column}>모집상태</SortButton>,
+    header: ({ column }) => <div className="w-full flex justify-center"><SortButton column={column}>모집상태</SortButton></div>,
     cell: ({ row }) => {
       const status: TeamStatus = row.original.requiredSessions.length === 0 ? "모집 완료" : "모집 중"
       return (
