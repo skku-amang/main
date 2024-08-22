@@ -10,13 +10,13 @@ import Link from "next/link";
 
 interface PerformanceDetailProp {
   params: {
-    performanceId: number
+    id: number
   }
 }
 
 const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
-  const { performanceId } = params
-  const performance = createPerformance(performanceId)
+  const { id } = params
+  const performance = createPerformance(id)
   // const rows: TeamColumn[] = performance.teams
   const relatedPerformances = generateDummys(3, createPerformance)
 
