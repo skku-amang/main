@@ -4,7 +4,7 @@ import { FaYoutube } from "react-icons/fa";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-const Footer = ({ position }: { position: 'sticky' | 'fixed' }) => {
+const Footer = ({ position }: { position: "static" | "relative" | "absolute" | "fixed" | "sticky" }) => {
   return (
     <footer
       className={cn(position, "w-full bottom-0 flex justify-center h-24 items-center gap-x-10")}

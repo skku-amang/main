@@ -3,7 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import NavLink from "@/components/common/NavLink"
 
-const Header = ({ position }: { position: 'sticky' | 'fixed' }) => {
+const Header = ({ position }: { position: "static" | "relative" | "absolute" | "fixed" | "sticky" }) => {
   const menuItems: { text: string, href: string }[] = [
     { text: "공지사항", href: "/notices" },
     { text: "공연팀 생성", href: "/teams/create"},
