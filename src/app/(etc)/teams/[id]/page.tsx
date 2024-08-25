@@ -1,6 +1,5 @@
 import React from 'react'
 
-import ImageLoader from '@/components/common/ImageLoader'
 import MemberSessionTable from '@/components/TeamDetail/MemberSessionTable'
 import SongInfo from '@/components/TeamDetail/SongInfo'
 import TeamInfo from '@/components/TeamDetail/TeamInfo'

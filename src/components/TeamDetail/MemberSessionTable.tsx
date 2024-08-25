@@ -1,9 +1,39 @@
+'use client'
+
+import { SubmitHandler, useForm } from "react-hook-form"
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { MemberSession, Team } from '../../../types/Team'
 import { User } from '../../../types/User'
-import SessionApplyBuuton from './SessionApplyButton'
+import { Button } from '../ui/button'
+import { Input } from "../ui/input"
+
+interface FormData {
+  teamId: number
+  sessionId: number
+  sessionMemberIndex: number
+}
+
+const SubmitButton = ({ teamId, sessionId, sessionMemberIndex }: FormData) => {
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>({
+    defaultValues: { teamId, sessionId, sessionMemberIndex }
+  })
+
+  return (
+    <form onSubmit={handleSubmit(async (data) => {
+      console.log(data)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+    })}>
+      <Input type="hidden" {...register('teamId' )} />
+      <Input type="hidden" {...register('sessionId' )} />
+      <Input type="hidden" {...register('sessionMemberIndex' )} />
+
+      <Button type="submit" disabled={isSubmitting}>등록</Button>
+    </form>
+  )
+}
 
 interface MemberSessionTableRowProps {
   team: Team
@@ -25,15 +55,9 @@ const MemberSessionTableRow = ({ team, memberSession, largestRequiredMemberCount
           {index < memberSession.members.length ? (
             memberName(memberSession.members[index])
           ) : index < memberSession.requiredMemberCount ? (
-            <SessionApplyBuuton
-              key={`${memberSession.session.id}-${index}`}
-              team={team}
-              session={memberSession.session}
-              sessionIndex={index}
-              existingUser={memberSession.members[index]}
-              user={leader} />  // TODO: 임시로 leader으로 설정함, 추후에 실제 현재 사용자로 변경 요망
+            <SubmitButton teamId={team.id} sessionId={memberSession.session.id} sessionMemberIndex={index} />
           ) : (
-            ''
+            'X'
           )}
         </TableCell>
       ))}
