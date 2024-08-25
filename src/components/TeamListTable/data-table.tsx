@@ -83,7 +83,7 @@ export function TeamListDataTable<TValue>({
           </Button>
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

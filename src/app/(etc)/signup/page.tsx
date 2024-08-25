@@ -61,7 +61,7 @@ const Signup = () => {
             form={form}
             name="nickname"
             label="닉네임"
-            placeholder="베이스!==기타"
+            placeholder="베이스 !== 기타"
             description="개성 넘치는 닉네임을 입력해주세요."
             required={!(formSchema.shape.nickname instanceof z.ZodOptional)}
           />
