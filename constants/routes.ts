@@ -70,9 +70,9 @@ const ROUTES = {
       url: (id: string) => `/teams/${id}`
     }
   },
-  GALLERY: {
-    name: '갤러리',
-    url: '/gallery'
+  USERLIST: {
+    name: '유저목록',
+    url: '/userlist'
   },
   MYPAGE: {
     INDEX: {
