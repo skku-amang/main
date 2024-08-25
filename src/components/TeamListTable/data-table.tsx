@@ -26,13 +26,16 @@ import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { TeamColumn } from "./columns"
+import ROUTES from "../../../constants/routes"
+import { CiCirclePlus } from "react-icons/ci"
+import { TbFilter } from "react-icons/tb";
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
   data: TeamColumn[]
 }
 
-export function DataTable<TValue>({
+export function TeamListDataTable<TValue>({
   columns,
   data,
 }: DataTableProps<TValue>) {
@@ -61,7 +64,7 @@ export function DataTable<TValue>({
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="곡 검색"
+          placeholder="검색"
           value={(table.getColumn("songName")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("songName")?.setFilterValue(event.target.value)
@@ -70,8 +73,14 @@ export function DataTable<TValue>({
         />
 
         <div className="flex gap-3">
-          <Button asChild><Link href="teams/create">Create</Link></Button>
-          <Button>Filter</Button>
+          <Button asChild className="h-8 py-1 rounded-md">
+            <Link href="teams/create">
+              <CiCirclePlus size={22} />&nbsp;Create
+            </Link>
+          </Button>
+          <Button className="h-8 py-1 rounded-md">
+            <TbFilter size={22} />&nbsp;Filter
+          </Button>
         </div>
       </div>
       <div className="rounded-md border">
@@ -81,7 +90,7 @@ export function DataTable<TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="bg-gray-700 text-white font-bold">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -101,7 +110,7 @@ export function DataTable<TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:cursor-pointer"
-                  onClick={() => router.push(`teams/${row.original.id}`)}
+                  onClick={() => router.push(ROUTES.TEAM.DETAIL.url(row.original.id.toString()))}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

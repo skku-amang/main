@@ -1,17 +1,23 @@
-import { TEAMS } from "@/lib/dummy"
-import { Team } from "../../../../../types/Team"
+import React from 'react';
+import DescribeToJSX from '@/components/common/DescribeToJSX';
+import { createTeam } from '@/lib/dummy/Team';
 
-const TeamDetail = ({ params }: { params: { id: string } }) => {
-  const teamData: Team = TEAMS[+params.id]
-  if (!teamData) {
-    alert("Not Found")
-  }
-
-  return (
-    <>
-      {teamData.name}
-    </>
-  )
+interface Props {
+  params: {
+    id: number;
+  };
 }
 
-export default TeamDetail
+const TeamDetail = ({ params }: Props) => {
+  const { id } = params;
+  const team = createTeam(id)
+  
+  return (
+    <div>
+      <h2>Team ID: {id}</h2>
+      <DescribeToJSX data={team} level={0} />
+    </div>
+  );
+};
+
+export default TeamDetail;

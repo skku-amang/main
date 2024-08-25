@@ -6,13 +6,20 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import React from 'react'
 
-const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => {
+const NavLink = ({ href, children, active }: { href: string, children: React.ReactNode, active: boolean }) => {
   const pathname = usePathname()
   const parentPathname = pathname.split('/')[1]
-  const hrefWithoutSlash = href.substring(1)
+  const hrefWithoutSlash = href.replaceAll("/", "")
   const activeClass = parentPathname === hrefWithoutSlash ? 'text-primary' : 'text-gray-300'
   return (
-    <Link href={href} className={cn('flex items-center font-extrabold hover:text-primary', activeClass)}>
+    <Link
+      href={href}
+      aria-disabled={!active}
+      tabIndex={active ? undefined : -1}
+      style={{
+        pointerEvents: active ? 'auto' : 'none'
+      }}
+      className={cn('flex items-center font-extrabold hover:text-primary', activeClass)}>
       {children}
     </Link>
   )
