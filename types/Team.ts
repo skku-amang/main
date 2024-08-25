@@ -11,6 +11,8 @@ export type Team = {
   performance: Performance
   song: Song
   is_freshmanFixed: boolean
+  posterImage?: string
+  youtubeVideo?: string     // 아망 공식 홈페이지 유튜브 영상
 }
 
 export type Song = {
@@ -20,6 +22,6 @@ export type Song = {
   cover_artist?: string
   original_url: string
   cover_url?: string
-  satisfied_sessions: Session[]   // 이거 Map<Session, User>으로 해야 하는거 아님?
+  satisfied_sessions: Session[]
   unsatisfied_sessions: Session[]
 }

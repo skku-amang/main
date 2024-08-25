@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { Performance } from "../../../types/Performance";
+import { Performance, PerformanceStatus } from "../../../types/Performance";
 
 export const createPerformance = (id: number): Performance => {
   const HOUR = 60 * 60 * 1000
@@ -13,6 +13,7 @@ export const createPerformance = (id: number): Performance => {
     representativeImage: faker.image.url(),
     location: faker.location.streetAddress(),
     start_datetime,
-    end_datetime
+    end_datetime,
+    status: faker.helpers.arrayElement(PerformanceStatus)
   };
 };
