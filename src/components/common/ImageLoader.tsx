@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
+
 import { cn } from '@/lib/utils';
 
 function ImageLoader({ src, alt, className }: { src: string, alt: string, className?: string }) {

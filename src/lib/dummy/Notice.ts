@@ -1,12 +1,12 @@
-import { faker } from "@faker-js/faker";
 import { Notice } from "../../../types/Notice";
+import { customFaker } from ".";
 import { createUser } from "./User";
 
 export const createNotice = (id: number): Notice => ({
   id,
-  title: faker.lorem.sentence(),
-  content: faker.lorem.paragraphs(),
+  title: customFaker.lorem.sentence(),
+  content: customFaker.lorem.paragraphs(),
   author: createUser(id),
-  createdDatetime: faker.date.past(),
-  editedDatetime: faker.date.recent(),
+  createdDatetime: customFaker.date.past(),
+  editedDatetime: customFaker.date.recent(),
 });

@@ -1,14 +1,16 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Session } from "../../../types/Session"
-import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
-import { Badge } from "../ui/badge"
 import Link from "next/link"
-import { MdOpenInNew } from "react-icons/md"
-import { cn } from "@/lib/utils"
 import React from "react"
+import { MdOpenInNew } from "react-icons/md"
+
+import { cn } from "@/lib/utils"
+
+import { Session } from "../../../types/Session"
+import { Badge } from "../ui/badge"
+import { Button } from "../ui/button"
 
 type TeamStatus = "모집 완료" | "모집 중"
 export type TeamColumn = {
@@ -16,7 +18,7 @@ export type TeamColumn = {
   songName: string
   songArtist: string
   leaderName: string
-  requiredSessions: Session[]
+  // requiredSessions: Session[]
   cover_url: string
   is_freshmanFixed: boolean
 }
@@ -80,26 +82,26 @@ export const columns: ColumnDef<TeamColumn>[] = [
         </div>
     ),
   },
-  {
-    accessorKey: "requiredSessions",
-    header: "필요 세션",
-    cell: ({ row }) => {
-      const requiredSessions = row.getValue("requiredSessions") as Session[]
-      return <div className="flex justify-start text-right font-medium gap-1">{requiredSessions.map((session) => (
-        <SessionBadge key={session.name} session={session} />
-      ))}</div>
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => <div className="w-full flex justify-center"><SortButton column={column}>모집상태</SortButton></div>,
-    cell: ({ row }) => {
-      const status: TeamStatus = row.original.requiredSessions.length === 0 ? "모집 완료" : "모집 중"
-      return (
-        <StatusBadge status={status}/>
-      )
-    },
-  },
+  // {
+  //   accessorKey: "requiredSessions",
+  //   header: "필요 세션",
+  //   cell: ({ row }) => {
+  //     const requiredSessions = row.getValue("requiredSessions") as Session[]
+  //     return <div className="flex justify-start text-right font-medium gap-1">{requiredSessions.map((session) => (
+  //       <SessionBadge key={session.name} session={session} />
+  //     ))}</div>
+  //   },
+  // },
+  // {
+  //   accessorKey: "status",
+  //   header: ({ column }) => <div className="w-full flex justify-center"><SortButton column={column}>모집상태</SortButton></div>,
+  //   cell: ({ row }) => {
+  //     const status: TeamStatus = row.original.requiredSessions.length === 0 ? "모집 완료" : "모집 중"
+  //     return (
+  //       <StatusBadge status={status}/>
+  //     )
+  //   },
+  // },
   {
     accessorKey: "cover_url",
     header: "영상링크",

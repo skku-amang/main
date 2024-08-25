@@ -1,11 +1,13 @@
-import { TeamListDataTable } from "@/components/TeamListTable/data-table"
-import { columns, TeamColumn } from "@/components/TeamListTable/columns"
-import { generateDummys } from "@/lib/dummy"
-import { createTeam } from "@/lib/dummy/Team"
-import { createPerformance } from "@/lib/dummy/Performance"
-import { Badge } from "@/components/ui/badge"
-import ROUTES from "../../../../constants/routes"
 import Link from "next/link"
+
+import { columns, TeamColumn } from "@/components/TeamListTable/columns"
+import { TeamListDataTable } from "@/components/TeamListTable/data-table"
+import { Badge } from "@/components/ui/badge"
+import { generateDummys } from "@/lib/dummy"
+import { createPerformance } from "@/lib/dummy/Performance"
+import { createTeam } from "@/lib/dummy/Team"
+
+import ROUTES from "../../../../constants/routes"
 
 const TEAMS = generateDummys(45, createTeam)
 const rows: TeamColumn[] = TEAMS.map((team) => ({
@@ -13,7 +15,7 @@ const rows: TeamColumn[] = TEAMS.map((team) => ({
   songName: team.song.name,
   songArtist: team.song.artist,
   leaderName: team.leader.name,
-  requiredSessions: team.song.unsatisfied_sessions,
+  // requiredSessions: team.song.unsatisfied_sessions,
   cover_url: team.song.cover_url ?? team.song.original_url,
   is_freshmanFixed: team.is_freshmanFixed
 }))

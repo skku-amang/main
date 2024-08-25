@@ -122,13 +122,6 @@ class YoutubeVideo {
     return `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
   }
 
-  public static getEmbedHTML(videoId: string, options?: YoutubeVideoHTML, style?: string) {
-    const optionsStr = Object.entries(options || {})
-      .map(([key, value]) => `${key}=${value}`)
-      .join(' ');
-    return <YoutubePlayer videoId={videoId} />
-  }
-
   /**
    * 
    * @example

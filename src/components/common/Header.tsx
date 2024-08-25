@@ -1,7 +1,9 @@
-import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
+
 import NavLink from "@/components/common/NavLink"
+import { cn } from "@/lib/utils"
+
 import ROUTES from "../../../constants/routes"
 
 export const HeaderInner = () => {
