@@ -1,0 +1,82 @@
+
+.login-image-container {
+    position: relative; /* 내부 절대 위치 요소의 기준 */
+    display: flex; /* Flexbox를 사용하여 정렬 */
+    justify-content: center; /* 가로 방향 가운데 정렬 */
+    align-items: center; /* 세로 방향 가운데 정렬 */
+    height: 100vh; /* 뷰포트의 전체 높이 설정 */
+    width: 100vw; /* 뷰포트의 전체 너비 설정 */
+  }
+  
+  .login-rectangular {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0;
+    width: 1152px; 
+    height: 698px; 
+    margin: auto; 
+    z-index: 1; 
+  }
+  
+  .login-image {
+    position: absolute; 
+    z-index: 2; 
+    left: 16.6%; 
+    top: 60px;
+    height: 570px;
+    bottom: 120px;
+    width: 33%;
+  }
+  
+  .login-bar {
+    z-index: 3;
+    position: absolute;
+    top: 174px;
+    left: 65.3%; 
+  }
+  
+  #login_text {
+    z-index: 4;
+    position: absolute;
+    top: 125px; 
+    left: 65%; 
+  }
+  
+  .styled-input {
+    z-index: 4;
+    width: 368px;
+    padding: 15px;
+    margin-bottom: 30px;
+    border-radius: 30px; 
+    border: 1px solid #f8f8f8;
+    font-size: 16px;
+    background-color: #f8f8f8; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .login-form{
+    z-index: 5;
+    margin-left: 530px;
+    margin-bottom: 50px;
+  }
+  
+  .styled-button {
+    z-index: 4;
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 30px; 
+    background-color: #47448a; 
+    color: #ffffff; 
+    font-size: 16px;
+    font-weight: 700; 
+    border: none;
+    cursor: pointer; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .styled-button:hover {
+    background-color: #363377; 
+  }
+  
