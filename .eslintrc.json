@@ -1,12 +1,18 @@
 {
-  "extends": ["next/core-web-vitals", "prettier"],
-  "plugins": ["simple-import-sort", "unused-imports"],
+  "extends": [
+    "eslint:recommended",
+    "next/core-web-vitals", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "simple-import-sort",
+    "unused-imports"
+  ],
   "rules": {
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "unused-imports/no-unused-imports": "error"
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
+    "no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "unused-imports/no-unused-imports": "warn"
   },
   "parserOptions": {
     "sourceType": "module",
