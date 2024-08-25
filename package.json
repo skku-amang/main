@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -35,6 +34,7 @@
     "zod-form-data": "^2.0.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
