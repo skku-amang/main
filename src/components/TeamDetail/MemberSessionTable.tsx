@@ -1,6 +1,6 @@
 'use client'
 
-import { SubmitHandler, useForm } from "react-hook-form"
+import { useForm } from 'react-hook-form'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -8,7 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { MemberSession, Team } from '../../../types/Team'
 import { User } from '../../../types/User'
 import { Button } from '../ui/button'
-import { Input } from "../ui/input"
+import { Input } from '../ui/input'
+import { useState } from 'react'
+import { FaSpinner } from 'react-icons/fa'
 
 interface FormData {
   teamId: number
@@ -16,21 +18,39 @@ interface FormData {
   sessionMemberIndex: number
 }
 
-const SubmitButton = ({ teamId, sessionId, sessionMemberIndex }: FormData) => {
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>({
+interface SubmitButtonProps {
+  teamId: number
+  sessionId: number
+  sessionMemberIndex: number
+  initialMode: 'signup' | 'cancel'
+}
+
+const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: SubmitButtonProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting }
+  } = useForm<FormData>({
     defaultValues: { teamId, sessionId, sessionMemberIndex }
   })
 
-  return (
-    <form onSubmit={handleSubmit(async (data) => {
-      console.log(data)
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-    })}>
-      <Input type="hidden" {...register('teamId' )} />
-      <Input type="hidden" {...register('sessionId' )} />
-      <Input type="hidden" {...register('sessionMemberIndex' )} />
+  const [mode, setMode] = useState<'signup' | 'cancel'>(initialMode)
 
-      <Button type="submit" disabled={isSubmitting}>등록</Button>
+  async function onSubmit(data: FormData) {
+    console.log(data)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    setMode(mode === 'signup' ? 'cancel' : 'signup')
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Input type="hidden" {...register('teamId')} />
+      <Input type="hidden" {...register('sessionId')} />
+      <Input type="hidden" {...register('sessionMemberIndex')} />
+
+      <Button type="submit" disabled={isSubmitting} variant={mode === 'signup' ? 'default' : 'destructive'}>
+        {isSubmitting ? <FaSpinner className='animate-spin' /> : mode === 'signup' ? '참가' : '탈퇴'}
+      </Button>
     </form>
   )
 }
@@ -42,8 +62,20 @@ interface MemberSessionTableRowProps {
   leader: User
 }
 
-const MemberSessionTableRow = ({ team, memberSession, largestRequiredMemberCount, leader }: MemberSessionTableRowProps) => {
+const MemberSessionTableRow = ({
+  team,
+  memberSession,
+  largestRequiredMemberCount,
+  leader
+}: MemberSessionTableRowProps) => {
   const memberName = (member: User) => (member.id === leader.id ? `${member.name}(리더)` : member.name)
+  const isOccupied = (index: number, memberSession: MemberSession) => index < memberSession.members.length
+  const isApplied = (index: number, memberSession: MemberSession) => {
+    // const currentUserId = 1;  // TODO: 나중에 로그인 한 유저로 수정
+    // return memberSession.members[index].id === currentUserId
+    return index === 1 // 일단은 두번째 유저를 신청한 것으로 가정
+  }
+  const isMissing = (index: number, memberSession: MemberSession) => index < memberSession.requiredMemberCount
 
   return (
     <TableRow>
@@ -52,10 +84,24 @@ const MemberSessionTableRow = ({ team, memberSession, largestRequiredMemberCount
       </TableCell>
       {Array.from({ length: largestRequiredMemberCount }, (_, index) => (
         <TableCell key={index} className="text-center">
-          {index < memberSession.members.length ? (
-            memberName(memberSession.members[index])
-          ) : index < memberSession.requiredMemberCount ? (
-            <SubmitButton teamId={team.id} sessionId={memberSession.session.id} sessionMemberIndex={index} />
+          {isOccupied(index, memberSession) ? (
+            isApplied(index, memberSession) ? (
+              <SubmitButton
+                teamId={team.id}
+                sessionId={memberSession.session.id}
+                sessionMemberIndex={index}
+                initialMode="cancel"
+              />
+            ) : (
+              memberName(memberSession.members[index])
+            )
+          ) : isMissing(index, memberSession) ? (
+            <SubmitButton
+              teamId={team.id}
+              sessionId={memberSession.session.id}
+              sessionMemberIndex={index}
+              initialMode="signup"
+            />
           ) : (
             'X'
           )}
