@@ -23,7 +23,10 @@ const SongInfo = ({ song }: { song: Song }) => {
         {song.cover_url ?
           <YoutubePlayer
             videoId={videoId}
-            width="100%" height="100%"
+            width="100%"
+            style={{
+              aspectRatio: '16/9',
+            }}
             className='rounded-2xl shadow-black shadow-lg' />
           :
           <FaMusic size={24} />

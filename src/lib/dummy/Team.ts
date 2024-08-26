@@ -25,7 +25,7 @@ export const createTeam = (id: number): Team => ({
   performance: createPerformance(id),
   song: createSong(),
   is_freshmanFixed: customFaker.datatype.boolean(),
-  posterImage: Math.random() < 0.3 ? undefined : customFaker.image.url(), // 30% 확률로 이미지 없음
+  posterImage: Math.random() < 0.0 ? undefined : customFaker.image.url(), // 30% 확률로 이미지 없음
   youtubeVideo: "https://youtu.be/oL68OY4Lll0?si=LTsLdWpr7Qr7YU9j",    // 24-1 뜨여밤
   memberSessions: createMemberSessions()
 });

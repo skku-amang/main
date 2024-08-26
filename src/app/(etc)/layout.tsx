@@ -1,12 +1,15 @@
 import "@/app/globals.css";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google"
 import React from "react";
 
 import HeightPopulatedBody from "@/components/common/HeightPopulatedBody";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
 
 export const metadata: Metadata = {
   title: "AMANG",
@@ -26,9 +29,9 @@ export default function RootLayout({
       <HeightPopulatedBody
         headerHeight="4rem"
         footerHeight="5rem"
-        className={inter.className}
+        className={fontSans.className}
       >
-        <div className="container">
+        <div className="container px-1 md:px-2 lg:px-3">
           {children}
         </div>
       </HeightPopulatedBody>

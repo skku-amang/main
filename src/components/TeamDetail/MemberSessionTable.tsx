@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaSpinner } from 'react-icons/fa'
 
@@ -101,7 +101,8 @@ const MemberSessionTableRow = ({
   largestRequiredMemberCount,
   leader
 }: MemberSessionTableRowProps) => {
-  const memberName = (member: User) => (member.id === leader.id ? `${member.name}(리더)` : member.name)
+  const memberName = (member: User) => (member.id === leader.id ? <>{member.name}<br/>(팀장)</> : member.name)
+
   const isOccupied = (index: number, memberSession: MemberSession) => index < memberSession.members.length
   const isApplied = (index: number, memberSession: MemberSession) => {
     // const currentUserId = 1;  // TODO: 나중에 로그인 한 유저로 수정
@@ -110,13 +111,16 @@ const MemberSessionTableRow = ({
   }
   const isMissing = (index: number, memberSession: MemberSession) => index < memberSession.requiredMemberCount
 
+  const cellClassName = "px-1"
+
   return (
     <TableRow>
-      <TableCell>
-        {memberSession.session.name}({memberSession.members.length}/{memberSession.requiredMemberCount})
+      <TableCell className={cellClassName}>
+        {memberSession.session.name}<br/>
+        ({memberSession.members.length}/{memberSession.requiredMemberCount})
       </TableCell>
       {Array.from({ length: largestRequiredMemberCount }, (_, index) => (
-        <TableCell key={index} className="text-center">
+        <TableCell key={index} className={cellClassName}>
           {isOccupied(index, memberSession) ? (
             isApplied(index, memberSession) ? (
               <SubmitButton
@@ -160,13 +164,13 @@ const MemberSessionTable = ({ team, memberSessions, leader }: MemberSessionTable
       <CardHeader>
         <CardTitle>멤버 목록</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table>
+      <CardContent className='px-2 lg:px-3'>
+        <Table className='text-center table-fixed rounded-t-md overflow-hidden shadow-black shadow-lg border-2'>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">세션</TableHead>
+            <TableRow className='bg-primary hover:bg-bg-primary'>
+              <TableHead className="w-[76px] text-center text-white">세션</TableHead>
               {Array.from({ length: largestRequiredMemberCount }, (_, index) => (
-                <TableHead key={index} className="text-center">
+                <TableHead key={index} className='text-center text-white'>
                   {index + 1}
                 </TableHead>
               ))}

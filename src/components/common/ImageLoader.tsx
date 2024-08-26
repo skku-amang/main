@@ -1,19 +1,23 @@
 'use client'
 
 import Image from 'next/image';
+import React from "react"
 import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
 function ImageLoader({ src, alt, className }: { src: string, alt: string, className?: string }) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [parentHeight, setParentHeight] = useState(0);
 
-  const handleImageLoad = () => {
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsImageLoaded(true);
+    console.log(e.currentTarget.naturalHeight)
+    setParentHeight(e.currentTarget.naturalHeight);
   };
 
   return (
-    <div className={cn(className, 'relative w-full h-full')}>
+    <div className={cn(className, 'relative w-full')} style={{ height: parentHeight }}>
       <Image
         src={src}
         alt={alt}

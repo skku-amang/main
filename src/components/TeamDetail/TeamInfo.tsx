@@ -22,10 +22,8 @@ const TeamInfo = ({ team }: TeamDescriptionProps) => {
       <CardContent>
         {/* 팀 포스터 */}
         {team.posterImage && (
-          <div className="flex col-span-1 lg:col-span-2 items-center justify-center">
-            <div className="h-96 w-96">
-              <ImageLoader alt={`${team.name} 사진`} src={team.posterImage} className="rounded-lg shadow-2xl" />
-            </div>
+          <div className="mb-3 lg:mb-6 rounded-lg shadow-xl overflow-hidden">
+            <ImageLoader alt={`${team.name} 사진`} src={team.posterImage} />
           </div>
         )}
 
