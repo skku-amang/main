@@ -1,16 +1,24 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { FaSpinner } from 'react-icons/fa'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { MemberSession, Team } from '../../../types/Team'
 import { User } from '../../../types/User'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
-import { useState } from 'react'
-import { FaSpinner } from 'react-icons/fa'
 
 interface FormData {
   teamId: number
@@ -34,6 +42,7 @@ const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: Su
     defaultValues: { teamId, sessionId, sessionMemberIndex }
   })
 
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [mode, setMode] = useState<'signup' | 'cancel'>(initialMode)
 
   async function onSubmit(data: FormData) {
@@ -43,15 +52,39 @@ const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: Su
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Input type="hidden" {...register('teamId')} />
-      <Input type="hidden" {...register('sessionId')} />
-      <Input type="hidden" {...register('sessionMemberIndex')} />
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Input type="hidden" {...register('teamId')} />
+        <Input type="hidden" {...register('sessionId')} />
+        <Input type="hidden" {...register('sessionMemberIndex')} />
 
-      <Button type="submit" disabled={isSubmitting} variant={mode === 'signup' ? 'default' : 'destructive'}>
-        {isSubmitting ? <FaSpinner className='animate-spin' /> : mode === 'signup' ? '참가' : '탈퇴'}
-      </Button>
-    </form>
+        {mode === 'signup' && (
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <FaSpinner className="animate-spin" /> : '신청'}
+          </Button>
+        )}
+        {mode === "cancel" && 
+          <Dialog open={dialogOpen} defaultOpen={false} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button type="button" disabled={isSubmitting} variant="destructive">
+                {isSubmitting ? <FaSpinner className="animate-spin" /> : "탈퇴"}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>정말로 탈퇴하시겠습니까?</DialogTitle>
+                <Button type="submit" disabled={isSubmitting} variant="destructive" onClick={handleSubmit(onSubmit)}>
+                  {isSubmitting ? <FaSpinner className="animate-spin" /> : "ㄹ?ㅇ"}
+                </Button>
+              </DialogHeader>
+              <DialogDescription>
+                선착순으로 모집되기에 탈퇴 시 다른 참가자가 참여할 수 있습니다.
+              </DialogDescription>
+            </DialogContent>
+          </Dialog>
+        }
+      </form>
+    </>
   )
 }
 
