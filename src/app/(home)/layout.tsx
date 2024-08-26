@@ -1,7 +1,9 @@
+import "@/app/globals.css";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "@/app/globals.css";
 import React from "react";
+
 import HeightPopulatedBody from "@/components/common/HeightPopulatedBody";
 import { cn } from "@/lib/utils";
 

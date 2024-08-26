@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React from 'react'
 
 import { cn } from '@/lib/utils'
-import React from 'react'
 
 const NavLink = ({ href, children, active }: { href: string, children: React.ReactNode, active: boolean }) => {
   const pathname = usePathname()
