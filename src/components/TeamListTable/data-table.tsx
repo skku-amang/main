@@ -1,18 +1,23 @@
 "use client"
 
-import { useState } from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { CiCirclePlus } from "react-icons/ci"
+import { TbFilter } from "react-icons/tb";
 
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -21,14 +26,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
-import { Button } from "../ui/button"
-import Link from "next/link"
-import { TeamColumn } from "./columns"
+
 import ROUTES from "../../../constants/routes"
-import { CiCirclePlus } from "react-icons/ci"
-import { TbFilter } from "react-icons/tb";
+import { Button } from "../ui/button"
+import { TeamColumn } from "./columns"
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
@@ -83,7 +84,7 @@ export function TeamListDataTable<TValue>({
           </Button>
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

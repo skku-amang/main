@@ -1,15 +1,15 @@
 'use client'
 
-import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import SimpleLabel from "@/components/common/Form/SimpleLabel"
 import SimpleStringField from "@/components/common/Form/SimpleStringField"
 import { Button } from "@/components/ui/button"
-import dummySessions from "@/lib/dummy/Session"
 import { Checkbox } from "@/components/ui/checkbox"
-import SimpleLabel from "@/components/common/Form/SimpleLabel"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import dummySessions from "@/lib/dummy/Session"
 
 const sessions = dummySessions
 
@@ -61,7 +61,7 @@ const Signup = () => {
             form={form}
             name="nickname"
             label="닉네임"
-            placeholder="베이스!==기타"
+            placeholder="베이스 !== 기타"
             description="개성 넘치는 닉네임을 입력해주세요."
             required={!(formSchema.shape.nickname instanceof z.ZodOptional)}
           />

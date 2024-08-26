@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FaInstagram } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
-import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 
 export const FooterInner = () => {

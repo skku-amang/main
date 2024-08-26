@@ -1,12 +1,14 @@
-import { createPerformance } from "@/lib/dummy/Performance"
 import Image from "next/image"
+import Link from "next/link";
 import { FaClock } from "react-icons/fa";
 import { IoLocationSharp } from "react-icons/io5";
-import TeamList from "../../teams/page";
+
 import { Badge } from "@/components/ui/badge";
 import { generateDummys } from "@/lib/dummy";
+import { createPerformance } from "@/lib/dummy/Performance"
+
 import ROUTES from "../../../../../constants/routes";
-import Link from "next/link";
+import TeamList from "../../teams/page";
 
 interface PerformanceDetailProp {
   params: {

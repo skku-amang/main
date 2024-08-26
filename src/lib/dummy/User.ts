@@ -1,15 +1,15 @@
-import { faker } from "@faker-js/faker";
 import { User } from "../../../types/User";
-import { getRandomSessions } from "./Session";
+import { customFaker } from ".";
 import dummyGenerations from "./Generation";
+import dummySessions from "./Session";
 
 export const createUser = (id: number): User => ({
   id,
-  name: faker.person.fullName(),
-  nickname: faker.internet.userName(),
-  email: faker.internet.email(),
-  bio: faker.lorem.sentence(),
-  profile_image: faker.image.avatar(),
-  generation: faker.helpers.arrayElement(dummyGenerations),
-  sessions: getRandomSessions(),
+  name: customFaker.person.fullName(),
+  nickname: customFaker.internet.userName(),
+  email: customFaker.internet.email(),
+  bio: customFaker.lorem.sentence(),
+  profile_image: customFaker.image.avatar(),
+  generation: customFaker.helpers.arrayElement(dummyGenerations),
+  sessions: customFaker.helpers.arrayElements(dummySessions, { min: 1, max: 3 }),
 })

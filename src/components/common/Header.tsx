@@ -1,7 +1,9 @@
-import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
+
 import NavLink from "@/components/common/NavLink"
+import { cn } from "@/lib/utils"
+
 import ROUTES from "../../../constants/routes"
 
 export const HeaderInner = () => {
@@ -44,7 +46,7 @@ export const HeaderInner = () => {
 const Header = ({ position, height }: { position: 'sticky' | 'fixed', height: string }) => {
   return (
     <header
-      className={cn(position, "w-full flex justify-center top-0 backdrop-blur")}
+      className={cn(position, "w-full flex justify-center top-0 backdrop-blur z-10")}
       style={{ height }}
     >
       <HeaderInner />

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import ROUTES from "../../../../constants/routes"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
+import ROUTES from "../../../../constants/routes"
 import { User } from "../../../../types/User"
 
 const NoticeCard = ({ title, author, createdDatetime }: { title: string, author: User, createdDatetime: Date}) => {
@@ -22,7 +24,7 @@ const NoticeCard = ({ title, author, createdDatetime }: { title: string, author:
         <p>Card Content</p>
       </CardContent>
       <CardFooter>
-        <p>Card Footer</p>
+        <p>{createdDatetime.toString()}</p>
       </CardFooter>
     </Card>
   )
