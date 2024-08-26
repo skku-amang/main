@@ -1,5 +1,3 @@
-import YoutubePlayer from './Player';
-
 export interface YoutubeVideoInfo {
   author_name: string;
   thumbnail_url: string;
