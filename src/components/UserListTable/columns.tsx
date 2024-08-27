@@ -48,11 +48,36 @@ export const columns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: "requiredSessions",
+    accessorKey: "sessions",
     header: "세션",
     cell: ({ row }) => {
-      const UserSessions  = row.getValue("sessions") as Session[]
-      return <div className="flex justify-start text-right font-medium gap-1">{row.original.sessions.name}</div>
+      const UserSessions  = row.getValue("sessions") as Session[];
+      return <div className="flex justify-start text-right font-medium gap-1">{UserSessions.map((session) => (
+        <SessionBadge key={session.name} session={session} />
+      ))}</div>
+    },
+  },
+  {
+    accessorKey: "genre",
+    header: "선호 장르",
+    cell: ({ row }) => {
+      return <div className="flex justify-start text-right font-medium gap-1"> 
+        <Badge className="p-2 px-3 bg-slate-200 text-black">
+          {row.original.genre}
+        </Badge>
+      </div>
+    },
+  },
+  {
+    accessorKey: "artist_like",
+    header: "최애 아티스트",
+    cell: ({ row }) => {
+      return <div className="flex justify-start text-right font-medium gap-1"> 
+        <div>
+          {row.original.artist_like}
+        </div>
+      </div>
     },
   }
-]
+];
+

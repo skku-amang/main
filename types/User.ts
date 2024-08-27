@@ -10,4 +10,6 @@ export type User = {
   profile_image: string
   generation: Generation
   sessions: Session[]
+  genre: string,
+  artist_like: string
 }

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { User } from "../../../types/User";
-import { getRandomSessions } from "./Session";
+import { getRandomSessions, getRandomSessions_atleast1 } from "./Session";
 import dummyGenerations from "./Generation";
 
 export const createUser = (id: number): User => ({
@@ -11,5 +11,7 @@ export const createUser = (id: number): User => ({
   bio: faker.lorem.sentence(),
   profile_image: faker.image.avatar(),
   generation: faker.helpers.arrayElement(dummyGenerations),
-  sessions: getRandomSessions(),
+  sessions: getRandomSessions_atleast1(),
+  genre: faker.music.genre(),
+  artist_like: faker.person.firstName()
 })

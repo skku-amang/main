@@ -18,7 +18,9 @@ const rows: User[] = USERS.map((user) => ({
   bio: user.bio,
   profile_image: user.profile_image,
   generation: user.generation,
-  sessions: user.sessions
+  sessions: user.sessions,
+  genre: user.genre,
+  artist_like: user.artist_like
 }))
 
 // TODO: column visible 선택 기능 -> 세션별 지원자 확인 할 수 있게

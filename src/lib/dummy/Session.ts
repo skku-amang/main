@@ -25,4 +25,18 @@ export const getRandomSessions = (): Session[] => {
   return shuffledSessions.slice(0, count);
 };
 
+export const getRandomSessions_atleast1 = (): Session[] => {
+  const random = Math.random();
+  let count = 3
+  if (random < 0.50) count = 1
+  else if (random < 0.80) count = 2
+
+  const shuffledSessions = [...dummySessions].sort(() => Math.random() - 0.5);
+  if (count === 0) {
+    return []
+  }
+  return shuffledSessions.slice(0, count);
+};
+
+
 export default dummySessions

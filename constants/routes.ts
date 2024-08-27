@@ -71,9 +71,16 @@ const ROUTES = {
     }
   },
   USERLIST: {
+    LIST:{
     name: '유저목록',
     url: '/userlist'
+    },
+    USERINFO: {
+      name: '유저 정보',
+      url: (id:string) => `/userlist/${id}`
+    }
   },
+
   MYPAGE: {
     INDEX: {
       name: '마이페이지',
