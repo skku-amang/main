@@ -29,7 +29,7 @@ const rows: User[] = USERS.map((user) => ({
 // TODO: 필터 -> Dialog로 처리
 // TODO: Pagination에서 1,2,3,4,5 등 추가
 // TODO: Primary, Secondary 색상 설정
-const TeamList = () => {
+const UserList = () => {
   const activePerformances = generateDummys(3, createPerformance)
 
   return (
@@ -46,4 +46,4 @@ const TeamList = () => {
   )
 }
 
-export default TeamList
+export default UserList

@@ -80,7 +80,6 @@ const ROUTES = {
       url: (id:string) => `/userlist/${id}`
     }
   },
-
   MYPAGE: {
     INDEX: {
       name: '마이페이지',
