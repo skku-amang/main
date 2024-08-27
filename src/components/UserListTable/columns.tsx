@@ -5,9 +5,6 @@ import { Session } from "../../../types/Session"
 import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { Badge } from "../ui/badge"
-import Link from "next/link"
-import { MdOpenInNew } from "react-icons/md"
-import { cn } from "@/lib/utils"
 import React from "react"
 import { User } from "../../../types/User"
 
@@ -49,5 +46,13 @@ export const columns: ColumnDef<User>[] = [
           {row.original.generation.order}<br/>
         </div>
     ),
+  },
+  {
+    accessorKey: "requiredSessions",
+    header: "세션",
+    cell: ({ row }) => {
+      const UserSessions  = row.getValue("sessions") as Session[]
+      return <div className="flex justify-start text-right font-medium gap-1">{row.original.sessions.name}</div>
+    },
   }
 ]
