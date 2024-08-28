@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { signOut, useSession } from 'next-auth/react'
 import React from 'react'
 import { CiSettings } from 'react-icons/ci'
 import { HiOutlineUserGroup } from 'react-icons/hi2'
@@ -14,39 +17,31 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-import { auth, signOut } from '../../../auth'
 import ROUTES from '../../../constants/routes'
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 
 interface MenuItemProps {
   icon: React.ReactNode
-  href?: string
+  href: string
   children: React.ReactNode
 }
 
 const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   return (
     <DropdownMenuItem className="p-0">
-      {href ? (
-        <Link
-          href={href}
-          className="flex h-full w-full items-center justify-start gap-x-3 p-2"
-        >
-          {icon}
-          {children}
-        </Link>
-      ) : (
-        <div className="flex h-full w-full items-center justify-start gap-x-3 p-2">
-          {icon}
-          {children}
-        </div>
-      )}
+      <Link
+        href={href}
+        className="flex h-full w-full items-center justify-start gap-x-3 p-2"
+      >
+        {icon}
+        {children}
+      </Link>
     </DropdownMenuItem>
   )
 }
 
-async function Profile() {
-  const session = await auth()
+function Profile() {
+  const { data: session } = useSession()
   const RANDOM_PROFILE_IMAGE = 'https://picsum.photos/50/50'
 
   if (!session) {
@@ -98,18 +93,13 @@ async function Profile() {
           </MenuItem>
 
           <DropdownMenuSeparator />
-          <MenuItem icon={<IoIosLogOut size={iconSize} />}>
-            <form
-              action={async () => {
-                'use server'
-                await signOut()
-              }}
-            >
-              <button type="submit" className="flex">
-                로그아웃
-              </button>
-            </form>
-          </MenuItem>
+          <DropdownMenuItem
+            onSelect={() => signOut()}
+            className="flex h-full w-full items-center justify-start gap-x-3 p-2 hover:cursor-pointer"
+          >
+            <IoIosLogOut size={iconSize} />
+            로그아웃
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
