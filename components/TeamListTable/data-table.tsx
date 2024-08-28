@@ -17,6 +17,8 @@ import { useState } from "react"
 import { CiCirclePlus } from "react-icons/ci"
 import { TbFilter } from "react-icons/tb";
 
+import ROUTES from "../../constants/routes"
+import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import {
   Table,
@@ -26,9 +28,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table"
-
-import ROUTES from "../../constants/routes"
-import { Button } from "../ui/button"
 import { TeamColumn } from "./columns"
 
 interface DataTableProps<TValue> {

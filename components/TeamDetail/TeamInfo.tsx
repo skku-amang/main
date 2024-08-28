@@ -1,3 +1,5 @@
+import { Team } from "../../types/Team"
+import ImageLoader from "../common/ImageLoader"
 import {
   Card,
   CardContent,
@@ -5,9 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card"
-
-import { Team } from "../../types/Team"
-import ImageLoader from "../common/ImageLoader"
 
 interface TeamDescriptionProps {
   team: Team

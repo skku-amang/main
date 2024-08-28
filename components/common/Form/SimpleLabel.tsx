@@ -1,7 +1,7 @@
 import React from "react";
 
-import { FormLabel } from "../../ui/form";
 import { cn } from "../../../lib/utils";
+import { FormLabel } from "../../ui/form";
 
 interface Prop {
   children: React.ReactNode

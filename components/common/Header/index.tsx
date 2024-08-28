@@ -1,11 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import Profile from "./Profile"
-import NavLink from "../NavLink"
-import { cn } from "../../../lib/utils"
-
 import ROUTES from "../../../constants/routes"
+import { cn } from "../../../lib/utils"
+import NavLink from "../NavLink"
+import Profile from "./Profile"
 
 export const HeaderInner = () => {
 

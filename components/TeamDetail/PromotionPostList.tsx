@@ -1,7 +1,6 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import { createUser } from '../../lib/dummy/User'
-
 import { User } from '../../types/User'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card'
 
 const PromotionPost = ({ title, content, author }: { title: string; content: string; author: User }) => {
   return (

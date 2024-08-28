@@ -1,9 +1,8 @@
 import Link from 'next/link'
 
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
-
 import { auth, signOut } from '../../../auth'
 import ROUTES from '../../../constants/routes'
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 
 const Profile = async () => {
   const session = await auth()

@@ -4,16 +4,15 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import * as React from "react"
 
+import { cn } from "../../lib/utils"
 import { Button } from "./button"
 import { Calendar } from "./calendar"
+import { FormControl } from "./form"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "./popover"
-import { cn } from "../../lib/utils"
-
-import { FormControl } from "./form"
 
 export function DatePicker({ field }: { field: any}) {
   const [date, setDate] = React.useState<Date>()

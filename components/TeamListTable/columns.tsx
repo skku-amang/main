@@ -7,7 +7,6 @@ import React from "react"
 import { MdOpenInNew } from "react-icons/md"
 
 import { cn } from "../../lib/utils"
-
 import { Session } from "../../types/Session"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
