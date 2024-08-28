@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { match } from 'path-to-regexp'
 
-import { auth } from '@/../auth'
+import { auth } from '@/auth'
 
 import ROUTES from './constants/routes'
 
