@@ -105,7 +105,7 @@ export function UserListDataTable<TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:cursor-pointer"
-                  onClick={() => router.push(ROUTES.USERLIST.USERINFO.url(row.original.id.toString()))}
+                  onClick={() => router.push(ROUTES.MEMBERS.MEMBERINFO.url(row.original.id.toString()))}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

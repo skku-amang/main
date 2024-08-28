@@ -70,14 +70,14 @@ const ROUTES = {
       url: (id: string) => `/teams/${id}`
     }
   },
-  USERLIST: {
+  MEMBERS: {
     LIST:{
     name: '유저목록',
-    url: '/userlist'
+    url: '/members'
     },
-    USERINFO: {
+    MEMBERINFO: {
       name: '유저 정보',
-      url: (id:string) => `/userlist/${id}`
+      url: (id:string) => `/members/${id}`
     }
   },
   MYPAGE: {
