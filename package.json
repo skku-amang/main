@@ -25,6 +25,8 @@
     "github-label-sync": "^2.3.1",
     "lucide-react": "^0.424.0",
     "next": "14.2.5",
+    "next-auth": "^5.0.0-beta.20",
+    "path-to-regexp": "^7.1.0",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
