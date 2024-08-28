@@ -14,11 +14,11 @@ const ProfilePage = async () => {
 
   return (
     <div>
-      <h1>마이 페이지</h1>
+      <h1>프로필 페이지</h1>
 
       <div>
         <h3>로그인된 유저 확인</h3>
-        
+
         <p>{session.user?.email}</p>
         <p>{session.user?.name}</p>
       </div>

@@ -1,36 +1,48 @@
 'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import SimpleLabel from "../../../components/common/Form/SimpleLabel"
-import SimpleStringField from "../../../components/common/Form/SimpleStringField"
-import { Button } from "../../../components/ui/button"
-import { Checkbox } from "../../../components/ui/checkbox"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form"
-import dummySessions from "../../../lib/dummy/Session"
+import {
+  emailSchema,
+  nameSchema,
+  nicknameSchema,
+  passwordSchema
+} from '@/constants/zodSchema'
+
+import SimpleLabel from '../../../components/common/Form/SimpleLabel'
+import SimpleStringField from '../../../components/common/Form/SimpleStringField'
+import { Button } from '../../../components/ui/button'
+import { Checkbox } from '../../../components/ui/checkbox'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '../../../components/ui/form'
+import dummySessions from '../../../lib/dummy/Session'
 
 const sessions = dummySessions
 
-const passwordRegex =
-  /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d!@$%&*?]$/;
 const formSchema = z.object({
-  name: z.string({ required_error: "필수 항목" }).min(2, { message: "최소 2자" }).max(4, { message: "최대 4자" }),
-  nickname: z.string({ required_error: "필수 항목" }).min(2, { message: "최소 2자" }).max(4, { message: "최대 10자" }),
-  email: z.string().email({ message: "올바른 이메일 형식을 입력해주세요 "}).optional(),
-  sessions: z.array(z.string()).min(1, {
-    message: "최소 1개의 세션을 선택해주세요.",
-  }).refine((value) => value.some((item) => item)),
-  password: z
-    .string({ required_error: "필수 항목" })
-    .min(8, { message: "8자리 이상 입력해 주세요." })
-    .max(20, { message: "20자리 이하 입력해 주세요." })
-    .regex(passwordRegex, {
-      message: "영문, 숫자를 모두 조합해 주세요.",
-    }),
+  name: nameSchema,
+  nickname: nicknameSchema,
+  email: emailSchema,
+  sessions: z
+    .array(z.string())
+    .min(1, {
+      message: '최소 1개의 세션을 선택해주세요.'
+    })
+    .refine((value) => value.some((item) => item)),
+  password: passwordSchema,
   confirmPassword: z
-    .string({ required_error: "필수 항목" }).min(8, { message: "8자리 이상 입력해 주세요." }).max(20, { message: "20자리 이하 입력해 주세요." })
+    .string({ required_error: '필수 항목' })
+    .min(8, { message: '8자리 이상 입력해 주세요.' })
+    .max(20, { message: '20자리 이하 입력해 주세요.' })
 })
 
 const Signup = () => {
@@ -48,7 +60,10 @@ const Signup = () => {
   return (
     <div className="container">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mb-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mb-3 w-full space-y-6"
+        >
           <SimpleStringField
             form={form}
             name="name"
@@ -76,7 +91,9 @@ const Signup = () => {
             form={form}
             name="confirmPassword"
             label="비밀번호 확인"
-            required={!(formSchema.shape.confirmPassword instanceof z.ZodOptional)}
+            required={
+              !(formSchema.shape.confirmPassword instanceof z.ZodOptional)
+            }
           />
 
           <SimpleStringField
@@ -87,14 +104,19 @@ const Signup = () => {
             required={!(formSchema.shape.email instanceof z.ZodOptional)}
           />
 
-
           <FormField
             control={form.control}
             name="sessions"
             render={() => (
               <FormItem>
                 <div>
-                  <SimpleLabel required={!(formSchema.shape.sessions instanceof z.ZodOptional)}>세션</SimpleLabel>
+                  <SimpleLabel
+                    required={
+                      !(formSchema.shape.sessions instanceof z.ZodOptional)
+                    }
+                  >
+                    세션
+                  </SimpleLabel>
                   <FormDescription>
                     연주 가능한 세션을 선택해주세요.
                   </FormDescription>
@@ -115,7 +137,10 @@ const Signup = () => {
                               checked={field.value?.includes(session.name)}
                               onCheckedChange={(checked) => {
                                 return checked
-                                  ? field.onChange([...field.value, session.name])
+                                  ? field.onChange([
+                                      ...field.value,
+                                      session.name
+                                    ])
                                   : field.onChange(
                                       field.value?.filter(
                                         (value) => value !== session.name
@@ -138,7 +163,6 @@ const Signup = () => {
           />
           <Button type="submit">회원가입</Button>
         </form>
-
       </Form>
     </div>
   )

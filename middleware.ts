@@ -1,41 +1,23 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { match } from 'path-to-regexp'
 
 import { auth } from '@/auth'
+import ROUTES from '@/constants/routes'
 
-import ROUTES from './constants/routes'
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
 
-const matchersForAuth = [
-  '/admin',
-  '/admin/*',
-  '/performances',
-  '/performances/*',
-]
-const matchersForSignIn = [
-  '/signup/*',
-  '/login/*'
-]
-
-export async function middleware(request: NextRequest) {
-  console.log(request.nextUrl.pathname)
-  // 인증이 필요한 페이지 접근 제어!
-  if (isMatch(request.nextUrl.pathname, matchersForAuth)) {
-    return (await auth()) // 세션 정보 확인
-      ? NextResponse.next()
-      : NextResponse.redirect(new URL(ROUTES.LOGIN.url, request.url))
-      // : NextResponse.redirect(new URL(`/signin?callbackUrl=${request.url}`, request.url))
+  // If the user is not logged in and is trying to access a protected route
+  if (!(await auth()) && pathname !== ROUTES.LOGIN.url) {
+    const url = req.nextUrl.clone()
+    url.pathname = ROUTES.LOGIN.url
+    url.searchParams.set('callbackUrl', req.nextUrl.pathname)
+    return NextResponse.redirect(url)
   }
-  // 인증 후 회원가입 및 로그인 접근 제어!
-  if (isMatch(request.nextUrl.pathname, matchersForSignIn)) {
-    return (await auth())
-      ? NextResponse.redirect(new URL('/', request.url))
-      : NextResponse.next()
-  }
+
   return NextResponse.next()
 }
 
-// 경로 일치 확인!
-function isMatch(pathname: string, urls: string[]) {
-  return urls.some(url => !!match(url)(pathname))
+export const config = {
+  matcher: ['/admin', '/performances', '/profile', '/teams'] // 보호된 경로를 여기에 추가
 }

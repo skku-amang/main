@@ -26,10 +26,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <SessionProvider>
         <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem" className={fontSans.className}>
-          <div className="container px-1 md:px-2 lg:px-3">{children}</div>
+          <div className="container">{children}</div>
         </HeightPopulatedBody>
       </SessionProvider>
     </html>
