@@ -1,14 +1,14 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signIn } from 'next-auth/react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { emailSchema, passwordSchema } from '@/constants/zodSchema'
-// import { FcGoogle } from 'react-icons/fc'
-import { signInWithCredentials } from '@/serverActions/auth'
 
+// import { FcGoogle } from 'react-icons/fc'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import styles from './login.module.css'
@@ -28,7 +28,7 @@ const Login = () => {
   })
 
   async function onValid(formData: z.infer<typeof formSchema>) {
-    await signInWithCredentials(formData)
+    await signIn('credentials', formData)
   }
 
   return (
