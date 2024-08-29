@@ -6,7 +6,13 @@ import { cn } from '../../../lib/utils'
 import NavLink from '../NavLink'
 import Profile from './Profile'
 
-const Header = ({ position, height }: { position: 'sticky' | 'fixed'; height: string }) => {
+const Header = ({
+  position,
+  height
+}: {
+  position: 'sticky' | 'fixed'
+  height: string
+}) => {
   const menuItems: { name: string; url: string; active: boolean }[] = [
     { name: '공지사항', url: ROUTES.NOTICE.LIST.url, active: false },
     { name: '공연목록', url: ROUTES.PERFORMANCE.LIST.url, active: true },
@@ -15,19 +21,29 @@ const Header = ({ position, height }: { position: 'sticky' | 'fixed'; height: st
   ]
 
   return (
-    <header className={cn(position, 'top-0 z-10 flex w-full h-full justify-center backdrop-blur bg-primary')} style={{ height }}>
+    <header
+      className={cn(
+        position,
+        'top-0 z-10 flex h-full w-full justify-center bg-primary backdrop-blur'
+      )}
+      style={{ height }}
+    >
       {/* Tablet & Desktop */}
-      <nav className="invisible flex w-full h-full items-center px-10 md:visible">
-        <div className="mx-auto flex w-full h-full items-center justify-between lg:w-[1280px]">
+      <nav className="invisible flex h-full w-full items-center px-10 md:visible">
+        <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
           <Link href="/">
             <Image src="/Logo.png" alt="logo" width={47} height={47} />
           </Link>
 
           {/* MenuItems */}
-          <div className="flex justify-center gap-x-24 h-full">
+          <div className="flex h-full justify-center gap-x-24">
             {menuItems.map((menuItem) => (
-              <NavLink key={menuItem.name} href={menuItem.url} active={menuItem.active}>
+              <NavLink
+                key={menuItem.name}
+                href={menuItem.url}
+                active={menuItem.active}
+              >
                 {menuItem.name}
               </NavLink>
             ))}
