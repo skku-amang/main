@@ -5,11 +5,28 @@ import { ArrowUpDown } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 import { MdOpenInNew } from "react-icons/md"
+import { useRouter } from 'next/navigation'
+import ROUTES from '@/constants/routes'
 
 import { cn } from "../../lib/utils"
 import { Session } from "../../types/Session"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import {
+  CaretSortIcon,
+  ChevronDownIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons"
 
 type TeamStatus = "모집 완료" | "모집 중"
 export type TeamColumn = {
@@ -58,6 +75,8 @@ const StatusBadge = ({ status }: { status: TeamStatus }) => {
 }
 
 
+
+
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
@@ -81,6 +100,37 @@ export const columns: ColumnDef<TeamColumn>[] = [
         </div>
     ),
   },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const payment = row.original
+
+      const router = useRouter()
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <DotsHorizontalIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end"> 
+            <DropdownMenuItem onClick={(event) =>
+              {
+              event.preventDefault();
+              }}>
+             편집하기
+            </DropdownMenuItem>
+            <DropdownMenuItem>삭제하기</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
+]
+
   // {
   //   accessorKey: "requiredSessions",
   //   header: "필요 세션",
@@ -101,12 +151,4 @@ export const columns: ColumnDef<TeamColumn>[] = [
   //     )
   //   },
   // },
-  {
-    accessorKey: "cover_url",
-    header: "영상링크",
-    cell: ({ row }) => {
-      const cover_url = row.getValue("cover_url") as string
-      return <Link href={cover_url} className="z-50"><MdOpenInNew size={24} /></Link>
-    },
-  },
-]
+  
