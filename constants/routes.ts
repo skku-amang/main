@@ -50,7 +50,7 @@ const ROUTES = {
     EDIT: {
       name: '공연 수정',
       url: (id: string) => `/performances/${id}/edit`
-    },
+    }
   },
   TEAM: {
     CREATE: {
@@ -71,13 +71,13 @@ const ROUTES = {
     }
   },
   MEMBERS: {
-    LIST:{
-    name: '유저목록',
-    url: '/members'
+    LIST: {
+      name: '유저 목록',
+      url: '/members'
     },
-    MEMBERINFO: {
-      name: '유저 정보',
-      url: (id:string) => `/members/${id}`
+    DETAIL: {
+      name: '유저 상세',
+      url: (id: string) => `/members/${id}`
     }
   },
   MYPAGE: {

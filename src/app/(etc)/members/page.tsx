@@ -1,12 +1,8 @@
-import { UserListDataTable } from "@/components/UserListTable/data-table"
-import { columns } from "@/components/UserListTable/columns"
+import { columns } from "@/components/MemberListTable/columns"
+import { MemberListDataTable } from "@/components/MemberListTable/data-table"
 import { generateDummys } from "@/lib/dummy"
-import { createTeam } from "@/lib/dummy/Team"
-import { createPerformance } from "@/lib/dummy/Performance"
-import { Badge } from "@/components/ui/badge"
-import ROUTES from "../../../../constants/routes"
-import Link from "next/link"
 import { createUser } from "@/lib/dummy/User"
+
 import { User } from "../../../../types/User"
 
 const USERS = generateDummys(45, createUser)
@@ -20,18 +16,10 @@ const rows: User[] = USERS.map((user) => ({
   generation: user.generation,
   sessions: user.sessions,
   genre: user.genre,
-  artist_like: user.artist_like
+  liked_artists: user.liked_artists
 }))
 
-// TODO: column visible 선택 기능 -> 세션별 지원자 확인 할 수 있게
-// TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
-// TODO: column 너비 조절
-// TODO: 필터 -> Dialog로 처리
-// TODO: Pagination에서 1,2,3,4,5 등 추가
-// TODO: Primary, Secondary 색상 설정
-const UserList = () => {
-  const activePerformances = generateDummys(3, createPerformance)
-
+const MemberListPage = () => {
   return (
     <div className="container">
       {/* 팀 배너 */}
@@ -41,9 +29,9 @@ const UserList = () => {
       </div>
 
       {/* 팀 목록 테이블 */}
-      <UserListDataTable columns={columns} data={rows} />
+      <MemberListDataTable columns={columns} data={rows} />
     </div>
   )
 }
 
-export default UserList
+export default MemberListPage

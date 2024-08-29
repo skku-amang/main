@@ -1,12 +1,13 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Session } from "../../../types/Session"
-import { Button } from "../ui/button"
 import { ArrowUpDown } from "lucide-react"
-import { Badge } from "../ui/badge"
 import React from "react"
+
+import { Session } from "../../../types/Session"
 import { User } from "../../../types/User"
+import { Badge } from "../ui/badge"
+import { Button } from "../ui/button"
 
 
 const SortButton = ({ column, children }: { column: any, children: React.ReactNode }) => {
@@ -69,12 +70,12 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "artist_like",
+    accessorKey: "liked_artists",
     header: "최애 아티스트",
     cell: ({ row }) => {
       return <div className="flex justify-start text-right font-medium gap-1"> 
         <div>
-          {row.original.artist_like}
+          {row.original.liked_artists}
         </div>
       </div>
     },

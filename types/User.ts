@@ -11,5 +11,5 @@ export type User = {
   generation: Generation
   sessions: Session[]
   genre: string,
-  artist_like: string
+  liked_artists: string
 }

@@ -1,18 +1,21 @@
 "use client"
 
-import { useState } from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { TbFilter } from "react-icons/tb";
 
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -21,21 +24,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
-import { Button } from "../ui/button"
-import Link from "next/link"
+
 import ROUTES from "../../../constants/routes"
-import { CiCirclePlus } from "react-icons/ci"
-import { TbFilter } from "react-icons/tb";
 import { User } from "../../../types/User"
+import { Button } from "../ui/button"
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<User, TValue>[]
   data: User[]
 }
 
-export function UserListDataTable<TValue>({
+export function MemberListDataTable<TValue>({
   columns,
   data,
 }: DataTableProps<TValue>) {
@@ -105,7 +104,7 @@ export function UserListDataTable<TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:cursor-pointer"
-                  onClick={() => router.push(ROUTES.MEMBERS.MEMBERINFO.url(row.original.id.toString()))}
+                  onClick={() => router.push(ROUTES.MEMBERS.DETAIL.url(row.original.id.toString()))}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

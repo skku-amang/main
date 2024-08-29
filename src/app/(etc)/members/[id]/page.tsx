@@ -1,4 +1,5 @@
 import React from 'react';
+
 import DescribeToJSX from '@/components/common/DescribeToJSX';
 import { createUser } from '@/lib/dummy/User';
 
@@ -8,16 +9,16 @@ interface Props {
   };
 }
 
-const UserDetail = ({ params }: Props) => {
+const MemberDetail = ({ params }: Props) => {
   const { id } = params;
   const user = createUser(id)
   
   return (
     <div>
-      <h2>User ID: {id}</h2>
+      <h2>Member ID: {id}</h2>
       <DescribeToJSX data={user} level={0} />
     </div>
   );
 };
 
-export default UserDetail;
+export default MemberDetail;
