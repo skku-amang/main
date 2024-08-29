@@ -76,7 +76,7 @@ const ROUTES = {
       url: (id: string) => `/teams/${id}`
     }
   },
-  MEMBERS: {
+  MEMBER: {
     LIST: {
       name: '유저 목록',
       url: '/members'

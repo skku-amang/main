@@ -2,8 +2,7 @@ import { columns } from "@/components/MemberListTable/columns"
 import { MemberListDataTable } from "@/components/MemberListTable/data-table"
 import { generateDummys } from "@/lib/dummy"
 import { createUser } from "@/lib/dummy/User"
-
-import { User } from "../../../../types/User"
+import { User } from "@/types/User"
 
 const USERS = generateDummys(45, createUser)
 const rows: User[] = USERS.map((user) => ({

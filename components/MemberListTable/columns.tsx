@@ -4,8 +4,9 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import React from "react"
 
-import { Session } from "../../../types/Session"
-import { User } from "../../../types/User"
+import { Session } from "@/types/Session"
+import { User } from "@/types/User"
+
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 

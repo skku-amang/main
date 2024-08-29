@@ -24,9 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import ROUTES from "@/constants/routes"
+import { User } from "@/types/User"
 
-import ROUTES from "../../../constants/routes"
-import { User } from "../../../types/User"
 import { Button } from "../ui/button"
 
 interface DataTableProps<TValue> {
@@ -104,7 +104,7 @@ export function MemberListDataTable<TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:cursor-pointer"
-                  onClick={() => router.push(ROUTES.MEMBERS.DETAIL.url(row.original.id.toString()))}
+                  onClick={() => router.push(ROUTES.MEMBER.DETAIL.url(row.original.id.toString()))}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

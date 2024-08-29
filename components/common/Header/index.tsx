@@ -17,7 +17,7 @@ const Header = ({
     { name: '공지사항', url: ROUTES.NOTICE.LIST.url, active: false },
     { name: '공연목록', url: ROUTES.PERFORMANCE.LIST.url, active: true },
     { name: '세션지원', url: ROUTES.TEAM.LIST.url, active: true },
-    { name: '사진앨범', url: ROUTES.GALLERY.url, active: false }
+    { name: '맴버목록', url: ROUTES.MEMBER.LIST.url, active: true }
   ]
 
   return (
