@@ -38,12 +38,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     redirect: async ({ url, baseUrl }) => {
-      // URL에서 callbackUrl을 읽어 리다이렉트
       const urlParams = new URL(url)
       const callbackUrl = urlParams.searchParams.get('callbackUrl')
         ? baseUrl + urlParams.searchParams.get('callbackUrl')
         : baseUrl
-      console.log('callbackUrl', callbackUrl)
       return callbackUrl
     },
     authorized: async ({ auth }) => {
