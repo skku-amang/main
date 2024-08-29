@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { User } from "./User"
 
 export enum SessionName {
@@ -9,6 +10,8 @@ export enum SessionName {
 }
 
 export type Session = {
+  id: number
   name: SessionName
-  leader?: User
+  leader?: User // 세션장
+  icon?: string
 }

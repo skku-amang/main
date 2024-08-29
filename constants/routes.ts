@@ -16,6 +16,12 @@ const ROUTES = {
     name: 'Sign up',
     url: '/signup'
   },
+  ADMIN: {
+    INDEX: {
+      name: 'Admin',
+      url: '/admin'
+    }
+  },
   NOTICE: {
     CREATE: {
       name: '공지사항 생성',
@@ -23,7 +29,7 @@ const ROUTES = {
     },
     LIST: {
       name: '공지사항 목록',
-      url: '/notices/'
+      url: '/notices'
     },
     DETAIL: {
       name: '공지사항 상세',
@@ -41,7 +47,7 @@ const ROUTES = {
     },
     LIST: {
       name: '공연 목록',
-      url: '/performances/'
+      url: '/performances'
     },
     DETAIL: {
       name: '공연 상세',
@@ -80,10 +86,10 @@ const ROUTES = {
       url: (id: string) => `/members/${id}`
     }
   },
-  MYPAGE: {
+  PROFILE: {
     INDEX: {
-      name: '마이페이지',
-      url: '/mypage'
+      name: '프로필',
+      url: '/profile'
     }
   }
 }
