@@ -76,9 +76,15 @@ const ROUTES = {
       url: (id: string) => `/teams/${id}`
     }
   },
-  GALLERY: {
-    name: '갤러리',
-    url: '/gallery'
+  MEMBER: {
+    LIST: {
+      name: '유저 목록',
+      url: '/members'
+    },
+    DETAIL: {
+      name: '유저 상세',
+      url: (id: string) => `/members/${id}`
+    }
   },
   PROFILE: {
     INDEX: {

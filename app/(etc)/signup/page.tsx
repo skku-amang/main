@@ -61,7 +61,7 @@ const Signup = () => {
     <div className="container">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit)}  // TODO: 부모 요소인 Form으로 이전
           className="mb-3 w-full space-y-6"
         >
           <SimpleStringField
