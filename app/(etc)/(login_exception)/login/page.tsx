@@ -32,12 +32,12 @@ const Login = () => {
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="flex items-center justify-center bg-white">
+    <div className="flex justify-center items-center w-[90%] h-[90%]">
+      <div className="flex w-3/4 h-full items-center lg:gap-16 justify-center bg-white">
         <div
-          className={`${styles.gradation}`}
+          className={`${styles.gradation} flex-shrink-0 lg:flex-1 w-0 lg:w-1/3 lg:h-3/4 rounded-3xl`}
         ></div>
-        <div className=" flex flex-col items-center justify-center">
+        <div className=" flex flex-1 flex-col items-center justify-center">
           <h3 className="mb-[30px] text-[35px] font-[600]">Login</h3>
           <div className="flex flex-col ">
             {/* 일반 로그인 */}
