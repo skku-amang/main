@@ -1,4 +1,4 @@
-import PerformanceForm from "../../../../components/performances/PerformanceForm"
+import PerformanceForm from "../../../../../components/performances/PerformanceForm"
 
 const PerformanceCreate = () => {
   return (
