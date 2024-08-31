@@ -28,8 +28,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem"  className={`${fontSans.className}`}>
-          <div className="flex justify-center w-full h-screen ">{children}</div>
+        <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem"  className={`${fontSans.className} flex`}>
+          <div className="">{children}</div>
         </HeightPopulatedBody>
       </SessionProvider>  
     </html>
