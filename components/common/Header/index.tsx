@@ -37,9 +37,9 @@ const Header = ({
           </Link>
 
           {/* MenuItems */}
-          <div className="flex h-full justify-center gap-x-24">
+          <div className="flex h-full justify-center md:gap-x-7 lg:gap-x-16 xl:gap-x-24">
             {menuItems.map((menuItem) => (
-              <NavLink
+              <NavLink 
                 key={menuItem.name}
                 href={menuItem.url}
                 active={menuItem.active}
