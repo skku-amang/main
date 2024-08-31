@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   ColumnDef,
@@ -9,26 +9,24 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  useReactTable,
-} from "@tanstack/react-table"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { CiCirclePlus } from "react-icons/ci"
-import { TbFilter } from "react-icons/tb";
+  useReactTable
+} from '@tanstack/react-table'
+import Link from 'next/link'
+import { useState } from 'react'
+import { CiCirclePlus } from 'react-icons/ci'
+import { TbFilter } from 'react-icons/tb'
 
-import ROUTES from "../../constants/routes"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "../ui/table"
-import { TeamColumn } from "./columns"
+  TableRow
+} from '../ui/table'
+import { TeamColumn } from './columns'
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
@@ -37,13 +35,10 @@ interface DataTableProps<TValue> {
 
 export function TeamListDataTable<TValue>({
   columns,
-  data,
+  data
 }: DataTableProps<TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  )
-  const router = useRouter()
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const table = useReactTable({
     data,
@@ -56,8 +51,8 @@ export function TeamListDataTable<TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnFilters,
-    },
+      columnFilters
+    }
   })
 
   return (
@@ -65,32 +60,39 @@ export function TeamListDataTable<TValue>({
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="검색"
-          value={(table.getColumn("songName")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn('songName')?.getFilterValue() as string) ?? ''
+          }
           onChange={(event) =>
-            table.getColumn("songName")?.setFilterValue(event.target.value)
+            table.getColumn('songName')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
 
         <div className="flex gap-3">
-          <Button asChild className="h-8 py-1 rounded-md">
+          <Button asChild className="h-8 rounded-md py-1">
             <Link href="teams/create">
-              <CiCirclePlus size={22} />&nbsp;Create
+              <CiCirclePlus size={22} />
+              &nbsp;Create
             </Link>
           </Button>
-          <Button className="h-8 py-1 rounded-md">
-            <TbFilter size={22} />&nbsp;Filter
+          <Button className="h-8 rounded-md py-1">
+            <TbFilter size={22} />
+            &nbsp;Filter
           </Button>
         </div>
       </div>
-      <div className="rounded-md border overflow-hidden">
+      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="bg-gray-700 text-white font-bold">
+                    <TableHead
+                      key={header.id}
+                      className="bg-gray-700 font-bold text-white"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -108,20 +110,24 @@ export function TeamListDataTable<TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:cursor-pointer"
-                  onClick={() => router.push(ROUTES.TEAM.DETAIL.url(row.original.id.toString()))}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
