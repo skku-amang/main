@@ -37,11 +37,28 @@ export type MemberSession = {
   requiredMemberCount: number
 }
 
+/**
+ * 팀의 세션별 멤버 정보를 담은 Set
+ * MemberSession의 상위 Class로서 세션별 필요한 멤버 수를 계산합니다.
+ */
 export class MemberSessionSet {
   private readonly memberSessions: Set<MemberSession>
 
   constructor(memberSessions: MemberSession[]) {
+    if (
+      !this.isSessionsUnique(
+        memberSessions.map((memberSession) => memberSession.session)
+      )
+    ) {
+      throw new Error('MemberSessionSet의 세션은 모두 고유해야 합니다.')
+    }
     this.memberSessions = new Set(memberSessions)
+  }
+
+  private isSessionsUnique(sessions: Session[]): boolean {
+    return (
+      sessions.length === new Set(sessions.map((session) => session.id)).size
+    )
   }
 
   /**

@@ -80,11 +80,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
     accessorKey: 'songName',
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
-      <div>
+      <Link href={ROUTES.TEAM.DETAIL.url(row.original.id.toString())}>
         {row.getValue('songName')}
         <br />
         <span className="text-slate-300">{row.original.songArtist}</span>
-      </div>
+      </Link>
     )
   },
   {

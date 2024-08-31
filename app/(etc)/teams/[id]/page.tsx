@@ -35,8 +35,8 @@ const TeamDetail = async ({ params }: Props) => {
         <div>
           <MemberSessionTable
             team={team}
-            memberSessions={team.memberSessionSet}
-            leader={team.memberSessionSet[0].members[0]}
+            memberSessions={team.memberSessions}
+            leader={team.memberSessions[0].members[0]}
           />
         </div>
 
