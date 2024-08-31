@@ -9,8 +9,8 @@ import { z } from 'zod'
 import { emailSchema, passwordSchema } from '@/constants/zodSchema'
 
 // import { FcGoogle } from 'react-icons/fc'
-import { Button } from '../../../components/ui/button'
-import { Input } from '../../../components/ui/input'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
 import styles from './login.module.css'
 
 const formSchema = z.object({
@@ -32,14 +32,14 @@ const Login = () => {
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="mb-[60px] mt-[50px] flex h-[698px] w-[1152px] items-center justify-center gap-[100px] rounded-[15px] bg-white">
+    <div className="flex h-[90%] w-[90%] items-center justify-center">
+      <div className="flex h-full w-3/4 items-center justify-center bg-white lg:gap-16">
         <div
-          className={`h-[644px] w-[490px] rounded-[50px] ${styles.gradation}`}
+          className={`${styles.gradation} w-0 flex-shrink-0 rounded-3xl lg:h-3/4 lg:w-1/3 lg:flex-1`}
         ></div>
-        <div className="mb-[45px] ml-[30px] mr-[100px] flex flex-col items-center justify-center">
+        <div className=" flex flex-1 flex-col items-center justify-center">
           <h3 className="mb-[30px] text-[35px] font-[600]">Login</h3>
-          <div className="flex flex-col gap-[30px]">
+          <div className="flex flex-col">
             {/* 일반 로그인 */}
             <form onSubmit={handleSubmit(onValid)} className="space-y-4">
               <Input
