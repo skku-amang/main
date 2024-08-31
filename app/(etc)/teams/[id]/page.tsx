@@ -17,8 +17,8 @@ const TeamDetail = async ({ params }: Props) => {
   const team = createTeam(id)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-3">
-      <div className='col-span-1 flex flex-col gap-y-3'>
+    <div className="my-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="col-span-1 flex flex-col gap-y-3">
         {/* 기본 정보 */}
         <div>
           <TeamInfo team={team} />
@@ -30,10 +30,14 @@ const TeamDetail = async ({ params }: Props) => {
         </div>
       </div>
 
-      <div className='col-span-1 flex flex-col gap-y-3'>
+      <div className="col-span-1 flex flex-col gap-y-3">
         {/* 멤버 정보 */}
         <div>
-          <MemberSessionTable team={team} memberSessions={team.memberSessions} leader={team.memberSessions[0].members[0]} />
+          <MemberSessionTable
+            team={team}
+            memberSessions={team.memberSessions}
+            leader={team.memberSessions[0].members[0]}
+          />
         </div>
 
         {/* 홍보글 */}

@@ -73,7 +73,7 @@ const ROUTES = {
     },
     EDIT: {
       name: '팀 수정',
-      url: (id: string) => `/teams/${id}`
+      url: (id: string) => `/teams/${id}/edit`
     }
   },
   MEMBER: {
