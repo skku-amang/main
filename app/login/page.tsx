@@ -32,21 +32,21 @@ const Login = () => {
   }
 
   return (
-    <div className="flex h-full w-[90%] items-center justify-center">
-      <div className="flex h-full w-11/12 rounded-2xl items-center justify-center bg-white lg:gap-16">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="flex h-full items-center justify-center gap-0 rounded-lg bg-white px-0 md:px-20 md:shadow-2xl lg:w-8/12 lg:gap-16">
         <div
-          className={`${styles.gradation} w-0 ml-20 flex-shrink-0 rounded-3xl xl:h-[90%] xl:w-1/3 xl:flex-1`}
+          className={`${styles.gradation} w-0 flex-shrink-0 rounded-3xl xl:h-[90%] xl:w-1/3 xl:flex-1`}
         ></div>
-        <div className=" flex flex-1 flex-col mr-20 xl:mr-10 items-center justify-center">
-          <h3 className="mb-[30px] text-[35px] font-[600]">Login</h3>
+        <div className="flex flex-1 flex-col items-center justify-center">
+          <h3 className="mb-10 text-4xl font-[600]">Login</h3>
           <div className="flex flex-col">
             {/* 일반 로그인 */}
-            <form onSubmit={handleSubmit(onValid)} className="space-y-4">
+            <form onSubmit={handleSubmit(onValid)} className="space-y-6">
               <Input
                 {...register('email', { required: '이메일을 입력해주세요' })}
                 name="email"
                 placeholder="Email"
-                className="h-[50px] w-[330px] rounded-[50px]"
+                className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.email?.message}</div>
               <Input
@@ -56,30 +56,18 @@ const Login = () => {
                 name="password"
                 placeholder="PW"
                 type="password"
-                className="h-[50px] w-[330px] rounded-[50px]"
+                className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.password?.message}</div>
 
               <Button
                 type="submit"
-                className="w-full rounded-3xl"
+                className="h-14 w-full rounded-full text-2xl font-extrabold"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? '로그인 중...' : '로그인'}
               </Button>
             </form>
-
-            {/* 구글 */}
-            {/* <form
-              action={async () => {
-                'use server'
-                await signIn('google')
-              }}
-            >
-              <button type="submit">
-                <FcGoogle size={50} />
-              </button>
-            </form> */}
           </div>
         </div>
       </div>
