@@ -6,11 +6,13 @@ import { cn } from '../../../lib/utils'
 import NavLink from '../NavLink'
 import Profile from './Profile'
 
-const Header = ({
-  position,
+export const HeaderInner = ({
+  style,
+  className,
   height
 }: {
-  position: 'sticky' | 'fixed'
+  style?: object
+  className?: string
   height: string
 }) => {
   const menuItems: { name: string; url: string; active: boolean }[] = [
@@ -21,6 +23,47 @@ const Header = ({
   ]
 
   return (
+    <nav
+      style={{ ...style, height }}
+      className={cn(
+        className,
+        'flex h-full w-0 items-center overflow-hidden px-0 md:w-full'
+      )}
+    >
+      <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
+        {/* Logo */}
+        <Link href="/">
+          <Image src="/Logo.png" alt="logo" width={47} height={47} />
+        </Link>
+
+        {/* MenuItems */}
+        <div className="flex h-full justify-center gap-x-24">
+          {menuItems.map((menuItem) => (
+            <NavLink
+              key={menuItem.name}
+              href={menuItem.url}
+              active={menuItem.active}
+            >
+              {menuItem.name}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Personal */}
+        <Profile />
+      </div>
+    </nav>
+  )
+}
+
+const Header = ({
+  position,
+  height
+}: {
+  position: 'sticky' | 'fixed'
+  height: string
+}) => {
+  return (
     <header
       className={cn(
         position,
@@ -28,31 +71,7 @@ const Header = ({
       )}
       style={{ height }}
     >
-      {/* Tablet & Desktop */}
-      <nav className="invisible flex h-full w-full items-center px-10 md:visible">
-        <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
-          {/* Logo */}
-          <Link href="/">
-            <Image src="/Logo.png" alt="logo" width={47} height={47} />
-          </Link>
-
-          {/* MenuItems */}
-          <div className="flex h-full justify-center gap-x-24">
-            {menuItems.map((menuItem) => (
-              <NavLink
-                key={menuItem.name}
-                href={menuItem.url}
-                active={menuItem.active}
-              >
-                {menuItem.name}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* Personal */}
-          <Profile />
-        </div>
-      </nav>
+      <HeaderInner height={height} />
     </header>
   )
 }
