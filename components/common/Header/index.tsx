@@ -26,10 +26,27 @@ const Header = ({
         position,
         'top-0 z-10 flex h-full w-full justify-center bg-primary backdrop-blur'
       )}
-      style={{ height }}
-    >
+      style={{ height }} >
+
       {/* Tablet & Desktop */}
-      <nav className="invisible flex h-full w-full items-center px-10 md:visible">
+      <nav className="flex justify-between w-full items-center md:hidden">
+        <div className='flex flex-col gap-[0.3rem] ml-6'>
+            <div className='bg-white w-[30px] h-[0.2rem]'></div>
+            <div className='bg-white w-[30px] h-[0.2rem]'></div>
+            <div className='bg-white w-[30px] h-[0.2rem]'></div>
+        </div>
+        <div className='flex items-center'>
+          <Link href="/">
+            <Image src="/Logo.png" alt="logo" width={47} height={47} />
+          </Link>
+        </div>
+        <div className='mr-10'>
+        </div>
+      </nav>
+
+
+      {/* Tablet & Desktop */}
+      <nav className="hidden md:flex h-full w-full items-center px-10 md:visible">
         <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
           <Link href="/">
