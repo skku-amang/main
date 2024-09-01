@@ -34,10 +34,10 @@ export default function RootLayout({
     <html lang="ko">
       <SessionProvider>
         <body
-          className={cn(fontSans, 'flex justify-center h-screen w-fit sm:w-screen flex-col bg-gray-300')}
+          className={cn(fontSans, 'flex justify-center w-fit sm:w-screen flex-col bg-white sm:bg-gray-300')}
         >
           <HeaderInner  height={headerHeight} />
-            <div className="flex w-full flex-grow min-ml-5 mt-5 mb-5 justify-center">{children}</div>
+            <div className="flex w-full h-[110vh] sm:h-[80vh] flex-grow min-ml-5 mt-5 mb-5 justify-center">{children}</div>
           <FooterInner height={footerHeight} />
         </body>
       </SessionProvider>
