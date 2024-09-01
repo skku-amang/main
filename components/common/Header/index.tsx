@@ -27,7 +27,7 @@ export const HeaderInner = ({
       style={{ ...style, height }}
       className={cn(
         className,
-        'invisible flex h-full w-full items-center px-10 md:visible'
+        'flex h-full w-0 items-center overflow-hidden px-0 md:w-full'
       )}
     >
       <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
