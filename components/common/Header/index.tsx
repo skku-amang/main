@@ -28,6 +28,10 @@ const Header = ({
     setIsOpen(!isOpen);
   }
 
+  const OpenSideMenu_only_close = () => {
+    setIsOpen(false);
+  }
+
   return (
     <header
       className={cn(
@@ -37,7 +41,7 @@ const Header = ({
       style={{ height }} >
 
       {/* Mobile */}
-      <nav className="flex justify-between w-full items-center md:hidden">
+      <nav className="flex  justify-between w-full items-center md:hidden">
         <div className='flex-col h-full items-center justify-center pl-4' onClick={OpenSideMenu}>
           <div className='flex flex-col justify-center h-full gap-[0.3rem]'>
             <div className='bg-white w-8 h-[0.2rem]'></div>
@@ -45,21 +49,27 @@ const Header = ({
             <div className='bg-white w-8 h-[0.2rem]'></div>
           </div>
         </div>
-        <div className='flex items-center'>
+        <div className='flex fixed ml-[45%] items-center'>
           <Link href="/">
             <Image src="/Logo.png" alt="logo" width={47} height={47} />
           </Link>
         </div>
         <div className='mr-10'>
         </div>
-      </nav>
+      </nav>    
 
-      {/* 모바일 열리는 창 전체 */}
-      <div className={`flex flex-col fixed top-0 left-0 h-screen w-[45%] bg-gray-800 text-white transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
-        <div className='flex-1' onClick={OpenSideMenu}>1번</div>
-        <div className='flex-1'>2번</div>
-        <div className='flex-1'>3번</div>
+      {/* 열리는 창 안에 있는 것들 고생이 많아 장수*/}
+      <div className={`flex flex-col justify-center fixed top-0 left-0 h-screen w-[43%] bg-gray-800 text-white transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
+        <div className='h-[90%] flex flex-col justify-center items-start'>
+          <Link href={ROUTES.NOTICE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공지사항</Link>
+          <Link href={ROUTES.PERFORMANCE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공연목록</Link>
+          <Link href={ROUTES.TEAM.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>세션지원</Link>
+          <Link href={ROUTES.MEMBER.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>멤버목록</Link>
+        </div>
+        <div className='flex-1 justify-center'><Profile/></div>
       </div>
+      <div className={`${isOpen ? 'visible' : 'hidden'} w-full h-screen`} onClick={OpenSideMenu_only_close}></div>
+      
 
       {/* Tablet & Desktop */}
       <nav className="hidden md:flex h-full w-full items-center px-10 md:visible">
