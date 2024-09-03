@@ -58,11 +58,11 @@ const Signup = () => {
   }
 
   return (
-    <div className="container">
+    <div className="container min-w-[160px] max-w-[400px] px-0 py-20">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}  // TODO: 부모 요소인 Form으로 이전
-          className="mb-3 w-full space-y-6"
+          onSubmit={form.handleSubmit(onSubmit)} // TODO: 부모 요소인 Form으로 이전
+          className="felx mb-3 w-full flex-col space-y-8"
         >
           <SimpleStringField
             form={form}
@@ -91,6 +91,7 @@ const Signup = () => {
             form={form}
             name="confirmPassword"
             label="비밀번호 확인"
+            description="오타 내면 바보~"
             required={
               !(formSchema.shape.confirmPassword instanceof z.ZodOptional)
             }
@@ -101,6 +102,7 @@ const Signup = () => {
             name="email"
             label="이메일"
             placeholder="example@g.skku.edu"
+            description="@g.skku.edu 이메일 입력해주세요"
             required={!(formSchema.shape.email instanceof z.ZodOptional)}
           />
 
@@ -130,7 +132,7 @@ const Signup = () => {
                       return (
                         <FormItem
                           key={session.name}
-                          className="flex flex-row items-start space-x-3 space-y-0"
+                          className="flex flex-row items-start space-x-3 space-y-0 py-0.5"
                         >
                           <FormControl>
                             <Checkbox
