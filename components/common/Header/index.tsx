@@ -1,12 +1,12 @@
-"use client"
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import ROUTES from '../../../constants/routes'
 import { cn } from '../../../lib/utils'
 import NavLink from '../NavLink'
 import Profile from './Profile'
-import { useState } from 'react'
 
 const Header = ({
   position,
@@ -22,15 +22,7 @@ const Header = ({
     { name: '맴버목록', url: ROUTES.MEMBER.LIST.url, active: true }
   ]
 
-  const [isOpen, setIsOpen] = useState(false);
-
-  const OpenSideMenu = () => {
-    setIsOpen(!isOpen);
-  }
-
-  const OpenSideMenu_only_close = () => {
-    setIsOpen(false);
-  }
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
     <header
@@ -38,41 +30,71 @@ const Header = ({
         position,
         'top-0 z-10 flex h-full w-full justify-center bg-primary backdrop-blur'
       )}
-      style={{ height }} >
-
+      style={{ height }}
+    >
       {/* Mobile */}
-      <nav className="flex  justify-between w-full items-center md:hidden">
-        <div className='flex-col h-full items-center justify-center pl-4' onClick={OpenSideMenu}>
-          <div className='flex flex-col justify-center h-full gap-[0.3rem]'>
-            <div className='bg-white w-8 h-[0.2rem]'></div>
-            <div className='bg-white w-8 h-[0.2rem]'></div>
-            <div className='bg-white w-8 h-[0.2rem]'></div>
+      <nav className="flex  w-full items-center justify-between md:hidden">
+        <div
+          className="h-full flex-col items-center justify-center pl-4"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          <div className="flex h-full flex-col justify-center gap-[0.3rem]">
+            <div className="h-[0.2rem] w-8 bg-white"></div>
+            <div className="h-[0.2rem] w-8 bg-white"></div>
+            <div className="h-[0.2rem] w-8 bg-white"></div>
           </div>
         </div>
-        <div className='flex fixed ml-[45%] items-center'>
-          <Link href="/">
+        <div className="fixed ml-[45%] flex items-center">
+          <Link href={ROUTES.HOME.url}>
             <Image src="/Logo.png" alt="logo" width={47} height={47} />
           </Link>
         </div>
-        <div className='mr-10'>
-        </div>
-      </nav>    
+        <div className="mr-10"></div>
+      </nav>
 
       {/* 열리는 창 안에 있는 것들 고생이 많아 장수*/}
-      <div className={`flex flex-col justify-center fixed top-0 left-0 h-screen w-[43%] bg-gray-800 text-white transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
-        <div className='h-[90%] flex flex-col justify-center items-start'>
-          <Link href={ROUTES.NOTICE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공지사항</Link>
-          <Link href={ROUTES.PERFORMANCE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공연목록</Link>
-          <Link href={ROUTES.TEAM.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>세션지원</Link>
-          <Link href={ROUTES.MEMBER.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>멤버목록</Link>
+      <div
+        className={`fixed left-0 top-0 flex h-screen w-[43%] transform flex-col justify-center bg-gray-800 text-white ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}
+      >
+        <div className="flex h-[90%] flex-col items-start justify-center">
+          <Link
+            href={ROUTES.NOTICE.LIST.url}
+            className="flex w-full flex-1 items-center justify-center text-2xl font-black"
+          >
+            공지사항
+          </Link>
+          <Link
+            href={ROUTES.PERFORMANCE.LIST.url}
+            className="flex w-full flex-1 items-center justify-center text-2xl font-black"
+          >
+            공연목록
+          </Link>
+          <Link
+            href={ROUTES.TEAM.LIST.url}
+            className="flex w-full flex-1 items-center justify-center text-2xl font-black"
+          >
+            세션지원
+          </Link>
+          <Link
+            href={ROUTES.MEMBER.LIST.url}
+            className="flex w-full flex-1 items-center justify-center text-2xl font-black"
+          >
+            멤버목록
+          </Link>
         </div>
-        <div className='flex-1 justify-center'><Profile/></div>
+        <div className="flex-1 justify-center">
+          <Profile />
+        </div>
       </div>
-      <div className={`${isOpen ? 'visible' : 'hidden'} w-full h-screen`} onClick={OpenSideMenu_only_close}></div>
-      
+      {isSidebarOpen && (
+        <div
+          className="h-screen w-full"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
 
       {/* Tablet & Desktop */}
-      <nav className="hidden md:flex h-full w-full items-center px-10 md:visible">
+      <nav className="hidden h-full w-full items-center px-10 md:visible md:flex">
         <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
           <Link href="/">
@@ -82,7 +104,7 @@ const Header = ({
           {/* MenuItems */}
           <div className="flex h-full justify-center md:gap-x-7 lg:gap-x-16 xl:gap-x-24">
             {menuItems.map((menuItem) => (
-              <NavLink 
+              <NavLink
                 key={menuItem.name}
                 href={menuItem.url}
                 active={menuItem.active}
