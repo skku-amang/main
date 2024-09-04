@@ -7,6 +7,7 @@ import { cn } from '../../../lib/utils'
 import NavLink from '../NavLink'
 import Profile from './Profile'
 import { useState } from 'react'
+import { FaInstagram, FaYoutube } from 'react-icons/fa'
 
 const Header = ({
   position,
@@ -60,13 +61,24 @@ const Header = ({
 
       {/* 열리는 창 안에 있는 것들 고생이 많아 장수*/}
       <div className={`flex flex-col justify-center fixed top-0 left-0 h-screen w-[43%] bg-gray-800 text-white transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
-        <div className='h-[90%] flex flex-col justify-center items-start'>
+        <div className='h-[82%] flex flex-col justify-center items-start'>
           <Link href={ROUTES.NOTICE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공지사항</Link>
           <Link href={ROUTES.PERFORMANCE.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>공연목록</Link>
           <Link href={ROUTES.TEAM.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>세션지원</Link>
           <Link href={ROUTES.MEMBER.LIST.url} className='flex items-center justify-center w-full font-black text-2xl flex-1'>멤버목록</Link>
         </div>
         <div className='flex-1 justify-center'><Profile/></div>
+        <div className='flex pb-9 gap-6 justify-center'>
+        <Link href="/">
+        <Image src="/Logo.png" alt="logo" width={35} height={35} />
+        </Link>
+        <Link href="/">
+          <FaYoutube size={30} style={{ color: "#BEBEBE" }} />
+        </Link>
+        <Link href="/">
+          <FaInstagram size={30} style={{ color: "#BEBEBE" }} />
+        </Link>
+        </div>
       </div>
       <div className={`${isOpen ? 'visible' : 'hidden'} w-full h-screen`} onClick={OpenSideMenu_only_close}></div>
       

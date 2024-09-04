@@ -29,8 +29,9 @@ export const FooterInner = () => {
 
 const Footer = ({ className, height }: { className?: string, height: string }) => {
   return (
+    <div className="invisible md:visible">
     <footer
-      className={cn(className)}
+      className={`cn(className)`}
       style={{
         height,
         transform : "translateY(-100%)"
@@ -38,6 +39,7 @@ const Footer = ({ className, height }: { className?: string, height: string }) =
     >
       <FooterInner />
     </footer>
+    </div>
   )
 }
 
