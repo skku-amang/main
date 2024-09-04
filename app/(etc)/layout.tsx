@@ -31,7 +31,7 @@ export default function RootLayout({
         <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem" className={fontSans.className}>
           <div className="container">{children}</div>
         </HeightPopulatedBody>
-      </SessionProvider>  
+      </SessionProvider>
     </html>
   )
 }
