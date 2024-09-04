@@ -1,10 +1,10 @@
 import React from 'react'
 
-import MemberSessionTable from '../../../../../components/TeamDetail/MemberSessionTable'
-import PromotionPostList from '../../../../../components/TeamDetail/PromotionPostList'
-import SongInfo from '../../../../../components/TeamDetail/SongInfo'
-import TeamInfo from '../../../../../components/TeamDetail/TeamInfo'
-import { createTeam } from '../../../../../lib/dummy/Team'
+import MemberSessionTable from '../../../../components/TeamDetail/MemberSessionTable'
+import PromotionPostList from '../../../../components/TeamDetail/PromotionPostList'
+import SongInfo from '../../../../components/TeamDetail/SongInfo'
+import TeamInfo from '../../../../components/TeamDetail/TeamInfo'
+import { createTeam } from '../../../../lib/dummy/Team'
 
 interface Props {
   params: {

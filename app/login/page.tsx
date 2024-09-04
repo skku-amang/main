@@ -9,8 +9,8 @@ import { z } from 'zod'
 import { emailSchema, passwordSchema } from '@/constants/zodSchema'
 
 // import { FcGoogle } from 'react-icons/fc'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
 import styles from './login.module.css'
 
 const formSchema = z.object({

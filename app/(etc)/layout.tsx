@@ -5,7 +5,7 @@ import { Inter as FontSans } from 'next/font/google'
 import { SessionProvider } from 'next-auth/react'
 import React from 'react'
 
-import HeightPopulatedBody from '../../../components/common/HeightPopulatedBody'
+import HeightPopulatedBody from '../../components/common/HeightPopulatedBody'
 
 const fontSans = FontSans({
   subsets: ['latin'],
