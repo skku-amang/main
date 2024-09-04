@@ -48,7 +48,7 @@ const Footer = ({
 }) => {
   return (
     <footer
-      className={cn(className)}
+      className={cn(className, 'hidden md:block')}
       style={{
         height,
         transform: 'translateY(-100%)'
