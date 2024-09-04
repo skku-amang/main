@@ -1,12 +1,12 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { columns, TeamColumn } from "../../../components/TeamListTable/columns"
-import { TeamListDataTable } from "../../../components/TeamListTable/data-table"
-import { Badge } from "../../../components/ui/badge"
-import ROUTES from "../../../constants/routes"
-import { generateDummys } from "../../../lib/dummy"
-import { createPerformance } from "../../../lib/dummy/Performance"
-import { createTeam } from "../../../lib/dummy/Team"
+import { columns, TeamColumn } from '../../../components/TeamListTable/columns'
+import { TeamListDataTable } from '../../../components/TeamListTable/data-table'
+import { Badge } from '../../../components/ui/badge'
+import ROUTES from '../../../constants/routes'
+import { generateDummys } from '../../../lib/dummy'
+import { createPerformance } from '../../../lib/dummy/Performance'
+import { createTeam } from '../../../lib/dummy/Team'
 
 const TEAMS = generateDummys(45, createTeam)
 const rows: TeamColumn[] = TEAMS.map((team) => ({
@@ -14,7 +14,7 @@ const rows: TeamColumn[] = TEAMS.map((team) => ({
   songName: team.song.name,
   songArtist: team.song.artist,
   leaderName: team.leader.name,
-  // requiredSessions: team.song.unsatisfied_sessions,
+  memberSessions: team.memberSessions,
   cover_url: team.song.cover_url ?? team.song.original_url,
   is_freshmanFixed: team.is_freshmanFixed
 }))
@@ -31,14 +31,18 @@ const TeamList = () => {
   return (
     <div className="container">
       {/* 팀 배너 */}
-      <div className="flex flex-col justify-center items-center">
-        <h2 className="text-4xl font-extrabold text-gray-600 mt-24">공연팀 목록</h2>
+      <div className="flex flex-col items-center justify-center">
+        <h2 className="mt-24 text-4xl font-extrabold text-gray-600">
+          공연팀 목록
+        </h2>
         <p className="my-8 font-bold">Performances</p>
         <div className="flex gap-x-4">
-          {activePerformances.map(p => (
-            <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}>
-              <Badge
-                className="py-1 px-6 bg-slate-200 text-black font-normal text-md rounded-xl">
+          {activePerformances.map((p) => (
+            <Link
+              key={p.id}
+              href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}
+            >
+              <Badge className="text-md rounded-xl bg-slate-200 px-6 py-1 font-normal text-black">
                 {p.name}
               </Badge>
             </Link>
