@@ -14,7 +14,7 @@ const rows: TeamColumn[] = TEAMS.map((team) => ({
   songName: team.song.name,
   songArtist: team.song.artist,
   leaderName: team.leader.name,
-  // requiredSessions: team.song.unsatisfied_sessions,
+  memberSessions: team.memberSessions,
   cover_url: team.song.cover_url ?? team.song.original_url,
   is_freshmanFixed: team.is_freshmanFixed
 }))
