@@ -27,11 +27,14 @@ import {
   TableRow
 } from '../ui/table'
 import { TeamColumn } from './columns'
+import { Checkbox } from '@radix-ui/react-checkbox'
+import { Check } from 'lucide-react'
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
   data: TeamColumn[]
 }
+
 
 export function TeamListDataTable<TValue>({
   columns,
@@ -55,6 +58,9 @@ export function TeamListDataTable<TValue>({
     }
   })
 
+  const [filter, setfilter] = useState(false);
+  const openfilter = () => setfilter(!filter);
+
   return (
     <div>
       <div className="flex items-center justify-between py-4">
@@ -69,18 +75,35 @@ export function TeamListDataTable<TValue>({
           className="max-w-sm"
         />
 
-        <div className="flex gap-3">
+        <div className="flex relative gap-3">
           <Button asChild className="h-8 rounded-md py-1">
             <Link href="teams/create">
               <CiCirclePlus size={22} />
               &nbsp;Create
             </Link>
           </Button>
-          <Button className="h-8 rounded-md py-1">
+          <Button className="h-8 rounded-md py-1" onClick={openfilter}>
             <TbFilter size={22} />
             &nbsp;Filter
           </Button>
-        </div>
+          {filter && (
+          <div className='flex absolute right-0 top-11 w-[30rem] h-[27rem] shadow-lg z-50 bg-white'>
+            
+            {/* 좌측 박스, 필요세션 (모두, 보컬12, 기타123, 신디12, 베이스, 드럼, 현악기, 관악기) */}
+            <div className='relative flex-col w-[18rem] h-full shadow-xl'>
+              <div className='absolute left-9 top-7'>필요세션</div>
+            </div>
+            
+            {/* 우측 박스, 모집상태 (모두, active, inactive) */}
+            <div className='relative w-[12rem] h-full shadow-xl '>
+              <div className='absolute  left-6 top-7'>모집상태</div>
+            </div>
+          </div>
+          )
+          }
+          </div>
+      
+
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
