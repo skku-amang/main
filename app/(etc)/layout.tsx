@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko">
+    <html className="" lang="ko">
       <SessionProvider>
         <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem" className={fontSans.className}>
           <div className="container">{children}</div>

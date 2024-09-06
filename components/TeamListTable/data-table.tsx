@@ -29,6 +29,7 @@ import {
 import { TeamColumn } from './columns'
 import { Checkbox } from '@radix-ui/react-checkbox'
 import { Check } from 'lucide-react'
+import dummySessions from '@/lib/dummy/Session'
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
@@ -60,6 +61,7 @@ export function TeamListDataTable<TValue>({
 
   const [filter, setfilter] = useState(false);
   const openfilter = () => setfilter(!filter);
+  const sessions = dummySessions;
 
   return (
     <div>
@@ -91,12 +93,15 @@ export function TeamListDataTable<TValue>({
             
             {/* 좌측 박스, 필요세션 (모두, 보컬12, 기타123, 신디12, 베이스, 드럼, 현악기, 관악기) */}
             <div className='relative flex-col w-[18rem] h-full shadow-xl'>
-              <div className='absolute left-9 top-7'>필요세션</div>
+              <div className='absolute left-9 top-7 font-semibold'>필요세션</div>
+              <div>
+                
+              </div>
             </div>
-            
+  
             {/* 우측 박스, 모집상태 (모두, active, inactive) */}
             <div className='relative w-[12rem] h-full shadow-xl '>
-              <div className='absolute  left-6 top-7'>모집상태</div>
+              <div className='absolute  left-6 top-7 font-semibold'>모집상태</div>
             </div>
           </div>
           )
@@ -105,7 +110,7 @@ export function TeamListDataTable<TValue>({
       
 
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -131,6 +136,7 @@ export function TeamListDataTable<TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
+               
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
@@ -158,6 +164,7 @@ export function TeamListDataTable<TValue>({
           </TableBody>
         </Table>
       </div>
+      {/* 다음 창으로 이동 버튼 */}
       <div className="flex items-center justify-center space-x-2 py-4">
         <Button
           variant="outline"
