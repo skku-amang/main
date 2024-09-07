@@ -8,6 +8,7 @@ const dummySessions: Session[] = [
   { id: 4, name: SessionName.DRUM },
 ]
 
+
 export default dummySessions
 
 type ProbabilityDensity = Map<number, number>

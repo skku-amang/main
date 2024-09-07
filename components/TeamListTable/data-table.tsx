@@ -16,6 +16,8 @@ import { useState } from 'react'
 import { CiCirclePlus } from 'react-icons/ci'
 import { TbFilter } from 'react-icons/tb'
 
+import FilterSection, { FilterLabel } from '@/components/common/Filter'
+
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import {
@@ -32,6 +34,26 @@ interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
   data: TeamColumn[]
 }
+
+const Example_Filter_array: FilterLabel[] = [
+  { id: 1, label: '모두' },
+  { id: 2, label: '보컬 1' },
+  { id: 3, label: '보컬 2' },
+  { id: 4, label: '기타 1' },
+  { id: 5, label: '기타 2' },
+  { id: 6, label: '신디 1' },
+  { id: 7, label: '신디 2' },
+  { id: 8, label: '베이스' },
+  { id: 9, label: '드럼' },
+  { id: 10, label: '현악기' },
+  { id: 11, label: '관악기' }
+]
+
+const Example_Filter_array2: FilterLabel[] = [
+  { id: 1, label: '모두' },
+  { id: 2, label: 'Active' },
+  { id: 3, label: 'InActive' }
+]
 
 export function TeamListDataTable<TValue>({
   columns,
@@ -55,6 +77,9 @@ export function TeamListDataTable<TValue>({
     }
   })
 
+  const [filter, setFilter] = useState(false)
+  const toggleFilter = () => setFilter((prev) => !prev)
+
   return (
     <div>
       <div className="flex items-center justify-between py-4">
@@ -69,20 +94,32 @@ export function TeamListDataTable<TValue>({
           className="max-w-sm"
         />
 
-        <div className="flex gap-3">
+        <div className="relative flex gap-3">
           <Button asChild className="h-8 rounded-md py-1">
             <Link href="teams/create">
               <CiCirclePlus size={22} />
               &nbsp;Create
             </Link>
           </Button>
-          <Button className="h-8 rounded-md py-1">
+          <Button className="h-8 rounded-md py-1" onClick={toggleFilter}>
             <TbFilter size={22} />
             &nbsp;Filter
           </Button>
+          {filter && (
+            <div className="absolute right-0 top-11 z-50 flex h-[21rem] w-[30rem] rounded-sm bg-white shadow-xl">
+              <FilterSection
+                header="세션"
+                filterObject={Example_Filter_array}
+              />
+              <FilterSection
+                header="모집상태"
+                filterObject={Example_Filter_array2}
+              />
+            </div>
+          )}
         </div>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-sm border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -135,6 +172,7 @@ export function TeamListDataTable<TValue>({
           </TableBody>
         </Table>
       </div>
+      {/* 다음 창으로 이동 버튼 */}
       <div className="flex items-center justify-center space-x-2 py-4">
         <Button
           variant="outline"
