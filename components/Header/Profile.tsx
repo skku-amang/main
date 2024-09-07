@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-import ROUTES from '../../../constants/routes'
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import ROUTES from '../../constants/routes'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 interface MenuItemProps {
   icon: React.ReactNode

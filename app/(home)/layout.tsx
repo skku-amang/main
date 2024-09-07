@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 import { SessionProvider } from 'next-auth/react'
 import React from 'react'
 
-import HeightPopulatedBody from '../../components/common/HeightPopulatedBody'
+import HeightPopulatedBody from '../../components/HeightPopulatedBody'
 import { cn } from '../../lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })

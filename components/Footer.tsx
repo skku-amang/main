@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { FaInstagram } from 'react-icons/fa'
 import { FaYoutube } from 'react-icons/fa'
 
-import { cn } from '../../lib/utils'
+import { cn } from '../lib/utils'
 
 export const FooterInner = ({
   className,

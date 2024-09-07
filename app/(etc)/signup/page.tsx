@@ -11,8 +11,8 @@ import {
   passwordSchema
 } from '@/constants/zodSchema'
 
-import SimpleLabel from '../../../components/common/Form/SimpleLabel'
-import SimpleStringField from '../../../components/common/Form/SimpleStringField'
+import SimpleLabel from '../../../components/Form/SimpleLabel'
+import SimpleStringField from '../../../components/Form/SimpleStringField'
 import { Button } from '../../../components/ui/button'
 import { Checkbox } from '../../../components/ui/checkbox'
 import {
@@ -61,7 +61,7 @@ const Signup = () => {
     <div className="container">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}  // TODO: 부모 요소인 Form으로 이전
+          onSubmit={form.handleSubmit(onSubmit)} // TODO: 부모 요소인 Form으로 이전
           className="mb-3 w-full space-y-6"
         >
           <SimpleStringField

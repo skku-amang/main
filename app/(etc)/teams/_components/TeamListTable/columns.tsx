@@ -18,10 +18,10 @@ import {
 import ROUTES from '@/constants/routes'
 import { MemberSession, MemberSessionSet } from '@/types/Team'
 
-import { cn } from '../../lib/utils'
-import { Session } from '../../types/Session'
-import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
+import { cn } from '../../../../../lib/utils'
+import { Session } from '../../../../../types/Session'
+import { Badge } from '../../../../../components/ui/badge'
+import { Button } from '../../../../../components/ui/button'
 
 type TeamStatus = '모집 완료' | '모집 중'
 export type TeamColumn = {

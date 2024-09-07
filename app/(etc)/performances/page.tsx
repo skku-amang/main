@@ -1,4 +1,4 @@
-import PerformanceCardList from "../../../components/performances/PerformanceCardList"
+import PerformanceCardList from './_components/PerformanceCardList'
 
 const PerformanceList = () => {
   return (

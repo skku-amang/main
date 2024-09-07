@@ -16,10 +16,10 @@ import { useState } from 'react'
 import { CiCirclePlus } from 'react-icons/ci'
 import { TbFilter } from 'react-icons/tb'
 
-import FilterSection, { FilterLabel } from '@/components/common/Filter'
+import FilterSection, { FilterLabel } from '@/components/Filter'
 
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import { Button } from '../../../../../components/ui/button'
+import { Input } from '../../../../../components/ui/input'
 import {
   Table,
   TableBody,
@@ -27,7 +27,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '../ui/table'
+} from '../../../../../components/ui/table'
 import { TeamColumn } from './columns'
 
 interface DataTableProps<TValue> {

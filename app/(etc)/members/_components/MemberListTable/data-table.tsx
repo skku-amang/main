@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { TbFilter } from 'react-icons/tb'
 
-import FilterSection, { FilterLabel } from '@/components/common/Filter'
+import FilterSection, { FilterLabel } from '@/components/Filter'
 import { Input } from '@/components/ui/input'
 import {
   Table,

@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
-import { columns, TeamColumn } from '../../../components/TeamListTable/columns'
-import { TeamListDataTable } from '../../../components/TeamListTable/data-table'
 import { Badge } from '../../../components/ui/badge'
 import ROUTES from '../../../constants/routes'
 import { generateDummys } from '../../../lib/dummy'
 import { createPerformance } from '../../../lib/dummy/Performance'
 import { createTeam } from '../../../lib/dummy/Team'
+import { columns, TeamColumn } from './_components/TeamListTable/columns'
+import { TeamListDataTable } from './_components/TeamListTable/data-table'
 
 const TEAMS = generateDummys(45, createTeam)
 const rows: TeamColumn[] = TEAMS.map((team) => ({

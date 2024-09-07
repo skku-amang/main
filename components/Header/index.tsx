@@ -3,8 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import ROUTES from '../../../constants/routes'
-import { cn } from '../../../lib/utils'
+import ROUTES from '../../constants/routes'
+import { cn } from '../../lib/utils'
 import NavLink from '../NavLink'
 import Profile from './Profile'
 

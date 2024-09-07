@@ -5,11 +5,11 @@ import { memo, useMemo, useState } from 'react'
 import React from 'react'
 import { CiCirclePlus } from 'react-icons/ci'
 
-import ROUTES from '../../constants/routes'
-import { generateDummys } from '../../lib/dummy'
-import { createPerformance } from '../../lib/dummy/Performance'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import ROUTES from '../../../../constants/routes'
+import { generateDummys } from '../../../../lib/dummy'
+import { createPerformance } from '../../../../lib/dummy/Performance'
+import { Button } from '../../../../components/ui/button'
+import { Input } from '../../../../components/ui/input'
 import PerformanceCard from './PerformanceCard'
 
 const MemoPerformanceCard = memo(PerformanceCard)

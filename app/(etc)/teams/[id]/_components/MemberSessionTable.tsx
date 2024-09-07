@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaSpinner } from 'react-icons/fa'
 
-import { MemberSession, Team } from '../../types/Team'
-import { User } from '../../types/User'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Button } from '../../../../../components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '../../../../../components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -15,9 +18,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '../ui/dialog'
-import { Input } from '../ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
+} from '../../../../../components/ui/dialog'
+import { Input } from '../../../../../components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '../../../../../components/ui/table'
+import { MemberSession, Team } from '../../../../../types/Team'
+import { User } from '../../../../../types/User'
 
 interface FormData {
   teamId: number
@@ -32,7 +44,12 @@ interface SubmitButtonProps {
   initialMode: 'signup' | 'cancel'
 }
 
-const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: SubmitButtonProps) => {
+const SubmitButton = ({
+  teamId,
+  sessionId,
+  sessionMemberIndex,
+  initialMode
+}: SubmitButtonProps) => {
   const {
     register,
     handleSubmit,
@@ -62,18 +79,35 @@ const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: Su
             {isSubmitting ? <FaSpinner className="animate-spin" /> : '신청'}
           </Button>
         )}
-        {mode === "cancel" && 
-          <Dialog open={dialogOpen} defaultOpen={false} onOpenChange={setDialogOpen}>
+        {mode === 'cancel' && (
+          <Dialog
+            open={dialogOpen}
+            defaultOpen={false}
+            onOpenChange={setDialogOpen}
+          >
             <DialogTrigger asChild>
-              <Button type="button" disabled={isSubmitting} variant="destructive">
-                {isSubmitting ? <FaSpinner className="animate-spin" /> : "탈퇴"}
+              <Button
+                type="button"
+                disabled={isSubmitting}
+                variant="destructive"
+              >
+                {isSubmitting ? <FaSpinner className="animate-spin" /> : '탈퇴'}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>정말로 탈퇴하시겠습니까?</DialogTitle>
-                <Button type="submit" disabled={isSubmitting} variant="destructive" onClick={handleSubmit(onSubmit)}>
-                  {isSubmitting ? <FaSpinner className="animate-spin" /> : "ㄹ?ㅇ"}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  variant="destructive"
+                  onClick={handleSubmit(onSubmit)}
+                >
+                  {isSubmitting ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    'ㄹ?ㅇ'
+                  )}
                 </Button>
               </DialogHeader>
               <DialogDescription>
@@ -81,7 +115,7 @@ const SubmitButton = ({ teamId, sessionId, sessionMemberIndex, initialMode }: Su
               </DialogDescription>
             </DialogContent>
           </Dialog>
-        }
+        )}
       </form>
     </>
   )
@@ -100,23 +134,35 @@ const MemberSessionTableRow = ({
   largestRequiredMemberCount,
   leader
 }: MemberSessionTableRowProps) => {
-  const memberName = (member: User) => (member.id === leader.id ? <>{member.name}<br/>(팀장)</> : member.name)
+  const memberName = (member: User) =>
+    member.id === leader.id ? (
+      <>
+        {member.name}
+        <br />
+        (팀장)
+      </>
+    ) : (
+      member.name
+    )
 
-  const isOccupied = (index: number, memberSession: MemberSession) => index < memberSession.members.length
+  const isOccupied = (index: number, memberSession: MemberSession) =>
+    index < memberSession.members.length
   const isApplied = (index: number, memberSession: MemberSession) => {
     // const currentUserId = 1;  // TODO: 나중에 로그인 한 유저로 수정
     // return memberSession.members[index].id === currentUserId
     return index === 1 // 일단은 두번째 유저를 신청한 것으로 가정
   }
-  const isMissing = (index: number, memberSession: MemberSession) => index < memberSession.requiredMemberCount
+  const isMissing = (index: number, memberSession: MemberSession) =>
+    index < memberSession.requiredMemberCount
 
-  const cellClassName = "px-1"
+  const cellClassName = 'px-1'
 
   return (
     <TableRow>
       <TableCell className={cellClassName}>
-        {memberSession.session.name}<br/>
-        ({memberSession.members.length}/{memberSession.requiredMemberCount})
+        {memberSession.session.name}
+        <br />({memberSession.members.length}/
+        {memberSession.requiredMemberCount})
       </TableCell>
       {Array.from({ length: largestRequiredMemberCount }, (_, index) => (
         <TableCell key={index} className={cellClassName}>
@@ -153,7 +199,11 @@ interface MemberSessionTableProps {
   leader: User
 }
 
-const MemberSessionTable = ({ team, memberSessions, leader }: MemberSessionTableProps) => {
+const MemberSessionTable = ({
+  team,
+  memberSessions,
+  leader
+}: MemberSessionTableProps) => {
   const largestRequiredMemberCount = Math.max(
     ...memberSessions.map((memberSession) => memberSession.requiredMemberCount)
   )
@@ -163,16 +213,21 @@ const MemberSessionTable = ({ team, memberSessions, leader }: MemberSessionTable
       <CardHeader>
         <CardTitle>멤버 목록</CardTitle>
       </CardHeader>
-      <CardContent className='px-2 lg:px-3'>
-        <Table className='text-center table-fixed rounded-t-md overflow-hidden shadow-black shadow-lg border-2'>
+      <CardContent className="px-2 lg:px-3">
+        <Table className="table-fixed overflow-hidden rounded-t-md border-2 text-center shadow-lg shadow-black">
           <TableHeader>
-            <TableRow className='bg-primary hover:bg-bg-primary'>
-              <TableHead className="w-[76px] text-center text-white">세션</TableHead>
-              {Array.from({ length: largestRequiredMemberCount }, (_, index) => (
-                <TableHead key={index} className='text-center text-white'>
-                  {index + 1}
-                </TableHead>
-              ))}
+            <TableRow className="hover:bg-bg-primary bg-primary">
+              <TableHead className="w-[76px] text-center text-white">
+                세션
+              </TableHead>
+              {Array.from(
+                { length: largestRequiredMemberCount },
+                (_, index) => (
+                  <TableHead key={index} className="text-center text-white">
+                    {index + 1}
+                  </TableHead>
+                )
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>

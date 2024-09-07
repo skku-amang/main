@@ -1,9 +1,9 @@
 import React from 'react'
 
-import MemberSessionTable from '../../../../components/TeamDetail/MemberSessionTable'
-import PromotionPostList from '../../../../components/TeamDetail/PromotionPostList'
-import SongInfo from '../../../../components/TeamDetail/SongInfo'
-import TeamInfo from '../../../../components/TeamDetail/TeamInfo'
+import MemberSessionTable from './_components/MemberSessionTable'
+import PromotionPostList from './_components/PromotionPostList'
+import SongInfo from './_components/SongInfo'
+import TeamInfo from './_components/TeamInfo'
 import { createTeam } from '../../../../lib/dummy/Team'
 
 interface Props {

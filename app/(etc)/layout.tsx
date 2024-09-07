@@ -5,7 +5,7 @@ import { Inter as FontSans } from 'next/font/google'
 import { SessionProvider } from 'next-auth/react'
 import React from 'react'
 
-import HeightPopulatedBody from '../../components/common/HeightPopulatedBody'
+import HeightPopulatedBody from '../../components/HeightPopulatedBody'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -28,7 +28,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <HeightPopulatedBody headerHeight="4rem" footerHeight="5rem" className={fontSans.className}>
+        <HeightPopulatedBody
+          headerHeight="4rem"
+          footerHeight="5rem"
+          className={fontSans.className}
+        >
           <div className="container">{children}</div>
         </HeightPopulatedBody>
       </SessionProvider>
