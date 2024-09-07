@@ -1,5 +1,3 @@
-import '@/app/globals.css'
-
 import React from 'react'
 
 import Footer from '@/components/Footer'
@@ -18,7 +16,7 @@ export default function RootLayout({
       <Header position="fixed" height={headerHeight} />
 
       <div
-        className="h-full"
+        className="h-auto min-h-full"
         style={{
           paddingTop: headerHeight,
           paddingBottom: footerHeight

@@ -1,18 +1,23 @@
-import { Ma_Shan_Zheng } from "next/font/google"
-import { Island_Moments } from "next/font/google"
+import { Ma_Shan_Zheng } from 'next/font/google'
+import { Island_Moments } from 'next/font/google'
 
-import { cn } from "../../lib/utils"
+import { cn } from '../../lib/utils'
 
-const MaShanZheng = Ma_Shan_Zheng({subsets: ['latin'], weight: "400"})
-const IslandMoments = Island_Moments({subsets: ['latin'], weight: '400'})
+const MaShanZheng = Ma_Shan_Zheng({ subsets: ['latin'], weight: '400' })
+const IslandMoments = Island_Moments({ subsets: ['latin'], weight: '400' })
 
 const Title = () => {
   return (
     <p
-      className={cn(MaShanZheng.className, "drop-shadow-2xl opacity-60 text-center")}
+      className={cn(
+        MaShanZheng.className,
+        'text-center opacity-60 drop-shadow-2xl'
+      )}
       style={{
-        fontSize: 500, color: "#2D316A",
-      }}>
+        fontSize: 500,
+        color: '#2D316A'
+      }}
+    >
       Amang
     </p>
   )
@@ -21,9 +26,9 @@ const Title = () => {
 const SubTitle = () => {
   return (
     <p
-      className={cn(IslandMoments.className, "drop-shadow-2xl text-center")}
-      style={{ fontSize: 80, color: "#4C3B27", transform: "translateY(-150%)" }}
-      >
+      className={cn(IslandMoments.className, 'text-center drop-shadow-2xl')}
+      style={{ fontSize: 80, color: '#4C3B27', transform: 'translateY(-150%)' }}
+    >
       Sungkyunkwan University Music Club
     </p>
   )
@@ -32,11 +37,10 @@ const SubTitle = () => {
 export default function Home() {
   return (
     <div
-      className="invisible lg:visible fixed top-1/2 left-1/2"
+      className="fixed left-1/2 top-1/2 hidden lg:block"
       style={{
-        transform: "translateY(-50%) translateX(-50%)",
-        userSelect: "none",
-        zIndex: -1
+        transform: 'translateY(-50%) translateX(-50%)',
+        userSelect: 'none'
       }}
     >
       <Title />
@@ -44,4 +48,3 @@ export default function Home() {
     </div>
   )
 }
-
