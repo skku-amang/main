@@ -1,68 +1,64 @@
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '../../lib/utils';
+import React from 'react'
 
-// 타입 정의
-type FilterLabel = {
-  id: number;
-  label: string;
-}; 
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
-export type FilterLabelArray = FilterLabel[];
+export type FilterLabel = {
+  id: number
+  label: string
+}
 
-{/* 일단 제목 필터 기준이 보이는 부분 (ex. 세션, 모집상태 등) */}
-export const FilterHeader = ({ header, className }: { header?: string; className?: string }) => {
+/**
+ * 제목 필터 기준이 보이는 부분 (ex. 세션, 모집상태 등)
+ */
+export const FilterHeader = ({
+  children,
+  className
+}: {
+  children?: React.ReactNode
+  className?: string
+}) => {
   return (
-    <div className={`absolute left-9 top-5 font-semibold text-blue-950 text-lg ${className}`}>
-      {header}
+    <div className={cn('text-lg font-semibold text-blue-950', className)}>
+      {children}
     </div>
-  );
-};
+  )
+}
 
-{/* 체크박스를 감싸는 네모 박스를 정의하는 부분 */}
-export const FilterCheckBoxContainer = ({label }: { label: string }) => {
+/**
+ * 체크박스를 감싸는 네모 박스를 정의하는 부분
+ */
+export const FilterCheckBoxContainer = ({ label }: { label: string }) => {
   return (
-    <div className='flex gap-2 items-center font-medium w-full h-[2.6rem]'>
+    <div className="flex h-[2.6rem] w-full items-center gap-2 font-medium">
       <Checkbox />
-      <label>{label}</label>
+      <Label>{label}</Label>
     </div>
-  );
-};
+  )
+}
 
-{/* 정의된 체크박스를 생성하는 컴포넌트 prop으로 FilterLabelArray 형식을 입력해줘야 함*/}
-export const FilterCheckBoxContainerGeneration = ({ filterLabelArray }: { filterLabelArray: FilterLabelArray }) => {
+const FilterSection = ({
+  filterObject,
+  header
+}: {
+  filterObject: FilterLabel[]
+  header: React.ReactNode
+}) => {
   return (
-    <div className='grid grid-rows-6 grid-flow-col' >
-      { filterLabelArray.map((filterLabel) => (
-        <FilterCheckBoxContainer key={filterLabel.id} label={filterLabel.label} />
-      ))}
+    <div className="relative h-full w-full p-5">
+      <FilterHeader>{header}</FilterHeader>
+
+      <div className="h-full w-full justify-center">
+        {filterObject.map((filterLabel) => (
+          <FilterCheckBoxContainer
+            key={filterLabel.id}
+            label={filterLabel.label}
+          />
+        ))}
+      </div>
     </div>
-  );
-};
+  )
+}
 
-{/* 위에서 정의한 GENERATOR를 바탕으로 필터에서 보이는 한 줄을 정의함 (한 줄에 6개의 CHECKBOX가 들어감) */}
-const FilterSection = ({filterObject, header, className}: {filterObject: FilterLabelArray, header?: string, className?: string}) => {
-  return (
-    <div className = "relative w-full h-full">
-        <div>
-            <FilterHeader header={header}/>
-        </div>
-        <div className="absolute h-full w-full justify-center left-9 top-16">
-            <FilterCheckBoxContainerGeneration filterLabelArray={filterObject}/>
-        </div>
-    </div>
-  );
-};
-
-export default FilterSection;
-{/*
-    사용법 예시 FilterLabelArray 타입의 배열을 FilterObject으로 입력하고, 분류 기준이 되는 header를 입력하면 완성
-    외각의 div로 틀을 짜주긴 해야 함
-
-    <div className='flex absolute rounded-sm right-0 top-11 w-[30rem] h-[21rem] shadow-xl z-50 bg-white'>
-        <FilterSection header="세션" FilterObject={Example_Filter_array}/>
-        <FilterSection header="모집상태" FilterObject={Example_Filter_array2}/>
-    </div>
-*/}
-
-
-
+export default FilterSection
