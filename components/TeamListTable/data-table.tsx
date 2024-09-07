@@ -80,8 +80,8 @@ export function TeamListDataTable<TValue>({
     }
   })
 
-  const [filter, setfilter] = useState(false);
-  const openfilter = () => setfilter(!filter);
+  const [filter, toggleFilter] = useState(false);
+  const openfilter = () => toggleFilter(!filter);
 
   return (
     <div>
@@ -110,8 +110,8 @@ export function TeamListDataTable<TValue>({
           </Button>
           {filter && (
             <div className='flex absolute rounded-sm right-0 top-11 w-[30rem] h-[21rem] shadow-xl z-50 bg-white'>
-              <FilterSection header="세션" Filter_obj={Example_Filter_array}/>
-              <FilterSection header="모집상태" Filter_obj={Example_Filter_array2}/>
+              <FilterSection header="세션" filterObject={Example_Filter_array}/>
+              <FilterSection header="모집상태" filterObject={Example_Filter_array2}/>
             </div>
           )
           }

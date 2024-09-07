@@ -70,8 +70,8 @@ export function MemberListDataTable<TValue>({
     },
   })
 
-  const [filter, setfilter] = useState(false);
-  const openfilter = () => setfilter(!filter);
+  const [filter, toggleFilter] = useState(false);
+  const openfilter = () => toggleFilter(!filter);
 
   return (
     <div>
@@ -91,7 +91,7 @@ export function MemberListDataTable<TValue>({
           </Button>
           {filter && (
             <div className='flex absolute rounded-sm right-0 top-11 w-[15rem] h-[21rem] shadow-xl z-50 bg-white'>
-              <FilterSection header="세션" Filter_obj={Example_Filter_array}/>
+              <FilterSection header="세션" filterObject={Example_Filter_array}/>
             </div>
           )
           }
