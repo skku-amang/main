@@ -1,12 +1,12 @@
-import { createUser } from '../../../../../lib/dummy/User'
-import { User } from '../../../../../types/User'
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../../../../components/ui/card'
+} from '@/components/ui/card'
+import { createUser } from '@/lib/dummy/User'
+import { User } from '@/types/User'
 
 const PromotionPost = ({
   title,

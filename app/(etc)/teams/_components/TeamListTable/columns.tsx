@@ -9,6 +9,8 @@ import { GoPencil } from 'react-icons/go'
 import { GoTrash } from 'react-icons/go'
 import { MdOpenInNew } from 'react-icons/md'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,12 +18,9 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import ROUTES from '@/constants/routes'
+import { cn } from '@/lib/utils'
+import { Session } from '@/types/Session'
 import { MemberSession, MemberSessionSet } from '@/types/Team'
-
-import { cn } from '../../../../../lib/utils'
-import { Session } from '../../../../../types/Session'
-import { Badge } from '../../../../../components/ui/badge'
-import { Button } from '../../../../../components/ui/button'
 
 type TeamStatus = '모집 완료' | '모집 중'
 export type TeamColumn = {

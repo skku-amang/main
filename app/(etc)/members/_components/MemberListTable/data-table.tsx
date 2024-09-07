@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { TbFilter } from 'react-icons/tb'
 
 import FilterSection, { FilterLabel } from '@/components/Filter'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -27,8 +28,6 @@ import {
 } from '@/components/ui/table'
 import ROUTES from '@/constants/routes'
 import { User } from '@/types/User'
-
-import { Button } from '../ui/button'
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<User, TValue>[]

@@ -4,13 +4,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaSpinner } from 'react-icons/fa'
 
-import { Button } from '../../../../../components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from '../../../../../components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -18,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '../../../../../components/ui/dialog'
-import { Input } from '../../../../../components/ui/input'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -27,9 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '../../../../../components/ui/table'
-import { MemberSession, Team } from '../../../../../types/Team'
-import { User } from '../../../../../types/User'
+} from '@/components/ui/table'
+import { MemberSession, Team } from '@/types/Team'
+import { User } from '@/types/User'
 
 interface FormData {
   teamId: number

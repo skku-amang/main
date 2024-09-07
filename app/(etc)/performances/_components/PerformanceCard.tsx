@@ -11,9 +11,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../../../components/ui/card'
-import ROUTES from '../../../../constants/routes'
-import { cn } from '../../../../lib/utils'
+} from '@/components/ui/card'
+import ROUTES from '@/constants/routes'
+import { cn } from '@/lib/utils'
 
 interface PerformanceCardProp {
   id?: number

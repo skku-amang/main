@@ -17,9 +17,8 @@ import { CiCirclePlus } from 'react-icons/ci'
 import { TbFilter } from 'react-icons/tb'
 
 import FilterSection, { FilterLabel } from '@/components/Filter'
-
-import { Button } from '../../../../../components/ui/button'
-import { Input } from '../../../../../components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -27,7 +26,8 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '../../../../../components/ui/table'
+} from '@/components/ui/table'
+
 import { TeamColumn } from './columns'
 
 interface DataTableProps<TValue> {

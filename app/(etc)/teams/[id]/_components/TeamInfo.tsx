@@ -1,12 +1,12 @@
-import { Team } from '../../../../../types/Team'
-import ImageLoader from '../../../../../components/ImageLoader'
+import ImageLoader from '@/components/ImageLoader'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle
-} from '../../../../../components/ui/card'
+} from '@/components/ui/card'
+import { Team } from '@/types/Team'
 
 interface TeamDescriptionProps {
   team: Team

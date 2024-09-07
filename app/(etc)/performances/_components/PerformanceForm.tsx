@@ -5,11 +5,12 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 
-import SimpleDateField from '../../../../components/Form/SimpleDateField'
-import SimpleImageField from '../../../../components/Form/SimpleImageField'
-import SimpleStringField from '../../../../components/Form/SimpleStringField'
-import { Button } from '../../../../components/ui/button'
-import { Form } from '../../../../components/ui/form'
+import SimpleDateField from '@/components/Form/SimpleDateField'
+import SimpleImageField from '@/components/Form/SimpleImageField'
+import SimpleStringField from '@/components/Form/SimpleStringField'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+
 import PerformanceCard from './PerformanceCard'
 
 const MAX_FILE_SIZE = 5000000 // 5MB
