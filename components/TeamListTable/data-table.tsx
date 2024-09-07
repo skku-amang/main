@@ -89,13 +89,13 @@ export function TeamListDataTable<TValue>({
             &nbsp;Filter
           </Button>
           {filter && (
-          <div className='flex absolute rounded-sm right-0 top-11 w-[30rem] h-[23rem] shadow-xl z-50 bg-white'>
+          <div className='flex absolute rounded-sm right-0 top-11 w-[30rem] h-[24rem] shadow-xl z-50 bg-white'>
             
             {/* 좌측 박스, 필요세션 (모두, 보컬12, 기타123, 신디12, 베이스, 드럼, 현악기, 관악기) */}
             <div className='relative flex-col w-[16rem] h-full '>
               <div className='absolute left-9 top-5 font-semibold text-blue-950 text-lg'>필요세션</div>
               {/* 좌측박스 체크박스 들어가는 부분 전체 */}
-              <div className="flex justify-center absolute left-0 top-14 w-[16rem] h-[22rem] ">
+              <div className="flex justify-center absolute left-0 top-16 w-[16rem] h-[22rem] ">
                 <div className="flex items-center justify-center gap-[1.5rem] w-[13rem] h-[20rem]">
                   <div className='flex flex-col w-[5rem] gap-[0.55rem] h-full '>
                     <div className='flex gap-2 items-center font-medium  w-full h-[2.6rem]' >
@@ -153,7 +153,7 @@ export function TeamListDataTable<TValue>({
             {/* 우측 박스, 모집상태 (모두, active, inactive) */}
             <div className='relative w-[14rem] h-full border-l-[0.1rem] border-l-slate-100 '>
               <div className='absolute left-6 top-5 font-semibold text-blue-950 text-lg'>모집상태</div>
-              <div className="flex justify-center absolute left-0 top-[3.4rem] w-full h-[22rem] ">
+              <div className="flex justify-center absolute left-0 top-16 w-full h-[22rem] ">
                 <div className="flex items-center justify-start pl-4 w-[13rem] h-[20rem]">
                   <div className='flex flex-col w-[5rem] gap-[0.55rem] h-full '>
                   <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
