@@ -1,5 +1,3 @@
-import '@/app/globals.css'
-
 import React from 'react'
 
 import Footer from '@/components/Footer'
@@ -20,9 +18,6 @@ export default function RootLayout({
       <div
         className="h-auto min-h-full"
         style={{
-          backgroundImage: `url('Music band_pixabay 1.png')`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
           paddingTop: headerHeight,
           paddingBottom: footerHeight
         }}

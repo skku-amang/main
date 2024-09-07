@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { FaClock } from 'react-icons/fa'
 import { IoLocationSharp } from 'react-icons/io5'
 
-import { Badge } from '../../../components/ui/badge'
-import ROUTES from '../../../constants/routes'
-import { generateDummys } from '../../../lib/dummy'
-import { createPerformance } from '../../../lib/dummy/Performance'
+import { Badge } from '../../../../components/ui/badge'
+import ROUTES from '../../../../constants/routes'
+import { generateDummys } from '../../../../lib/dummy'
+import { createPerformance } from '../../../../lib/dummy/Performance'
 import TeamList from '../../teams/page'
 
 interface PerformanceDetailProp {

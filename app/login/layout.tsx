@@ -18,11 +18,8 @@ export default function RootLayout({
       <Header position="fixed" height={headerHeight} />
 
       <div
-        className="h-auto min-h-full"
+        className="h-full"
         style={{
-          backgroundImage: `url('Music band_pixabay 1.png')`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
           paddingTop: headerHeight,
           paddingBottom: footerHeight
         }}

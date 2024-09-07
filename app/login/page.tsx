@@ -6,11 +6,10 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { emailSchema, passwordSchema } from '@/constants/zodSchema'
 
-// import { FcGoogle } from 'react-icons/fc'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
 import styles from './login.module.css'
 
 const formSchema = z.object({
@@ -32,7 +31,7 @@ const Login = () => {
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div className="flex h-full min-h-full w-full items-center justify-center py-10">
       <div className="flex h-full items-center justify-center gap-0 rounded-lg bg-white px-0 md:px-20 md:shadow-2xl lg:w-8/12 lg:gap-16">
         <div
           className={`${styles.gradation} w-0 flex-shrink-0 rounded-3xl xl:h-[90%] xl:w-1/3 xl:flex-1`}
@@ -43,16 +42,14 @@ const Login = () => {
             {/* 일반 로그인 */}
             <form onSubmit={handleSubmit(onValid)} className="space-y-6">
               <Input
-                {...register('email', { required: '이메일을 입력해주세요' })}
+                {...register('email')}
                 name="email"
                 placeholder="Email"
                 className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.email?.message}</div>
               <Input
-                {...register('password', {
-                  required: '비밀번호를 입력해주세요'
-                })}
+                {...register('password')}
                 name="password"
                 placeholder="PW"
                 type="password"

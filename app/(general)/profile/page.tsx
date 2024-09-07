@@ -1,4 +1,4 @@
-import { auth } from '../../auth'
+import { auth } from '../../../auth'
 
 const ProfilePage = async () => {
   const session = await auth()

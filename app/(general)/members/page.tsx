@@ -1,5 +1,5 @@
-import { columns } from '@/app/members/_components/MemberListTable/columns'
-import { MemberListDataTable } from '@/app/members/_components/MemberListTable/data-table'
+import { columns } from '@/app/(general)/members/_components/MemberListTable/columns'
+import { MemberListDataTable } from '@/app/(general)/members/_components/MemberListTable/data-table'
 import { generateDummys } from '@/lib/dummy'
 import { createUser } from '@/lib/dummy/User'
 import { User } from '@/types/User'

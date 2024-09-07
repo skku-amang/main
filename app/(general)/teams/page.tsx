@@ -1,10 +1,10 @@
 import Link from 'next/link'
 
-import { Badge } from '../../components/ui/badge'
-import ROUTES from '../../constants/routes'
-import { generateDummys } from '../../lib/dummy'
-import { createPerformance } from '../../lib/dummy/Performance'
-import { createTeam } from '../../lib/dummy/Team'
+import { Badge } from '../../../components/ui/badge'
+import ROUTES from '../../../constants/routes'
+import { generateDummys } from '../../../lib/dummy'
+import { createPerformance } from '../../../lib/dummy/Performance'
+import { createTeam } from '../../../lib/dummy/Team'
 import { columns, TeamColumn } from './_components/TeamListTable/columns'
 import { TeamListDataTable } from './_components/TeamListTable/data-table'
 
