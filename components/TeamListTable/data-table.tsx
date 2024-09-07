@@ -27,9 +27,9 @@ import {
   TableRow
 } from '../ui/table'
 import { TeamColumn } from './columns'
-import { Checkbox } from '@radix-ui/react-checkbox'
 import { Check } from 'lucide-react'
 import dummySessions from '@/lib/dummy/Session'
+import { Checkbox } from '../ui/checkbox'
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
@@ -89,19 +89,88 @@ export function TeamListDataTable<TValue>({
             &nbsp;Filter
           </Button>
           {filter && (
-          <div className='flex absolute right-0 top-11 w-[30rem] h-[27rem] shadow-lg z-50 bg-white'>
+          <div className='flex absolute rounded-sm right-0 top-11 w-[30rem] h-[23rem] shadow-xl z-50 bg-white'>
             
             {/* 좌측 박스, 필요세션 (모두, 보컬12, 기타123, 신디12, 베이스, 드럼, 현악기, 관악기) */}
-            <div className='relative flex-col w-[18rem] h-full shadow-xl'>
-              <div className='absolute left-9 top-7 font-semibold'>필요세션</div>
-              <div>
-                
+            <div className='relative flex-col w-[16rem] h-full '>
+              <div className='absolute left-9 top-5 font-semibold text-blue-950 text-lg'>필요세션</div>
+              {/* 좌측박스 체크박스 들어가는 부분 전체 */}
+              <div className="flex justify-center absolute left-0 top-14 w-[16rem] h-[22rem] ">
+                <div className="flex items-center justify-center gap-[1.5rem] w-[13rem] h-[20rem]">
+                  <div className='flex flex-col w-[5rem] gap-[0.55rem] h-full '>
+                    <div className='flex gap-2 items-center font-medium  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>모두</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>보컬1</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>보컬2</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>기타1</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>기타2</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>신디1</label>
+                    </div>
+                  </div>
+                  <div className='flex flex-col w-[5rem] gap-[0.55rem] h-full'>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>신디2</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>베이스</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>드럼</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>현악기</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>관악기</label>
+                    </div>
+                  </div>
+                </div>
               </div>
+              
             </div>
   
             {/* 우측 박스, 모집상태 (모두, active, inactive) */}
-            <div className='relative w-[12rem] h-full shadow-xl '>
-              <div className='absolute  left-6 top-7 font-semibold'>모집상태</div>
+            <div className='relative w-[14rem] h-full border-l-[0.1rem] border-l-slate-100 '>
+              <div className='absolute left-6 top-5 font-semibold text-blue-950 text-lg'>모집상태</div>
+              <div className="flex justify-center absolute left-0 top-[3.4rem] w-full h-[22rem] ">
+                <div className="flex items-center justify-start pl-4 w-[13rem] h-[20rem]">
+                  <div className='flex flex-col w-[5rem] gap-[0.55rem] h-full '>
+                  <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>모두</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>Active</label>
+                    </div>
+                    <div className='flex gap-2 items-center  w-full h-[2.6rem]' >
+                      <Checkbox/>
+                      <label>Inactive</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           )
