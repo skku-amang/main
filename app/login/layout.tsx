@@ -1,3 +1,5 @@
+import '@/app/globals.css'
+
 import React from 'react'
 
 export const metadata = {
