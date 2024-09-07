@@ -52,7 +52,6 @@ const Header = ({
         <div className="mr-10"></div>
       </nav>
 
-      {/* 열리는 창 안에 있는 것들 고생이 많아 장수*/}
       <div
         className={`fixed left-0 top-0 flex h-screen w-[43%] transform flex-col justify-center bg-gray-800 text-white ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}
       >

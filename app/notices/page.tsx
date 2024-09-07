@@ -1,18 +1,26 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "../../../components/ui/button"
+import { Button } from '../../components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "../../../components/ui/card"
-import ROUTES from "../../../constants/routes"
-import { User } from "../../../types/User"
+  CardTitle
+} from '../../components/ui/card'
+import ROUTES from '../../constants/routes'
+import { User } from '../../types/User'
 
-const NoticeCard = ({ title, author, createdDatetime }: { title: string, author: User, createdDatetime: Date}) => {
+const NoticeCard = ({
+  title,
+  author,
+  createdDatetime
+}: {
+  title: string
+  author: User
+  createdDatetime: Date
+}) => {
   return (
     <Card>
       <CardHeader>
@@ -36,9 +44,7 @@ const NoticeList = () => {
         <Link href={ROUTES.NOTICE.CREATE.url}>추가</Link>
       </Button>
 
-      <div>
-        
-      </div>
+      <div></div>
     </>
   )
 }

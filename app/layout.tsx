@@ -2,6 +2,7 @@ import '@/app/globals.css'
 
 import { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
+import { SessionProvider } from 'next-auth/react'
 import React from 'react'
 
 const fontSans = FontSans({
@@ -23,7 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={fontSans.className}>{children}</body>
+      <SessionProvider>
+        <body className={fontSans.className}>{children}</body>
+      </SessionProvider>
     </html>
   )
 }

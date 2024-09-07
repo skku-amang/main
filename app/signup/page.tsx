@@ -11,10 +11,10 @@ import {
   passwordSchema
 } from '@/constants/zodSchema'
 
-import SimpleLabel from '../../../components/Form/SimpleLabel'
-import SimpleStringField from '../../../components/Form/SimpleStringField'
-import { Button } from '../../../components/ui/button'
-import { Checkbox } from '../../../components/ui/checkbox'
+import SimpleLabel from '../../components/Form/SimpleLabel'
+import SimpleStringField from '../../components/Form/SimpleStringField'
+import { Button } from '../../components/ui/button'
+import { Checkbox } from '../../components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -23,8 +23,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from '../../../components/ui/form'
-import dummySessions from '../../../lib/dummy/Session'
+} from '../../components/ui/form'
+import dummySessions from '../../lib/dummy/Session'
 
 const sessions = dummySessions
 

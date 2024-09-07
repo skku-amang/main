@@ -1,44 +1,37 @@
 import '@/app/globals.css'
 
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { SessionProvider } from 'next-auth/react'
 import React from 'react'
 
-import HeightPopulatedBody from '../../components/HeightPopulatedBody'
-import { cn } from '../../lib/utils'
-
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'AMANG',
-  description: 'SKKU AMANG official homepage',
-  icons: {
-    icon: '/favicon.ico'
-  }
-}
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
 
 export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const headerHeight = '4rem'
+  const footerHeight = '5rem'
+
   return (
-    <html lang="ko">
-      <SessionProvider>
-        <HeightPopulatedBody
-          headerHeight="4rem"
-          footerHeight="5rem"
-          className={cn(inter.className, 'overflow-hidden')}
-          style={{
-            backgroundImage: `url('Music band_pixabay 1.png')`,
-            backgroundPosition: 'center',
-            backgroundSize: 'cover'
-          }}
-        >
-          <div className="container">{children}</div>
-        </HeightPopulatedBody>
-      </SessionProvider>
-    </html>
+    <div className="h-screen">
+      <Header position="fixed" height={headerHeight} />
+
+      <div
+        className="h-auto"
+        style={{
+          backgroundImage: `url('Music band_pixabay 1.png')`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          minHeight: '100%',
+          paddingTop: headerHeight,
+          paddingBottom: footerHeight
+        }}
+      >
+        {children}
+      </div>
+
+      <Footer height={footerHeight} />
+    </div>
   )
 }
