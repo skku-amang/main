@@ -1,6 +1,6 @@
-import { Performance } from './Performance'
-import { Session } from './Session'
-import { User } from './User'
+import { Performance } from "./Performance"
+import { Session } from "./Session"
+import { User } from "./User"
 
 export type Team = {
   id: number
@@ -50,7 +50,7 @@ export class MemberSessionSet {
         memberSessions.map((memberSession) => memberSession.session)
       )
     ) {
-      throw new Error('MemberSessionSet의 세션은 모두 고유해야 합니다.')
+      throw new Error("MemberSessionSet의 세션은 모두 고유해야 합니다.")
     }
     this.memberSessions = new Set(memberSessions)
   }

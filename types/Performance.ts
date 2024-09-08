@@ -1,5 +1,9 @@
 export type PerformanceStatus = "예정" | "진행중" | "종료"
-export const PerformanceStatus: PerformanceStatus[] = ["예정", "진행중", "종료"]
+export const PerformanceStatusValues: PerformanceStatus[] = [
+  "예정",
+  "진행중",
+  "종료"
+]
 
 export type Performance = {
   id: number
