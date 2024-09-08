@@ -26,7 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
+} from './ui/table'
 
 import { TeamColumn } from './columns'
 
@@ -119,7 +119,7 @@ export function TeamListDataTable<TValue>({
           )}
         </div>
       </div>
-      <div className="overflow-hidden rounded-sm border">
+      <div className="overflow-hidden rounded-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -128,7 +128,7 @@ export function TeamListDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="bg-gray-700 font-bold text-white"
+                      className="bg-zinc-700 font-bold text-white"
                     >
                       {header.isPlaceholder
                         ? null
@@ -172,7 +172,6 @@ export function TeamListDataTable<TValue>({
           </TableBody>
         </Table>
       </div>
-      {/* 다음 창으로 이동 버튼 */}
       <div className="flex items-center justify-center space-x-2 py-4">
         <Button
           variant="outline"
