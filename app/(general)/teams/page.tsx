@@ -32,17 +32,18 @@ const TeamList = () => {
     <div className="container">
       {/* 팀 배너 */}
       <div className="flex flex-col items-center justify-center">
-        <h2 className="mt-24 text-4xl font-extrabold text-gray-600">
+        <h2 className="mt-28 text-4xl font-extrabold text-zinc-700">
           공연팀 목록
         </h2>
         <p className="my-8 font-bold">Performances</p>
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 pb-8">
           {activePerformances.map((p) => (
             <Link
               key={p.id}
               href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}
+              className= "rounded-xl shadow-md"
             >
-              <Badge className="text-md rounded-xl bg-slate-200 px-6 py-1 font-normal text-black">
+              <Badge className="text-md rounded-xl bg-zinc-100 px-6 py-1 font-normal text-black">
                 {p.name}
               </Badge>
             </Link>
