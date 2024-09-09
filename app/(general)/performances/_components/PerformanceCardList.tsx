@@ -1,39 +1,27 @@
-'use client'
+import Link from "next/link"
+import React from "react"
+import { CiCirclePlus } from "react-icons/ci"
 
-import Link from 'next/link'
-import { memo, useMemo, useState } from 'react'
-import React from 'react'
-import { CiCirclePlus } from 'react-icons/ci'
+import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
+import fetchData from "@/lib/fetch"
+import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { Performance } from "@/types/Performance"
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import ROUTES from '@/constants/routes'
-import { generateDummys } from '@/lib/dummy'
-import { createPerformance } from '@/lib/dummy/Performance'
-
-import PerformanceCard from './PerformanceCard'
-
-const MemoPerformanceCard = memo(PerformanceCard)
-
-const PerformanceList = () => {
-  const performances = useMemo(() => generateDummys(10, createPerformance), [])
-  const [query, setQuery] = useState('')
-
-  const filteredList = useMemo(() => {
-    return performances.filter((p) =>
-      p.name.toLowerCase().includes(query.toLowerCase())
-    )
-  }, [performances, query])
+const PerformanceList = async () => {
+  // const performances = generateDummys(10, createPerformance)
+  const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST)
+  const performances = (await res.json()) as ListResponse<Performance>
 
   return (
     <div className="mb-10">
       {/* 도구 모음 */}
       <div className="mb-3 flex justify-between">
         <div className="flex gap-x-3">
-          <Input
-            className="w-72"
-            onInput={(e) => setQuery(e.currentTarget.value)}
-          />
+          <Input className="w-72" />
           <Button>검색</Button>
         </div>
 
@@ -47,9 +35,9 @@ const PerformanceList = () => {
 
       {/* 공연 카드 목록 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredList.map((p) => (
+        {performances.map((p) => (
           <div key={p.id} className="flex w-full justify-center">
-            <MemoPerformanceCard
+            <PerformanceCard
               id={p.id}
               name={p.name}
               representativeSrc={p.representativeImage}

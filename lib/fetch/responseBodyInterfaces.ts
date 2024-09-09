@@ -1,8 +1,6 @@
-export interface CreateListResponse<T> {
-  data: T
-}
+export interface ListResponse<T> extends Array<T> {}
 
-export interface RetrieveUpdateResponse<T> {
+export interface CreateRetrieveUpdateResponse<T> {
   data: T
 }
 
