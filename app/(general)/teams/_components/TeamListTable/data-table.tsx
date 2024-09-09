@@ -26,7 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from './ui/table'
+} from '@/app/(general)/teams/_components/TeamListTable/table'
 
 import { TeamColumn } from './columns'
 
