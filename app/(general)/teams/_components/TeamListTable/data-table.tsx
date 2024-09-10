@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import {
   ColumnDef,
@@ -10,15 +10,15 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable
-} from '@tanstack/react-table'
-import Link from 'next/link'
-import { useState } from 'react'
-import { CiCirclePlus } from 'react-icons/ci'
-import { TbFilter } from 'react-icons/tb'
+} from "@tanstack/react-table"
+import Link from "next/link"
+import { useState } from "react"
+import { CiCirclePlus } from "react-icons/ci"
+import { TbFilter } from "react-icons/tb"
 
-import FilterSection, { FilterLabel } from '@/components/Filter'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import FilterSection, { FilterLabel } from "@/components/Filter"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -26,33 +26,33 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
+} from "@/components/ui/table"
 
-import { TeamColumn } from './columns'
+import { TeamColumn } from "./columns"
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<TeamColumn, TValue>[]
   data: TeamColumn[]
 }
 
-const Example_Filter_array: FilterLabel[] = [
-  { id: 1, label: '모두' },
-  { id: 2, label: '보컬 1' },
-  { id: 3, label: '보컬 2' },
-  { id: 4, label: '기타 1' },
-  { id: 5, label: '기타 2' },
-  { id: 6, label: '신디 1' },
-  { id: 7, label: '신디 2' },
-  { id: 8, label: '베이스' },
-  { id: 9, label: '드럼' },
-  { id: 10, label: '현악기' },
-  { id: 11, label: '관악기' }
+const ExampleFilters: FilterLabel[] = [
+  { id: 1, label: "모두" },
+  { id: 2, label: "보컬 1" },
+  { id: 3, label: "보컬 2" },
+  { id: 4, label: "기타 1" },
+  { id: 5, label: "기타 2" },
+  { id: 6, label: "신디 1" },
+  { id: 7, label: "신디 2" },
+  { id: 8, label: "베이스" },
+  { id: 9, label: "드럼" },
+  { id: 10, label: "현악기" },
+  { id: 11, label: "관악기" }
 ]
 
-const Example_Filter_array2: FilterLabel[] = [
-  { id: 1, label: '모두' },
-  { id: 2, label: 'Active' },
-  { id: 3, label: 'InActive' }
+const ExampleFilter2: FilterLabel[] = [
+  { id: 1, label: "모두" },
+  { id: 2, label: "Active" },
+  { id: 3, label: "InActive" }
 ]
 
 export function TeamListDataTable<TValue>({
@@ -86,10 +86,10 @@ export function TeamListDataTable<TValue>({
         <Input
           placeholder="검색"
           value={
-            (table.getColumn('songName')?.getFilterValue() as string) ?? ''
+            (table.getColumn("songName")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn('songName')?.setFilterValue(event.target.value)
+            table.getColumn("songName")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -107,14 +107,8 @@ export function TeamListDataTable<TValue>({
           </Button>
           {filter && (
             <div className="absolute right-0 top-11 z-50 flex h-[21rem] w-[30rem] rounded-sm bg-white shadow-xl">
-              <FilterSection
-                header="세션"
-                filterObject={Example_Filter_array}
-              />
-              <FilterSection
-                header="모집상태"
-                filterObject={Example_Filter_array2}
-              />
+              <FilterSection header="세션" filterObject={ExampleFilters} />
+              <FilterSection header="모집상태" filterObject={ExampleFilter2} />
             </div>
           )}
         </div>
@@ -147,7 +141,7 @@ export function TeamListDataTable<TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

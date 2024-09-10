@@ -1,10 +1,10 @@
-import { faker } from '@faker-js/faker'
+import { faker } from "@faker-js/faker"
 
-import { getRandomSessions } from '@/lib/dummy/Session'
+import { getRandomSessions } from "@/lib/dummy/Session"
+import { DepartmentNames, Position, User } from "@/types/User"
 
-import { User } from '../../types/User'
-import { customFaker } from '.'
-import dummyGenerations from './Generation'
+import { customFaker } from "."
+import dummyGenerations from "./Generation"
 
 export const createUser = (id: number): User => {
   let fakerWithSeed = faker
@@ -12,11 +12,11 @@ export const createUser = (id: number): User => {
 
   return {
     id,
+    email: customFaker.internet.email(),
     name: customFaker.person.fullName(),
     nickname: customFaker.internet.userName(),
-    email: customFaker.internet.email(),
     bio: customFaker.lorem.sentence(),
-    profile_image: customFaker.image.avatar(),
+    profileImage: customFaker.image.avatar(),
     generation: customFaker.helpers.arrayElement(dummyGenerations),
     sessions: getRandomSessions(
       new Map([
@@ -25,7 +25,18 @@ export const createUser = (id: number): User => {
         [3, 0.1]
       ])
     ),
+    position: customFaker.helpers.arrayElement(
+      Object.keys(Position) as Position[]
+    ),
+    department: customFaker.helpers.arrayElement(
+      DepartmentNames.map((name, id) => ({
+        id,
+        name: name as keyof typeof DepartmentNames
+      }))
+    ),
     genre: fakerWithSeed.music.genre(),
-    liked_artists: customFaker.person.firstName()
+    likedArtists: customFaker.person.firstName(),
+    createdDatetime: customFaker.date.past().toISOString(),
+    updatedDatetime: customFaker.date.recent().toISOString()
   }
 }

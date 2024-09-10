@@ -1,36 +1,36 @@
-'use client'
+"use client"
 
-import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown } from 'lucide-react'
-import Link from 'next/link'
-import React from 'react'
-import { BsThreeDotsVertical } from 'react-icons/bs'
-import { GoPencil } from 'react-icons/go'
-import { GoTrash } from 'react-icons/go'
-import { MdOpenInNew } from 'react-icons/md'
+import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown } from "lucide-react"
+import Link from "next/link"
+import React from "react"
+import { BsThreeDotsVertical } from "react-icons/bs"
+import { GoPencil } from "react-icons/go"
+import { GoTrash } from "react-icons/go"
+import { MdOpenInNew } from "react-icons/md"
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import ROUTES from '@/constants/routes'
-import { cn } from '@/lib/utils'
-import { Session } from '@/types/Session'
-import { MemberSession, MemberSessionSet } from '@/types/Team'
+} from "@/components/ui/dropdown-menu"
+import ROUTES from "@/constants/routes"
+import { cn } from "@/lib/utils"
+import { Session } from "@/types/Session"
+import { MemberSession, MemberSessionSet } from "@/types/Team"
 
-type TeamStatus = '모집 완료' | '모집 중'
+type TeamStatus = "모집 완료" | "모집 중"
 export type TeamColumn = {
   id: number
   songName: string
   songArtist: string
   leaderName: string
   memberSessions: MemberSession[]
-  cover_url: string
-  is_freshmanFixed: boolean
+  coverUrl?: string
+  isFreshmanFixed: boolean
 }
 
 const SortButton = ({
@@ -43,7 +43,7 @@ const SortButton = ({
   return (
     <Button
       variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       {children}
       <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -59,14 +59,14 @@ const SessionBadge = ({ session }: { session: Session }) => {
 
 const StatusBadge = ({ status }: { status: TeamStatus }) => {
   const className =
-    status === '모집 완료'
-      ? 'bg-red-100 border-destructive text-destructive '
-      : 'bg-green-100 border-green-600 text-green-600 '
+    status === "모집 완료"
+      ? "bg-red-100 border-destructive text-destructive "
+      : "bg-green-100 border-green-600 text-green-600 "
   return (
     <div className="flex justify-center">
       <Badge
         variant="outline"
-        className={cn(className, 'rounded-lg border font-bold')}
+        className={cn(className, "rounded-lg border font-bold")}
       >
         {status}
       </Badge>
@@ -76,18 +76,18 @@ const StatusBadge = ({ status }: { status: TeamStatus }) => {
 
 export const columns: ColumnDef<TeamColumn>[] = [
   {
-    accessorKey: 'songName',
+    accessorKey: "songName",
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
       <Link href={ROUTES.TEAM.DETAIL.url(row.original.id.toString())}>
-        {row.getValue('songName')}
+        {row.getValue("songName")}
         <br />
         <span className="text-slate-300">{row.original.songArtist}</span>
       </Link>
     )
   },
   {
-    accessorKey: 'leaderName',
+    accessorKey: "leaderName",
     header: ({ column }) => (
       <div className="flex w-full justify-center">
         <SortButton column={column}>팀장</SortButton>
@@ -95,17 +95,17 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue('leaderName')}
+        {row.getValue("leaderName")}
         <br />
-        {row.original.is_freshmanFixed && (
+        {row.original.isFreshmanFixed && (
           <Badge className="bg-blue-900 py-0">신입고정</Badge>
         )}
       </div>
     )
   },
   {
-    id: 'requiredSessions',
-    header: '필요 세션',
+    id: "requiredSessions",
+    header: "필요 세션",
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions)
@@ -125,7 +125,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     }
   },
   {
-    accessorKey: 'status',
+    accessorKey: "status",
     header: ({ column }) => (
       <div className="flex w-full justify-center">
         <SortButton column={column}>모집상태</SortButton>
@@ -135,25 +135,25 @@ export const columns: ColumnDef<TeamColumn>[] = [
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions)
       const status: TeamStatus = memberSessionsSet.isSatisfied
-        ? '모집 완료'
-        : '모집 중'
+        ? "모집 완료"
+        : "모집 중"
       return <StatusBadge status={status} />
     }
   },
   {
-    accessorKey: 'cover_url',
-    header: '영상링크',
+    accessorKey: "coverUrl",
+    header: "영상링크",
     cell: ({ row }) => {
-      const cover_url = row.getValue('cover_url') as string
+      const coverUrl = row.getValue("coverUrl") as string
       return (
-        <Link href={cover_url} className="z-50">
+        <Link href={coverUrl} className="z-50">
           <MdOpenInNew size={24} />
         </Link>
       )
     }
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       return (

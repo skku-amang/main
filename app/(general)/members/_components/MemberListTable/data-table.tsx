@@ -34,7 +34,7 @@ interface DataTableProps<TValue> {
   data: User[]
 }
 
-const Example_Filter_array: FilterLabel[] = [
+const ExampleFilterArray: FilterLabel[] = [
   { id: 1, label: '모두' },
   { id: 2, label: '보컬 1' },
   { id: 3, label: '기타' },
@@ -90,7 +90,7 @@ export function MemberListDataTable<TValue>({
             <div className="absolute right-0 top-11 z-50 flex h-[21rem] w-[15rem] rounded-sm bg-white shadow-xl">
               <FilterSection
                 header="세션"
-                filterObject={Example_Filter_array}
+                filterObject={ExampleFilterArray}
               />
             </div>
           )}

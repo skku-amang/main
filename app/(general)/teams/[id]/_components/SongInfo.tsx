@@ -1,12 +1,12 @@
-import { FaMusic } from 'react-icons/fa'
+import { FaMusic } from "react-icons/fa"
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import YoutubeVideo from '@/lib/youtube'
-import YoutubePlayer from '@/lib/youtube/Player'
-import { Song } from '@/types/Team'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import YoutubeVideo from "@/lib/youtube"
+import YoutubePlayer from "@/lib/youtube/Player"
+import { Song } from "@/types/Team"
 
 const SongInfo = ({ song }: { song: Song }) => {
-  const videoId = YoutubeVideo.getVideoId(song.original_url)
+  const videoId = YoutubeVideo.getVideoId(song.originalUrl)
 
   return (
     <Card>
@@ -14,12 +14,12 @@ const SongInfo = ({ song }: { song: Song }) => {
         <CardTitle>{song.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        {song.cover_url ? (
+        {song.coverUrl ? (
           <YoutubePlayer
             videoId={videoId}
             width="100%"
             style={{
-              aspectRatio: '16/9'
+              aspectRatio: "16/9"
             }}
             className="rounded-2xl shadow-lg shadow-black"
           />

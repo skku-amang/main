@@ -7,13 +7,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
+import { generateDummys } from "@/lib/dummy"
+import { createPerformance } from "@/lib/dummy/Performance"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
 
 const PerformanceList = async () => {
-  // const performances = generateDummys(10, createPerformance)
-  const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST)
+  const _performances = generateDummys(10, createPerformance)
+  const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
+    cache: "no-cache"
+  })
   const performances = (await res.json()) as ListResponse<Performance>
 
   return (
@@ -42,7 +46,7 @@ const PerformanceList = async () => {
               name={p.name}
               representativeSrc={p.representativeImage}
               location={p.location}
-              startDatetime={p.start_datetime}
+              startDatetime={new Date(p.startDatetime)}
             />
           </div>
         ))}

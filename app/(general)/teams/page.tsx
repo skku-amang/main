@@ -1,32 +1,48 @@
-import Link from 'next/link'
+import Link from "next/link"
 
-import { Badge } from '../../../components/ui/badge'
-import ROUTES from '../../../constants/routes'
-import { generateDummys } from '../../../lib/dummy'
-import { createPerformance } from '../../../lib/dummy/Performance'
-import { createTeam } from '../../../lib/dummy/Team'
-import { columns, TeamColumn } from './_components/TeamListTable/columns'
-import { TeamListDataTable } from './_components/TeamListTable/data-table'
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import fetchData from "@/lib/fetch"
+import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { Team } from "@/types/Team"
 
-const TEAMS = generateDummys(45, createTeam)
-const rows: TeamColumn[] = TEAMS.map((team) => ({
+import { Badge } from "../../../components/ui/badge"
+import ROUTES from "../../../constants/routes"
+import { generateDummys } from "../../../lib/dummy"
+import { createPerformance } from "../../../lib/dummy/Performance"
+import { createTeam } from "../../../lib/dummy/Team"
+import { columns, TeamColumn } from "./_components/TeamListTable/columns"
+import { TeamListDataTable } from "./_components/TeamListTable/data-table"
+
+const _TEAMS = generateDummys(45, createTeam)
+const _teams: TeamColumn[] = _TEAMS.map((team) => ({
   id: team.id,
   songName: team.song.name,
   songArtist: team.song.artist,
   leaderName: team.leader.name,
   memberSessions: team.memberSessions,
-  cover_url: team.song.cover_url ?? team.song.original_url,
-  is_freshmanFixed: team.is_freshmanFixed
+  coverUrl: team.song.coverUrl,
+  isFreshmanFixed: team.isFreshmanFixed
 }))
 
 // TODO: column visible 선택 기능 -> 세션별 지원자 확인 할 수 있게
 // TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
 // TODO: column 너비 조절
-// TODO: 필터 -> Dialog로 처리
 // TODO: Pagination에서 1,2,3,4,5 등 추가
-// TODO: Primary, Secondary 색상 설정
-const TeamList = () => {
+const TeamList = async () => {
   const activePerformances = generateDummys(3, createPerformance)
+  const res = await fetchData(API_ENDPOINTS.TEAM.LIST, {
+    cache: "no-cache"
+  })
+  const data = (await res.json()) as ListResponse<Team>
+  const teams = data.map((team) => ({
+    id: team.id,
+    songName: team.song.name,
+    songArtist: team.song.artist,
+    leaderName: team.leader.name,
+    memberSessions: team.memberSessions,
+    coverUrl: team.song.coverUrl,
+    isFreshmanFixed: team.isFreshmanFixed
+  }))
 
   return (
     <div className="container">
@@ -51,7 +67,7 @@ const TeamList = () => {
       </div>
 
       {/* 팀 목록 테이블 */}
-      <TeamListDataTable columns={columns} data={rows} />
+      <TeamListDataTable columns={columns} data={teams} />
     </div>
   )
 }
