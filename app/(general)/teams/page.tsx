@@ -10,23 +10,21 @@ import ROUTES from "../../../constants/routes"
 import { generateDummys } from "../../../lib/dummy"
 import { createPerformance } from "../../../lib/dummy/Performance"
 import { createTeam } from "../../../lib/dummy/Team"
-import { columns, TeamColumn } from "./_components/TeamListTable/columns"
+import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 
 const _TEAMS = generateDummys(45, createTeam)
-const _teams: TeamColumn[] = _TEAMS.map((team) => ({
-  id: team.id,
-  songName: team.song.name,
-  songArtist: team.song.artist,
-  leaderName: team.leader.name,
-  memberSessions: team.memberSessions,
-  coverUrl: team.song.coverUrl,
-  isFreshmanFixed: team.isFreshmanFixed
-}))
+// const _teams: TeamColumn[] = _TEAMS.map((team) => ({
+//   id: team.id,
+//   songName: team.songName,
+//   songArtist: team.songArtist,
+//   leaderName: team.leader?.name,
+//   memberSessions: team.memberSessions,
+//   coverUrl: team.songYoutubeVideoId,
+//   isFreshmanFixed: team.isFreshmanFixed
+// }))
 
-// TODO: column visible 선택 기능 -> 세션별 지원자 확인 할 수 있게
 // TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
-// TODO: column 너비 조절
 // TODO: Pagination에서 1,2,3,4,5 등 추가
 const TeamList = async () => {
   const activePerformances = generateDummys(3, createPerformance)
@@ -36,11 +34,11 @@ const TeamList = async () => {
   const data = (await res.json()) as ListResponse<Team>
   const teams = data.map((team) => ({
     id: team.id,
-    songName: team.song.name,
-    songArtist: team.song.artist,
-    leaderName: team.leader.name,
+    songName: team.songName,
+    songArtist: team.songArtist,
+    leaderName: team.leader?.name,
     memberSessions: team.memberSessions,
-    coverUrl: team.song.coverUrl,
+    songYoutubeVideoId: team.songYoutubeVideoId,
     isFreshmanFixed: team.isFreshmanFixed
   }))
 

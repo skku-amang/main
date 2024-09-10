@@ -27,9 +27,9 @@ export type TeamColumn = {
   id: number
   songName: string
   songArtist: string
-  leaderName: string
-  memberSessions: MemberSession[]
-  coverUrl?: string
+  leaderName?: string
+  memberSessions?: MemberSession[]
+  songYoutubeVideoId?: string
   isFreshmanFixed: boolean
 }
 
@@ -95,7 +95,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("leaderName")}
+        {row.getValue("leaderName") ?? ""}
         <br />
         {row.original.isFreshmanFixed && (
           <Badge className="bg-blue-900 py-0">신입고정</Badge>
@@ -108,7 +108,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     header: "필요 세션",
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
-      const memberSessionsSet = new MemberSessionSet(memberSessions)
+      const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
       const requiredMembers =
         memberSessionsSet.getRequiredSessionsWithMissingUserCount()
 
@@ -133,7 +133,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
-      const memberSessionsSet = new MemberSessionSet(memberSessions)
+      const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
       const status: TeamStatus = memberSessionsSet.isSatisfied
         ? "모집 완료"
         : "모집 중"
@@ -141,15 +141,17 @@ export const columns: ColumnDef<TeamColumn>[] = [
     }
   },
   {
-    accessorKey: "coverUrl",
+    accessorKey: "songYoutubeVideoId",
     header: "영상링크",
     cell: ({ row }) => {
-      const coverUrl = row.getValue("coverUrl") as string
-      return (
-        <Link href={coverUrl} className="z-50">
-          <MdOpenInNew size={24} />
-        </Link>
-      )
+      const songYoutubeVideoId = row.getValue("songYoutubeVideoId") as string
+      if (songYoutubeVideoId) {
+        return (
+          <Link href={songYoutubeVideoId} className="z-50">
+            <MdOpenInNew size={24} />
+          </Link>
+        )
+      }
     }
   },
   {

@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
+import ROUTES from "@/constants/routes"
 
 import { TeamColumn } from "./columns"
 
@@ -96,7 +97,7 @@ export function TeamListDataTable<TValue>({
 
         <div className="relative flex gap-3">
           <Button asChild className="h-8 rounded-md py-1">
-            <Link href="teams/create">
+            <Link href={ROUTES.TEAM.CREATE.url}>
               <CiCirclePlus size={22} />
               &nbsp;Create
             </Link>

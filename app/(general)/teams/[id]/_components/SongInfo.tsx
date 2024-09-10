@@ -3,18 +3,31 @@ import { FaMusic } from "react-icons/fa"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { Song } from "@/types/Team"
 
-const SongInfo = ({ song }: { song: Song }) => {
-  const videoId = YoutubeVideo.getVideoId(song.originalUrl)
+interface SongInfoProps {
+  songName: string
+  songArtist: string
+  songYoutubeUrl?: string
+}
 
+const SongInfo = ({ songName, songArtist, songYoutubeUrl }: SongInfoProps) => {
+  let videoId
+  try {
+    if (songYoutubeUrl) {
+      videoId = YoutubeVideo.getVideoId(songYoutubeUrl)
+    }
+  } catch (error) {
+    if (error instanceof TypeError) {
+      console.error("올바르지 않은 URL입니다.")
+    }
+  }
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{song.name}</CardTitle>
+        <CardTitle>{songName}</CardTitle>
       </CardHeader>
       <CardContent>
-        {song.coverUrl ? (
+        {videoId ? (
           <YoutubePlayer
             videoId={videoId}
             width="100%"

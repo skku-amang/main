@@ -22,13 +22,17 @@ export const createTeam = (id: number): Team => ({
   description: customFaker.lorem.paragraph(),
   leader: createUser(id),
   performance: createPerformance(id),
-  song: createSong(),
   isFreshmanFixed: customFaker.datatype.boolean(),
   posterImage: Math.random() < 0.0 ? undefined : customFaker.image.url(), // 30% 확률로 이미지 없음
-  youtubeVideoId: "https://youtu.be/oL68OY4Lll0?si=LTsLdWpr7Qr7YU9j", // 24-1 뜨여밤
-  memberSessions: createMemberSessions(),
+
+  songName: customFaker.lorem.words(),
+  songArtist: customFaker.person.fullName(),
+  songYoutubeVideoId: "https://youtu.be/oL68OY4Lll0?si=LTsLdWpr7Qr7YU9j", // 24-1 뜨여밤
+
   createdDatetime: customFaker.date.past().toISOString(),
-  updatedDatetime: customFaker.date.recent().toISOString()
+  updatedDatetime: customFaker.date.recent().toISOString(),
+
+  memberSessions: createMemberSessions()
 })
 
 function getRandomValueByProbability(probability: {

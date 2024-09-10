@@ -44,18 +44,18 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/generations`,
       method: "GET"
     },
-    RETRIEVE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/generations/${id}`,
+    RETRIEVE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/generations/${id}`,
       method: "GET"
-    },
-    UPDATE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/generations/${id}`,
+    }),
+    UPDATE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/generations/${id}`,
       method: "PUT"
-    },
-    DELETE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/generations/${id}`,
+    }),
+    DELETE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/generations/${id}`,
       method: "DELETE"
-    }
+    })
   },
   PERFORMANCE: {
     CREATE: {
@@ -66,18 +66,18 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/performances`,
       method: "GET"
     },
-    RETRIEVE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/performances/${id}`,
+    RETRIEVE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/performances/${id}`,
       method: "GET"
-    },
-    UPDATE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/performances/${id}`,
+    }),
+    UPDATE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/performances/${id}`,
       method: "PUT"
-    },
-    DELETE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/performances/${id}`,
+    }),
+    DELETE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/performances/${id}`,
       method: "DELETE"
-    }
+    })
   },
   SESSION: {
     CREATE: {
@@ -88,18 +88,18 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/sessions`,
       method: "GET"
     },
-    RETRIEVE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/sessions/${id}`,
+    RETRIEVE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/sessions/${id}`,
       method: "GET"
-    },
-    UPDATE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/sessions/${id}`,
+    }),
+    UPDATE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/sessions/${id}`,
       method: "PUT"
-    },
-    DELETE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/sessions/${id}`,
+    }),
+    DELETE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/sessions/${id}`,
       method: "DELETE"
-    }
+    })
   },
   TEAM: {
     CREATE: {
@@ -110,18 +110,18 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/teams`,
       method: "GET"
     },
-    RETRIEVE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/teams/${id}`,
+    RETRIEVE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/teams/${id}`,
       method: "GET"
-    },
-    UPDATE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/teams/${id}`,
+    }),
+    UPDATE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/teams/${id}`,
       method: "PUT"
-    },
-    DELETE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/teams/${id}`,
+    }),
+    DELETE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/teams/${id}`,
       method: "DELETE"
-    }
+    })
   },
   USER: {
     CREATE: {
@@ -132,18 +132,18 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/users`,
       method: "GET"
     },
-    RETRIEVE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/users/${id}`,
+    RETRIEVE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/users/${id}`,
       method: "GET"
-    },
-    UPDATE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/users/${id}`,
+    }),
+    UPDATE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/users/${id}`,
       method: "PUT"
-    },
-    DELETE: {
-      url: (id: string) => `${baseURL}/${API_PREFIX}/users/${id}`,
+    }),
+    DELETE: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/users/${id}`,
       method: "DELETE"
-    }
+    })
   }
 } as const
 
