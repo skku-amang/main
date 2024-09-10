@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import SimpleImageField from '@/components/common/Form/SimpleImageField'
 import SimpleLabel from '@/components/common/Form/SimpleLabel'
 import SimpleStringField from '@/components/common/Form/SimpleStringField'
 import { Button } from '@/components/ui/button'
@@ -102,6 +103,14 @@ export function SignupForm() {
           placeholder="example@g.skku.edu"
           description="@g.skku.edu 이메일 입력해주세요"
           required={!(formSchema.shape.email instanceof z.ZodOptional)}
+        />
+
+        <SimpleImageField
+          form={form}
+          name="profileImage"
+          label="프로필 사진"
+          description="프로필 사진을 업로드해주세요"
+          required={false}
         />
 
         <FormField
