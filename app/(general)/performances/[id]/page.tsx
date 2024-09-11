@@ -1,13 +1,13 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import { FaClock } from 'react-icons/fa'
-import { IoLocationSharp } from 'react-icons/io5'
+import Image from "next/image"
+import Link from "next/link"
+import { FaClock } from "react-icons/fa"
+import { IoLocationSharp } from "react-icons/io5"
 
-import { Badge } from '../../../../components/ui/badge'
-import ROUTES from '../../../../constants/routes'
-import { generateDummys } from '../../../../lib/dummy'
-import { createPerformance } from '../../../../lib/dummy/Performance'
-import TeamList from '../../teams/page'
+import TeamList from "@/app/(general)/teams/page"
+import { Badge } from "@/components/ui/badge"
+import ROUTES from "@/constants/routes"
+import { generateDummys } from "@/lib/dummy"
+import { createPerformance } from "@/lib/dummy/Performance"
 
 interface PerformanceDetailProp {
   params: {
@@ -28,7 +28,7 @@ const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
         {/* 이미지 */}
         <Image
           alt={`${performance.name} 사진`}
-          src={performance.representativeImage}
+          src={performance.representativeImage ?? "/images/default.jpg"}
           width={300}
           height={300}
           className="m-10 rounded-lg shadow-2xl"
@@ -41,8 +41,10 @@ const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
           <div className="space-y-3">
             <div className="flex items-center">
               <FaClock />
-              &nbsp;{performance.start_datetime.toLocaleString('ko-KR')} ~{' '}
-              {performance.end_datetime.toLocaleTimeString()}
+              &nbsp;
+              {new Date(performance.startDatetime).toLocaleString(
+                "ko-KR"
+              )} ~ {new Date(performance.endDatetime).toLocaleTimeString()}
             </div>
             <div className="flex items-center">
               <IoLocationSharp />

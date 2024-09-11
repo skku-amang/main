@@ -1,28 +1,35 @@
-import { Performance } from './Performance'
-import { Session } from './Session'
-import { User } from './User'
+import { Performance } from "./Performance"
+import { Session } from "./Session"
+import { User } from "./User"
 
 export type Team = {
   id: number
   name?: string
   description: string
-  is_private: boolean
-  leader: User
+  leader?: User
   performance: Performance
-  song: Song
-  is_freshmanFixed: boolean
+  isFreshmanFixed: boolean
   posterImage?: string
-  youtubeVideo?: string // 아망 공식 홈페이지 유튜브 영상
-  memberSessions: MemberSession[]
+
+  songName: string
+  songArtist: string
+  songYoutubeVideoId?: string // 아망 공식 홈페이지 유튜브 영상
+
+  createdDatetime: string
+  updatedDatetime: string
+
+  memberSessions?: MemberSession[]
 }
+// TODO: 각 모델별 DTO 작성: API에서 받은 JSON 형태 정의
+// TODO: 각 모델별 refine 함수 작성 -> DTO를 받아서 해당 모델로 변환
 
 export type Song = {
   name: string
   artist: string
-  cover_name?: string
-  cover_artist?: string
-  original_url: string
-  cover_url?: string
+  coverName?: string
+  coverArtist?: string
+  originalUrl: string
+  coverUrl?: string
 }
 
 /**
@@ -50,7 +57,7 @@ export class MemberSessionSet {
         memberSessions.map((memberSession) => memberSession.session)
       )
     ) {
-      throw new Error('MemberSessionSet의 세션은 모두 고유해야 합니다.')
+      throw new Error("MemberSessionSet의 세션은 모두 고유해야 합니다.")
     }
     this.memberSessions = new Set(memberSessions)
   }

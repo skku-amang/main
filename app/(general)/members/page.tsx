@@ -1,21 +1,12 @@
-import { columns } from '@/app/(general)/members/_components/MemberListTable/columns'
-import { MemberListDataTable } from '@/app/(general)/members/_components/MemberListTable/data-table'
-import { generateDummys } from '@/lib/dummy'
-import { createUser } from '@/lib/dummy/User'
-import { User } from '@/types/User'
+import { columns } from "@/app/(general)/members/_components/MemberListTable/columns"
+import { MemberListDataTable } from "@/app/(general)/members/_components/MemberListTable/data-table"
+import { generateDummys } from "@/lib/dummy"
+import { createUser } from "@/lib/dummy/User"
+import { User } from "@/types/User"
 
 const USERS = generateDummys(45, createUser)
 const rows: User[] = USERS.map((user) => ({
-  id: user.id,
-  name: user.name,
-  nickname: user.nickname,
-  email: user.email,
-  bio: user.bio,
-  profile_image: user.profile_image,
-  generation: user.generation,
-  sessions: user.sessions,
-  genre: user.genre,
-  liked_artists: user.liked_artists
+  ...user
 }))
 
 const MemberListPage = () => {

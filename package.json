@@ -28,7 +28,7 @@
     "dotenv": "^16.4.5",
     "github-label-sync": "^2.3.1",
     "lucide-react": "^0.424.0",
-    "next": "^14.2.7",
+    "next": "^14.2.8",
     "next-auth": "^5.0.0-beta.20",
     "path-to-regexp": "^8.0.0",
     "react": "^18",

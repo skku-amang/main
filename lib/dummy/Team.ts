@@ -1,32 +1,37 @@
-import { SessionName } from '../../types/Session'
-import { MemberSession, Song, Team } from '../../types/Team'
-import { customFaker } from '.'
-import { createPerformance } from './Performance'
-import dummySessions from './Session'
-import { createUser } from './User'
+import { SessionName } from "../../types/Session"
+import { MemberSession, Song, Team } from "../../types/Team"
+import { customFaker } from "."
+import { createPerformance } from "./Performance"
+import dummySessions from "./Session"
+import { createUser } from "./User"
 
-export const AJR_MAYBE_MAN_URL = 'https://youtu.be/OU24A9C8BUk'
+export const AJR_MAYBE_MAN_URL = "https://youtu.be/OU24A9C8BUk"
 
 export const createSong = (): Song => ({
   name: customFaker.lorem.words(),
   artist: customFaker.person.fullName(),
-  cover_name: customFaker.lorem.words(),
-  cover_artist: customFaker.person.fullName(),
-  original_url: AJR_MAYBE_MAN_URL,
-  cover_url: AJR_MAYBE_MAN_URL
+  coverName: customFaker.lorem.words(),
+  coverArtist: customFaker.person.fullName(),
+  originalUrl: AJR_MAYBE_MAN_URL,
+  coverUrl: AJR_MAYBE_MAN_URL
 })
 
 export const createTeam = (id: number): Team => ({
   id,
   name: Math.random() < 0.7 ? undefined : customFaker.company.name(),
   description: customFaker.lorem.paragraph(),
-  is_private: customFaker.datatype.boolean(),
   leader: createUser(id),
   performance: createPerformance(id),
-  song: createSong(),
-  is_freshmanFixed: customFaker.datatype.boolean(),
+  isFreshmanFixed: customFaker.datatype.boolean(),
   posterImage: Math.random() < 0.0 ? undefined : customFaker.image.url(), // 30% 확률로 이미지 없음
-  youtubeVideo: 'https://youtu.be/oL68OY4Lll0?si=LTsLdWpr7Qr7YU9j', // 24-1 뜨여밤
+
+  songName: customFaker.lorem.words(),
+  songArtist: customFaker.person.fullName(),
+  songYoutubeVideoId: "https://youtu.be/oL68OY4Lll0?si=LTsLdWpr7Qr7YU9j", // 24-1 뜨여밤
+
+  createdDatetime: customFaker.date.past().toISOString(),
+  updatedDatetime: customFaker.date.recent().toISOString(),
+
   memberSessions: createMemberSessions()
 })
 
