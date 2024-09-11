@@ -203,7 +203,7 @@ const TeamCreate = () => {
                     <PaginationPrevious/>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive>
+                    <PaginationLink href="#" >
                       1
                     </PaginationLink>
                   </PaginationItem>
@@ -297,11 +297,12 @@ const TeamCreate = () => {
                           2
                         </PaginationLink>
                       </PaginationItem>
-                      <PaginationItem>
+                      <PaginationItem className={`${currentPage === 1}:"":"h-0 hidden"}`}>
                         <PaginationNext href=""/>
                       </PaginationItem>
                     </PaginationContent>
                   </Pagination>
+                  
                 </div>
             </div>
 
