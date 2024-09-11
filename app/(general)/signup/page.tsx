@@ -1,20 +1,20 @@
-'use client'
+"use client"
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 import {
   emailSchema,
   nameSchema,
   nicknameSchema,
   passwordSchema
-} from '@/constants/zodSchema'
+} from "@/constants/zodSchema"
 
-import SimpleLabel from '../../../components/Form/SimpleLabel'
-import SimpleStringField from '../../../components/Form/SimpleStringField'
-import { Button } from '../../../components/ui/button'
-import { Checkbox } from '../../../components/ui/checkbox'
+import SimpleLabel from "@/components/Form/SimpleLabel"
+import SimpleStringField from "@/components/Form/SimpleStringField"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -23,8 +23,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from '../../../components/ui/form'
-import dummySessions from '../../../lib/dummy/Session'
+} from "@/components/ui/form"
+import dummySessions from "@/lib/dummy/Session"
 
 const sessions = dummySessions
 
@@ -35,14 +35,14 @@ const formSchema = z.object({
   sessions: z
     .array(z.string())
     .min(1, {
-      message: '최소 1개의 세션을 선택해주세요.'
+      message: "최소 1개의 세션을 선택해주세요."
     })
     .refine((value) => value.some((item) => item)),
   password: passwordSchema,
   confirmPassword: z
-    .string({ required_error: '필수 항목' })
-    .min(8, { message: '8자리 이상 입력해 주세요.' })
-    .max(20, { message: '20자리 이하 입력해 주세요.' })
+    .string({ required_error: "필수 항목" })
+    .min(8, { message: "8자리 이상 입력해 주세요." })
+    .max(20, { message: "20자리 이하 입력해 주세요." })
 })
 
 const Signup = () => {

@@ -1,11 +1,11 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { FaSpinner } from 'react-icons/fa'
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { FaSpinner } from "react-icons/fa"
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -22,9 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
-import { MemberSession, Team } from '@/types/Team'
-import { User } from '@/types/User'
+} from "@/components/ui/table"
+import { MemberSession, Team } from "@/types/Team"
+import { User } from "@/types/User"
 
 interface FormData {
   teamId: number
@@ -36,7 +36,7 @@ interface SubmitButtonProps {
   teamId: number
   sessionId: number
   sessionMemberIndex: number
-  initialMode: 'signup' | 'cancel'
+  initialMode: "signup" | "cancel"
 }
 
 const SubmitButton = ({
@@ -54,27 +54,27 @@ const SubmitButton = ({
   })
 
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [mode, setMode] = useState<'signup' | 'cancel'>(initialMode)
+  const [mode, setMode] = useState<"signup" | "cancel">(initialMode)
 
   async function onSubmit(data: FormData) {
     console.log(data)
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    setMode(mode === 'signup' ? 'cancel' : 'signup')
+    setMode(mode === "signup" ? "cancel" : "signup")
   }
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Input type="hidden" {...register('teamId')} />
-        <Input type="hidden" {...register('sessionId')} />
-        <Input type="hidden" {...register('sessionMemberIndex')} />
+        <Input type="hidden" {...register("teamId")} />
+        <Input type="hidden" {...register("sessionId")} />
+        <Input type="hidden" {...register("sessionMemberIndex")} />
 
-        {mode === 'signup' && (
+        {mode === "signup" && (
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <FaSpinner className="animate-spin" /> : '신청'}
+            {isSubmitting ? <FaSpinner className="animate-spin" /> : "신청"}
           </Button>
         )}
-        {mode === 'cancel' && (
+        {mode === "cancel" && (
           <Dialog
             open={dialogOpen}
             defaultOpen={false}
@@ -86,7 +86,7 @@ const SubmitButton = ({
                 disabled={isSubmitting}
                 variant="destructive"
               >
-                {isSubmitting ? <FaSpinner className="animate-spin" /> : '탈퇴'}
+                {isSubmitting ? <FaSpinner className="animate-spin" /> : "탈퇴"}
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -101,7 +101,7 @@ const SubmitButton = ({
                   {isSubmitting ? (
                     <FaSpinner className="animate-spin" />
                   ) : (
-                    'ㄹ?ㅇ'
+                    "ㄹ?ㅇ"
                   )}
                 </Button>
               </DialogHeader>
@@ -120,7 +120,7 @@ interface MemberSessionTableRowProps {
   team: Team
   memberSession: MemberSession
   largestRequiredMemberCount: number
-  leader: User
+  leader?: User
 }
 
 const MemberSessionTableRow = ({
@@ -130,7 +130,7 @@ const MemberSessionTableRow = ({
   leader
 }: MemberSessionTableRowProps) => {
   const memberName = (member: User) =>
-    member.id === leader.id ? (
+    member.id === leader?.id ? (
       <>
         {member.name}
         <br />
@@ -150,7 +150,7 @@ const MemberSessionTableRow = ({
   const isMissing = (index: number, memberSession: MemberSession) =>
     index < memberSession.requiredMemberCount
 
-  const cellClassName = 'px-1'
+  const cellClassName = "px-1"
 
   return (
     <TableRow>
@@ -180,7 +180,7 @@ const MemberSessionTableRow = ({
               initialMode="signup"
             />
           ) : (
-            'X'
+            "X"
           )}
         </TableCell>
       ))}
@@ -191,7 +191,7 @@ const MemberSessionTableRow = ({
 interface MemberSessionTableProps {
   team: Team
   memberSessions: MemberSession[]
-  leader: User
+  leader?: User
 }
 
 const MemberSessionTable = ({

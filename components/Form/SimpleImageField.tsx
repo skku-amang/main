@@ -1,7 +1,13 @@
-import { FormControl, FormField, FormItem, FormMessage } from '../ui/form'
-import { Input } from '../ui/input'
-import SimpleDescription from './SimpleDescription'
-import SimpleLabel from './SimpleLabel'
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+
+import SimpleDescription from "./SimpleDescription"
+import SimpleLabel from "./SimpleLabel"
 
 interface Prop {
   form: any
@@ -21,10 +27,10 @@ const SimpleImageField = ({
   acceptedImageTypes
 }: Prop) => {
   acceptedImageTypes = acceptedImageTypes ?? [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp'
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp"
   ]
 
   return (
@@ -40,12 +46,12 @@ const SimpleImageField = ({
             <Input
               type="file"
               {...fieldProps}
-              accept={acceptedImageTypes.join(',')}
+              accept={acceptedImageTypes.join(",")}
               onChange={(event) =>
                 onChange(event.target.files && event.target.files[0])
               }
               className="hover:cursor-pointer"
-              style={{ marginTop: '0.2rem' }}
+              style={{ marginTop: "0.2rem" }}
             />
           </FormControl>
 
