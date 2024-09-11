@@ -1,31 +1,31 @@
-'use client'
+"use client"
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zfd } from 'zod-form-data'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zfd } from "zod-form-data"
 
-import SimpleDateField from '@/components/Form/SimpleDateField'
-import SimpleImageField from '@/components/Form/SimpleImageField'
-import SimpleStringField from '@/components/Form/SimpleStringField'
-import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
+import SimpleDateField from "@/components/Form/SimpleDateField"
+import SimpleImageField from "@/components/Form/SimpleImageField"
+import SimpleStringField from "@/components/Form/SimpleStringField"
+import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
 
-import PerformanceCard from './PerformanceCard'
+import PerformanceCard from "./PerformanceCard"
 
 const MAX_FILE_SIZE = 5000000 // 5MB
 const ACCEPTED_IMAGE_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/webp'
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp"
 ]
 
 const formSchema = z.object({
   name: z
-    .string({ required_error: '필수 항목' })
-    .min(2, { message: '최소 2자' })
-    .max(50, { message: '최대 50자' }),
+    .string({ required_error: "필수 항목" })
+    .min(2, { message: "최소 2자" })
+    .max(50, { message: "최대 50자" }),
   description: z.string().optional(),
   representativeImage: zfd
     .file()
@@ -33,12 +33,12 @@ const formSchema = z.object({
       message: "File can't be bigger than 5MB."
     })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-      message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace('image/', '')).join(', ')} 만 가능합니다.`
+      message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace("image/", "")).join(", ")} 만 가능합니다.`
     })
     .optional(),
   location: z.string().optional(),
-  start_datetime: z.date().optional(),
-  end_datetime: z.date().optional()
+  startDatetime: z.date().optional(),
+  endDatetime: z.date().optional()
 })
 
 const PerformanceForm = () => {
@@ -60,15 +60,15 @@ const PerformanceForm = () => {
         <div className="flex h-full w-full items-center justify-center">
           <PerformanceCard
             id={0}
-            name={formValues.name || '공연 이름'}
+            name={formValues.name || "공연 이름"}
             representativeSrc={
               formValues.representativeImage
                 ? URL.createObjectURL(formValues.representativeImage)
-                : '/no-image.svg'
+                : "/no-image.svg"
             }
             description={formValues.description}
-            location={formValues.location || '미정'}
-            startDatetime={formValues.start_datetime || new Date()}
+            location={formValues.location || "미정"}
+            startDatetime={formValues.startDatetime || new Date()}
             className="shadow-2xl hover:cursor-pointer"
           />
         </div>
@@ -120,18 +120,18 @@ const PerformanceForm = () => {
               />
               <SimpleDateField
                 form={form}
-                name="start_datetime"
+                name="startDatetime"
                 label="시작 일시"
                 required={
-                  !(formSchema.shape.start_datetime instanceof z.ZodOptional)
+                  !(formSchema.shape.startDatetime instanceof z.ZodOptional)
                 }
               />
               <SimpleDateField
                 form={form}
-                name="end_datetime"
+                name="endDatetime"
                 label="종료 일시"
                 required={
-                  !(formSchema.shape.end_datetime instanceof z.ZodOptional)
+                  !(formSchema.shape.endDatetime instanceof z.ZodOptional)
                 }
               />
 
