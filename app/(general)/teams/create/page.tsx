@@ -23,8 +23,41 @@ import {
 import { useState } from "react"
 import { CheckboxCustom } from "@/components/ui/checkbox-custom"
 import { Textarea } from "@/components/ui/textarea"
+import { CheckboxWithInput } from "@/components/ui/checkbox-with-input"
+
+interface CheckboxUpdateProps {
+  selectedItems: string[];
+}
 
 const TeamCreate = () => {
+
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const handleCheckboxChange = (key: string) => {
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(key)
+        ? prevSelected.filter((item) => item !== key) // 선택 해제
+        : [...prevSelected, key] // 선택 추가
+    );
+  };
+
+  const CheckboxUpdate = ({ selectedItems }: CheckboxUpdateProps): JSX.Element => {
+   
+  return (
+    <>
+    {selectedItems.map((selectedItems) =>( 
+    <div className="flex h-8 w-96 relative items-center gap-2">
+      <CheckboxWithInput/>
+      <div className="flex items-center absolute left-9 h-full w-full">
+        {selectedItems}
+      </div>
+    </div>
+  ))}
+  </>
+)
+  };
+  
+  console.log(selectedItems);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -99,64 +132,64 @@ const TeamCreate = () => {
                   <div className="font-medium text-sm text-gray-500">곡에 필요한 모든 세션을 체크해주세요</div>
                 </div>
               </div>
-              <div className="w-[68%] h-full ">
+              <div className="w-[68%] h-full">
                 <div className="grid grid-cols-4 gap-8">
                   <div className="">보컬</div>
-                  <div className="flex items-center">
-                    <CheckboxCustom />
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('보컬1')}>
+                    <CheckboxCustom/>
                     <div className="pl-3">보컬1</div>
                   </div>
-                  <div className="flex items-center">
-                    <CheckboxCustom />
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('보컬2')}>
+                    <CheckboxCustom/>
                     <div className="pl-3">보컬2</div>
                   </div>
-                  <div className="flex items-center">
-                    <CheckboxCustom />
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('보컬3')}>
+                    <CheckboxCustom/>
                     <div className="pl-3">보컬3</div>
                   </div>
                   <div className="">기타</div>
-                  <div className="flex items-center">
-                    <CheckboxCustom />
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('기타1')}>
+                    <CheckboxCustom/>
                     <div className="pl-3">기타1</div>
                   </div>
-                  <div className="flex items-center">
-                    <CheckboxCustom />
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('기타2')}>
+                    <CheckboxCustom/>
                     <div className="pl-3">기타2</div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('기타3')}>
                     <CheckboxCustom />
                     <div className="pl-3">기타3</div>
                   </div>
                   <div className="">베이스 및 드럼</div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('베이스1')}>
                     <CheckboxCustom />
                     <div className="pl-3">베이스1</div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('베이스2')}>
                     <CheckboxCustom />
                     <div className="pl-3">베이스2</div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('드럼')}>
                     <CheckboxCustom />
                     <div className="pl-3">드럼</div>
                   </div>
                   <div className="">신디</div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('신디1')}>
                     <CheckboxCustom />
                     <div className="pl-3">신디1</div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('신디2')}>
                     <CheckboxCustom />
                     <div className="pl-3">신디2</div>
                   </div>
                   <div>
                   </div>
                   <div className="">그 외</div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('현악기')}>
                     <CheckboxCustom />
                     <div className="pl-3">현악기</div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center" onClick={() =>handleCheckboxChange('관악기')}>
                     <CheckboxCustom />
                     <div className="pl-3">관악기</div>
                   </div>
@@ -190,17 +223,22 @@ const TeamCreate = () => {
         <div className={`${currentPage=== 1 ? "h-0 hidden" : ""}
          flex flex-col items-center relative w-4/5 h-[80rem] lg:h-[70rem] shadow-xl rounded-lg mt-10 mb-12 bg-gray-50 z-10}`}
          >
-            <div className="flex justify-center w-full h-[43%] border-b-[1px] border-b-zinc-200 pt-[4.5rem]">
-              <div className="w-[83%]">
+            <div className="flex flex-col items-center w-full h-[43%] border-b-[1px] border-b-zinc-200 pt-[4.5rem]">
+              <div className="w-[83%] h-28">
                 <div className="flex flex-col gap-2 items-start">
                   <div className="font-semibold text-lg text-slate-900">팀원 정보</div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 flex justify-center items-center rounded-full bg-gray-600 text-white">
                       !
                       </div>
-                    <div className="font-medium text-sm text-gray-500">이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 
-                    후 멤버를 선택해주세요.<br/>멤버모집이 필요한 세션의 경우, 체크표시가 되어 있지 않아야 합니다</div>
+                      <div className="font-medium text-sm text-gray-500">이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 
+                      후 멤버를 선택해주세요.<br/>멤버모집이 필요한 세션의 경우, 체크표시가 되어 있지 않아야 합니다</div>
                   </div>
+                </div>
+              </div>
+              <div className="w-[79%] h-full">
+                <div className="grid grid-flow-col gap-8 grid-cols-3 grid-rows-4 pt-7">
+                  <CheckboxUpdate selectedItems={selectedItems}/>
                 </div>
               </div>
             </div>
