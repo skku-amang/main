@@ -42,18 +42,14 @@ const TeamDetail = async ({ params }: Props) => {
 
       <div className="col-span-1 flex flex-col gap-y-3">
         {/* 멤버 정보 */}
-        <div>
-          <MemberSessionTable
-            team={team}
-            memberSessions={team.memberSessions ?? []}
-            leader={team.memberSessions && team.memberSessions[0].members[0]}
-          />
-        </div>
+        <MemberSessionTable
+          team={team}
+          memberSessions={team.memberSessions ?? []}
+          leader={team.memberSessions && team.memberSessions[0]?.members[0]}
+        />
 
         {/* 홍보글 */}
-        <div>
-          <PromotionPostList />
-        </div>
+        <PromotionPostList />
       </div>
     </div>
   )
