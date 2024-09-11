@@ -41,7 +41,7 @@ const TeamList = async () => {
     <div className="container">
       {/* 팀 배너 */}
       <div className="flex flex-col items-center justify-center">
-        <h2 className="mt-24 text-4xl font-extrabold text-gray-600">
+        <h2 className="mt-28 text-4xl font-extrabold text-zinc-700">
           공연팀 목록
         </h2>
 
