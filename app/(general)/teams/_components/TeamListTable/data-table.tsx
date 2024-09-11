@@ -16,9 +16,6 @@ import { useState } from "react"
 import { CiCirclePlus } from "react-icons/ci"
 import { TbFilter } from "react-icons/tb"
 
-import FilterSection, { FilterLabel } from "@/components/Filter"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -26,7 +23,11 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/app/(general)/teams/_components/TeamListTable/table'
+} from "@/app/(general)/teams/_components/TeamListTable/table"
+import FilterSection, { FilterLabel } from "@/components/Filter"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import ROUTES from "@/constants/routes"
 
 import { TeamColumn } from "./columns"
 
