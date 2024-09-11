@@ -1,5 +1,6 @@
-import { SessionName } from "../../types/Session"
-import { MemberSession, Song, Team } from "../../types/Team"
+import { SessionName } from "@/types/Session"
+import { MemberSession, Song, Team } from "@/types/Team"
+
 import { customFaker } from "."
 import { createPerformance } from "./Performance"
 import dummySessions from "./Session"

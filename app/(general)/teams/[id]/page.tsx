@@ -1,11 +1,11 @@
 import React from "react"
 
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
+import { createTeam } from "@/lib/dummy/Team"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Team } from "@/types/Team"
 
-import { createTeam } from "../../../../lib/dummy/Team"
 import MemberSessionTable from "./_components/MemberSessionTable"
 import PromotionPostList from "./_components/PromotionPostList"
 import SongInfo from "./_components/SongInfo"
