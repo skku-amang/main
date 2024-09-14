@@ -72,7 +72,8 @@ export const basicInfoSchema = z.object({
     .string({ required_error: "필수 항목" })
     .min(1, { message: "1글자 이상 입력해주세요" }),
   isFreshmenFixed: z.string({ required_error: "필수 항목" }),
-  isSelfMade: z.string({ required_error: "필수 항목" })
+  isSelfMade: z.string({ required_error: "필수 항목" }),
+  description: z.string().optional()
 })
 
 export const memberSessionSchema = z.object({

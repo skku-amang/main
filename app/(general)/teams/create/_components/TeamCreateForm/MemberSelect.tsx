@@ -78,9 +78,16 @@ const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
                 {users.map((user) => (
                   <CommandItem
                     key={user.id}
-                    value={user.name}
+                    value={user.id.toString()}
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue)
+                      console.log(`${memberSessionFieldName}.memberId`)
+                      console.log(currentValue)
+                      form.setValue(
+                        `memberSessions.${memberSessionFieldName}.memberId`,
+                        +currentValue
+                      )
+                      console.log(form.getValues())
                       setOpen(false)
                     }}
                   >

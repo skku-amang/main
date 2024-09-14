@@ -118,7 +118,9 @@ const TeamCreateForm = ({
                 <div className="grid w-full grid-cols-2 gap-x-10 gap-y-2">
                   {/* Field: 공연 선택 */}
                   <div className="col-span-1">
-                    <Label htmlFor="performanceId">공연선택</Label>
+                    <Label htmlFor="performanceId">
+                      공연선택<span className="text-destructive">&nbsp;*</span>
+                    </Label>
                     <Select
                       onValueChange={(value) =>
                         basicInfoForm.setValue("performanceId", +value, {
@@ -252,11 +254,11 @@ const TeamCreateForm = ({
                   </p>
                 </div>
 
-                <div>
+                <div className="space-y-5">
                   {memberSessionForm.getValues().memberSessions &&
-                    Object.entries(
+                    Object.keys(
                       memberSessionForm.getValues().memberSessions
-                    ).map(([key, value]) => {
+                    ).map((key) => {
                       return (
                         <MemberSelect
                           key={key}
@@ -279,7 +281,7 @@ const TeamCreateForm = ({
                     자유롭게 팀을 홍보해주세요
                   </p>
                 </div>
-                <Textarea />
+                <Textarea {...basicInfoForm.register("description")} />
               </div>
             </div>
 
@@ -326,12 +328,25 @@ const TeamCreateForm = ({
                       console.log(key, value)
                     })
                   } else if (currentPage === 2) {
-                    memberSessionForm.handleSubmit(
-                      () => {
-                        console.log("memberSessionForm")
-                        console.log("이제 제출하셈")
+                    basicInfoForm.handleSubmit(
+                      (basicInfoData) => {
+                        memberSessionForm.handleSubmit(
+                          (memberSessionData) => {
+                            console.log("basicInfoData", basicInfoData)
+                            console.log("memberSessionData", memberSessionData)
+                            console.log("이제 제출하셈")
+                            // 여기서 두 폼의 데이터를 함께 처리합니다.
+                            const teamCreateData = {
+                              ...basicInfoData,
+                              memberSessions: memberSessionData.memberSessions
+                            }
+                            console.log("teamCreateData", teamCreateData)
+                            // teamCreateData를 서버로 제출하는 로직을 추가합니다.
+                          },
+                          (formData) => console.warn(formData)
+                        )()
                       },
-                      (formData) => console.log(formData)
+                      (formData) => console.warn(formData)
                     )()
                   }
                 }}
