@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FaExclamationCircle } from "react-icons/fa"
 import { GoDot, GoDotFill } from "react-icons/go"
@@ -27,6 +27,7 @@ import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
 import { SessionName } from "@/types/Session"
+import { User } from "@/types/User"
 
 import CheckboxField from "./CheckboxField"
 import teamCreateFormSchema, {
@@ -44,6 +45,13 @@ const TeamCreateForm = ({
   performanceOptions
 }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
+
+  const [users, setMembers] = useState<User[]>([])
+  useEffect(() => {
+    fetchData(API_ENDPOINTS.USER.LIST)
+      .then((data) => data.json())
+      .then((users) => setMembers(users))
+  }, [])
 
   const basicInfoForm = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema)
@@ -235,6 +243,69 @@ const TeamCreateForm = ({
                     memberSessionFieldName="memberSessions.보컬3.required"
                     label="보컬3"
                   />
+
+                  {/* 기타 */}
+                  <div>기타</div>
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.기타1.required"
+                    label="기타1"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.기타2.required"
+                    label="기타2"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.기타3.required"
+                    label="기타3"
+                  />
+
+                  {/* 베이스 및 드럼 */}
+                  <div>베이스</div>
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.베이스1.required"
+                    label="베이스1"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.베이스2.required"
+                    label="베이스2"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.드럼.required"
+                    label="드럼"
+                  />
+
+                  {/* 신디 */}
+                  <div>신디</div>
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.신디1.required"
+                    label="신디1"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.신디2.required"
+                    label="신디2"
+                  />
+                  <div></div>
+
+                  {/* 그 외 */}
+                  <div>그 외</div>
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.현악기.required"
+                    label="현악기"
+                  />
+                  <CheckboxField
+                    form={memberSessionForm}
+                    memberSessionFieldName="memberSessions.관악기.required"
+                    label="관악기"
+                  />
                 </div>
               </div>
             </div>
@@ -257,19 +328,20 @@ const TeamCreateForm = ({
                   </p>
                 </div>
 
-                <div className="space-y-5">
+                <div className="mt-5 space-y-5">
                   {memberSessionForm.getValues().memberSessions &&
-                    Object.keys(
-                      memberSessionForm.getValues().memberSessions
-                    ).map((key) => {
-                      return (
-                        <MemberSelect
-                          key={key}
-                          form={memberSessionForm}
-                          memberSessionFieldName={key}
-                        />
-                      )
-                    })}
+                    Object.keys(memberSessionForm.getValues().memberSessions)
+                      .toSorted()
+                      .map((key) => {
+                        return (
+                          <MemberSelect
+                            key={key}
+                            form={memberSessionForm}
+                            memberSessionFieldName={key}
+                            users={users}
+                          />
+                        )
+                      })}
                 </div>
               </div>
 
@@ -284,7 +356,10 @@ const TeamCreateForm = ({
                     자유롭게 팀을 홍보해주세요
                   </p>
                 </div>
-                <Textarea {...basicInfoForm.register("description")} />
+                <Textarea
+                  {...basicInfoForm.register("description")}
+                  className="mt-5"
+                />
               </div>
             </div>
 

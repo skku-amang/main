@@ -19,8 +19,6 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import { User } from "@/types/User"
 
@@ -29,25 +27,17 @@ import CheckboxField from "./CheckboxField"
 interface MemberSelectProps {
   form: UseFormReturn<z.infer<typeof memberSessionSchema>>
   memberSessionFieldName: string
+  users: User[]
 }
 
-const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
+const MemberSelect = ({
+  form,
+  memberSessionFieldName,
+  users
+}: MemberSelectProps) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
-  const [users, setMembers] = useState<User[]>([])
   const [hasError, setHasError] = useState(false)
-
-  useEffect(() => {
-    fetchData(API_ENDPOINTS.USER.LIST)
-      .then((data) => {
-        console.log(data)
-        return data.json()
-      })
-      .then((users) => {
-        console.log(users)
-        return setMembers(users)
-      })
-  }, [])
 
   useEffect(() => {
     if (form.formState.errors.memberSessions) {
