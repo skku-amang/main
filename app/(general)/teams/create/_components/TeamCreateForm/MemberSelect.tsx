@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils"
 import { User } from "@/types/User"
 
-import CheckboxField from "./CheckboxField"
+import CheckboxField from "./MemberSessionRequiredCheckbox"
 
 interface MemberSelectProps {
   form: UseFormReturn<z.infer<typeof memberSessionSchema>>
