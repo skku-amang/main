@@ -22,8 +22,11 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
+import { SessionName } from "@/types/Session"
 
 import CheckboxField from "./CheckboxField"
 import teamCreateFormSchema, {
@@ -322,26 +325,54 @@ const TeamCreateForm = ({
                       },
                       (formData) => console.log(formData)
                     )()
-                    Object.entries(
-                      memberSessionForm.getValues().memberSessions
-                    ).forEach(([key, value]) => {
-                      console.log(key, value)
-                    })
                   } else if (currentPage === 2) {
                     basicInfoForm.handleSubmit(
                       (basicInfoData) => {
                         memberSessionForm.handleSubmit(
-                          (memberSessionData) => {
-                            console.log("basicInfoData", basicInfoData)
-                            console.log("memberSessionData", memberSessionData)
-                            console.log("이제 제출하셈")
-                            // 여기서 두 폼의 데이터를 함께 처리합니다.
+                          (memberSessionsData) => {
+                            let translatedMemberSessions: {
+                              session: SessionName
+                              members: (number | null)[]
+                              requiredMemberCount: number
+                            }[] = []
+                            // 폼 데이터를 API 형식에 맞게 변환
+                            const formMemberSessions = Object.values(
+                              memberSessionsData.memberSessions
+                            )
+                            formMemberSessions.forEach((formMemberSession) => {
+                              let targetTranslatedMemberSession =
+                                translatedMemberSessions.find(
+                                  (ms) =>
+                                    ms.session === formMemberSession.sessionName
+                                )
+                              if (
+                                targetTranslatedMemberSession &&
+                                formMemberSession.memberId
+                              ) {
+                                targetTranslatedMemberSession.requiredMemberCount += 1
+                                targetTranslatedMemberSession.members[
+                                  formMemberSession.index - 1
+                                ] = formMemberSession.memberId
+                              } else {
+                                if (!formMemberSession.memberId) return
+                                translatedMemberSessions.push({
+                                  session:
+                                    formMemberSession.sessionName as SessionName,
+                                  members: [formMemberSession.memberId],
+                                  requiredMemberCount: 1
+                                })
+                              }
+                            })
+
+                            console.log(translatedMemberSessions)
+                            // API 호출
                             const teamCreateData = {
                               ...basicInfoData,
-                              memberSessions: memberSessionData.memberSessions
+                              memberSessions: translatedMemberSessions
                             }
-                            console.log("teamCreateData", teamCreateData)
-                            // teamCreateData를 서버로 제출하는 로직을 추가합니다.
+                            fetchData(API_ENDPOINTS.TEAM.CREATE, {
+                              body: JSON.stringify(teamCreateData)
+                            }).then((data) => data.json())
                           },
                           (formData) => console.warn(formData)
                         )()

@@ -22,7 +22,7 @@ const singleMemberSessionSchema = ({
       required: z.boolean({ required_error: "필수 항목" }).default(false),
       memberId: z.number().optional()
     })
-    .refine((data) => !data.required || data.memberId !== undefined, {
+    .refine((data) => data.required && data.memberId, {
       message: "required가 true인 경우 memberId는 필수입니다.",
       path: ["memberId"]
     })
@@ -77,7 +77,35 @@ export const basicInfoSchema = z.object({
 })
 
 export const memberSessionSchema = z.object({
-  memberSessions: z.object(memberSessions)
+  memberSessions: z.object(memberSessions).refine(
+    (data) => {
+      // 한 세션에 중복된 멤버가 없어야 합니다.
+      let sessions = new Set<SessionName>()
+      Object.values(data).map((memberSession) =>
+        sessions.add(memberSession.sessionName as SessionName)
+      )
+      for (const session of sessions) {
+        let totalMembers: number[] = []
+        let members = new Set<number>()
+        Object.values(data).map((memberSession) => {
+          if (memberSession.sessionName === session && memberSession.memberId) {
+            totalMembers.push(memberSession.memberId)
+            if (memberSession.memberId) {
+              members.add(memberSession.memberId)
+            }
+          }
+        })
+        if (totalMembers.length !== members.size) {
+          return false
+        }
+      }
+      return true
+    },
+    {
+      message: "한 세션에 중복된 멤버가 없어야 합니다.",
+      path: ["memberSessions"]
+    }
+  )
 })
 
 const teamCreateFormSchema = basicInfoSchema.merge(memberSessionSchema)

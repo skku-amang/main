@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
+import { memberSessionSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,7 +27,7 @@ import { User } from "@/types/User"
 import CheckboxField from "./CheckboxField"
 
 interface MemberSelectProps {
-  form: UseFormReturn<z.infer<any>>
+  form: UseFormReturn<z.infer<typeof memberSessionSchema>>
   memberSessionFieldName: string
 }
 
@@ -34,6 +35,7 @@ const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
   const [users, setMembers] = useState<User[]>([])
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     fetchData(API_ENDPOINTS.USER.LIST)
@@ -46,6 +48,21 @@ const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
         return setMembers(users)
       })
   }, [])
+
+  useEffect(() => {
+    if (form.formState.errors.memberSessions) {
+      return setHasError(true)
+    }
+    if (
+      form.formState.errors.memberSessions &&
+      Object.hasOwn(
+        form.formState.errors.memberSessions,
+        memberSessionFieldName
+      )
+    ) {
+      return setHasError(true)
+    }
+  }, [form.formState.errors.memberSessions, memberSessionFieldName])
 
   return (
     <div className="flex items-center gap-x-3">
@@ -61,7 +78,10 @@ const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[360px] justify-between"
+            className={cn(
+              "w-[360px] justify-between",
+              hasError && "border-destructive"
+            )}
           >
             {value
               ? users.find((user) => user.id.toString() === value)?.name
@@ -80,14 +100,21 @@ const MemberSelect = ({ form, memberSessionFieldName }: MemberSelectProps) => {
                     key={user.id}
                     value={user.id.toString()}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue)
-                      console.log(`${memberSessionFieldName}.memberId`)
-                      console.log(currentValue)
-                      form.setValue(
-                        `memberSessions.${memberSessionFieldName}.memberId`,
-                        +currentValue
-                      )
-                      console.log(form.getValues())
+                      if (!currentValue) {
+                        form.setValue(
+                          `memberSessions.${memberSessionFieldName}.memberId` as any,
+                          undefined
+                        )
+                        setValue("")
+                      } else {
+                        setValue(currentValue === value ? "" : currentValue)
+                        form.setValue(
+                          `memberSessions.${memberSessionFieldName}.memberId` as any,
+                          +currentValue
+                        )
+                      }
+                      form.clearErrors("memberSessions")
+                      setHasError(false)
                       setOpen(false)
                     }}
                   >
