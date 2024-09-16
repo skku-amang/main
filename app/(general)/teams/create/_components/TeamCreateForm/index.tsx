@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -18,7 +19,12 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
+import fetchData from "@/lib/fetch"
+import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
+import { Team } from "@/types/Team"
 
 import { createDynamicSchema, firstPageSchema } from "./schema"
 
@@ -32,6 +38,7 @@ const TeamCreateForm = ({
   performanceOptions
 }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
+  const router = useRouter()
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof firstPageSchema>>({
@@ -75,8 +82,20 @@ const TeamCreateForm = ({
 
   // Second Page
   const [secondPageSchema, setSecondPageSchema] = useState<z.infer<any>>()
-  function onSecondPageValid(formData: z.infer<any>) {
-    console.log("FormValid:", formData)
+  async function onSecondPageValid(secondPageFormData: z.infer<any>) {
+    let allFormData = {
+      performanceId: firstPageForm.getValues("performanceId"),
+      songName: firstPageForm.getValues("songName"),
+      artistName: firstPageForm.getValues("artistName"),
+      memberSessions: Object.values(secondPageFormData)
+    }
+
+    const res = await fetchData(API_ENDPOINTS.TEAM.CREATE, {
+      cache: "no-store",
+      body: JSON.stringify(allFormData)
+    })
+    const data = (await res.json()) as CreateRetrieveUpdateResponse<Team>
+    router.push(ROUTES.TEAM.DETAIL(data.id).url)
   }
   function onSecondPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
