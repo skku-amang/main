@@ -26,7 +26,7 @@ export const memberSessionRequiredField = ({
     required: z.boolean({ required_error: "필수 항목" }).default(false)
   })
 
-const memberSessionRequiredSchema = z.object({
+const memberSessionRequiredBaseSchema = z.object({
   보컬1: memberSessionRequiredField({ sessionName: "보컬", index: 1 }),
   보컬2: memberSessionRequiredField({ sessionName: "보컬", index: 2 }),
   보컬3: memberSessionRequiredField({ sessionName: "보컬", index: 3 }),
@@ -42,49 +42,79 @@ const memberSessionRequiredSchema = z.object({
   현악기: memberSessionRequiredField({ sessionName: "현악기", index: 1 }),
   관악기: memberSessionRequiredField({ sessionName: "관악기", index: 1 })
 })
+const memberSessionRequiredSchema = z.object({
+  memberSessions: memberSessionRequiredBaseSchema
+})
 
 export const firstPageSchema = basicInfoSchema.merge(
   memberSessionRequiredSchema
 )
 
-const createDynamicSchema = (baseSchema: z.ZodObject<any>) => {
-  const shape = baseSchema.shape
-  const dynamicShape: any = {}
+// API에 주어야 하는 형태
+// [
+//   session: SessionName,
+//   members: number[],
+//   requiredMemberCount: number
+// ]
+export type SecondPageFormSchema = z.ZodObject<{
+  // TODO: 그냥 z.Object로 합시다
+  [key: string]: z.ZodObject<{
+    session: z.ZodString
+    members: z.ZodArray<z.ZodNumber>
+    requiredMemberCount: z.ZodNumber
+  }>
+}>
 
-  const sessionNameSet = new Set<string>()
-  for (const key in shape) {
-    if (Object.hasOwn(shape, key)) {
-      const sessionName = shape[key].shape.sessionName
-      sessionNameSet.add(sessionName)
+export const createDynamicSchema = (
+  baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>
+) => {
+  const dynamicShape: { [key: string]: z.ZodType<any> } = {}
+
+  const sessionNameRequiredMemberCountMap = new Map<string, number>()
+  Object.values(baseSchema).forEach((value) => {
+    if (!value.required) {
+      return
     }
-  }
+    const requiredMemberCount = sessionNameRequiredMemberCountMap.get(
+      value.sessionName
+    )
 
-  for (const sessionName in sessionNameSet) {
-    dynamicShape[sessionName] = z
-      .object({
-        members: z.array(z.number()),
-        requiredMemberCount: z.number()
-      })
-      .refine(
-        (data) => {
-          // 멤버 중복 체크
-          const memberSet = new Set<number>()
-          for (const member of data.members) {
-            if (memberSet.has(member)) {
-              return false
-            }
-            memberSet.add(member)
-          }
-        },
-        {
-          message: "멤버가 중복되었습니다"
-        }
+    if (requiredMemberCount) {
+      sessionNameRequiredMemberCountMap.set(
+        value.sessionName,
+        requiredMemberCount + 1
       )
-  }
+    } else {
+      sessionNameRequiredMemberCountMap.set(value.sessionName, 1)
+    }
+  })
+
+  sessionNameRequiredMemberCountMap.forEach(
+    (requiredMemberCount, sessionName) => {
+      dynamicShape[sessionName] = z
+        .object({
+          session: z.string().default(sessionName).readonly(),
+          members: z.array(z.number()),
+          requiredMemberCount: z.number().default(requiredMemberCount)
+        })
+        .refine(
+          (data) => {
+            // 멤버 중복 체크
+            const memberSet = new Set<number>()
+            for (const member of data.members) {
+              if (memberSet.has(member)) {
+                return false
+              }
+              memberSet.add(member)
+            }
+            return true
+          },
+          {
+            message: "멤버가 중복되었습니다"
+          }
+        )
+    }
+  )
 
   return z.object(dynamicShape)
 }
-
-export const memberSessionInitSchema = createDynamicSchema(
-  memberSessionRequiredSchema
-)

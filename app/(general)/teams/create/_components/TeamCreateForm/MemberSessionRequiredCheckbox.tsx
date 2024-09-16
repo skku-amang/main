@@ -18,17 +18,16 @@ const MemberSessionRequiredCheckbox = ({
 }: CheckboxFieldProps) => {
   if (!firstPageForm) return null
   const requiredFieldName = `${fieldName}.required` as any
-  const checkboxId = `${firstPageForm.getValues(requiredFieldName)}-${firstPageForm.getValues(requiredFieldName)}`
 
   return (
     <div className="flex items-center gap-x-2">
       <Checkbox
-        id={checkboxId}
+        id={requiredFieldName}
         className="h-5 w-5"
         onCheckedChange={(e) => firstPageForm.setValue(requiredFieldName, !!e)}
         checked={firstPageForm.getValues(requiredFieldName) as boolean}
       />
-      <Label htmlFor={checkboxId}>{label}</Label>
+      <Label htmlFor={requiredFieldName}>{label}</Label>
     </div>
   )
 }
