@@ -63,10 +63,7 @@ const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
         <p className="mb-2 text-sm font-bold">모집 중인 공연</p>
         <div className="flex gap-x-2">
           {relatedPerformances.map((p) => (
-            <Link
-              key={p.id}
-              href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}
-            >
+            <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL(p.id).url}>
               <Badge className="bg-slate-200 p-2 px-3 text-black">
                 {p.name}
               </Badge>

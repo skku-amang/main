@@ -13,18 +13,18 @@ import { User } from "@/types/User"
 
 import { createDynamicSchema } from "../schema"
 
-// 참고: 다른 방법: schema를 받아서 오지 말고 metaData를 받아서 이 컴포넌트에서 schema와 form 생성
 interface SecondPageProps {
   schema: ReturnType<typeof createDynamicSchema>
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
 }
 
-const requiredMemberCount = (shape: any) =>
-  shape._def.schema._def
+const requiredMemberCount = (shape: any) => {
+  return shape._def.innerType._def.schema._def
     .shape()
     .requiredMemberCount.default()
     ._def.innerType._def.defaultValue()
+}
 
 const SecondPage = ({
   schema,
@@ -39,6 +39,8 @@ const SecondPage = ({
       .then((users) => setMembers(users))
   }, [])
 
+  // TODO: schema 받지 말고 metadata 받아서 schema를 이 컴포넌트에서 생성
+  // TODO: 메타데이터에서 default 받아서 defaultValues 설정
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema)
   })

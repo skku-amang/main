@@ -39,6 +39,7 @@ export type Song = {
  * 해당 세션에 멤버가 2명이 있지만 아직 세션에 멤버가 1명이 부족한 상황
  */
 export type MemberSession = {
+  id: number
   session: Session
   members: User[]
   requiredMemberCount: number

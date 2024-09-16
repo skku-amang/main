@@ -79,7 +79,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     accessorKey: "songName",
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
-      <Link href={ROUTES.TEAM.DETAIL.url(row.original.id.toString())}>
+      <Link href={ROUTES.TEAM.DETAIL(row.original.id).url}>
         {row.getValue("songName")}
         <br />
         <span className="text-slate-300">{row.original.songArtist}</span>
@@ -169,7 +169,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
           <DropdownMenuContent align="end" className="rounded-none text-sm">
             <DropdownMenuItem className="p-0">
               <Link
-                href={ROUTES.TEAM.EDIT.url(row.original.id.toString())}
+                href={ROUTES.TEAM.EDIT(row.original.id).url}
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               >
                 <GoPencil />

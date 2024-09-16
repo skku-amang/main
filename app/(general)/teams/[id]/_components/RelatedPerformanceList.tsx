@@ -18,10 +18,7 @@ const RelatedPerformanceList = async () => {
       <p className="my-8 font-bold">Performances</p>
       <div className="flex gap-x-4">
         {data.map((p) => (
-          <Link
-            key={p.id}
-            href={ROUTES.PERFORMANCE.DETAIL.url(p.id.toString())}
-          >
+          <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL(p.id).url}>
             <Badge className="text-md rounded-xl bg-slate-200 px-6 py-1 font-normal text-black">
               {p.name}
             </Badge>

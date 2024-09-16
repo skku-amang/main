@@ -50,14 +50,7 @@ export const firstPageSchema = basicInfoSchema.merge(
   memberSessionRequiredSchema
 )
 
-// API에 주어야 하는 형태
-// [
-//   session: SessionName,
-//   members: number[],
-//   requiredMemberCount: number
-// ]
 export type SecondPageFormSchema = z.ZodObject<{
-  // TODO: 그냥 z.Object로 합시다
   [key: string]: z.ZodObject<{
     session: z.ZodString
     members: z.ZodArray<z.ZodNumber>
@@ -94,7 +87,7 @@ export const createDynamicSchema = (
       dynamicShape[sessionName] = z
         .object({
           session: z.string().default(sessionName).readonly(),
-          members: z.array(z.number()),
+          members: z.array(z.number().optional()).default([]),
           requiredMemberCount: z.number().default(requiredMemberCount)
         })
         .refine(
@@ -102,6 +95,9 @@ export const createDynamicSchema = (
             // 멤버 중복 체크
             const memberSet = new Set<number>()
             for (const member of data.members) {
+              if (!member) {
+                continue
+              }
               if (memberSet.has(member)) {
                 return false
               }
@@ -113,6 +109,7 @@ export const createDynamicSchema = (
             message: "멤버가 중복되었습니다"
           }
         )
+        .optional()
     }
   )
 

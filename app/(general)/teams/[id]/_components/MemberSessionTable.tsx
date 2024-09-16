@@ -229,7 +229,7 @@ const MemberSessionTable = ({
             {memberSessions.map((memberSession) => (
               <MemberSessionTableRow
                 team={team}
-                key={memberSession.session.id}
+                key={memberSession.id}
                 memberSession={memberSession}
                 largestRequiredMemberCount={largestRequiredMemberCount}
                 leader={leader}
