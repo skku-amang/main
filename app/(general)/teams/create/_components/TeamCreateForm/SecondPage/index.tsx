@@ -17,13 +17,6 @@ import {
   memberSessionRequiredBaseSchema
 } from "../schema"
 
-interface SchemaMetadata {
-  [key: string]: {
-    session: string
-    requiredMemberCount: number
-  }
-}
-
 interface SecondPageProps {
   schemaMetadata: z.infer<typeof memberSessionRequiredBaseSchema>
   onValid: (formData: z.infer<any>) => void

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -127,37 +128,38 @@ const TeamCreateForm = ({
             )}
           >
             {/* 공연 선택 */}
-            <Select
-              onValueChange={(e) => {
-                firstPageForm.setValue("performanceId", +e)
-                firstPageForm.clearErrors("performanceId")
-              }}
-            >
-              <SelectTrigger
-                className={
-                  firstPageForm.formState.errors.performanceId &&
-                  "border-destructive"
-                }
-                value="dd"
+            <div>
+              <Select
+                onValueChange={(e) => {
+                  firstPageForm.setValue("performanceId", +e)
+                  firstPageForm.clearErrors("performanceId")
+                }}
               >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {performanceOptions.map((performance) => (
-                  <SelectItem
-                    key={performance.id}
-                    value={performance.id.toString()}
-                  >
-                    {performance.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {firstPageForm.formState.errors.performanceId && (
-              <div className="text-destructive">
-                {firstPageForm.formState.errors.performanceId.message}
-              </div>
-            )}
+                <SelectTrigger
+                  className={
+                    firstPageForm.formState.errors.performanceId &&
+                    "border-destructive"
+                  }
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {performanceOptions.map((performance) => (
+                    <SelectItem
+                      key={performance.id}
+                      value={performance.id.toString()}
+                    >
+                      {performance.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {firstPageForm.formState.errors.performanceId && (
+                <div className="text-destructive">
+                  {firstPageForm.formState.errors.performanceId.message}
+                </div>
+              )}
+            </div>
 
             {/* 곡 입력 */}
             <div>
@@ -174,6 +176,8 @@ const TeamCreateForm = ({
                 </div>
               )}
             </div>
+
+            {/* 아티스트 입력 */}
             <div>
               <Input
                 {...firstPageForm.register("artistName")}
@@ -189,16 +193,29 @@ const TeamCreateForm = ({
               )}
             </div>
 
-            <Checkbox
-              onCheckedChange={(e) =>
-                firstPageForm.setValue("isFreshmenFixed", !!e)
-              }
-              checked={firstPageForm.getValues("isFreshmenFixed")}
-            />
-            <Checkbox
-              onCheckedChange={(e) => firstPageForm.setValue("isSelfMade", !!e)}
-              checked={firstPageForm.getValues("isSelfMade")}
-            />
+            {/* 신입고정 여부 */}
+            <div className="flex items-center gap-x-2">
+              <Checkbox
+                id="isFreshmenFixedInput"
+                onCheckedChange={(e) =>
+                  firstPageForm.setValue("isFreshmenFixed", !!e)
+                }
+                checked={firstPageForm.getValues("isFreshmenFixed")}
+              />
+              <Label htmlFor="isFreshmenFixedInput">신입고정팀입니다</Label>
+            </div>
+
+            {/* 자작곡 여부 */}
+            <div className="flex items-center gap-x-2">
+              <Checkbox
+                id="isSelfMadeInput"
+                onCheckedChange={(e) =>
+                  firstPageForm.setValue("isSelfMade", !!e)
+                }
+                checked={firstPageForm.getValues("isSelfMade")}
+              />
+              <Label htmlFor="isSelfMadeInput">자작곡입니다</Label>
+            </div>
 
             {/* 세션 초기화 폼 */}
             <table>
