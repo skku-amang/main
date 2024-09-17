@@ -5,13 +5,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { AiFillExclamationCircle } from "react-icons/ai"
-import { GoDot, GoDotFill } from "react-icons/go"
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { z } from "zod"
 
+import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
 import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/MemberSessionRequiredCheckbox"
+import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/paginator"
 import SecondPage from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
@@ -130,36 +129,28 @@ const TeamCreateForm = ({
     <div className="m-20 rounded-2xl p-20 shadow-2xl">
       {currentPage === 1 && (
         <Form {...firstPageForm}>
-          <form
-            onSubmit={firstPageForm.handleSubmit(
-              onFirstPageValid,
-              onFirstPageInvalid
-            )}
-          >
+          <form>
             {/* 공연 및 곡 폼 */}
             <div>
               {/* 설명 */}
-              <div className="mb-6">
-                <h2 className="mb-1 text-lg font-extrabold">공연 및 곡 정보</h2>
-                <div className="flex items-center gap-x-2 text-sm text-gray-400">
-                  <AiFillExclamationCircle />
-                  <HoverCard>
-                    <HoverCardTrigger>
-                      입력 시 주의사항을 확인해주세요
-                    </HoverCardTrigger>
-                    <HoverCardContent
-                      className="w-[420px] bg-black text-white"
-                      side="right"
-                    >
-                      ・곡명, 아티스트명을 정확히 입력해주세요
-                      <br />
-                      ・커버곡의 경우 아래의 예시와 같이 작성해주세요
-                      <br />
-                      (예) 곡명: 화장을 고치고(Cover by 태연) / 아티스트명: 왁스
-                    </HoverCardContent>
-                  </HoverCard>
-                </div>
-              </div>
+              <Description header="공연 및 곡 정보" className="mb-6">
+                <AiFillExclamationCircle />
+                <HoverCard>
+                  <HoverCardTrigger>
+                    입력 시 주의사항을 확인해주세요
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    className="w-[420px] bg-black text-white"
+                    side="right"
+                  >
+                    ・곡명, 아티스트명을 정확히 입력해주세요
+                    <br />
+                    ・커버곡의 경우 아래의 예시와 같이 작성해주세요
+                    <br />
+                    (예) 곡명: 화장을 고치고(Cover by 태연) / 아티스트명: 왁스
+                  </HoverCardContent>
+                </HoverCard>
+              </Description>
 
               <div className="grid grid-cols-2 gap-x-14 gap-y-6">
                 {/* 공연 선택 */}
@@ -292,16 +283,13 @@ const TeamCreateForm = ({
             {/* 세션 초기화 폼 */}
             <div>
               {/* 설명 */}
-              <div className="mb-6">
-                <h2 className="mb-1 text-lg font-extrabold">세션 정보</h2>
-                <div className="flex items-center gap-x-2 text-sm text-gray-400">
-                  <AiFillExclamationCircle />
-                  곡에 필요한 모든 세션을 체크해주세요
-                </div>
-              </div>
+              <Description header="세션 정보" className="mb-6">
+                <AiFillExclamationCircle />
+                곡에 필요한 모든 세션을 체크해주세요
+              </Description>
 
               {/* 세션 체크박스 */}
-              <table>
+              <table className="table-auto">
                 <tbody>
                   {Object.entries(memberSessionRequiredFormStructure).map(
                     ([label, fieldNames]) => (
@@ -324,24 +312,15 @@ const TeamCreateForm = ({
             </div>
 
             {/* 페이지 이동 */}
-            <div className="mt-24 flex items-center justify-around">
-              <Button className="h-12 rounded-none" variant="outline" disabled>
-                <IoIosArrowBack className="me-3" />
-                Back
-              </Button>
-              <div className="flex items-center gap-x-3">
-                <GoDotFill size={28} />
-                <GoDot size={28} />
-              </div>
-              <Button
-                className="h-12 rounded-none"
-                variant="outline"
-                type="submit"
-              >
-                Next
-                <IoIosArrowForward className="ms-3" />
-              </Button>
-            </div>
+            <Paginator
+              onNext={firstPageForm.handleSubmit(
+                onFirstPageValid,
+                onFirstPageInvalid
+              )}
+              isFirstPage={true}
+              totalPage={2}
+              currentPage={1}
+            />
           </form>
         </Form>
       )}
