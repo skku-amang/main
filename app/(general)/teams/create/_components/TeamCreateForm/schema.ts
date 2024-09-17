@@ -26,7 +26,7 @@ export const memberSessionRequiredField = ({
     required: z.boolean({ required_error: "필수 항목" }).default(false)
   })
 
-const memberSessionRequiredBaseSchema = z.object({
+export const memberSessionRequiredBaseSchema = z.object({
   보컬1: memberSessionRequiredField({ sessionName: "보컬", index: 1 }),
   보컬2: memberSessionRequiredField({ sessionName: "보컬", index: 2 }),
   보컬3: memberSessionRequiredField({ sessionName: "보컬", index: 3 }),
@@ -114,4 +114,31 @@ export const createDynamicSchema = (
   )
 
   return z.object(dynamicShape)
+}
+
+export function getFormDefaultValeus(
+  baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>
+) {
+  const formDefaultValues: { [key: string]: z.infer<any> } = {}
+
+  Object.values(baseSchema).forEach((value) => {
+    if (!value.required) {
+      return
+    }
+    if (!formDefaultValues[value.sessionName]) {
+      formDefaultValues[value.sessionName] = {
+        session: value.sessionName,
+        members: [],
+        requiredMemberCount: 1
+      }
+    } else {
+      formDefaultValues[value.sessionName].requiredMemberCount += 1
+    }
+  })
+
+  Object.values(formDefaultValues).forEach((value) => {
+    value.members = new Array(value.requiredMemberCount).fill(null)
+  })
+
+  return formDefaultValues
 }

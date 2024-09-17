@@ -26,7 +26,7 @@ import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces
 import { Performance } from "@/types/Performance"
 import { Team } from "@/types/Team"
 
-import { createDynamicSchema, firstPageSchema } from "./schema"
+import { firstPageSchema } from "./schema"
 
 interface TeamCreateFormProps {
   initialData?: any
@@ -68,10 +68,8 @@ const TeamCreateForm = ({
       // console.log(firstPageResult.error)
       return
     }
-    console.warn(firstPageResult.data.memberSessions)
-    setSecondPageSchema(
-      createDynamicSchema(firstPageResult.data.memberSessions)
-    )
+
+    setSecondPageSchemaMetadata(firstPageResult.data.memberSessions)
     setCurrentPage(2)
   }
   function onFirstPageInvalid(
@@ -81,7 +79,8 @@ const TeamCreateForm = ({
   }
 
   // Second Page
-  const [secondPageSchema, setSecondPageSchema] = useState<z.infer<any>>()
+  const [secondPageSchemaMetadata, setSecondPageSchemaMetadata] =
+    useState<z.infer<any>>()
   async function onSecondPageValid(secondPageFormData: z.infer<any>) {
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
@@ -229,9 +228,10 @@ const TeamCreateForm = ({
       )}
       {currentPage === 2 && (
         <SecondPage
-          schema={secondPageSchema}
+          schemaMetadata={secondPageSchemaMetadata}
           onValid={onSecondPageValid}
           onInvalid={onSecondPageInvalid}
+          onPreviousButtonClick={() => setCurrentPage(1)}
         />
       )}
     </div>

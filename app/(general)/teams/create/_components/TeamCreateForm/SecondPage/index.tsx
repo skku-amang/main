@@ -11,12 +11,24 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
 
-import { createDynamicSchema } from "../schema"
+import {
+  createDynamicSchema,
+  getFormDefaultValeus,
+  memberSessionRequiredBaseSchema
+} from "../schema"
+
+interface SchemaMetadata {
+  [key: string]: {
+    session: string
+    requiredMemberCount: number
+  }
+}
 
 interface SecondPageProps {
-  schema: ReturnType<typeof createDynamicSchema>
+  schemaMetadata: z.infer<typeof memberSessionRequiredBaseSchema>
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
+  onPreviousButtonClick: () => void
 }
 
 const requiredMemberCount = (shape: any) => {
@@ -27,22 +39,24 @@ const requiredMemberCount = (shape: any) => {
 }
 
 const SecondPage = ({
-  schema,
+  schemaMetadata,
   onValid: _onValid,
-  onInvalid: _onInvalid
+  onInvalid: _onInvalid,
+  onPreviousButtonClick
 }: SecondPageProps) => {
   const [users, setMembers] = useState<User[]>([])
+  const schema = createDynamicSchema(schemaMetadata)
 
+  // 유저 목록 가져오기
   useEffect(() => {
     fetchData(API_ENDPOINTS.USER.LIST)
       .then((data) => data.json())
       .then((users) => setMembers(users))
   }, [])
 
-  // TODO: schema 받지 말고 metadata 받아서 schema를 이 컴포넌트에서 생성
-  // TODO: 메타데이터에서 default 받아서 defaultValues 설정
   const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema)
+    resolver: zodResolver(schema),
+    defaultValues: getFormDefaultValeus(schemaMetadata)
   })
 
   function onValid(formData: z.infer<typeof schema>) {
@@ -86,7 +100,10 @@ const SecondPage = ({
           </tbody>
         </table>
 
-        <Button type="submit">다음</Button>
+        <div className="flex items-center justify-between">
+          <Button onClick={onPreviousButtonClick}>이전</Button>
+          <Button type="submit">다음</Button>
+        </div>
       </form>
     </Form>
   )
