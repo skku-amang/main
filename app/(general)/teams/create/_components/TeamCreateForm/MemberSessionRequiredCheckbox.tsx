@@ -27,7 +27,9 @@ const MemberSessionRequiredCheckbox = ({
         onCheckedChange={(e) => firstPageForm.setValue(requiredFieldName, !!e)}
         checked={firstPageForm.getValues(requiredFieldName) as boolean}
       />
-      <Label htmlFor={requiredFieldName}>{label}</Label>
+      <Label htmlFor={requiredFieldName} className="w-32 font-semibold">
+        {label}
+      </Label>
     </div>
   )
 }
