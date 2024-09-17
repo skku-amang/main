@@ -93,7 +93,7 @@ function createMemberSessions(): MemberSession[] {
   }
 
   let result: MemberSession[] = []
-  Object.entries(probability).map(([session, p]) => {
+  Object.entries(probability).map(([session, p], index) => {
     const sessionName = session as SessionName
     const probability = p as { [key: string]: number }
     const memberCount = getRandomValueByProbability(probability)
@@ -102,6 +102,7 @@ function createMemberSessions(): MemberSession[] {
     )
 
     result.push({
+      id: index,
       session: dummySessions.find((s) => s.name === sessionName)!,
       members,
       requiredMemberCount:

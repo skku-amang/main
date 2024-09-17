@@ -1,13 +1,14 @@
 /* eslint-disable no-unused-vars */
 import { User } from "./User"
 
-export enum SessionName {
-  VOCAL = "보컬",
-  GUITAR = "기타",
-  BASS = "베이스",
-  SYNTH = "신디",
-  DRUM = "드럼"
-}
+export type SessionName =
+  | "보컬"
+  | "기타"
+  | "베이스"
+  | "신디"
+  | "드럼"
+  | "현악기"
+  | "관악기"
 
 export type Session = {
   id: number

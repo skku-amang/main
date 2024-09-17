@@ -1,13 +1,12 @@
-import { Session, SessionName } from '@/types/Session'
+import { Session } from "@/types/Session"
 
 const dummySessions: Session[] = [
-  { id: 0, name: SessionName.VOCAL },
-  { id: 1, name: SessionName.GUITAR },
-  { id: 2, name: SessionName.BASS },
-  { id: 3, name: SessionName.SYNTH },
-  { id: 4, name: SessionName.DRUM },
+  { id: 0, name: "보컬" },
+  { id: 1, name: "기타" },
+  { id: 2, name: "베이스" },
+  { id: 3, name: "신디" },
+  { id: 4, name: "드럼" }
 ]
-
 
 export default dummySessions
 
@@ -36,8 +35,8 @@ const getRandomKey = (pd: ProbabilityDensity): number => {
 /**
  * pd에 따라 세션을 랜덤하게 반환합니다.
  * @param pd 확률 밀도: key는 세션의 개수, value는 그 세션의 확률
- * @example   
- * // 1개의 세션을 50% 확률로, 2개의 세션을 30% 확률로, 3개의 세션을 20% 확률로 반환   
+ * @example
+ * // 1개의 세션을 50% 확률로, 2개의 세션을 30% 확률로, 3개의 세션을 20% 확률로 반환
  * getRandomSessions(new Map([[1, 0.5], [2, 0.3], [3, 0.2]]))
  */
 export const getRandomSessions = (pd: ProbabilityDensity): Session[] => {

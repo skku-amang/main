@@ -23,25 +23,25 @@ export interface ApiEndpoint {
 const API_ENDPOINTS = {
   AUTH: {
     LOGIN: {
-      url: `${baseURL}/${API_PREFIX}/auth`,
+      url: `${baseURL}/${API_PREFIX}/auth/`,
       method: "GET"
     },
     REGISTER: {
-      url: `${baseURL}/${API_PREFIX}/auth`,
+      url: `${baseURL}/${API_PREFIX}/auth/`,
       method: "POST"
     },
     LOGOUT: {
-      url: `${baseURL}/${API_PREFIX}/auth`,
+      url: `${baseURL}/${API_PREFIX}/auth/`,
       method: "DELETE"
     }
   },
   GENERATION: {
     CREATE: {
-      url: `${baseURL}/${API_PREFIX}/generations`,
+      url: `${baseURL}/${API_PREFIX}/generations/`,
       method: "POST"
     },
     LIST: {
-      url: `${baseURL}/${API_PREFIX}/generations`,
+      url: `${baseURL}/${API_PREFIX}/generations/`,
       method: "GET"
     },
     RETRIEVE: (id: number) => ({
@@ -59,11 +59,11 @@ const API_ENDPOINTS = {
   },
   PERFORMANCE: {
     CREATE: {
-      url: `${baseURL}/${API_PREFIX}/performances`,
+      url: `${baseURL}/${API_PREFIX}/performances/`,
       method: "POST"
     },
     LIST: {
-      url: `${baseURL}/${API_PREFIX}/performances`,
+      url: `${baseURL}/${API_PREFIX}/performances/`,
       method: "GET"
     },
     RETRIEVE: (id: number) => ({
@@ -81,11 +81,11 @@ const API_ENDPOINTS = {
   },
   SESSION: {
     CREATE: {
-      url: `${baseURL}/${API_PREFIX}/sessions`,
+      url: `${baseURL}/${API_PREFIX}/sessions/`,
       method: "POST"
     },
     LIST: {
-      url: `${baseURL}/${API_PREFIX}/sessions`,
+      url: `${baseURL}/${API_PREFIX}/sessions/`,
       method: "GET"
     },
     RETRIEVE: (id: number) => ({
@@ -103,11 +103,11 @@ const API_ENDPOINTS = {
   },
   TEAM: {
     CREATE: {
-      url: `${baseURL}/${API_PREFIX}/teams`,
+      url: `${baseURL}/${API_PREFIX}/teams/`,
       method: "POST"
     },
     LIST: {
-      url: `${baseURL}/${API_PREFIX}/teams`,
+      url: `${baseURL}/${API_PREFIX}/teams/`,
       method: "GET"
     },
     RETRIEVE: (id: number) => ({
@@ -125,11 +125,11 @@ const API_ENDPOINTS = {
   },
   USER: {
     CREATE: {
-      url: `${baseURL}/${API_PREFIX}/users`,
+      url: `${baseURL}/${API_PREFIX}/users/`,
       method: "POST"
     },
     LIST: {
-      url: `${baseURL}/${API_PREFIX}/users`,
+      url: `${baseURL}/${API_PREFIX}/users/`,
       method: "GET"
     },
     RETRIEVE: (id: number) => ({
