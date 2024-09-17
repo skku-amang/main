@@ -5,9 +5,9 @@ import { ArrowUpDown } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 import { BsThreeDotsVertical } from "react-icons/bs"
+import { FiPaperclip } from "react-icons/fi"
 import { GoPencil } from "react-icons/go"
 import { GoTrash } from "react-icons/go"
-import { MdOpenInNew } from "react-icons/md"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
-import { Session } from "@/types/Session"
+import { SessionName } from "@/types/Session"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
 
-type TeamStatus = "모집 완료" | "모집 중"
+type TeamStatus = "Inactive" | "Active"
 export type TeamColumn = {
   id: number
   songName: string
@@ -51,24 +51,25 @@ const SortButton = ({
   )
 }
 
-const SessionBadge = ({ session }: { session: Session }) => {
-  return (
-    <Badge className="rounded-lg bg-slate-200 text-black">{session.name}</Badge>
-  )
+const SessionBadge = ({ session }: { session: SessionName }) => {
+  return <Badge className="rounded-lg bg-slate-200 text-black">{session}</Badge>
 }
 
 const StatusBadge = ({ status }: { status: TeamStatus }) => {
   const className =
-    status === "모집 완료"
-      ? "bg-red-100 border-destructive text-destructive "
-      : "bg-green-100 border-green-600 text-green-600 "
+    status === "Inactive"
+      ? "bg-red-100 text-destructive"
+      : "bg-green-100 text-green-600"
   return (
     <div className="flex justify-center">
       <Badge
         variant="outline"
-        className={cn(className, "rounded-lg border font-bold")}
+        className={cn(
+          className,
+          "rounded-full border-none px-3 py-2 font-bold"
+        )}
       >
-        {status}
+        ● {status}
       </Badge>
     </div>
   )
@@ -80,7 +81,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
       <Link href={ROUTES.TEAM.DETAIL(row.original.id).url}>
-        {row.getValue("songName")}
+        {row.original.songName}
         <br />
         <span className="text-slate-300">{row.original.songArtist}</span>
       </Link>
@@ -117,7 +118,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
           {Array.from(requiredMembers.entries()).map(
             ([session, requiredMemberCount]) => {
               if (requiredMemberCount === 0) return
-              return <SessionBadge key={session.id} session={session} />
+              return <SessionBadge key={session} session={session} />
             }
           )}
         </div>
@@ -126,29 +127,25 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "status",
-    header: ({ column }) => (
-      <div className="flex w-full justify-center">
-        <SortButton column={column}>모집상태</SortButton>
-      </div>
-    ),
+    header: () => <div className="flex w-full justify-center">모집상태</div>,
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
       const status: TeamStatus = memberSessionsSet.isSatisfied
-        ? "모집 완료"
-        : "모집 중"
+        ? "Inactive"
+        : "Active"
       return <StatusBadge status={status} />
     }
   },
   {
     accessorKey: "songYoutubeVideoId",
-    header: "영상링크",
+    header: () => <div className="flex w-full justify-center">영상링크</div>,
     cell: ({ row }) => {
       const songYoutubeVideoId = row.getValue("songYoutubeVideoId") as string
       if (songYoutubeVideoId) {
         return (
-          <Link href={songYoutubeVideoId} className="z-50">
-            <MdOpenInNew size={24} />
+          <Link href={songYoutubeVideoId}>
+            <FiPaperclip size={24} />
           </Link>
         )
       }
@@ -161,7 +158,10 @@ export const columns: ColumnDef<TeamColumn>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              className="flex w-full items-center justify-center p-0"
+            >
               <span className="sr-only">Open menu</span>
               <BsThreeDotsVertical className="h-4 w-4" />
             </Button>

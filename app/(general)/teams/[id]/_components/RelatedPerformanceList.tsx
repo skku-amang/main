@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -15,13 +15,13 @@ const RelatedPerformanceList = async () => {
 
   return (
     <div>
-      <p className="my-8 font-bold">Performances</p>
+      <p className="my-8 text-center font-bold">Performances</p>
       <div className="flex gap-x-4">
         {data.map((p) => (
           <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL(p.id).url}>
-            <Badge className="text-md rounded-xl bg-slate-200 px-6 py-1 font-normal text-black">
+            <Button className="rounded-xl py-0 shadow" variant="secondary">
               {p.name}
-            </Badge>
+            </Button>
           </Link>
         ))}
       </div>

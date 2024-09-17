@@ -94,7 +94,7 @@ const TeamCreateForm = ({
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
-      artistName: firstPageForm.getValues("artistName"),
+      songArtist: firstPageForm.getValues("songArtist"),
       memberSessions: Object.values(secondPageFormData),
       description: firstPageForm.getValues("description")
     }
@@ -252,23 +252,23 @@ const TeamCreateForm = ({
 
                 {/* 아티스트 입력 */}
                 <div>
-                  <Label htmlFor="artistNameInput" className="font-semibold">
+                  <Label htmlFor="songArtistInput" className="font-semibold">
                     아티스트명
                   </Label>
                   <Input
-                    id="artistNameInput"
-                    {...firstPageForm.register("artistName")}
+                    id="songArtistInput"
+                    {...firstPageForm.register("songArtist")}
                     className={cn(
                       "my-1",
-                      firstPageForm.formState.errors.artistName &&
+                      firstPageForm.formState.errors.songArtist &&
                         "border-destructive"
                     )}
                     placeholder="아티스트명 입력"
                   />
                   {/* 에러 표시 */}
-                  {firstPageForm.formState.errors.artistName && (
+                  {firstPageForm.formState.errors.songArtist && (
                     <div className="text-destructive">
-                      {firstPageForm.formState.errors.artistName.message}
+                      {firstPageForm.formState.errors.songArtist.message}
                     </div>
                   )}
 
