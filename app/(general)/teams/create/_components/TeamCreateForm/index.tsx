@@ -95,13 +95,28 @@ const TeamCreateForm = ({
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       artistName: firstPageForm.getValues("artistName"),
-      memberSessions: Object.values(secondPageFormData)
+      memberSessions: Object.values(secondPageFormData),
+      description: firstPageForm.getValues("description")
     }
 
     const res = await fetchData(API_ENDPOINTS.TEAM.CREATE, {
       cache: "no-store",
       body: JSON.stringify(allFormData)
     })
+    if (!res.ok) {
+      switch (res.status) {
+        case 400:
+          console.error("Error:", await res.json())
+          break
+        case 401:
+          console.error("Unauthorized")
+          break
+        default:
+          console.error("Unknown error")
+          break
+      }
+      return
+    }
     const data = (await res.json()) as CreateRetrieveUpdateResponse<Team>
     router.push(ROUTES.TEAM.DETAIL(data.id).url)
   }
@@ -330,6 +345,7 @@ const TeamCreateForm = ({
           onValid={onSecondPageValid}
           onInvalid={onSecondPageInvalid}
           onPreviousButtonClick={() => setCurrentPage(1)}
+          firstPageForm={firstPageForm}
         />
       )}
     </div>

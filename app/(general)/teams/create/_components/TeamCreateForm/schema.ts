@@ -87,7 +87,7 @@ export const createDynamicSchema = (
       dynamicShape[sessionName] = z
         .object({
           session: z.string().default(sessionName).readonly(),
-          members: z.array(z.number().optional()).default([]),
+          members: z.array(z.union([z.number(), z.null()])).default([]),
           requiredMemberCount: z.number().default(requiredMemberCount)
         })
         .refine(

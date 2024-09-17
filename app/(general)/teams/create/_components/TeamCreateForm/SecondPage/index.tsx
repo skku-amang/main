@@ -25,6 +25,7 @@ interface SecondPageProps {
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
   onPreviousButtonClick: () => void
+  firstPageForm: ReturnType<typeof useForm<any>>
 }
 
 const requiredMemberCount = (shape: any) => {
@@ -38,7 +39,8 @@ const SecondPage = ({
   schemaMetadata,
   onValid: _onValid,
   onInvalid: _onInvalid,
-  onPreviousButtonClick
+  onPreviousButtonClick,
+  firstPageForm
 }: SecondPageProps) => {
   const [users, setMembers] = useState<User[]>([])
   const schema = createDynamicSchema(schemaMetadata)
@@ -61,11 +63,6 @@ const SecondPage = ({
   function onInvalid(errors: FieldErrors<z.infer<typeof schema>>) {
     _onInvalid(errors)
   }
-
-  const formData = form.watch()
-  useEffect(() => {
-    console.log(formData)
-  }, [formData])
 
   return (
     <Form {...form}>
@@ -114,7 +111,11 @@ const SecondPage = ({
         </Description>
 
         {/* 게시글 작성 */}
-        <Textarea rows={7} placeholder="팀 홍보 글을 작성해주세요" />
+        <Textarea
+          rows={7}
+          placeholder="팀 홍보 글을 작성해주세요"
+          {...firstPageForm.register("description")}
+        />
 
         {/* 페이지 이동 */}
         <Paginator
