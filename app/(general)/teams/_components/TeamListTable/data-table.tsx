@@ -120,7 +120,6 @@ const reducer = (state: State, action: Action) => {
             return true
           // eslint-disable-next-line no-fallthrough
           case "필요세션":
-            console.log(newState)
             if ((filterValues as Set<string>).size === 0) return true
             return new MemberSessionSet(team.memberSessions)
               .getSessionsWithMissingMembers()
@@ -192,7 +191,6 @@ export function TeamListDataTable<TValue>({
           }),
         checked: !!state.filters["필요세션"]?.has("신디")
       },
-
       {
         label: "베이스",
         onChecked: (checked) =>
@@ -210,10 +208,25 @@ export function TeamListDataTable<TValue>({
             payload: { target: "필요세션", value: "드럼" }
           }),
         checked: !!state.filters["필요세션"]?.has("드럼")
+      },
+      {
+        label: "현악기",
+        onChecked: (checked) =>
+          dispatch({
+            type: checked ? "addFilter" : "removeFilter",
+            payload: { target: "필요세션", value: "현악기" }
+          }),
+        checked: !!state.filters["필요세션"]?.has("현악기")
+      },
+      {
+        label: "관악기",
+        onChecked: (checked) =>
+          dispatch({
+            type: checked ? "addFilter" : "removeFilter",
+            payload: { target: "필요세션", value: "관악기" }
+          }),
+        checked: !!state.filters["필요세션"]?.has("관악기")
       }
-      // TODO: 백엔드 seed 스크립트 추가, types.ts에 추가 후 적용
-      // { label: "현악기", onChecked: () => console.log() },
-      // { label: "관악기", onChecked: () => console.log() }
     ],
     모집상태: [
       {
