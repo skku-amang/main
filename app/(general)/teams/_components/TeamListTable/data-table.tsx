@@ -96,6 +96,11 @@ const reducer = (state: State, action: Action) => {
       throw new TypeError(`Invalid action type`)
   }
 
+  // TODO: 여기서 `action`을 참조하는 모든 코드는 지워야 함
+  // 왜냐하면 action을 참조한다는 것은 이번에 한시적으로 추가/수정된 action의 내용만을 반영한다는 것임
+  // 이전의 모든 필터를 적용시켜야 하기 때문에
+  // action이 아니라 state.filters 만을 참조해야 함
+
   // 실제 데이터에 반영
   // 모두 선택시
   if (
@@ -106,20 +111,19 @@ const reducer = (state: State, action: Action) => {
   }
   // 필터 값 존재시
   newState.result = state.originalData.filter((team) => {
-    return Object.entries(newState.filters).some(
+    return Object.entries(newState.filters).every(
       ([filterKey, filterValues]) => {
-        switch (action.payload?.target) {
+        if (!team.memberSessions) return false
+        switch (filterKey) {
           case "모집상태":
-            if (filterKey !== action.payload.target) break
-            if (!team.memberSessions) return false
-            if (filterValues === "inactive")
-              return new MemberSessionSet(team.memberSessions).isSatisfied
             if (filterValues === "active")
               return !new MemberSessionSet(team.memberSessions).isSatisfied
+            if (filterValues === "inactive")
+              return new MemberSessionSet(team.memberSessions).isSatisfied
+            return true
           // eslint-disable-next-line no-fallthrough
           case "필요세션":
-            if (filterKey !== action.payload.target) break
-            if (!team.memberSessions) return false
+            if ((filterValues as Set<string>).size === 0) return true
             return new MemberSessionSet(team.memberSessions)
               .getSessionsWithMissingMembers()
               .some((ms) => {
