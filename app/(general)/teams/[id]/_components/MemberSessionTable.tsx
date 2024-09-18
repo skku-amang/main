@@ -23,25 +23,26 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
+import { SessionName } from "@/types/Session"
 import { MemberSession, Team } from "@/types/Team"
 import { User } from "@/types/User"
 
 interface FormData {
   teamId: number
-  sessionId: number
+  session: SessionName
   sessionMemberIndex: number
 }
 
 interface SubmitButtonProps {
   teamId: number
-  sessionId: number
+  session: SessionName
   sessionMemberIndex: number
   initialMode: "signup" | "cancel"
 }
 
 const SubmitButton = ({
   teamId,
-  sessionId,
+  session,
   sessionMemberIndex,
   initialMode
 }: SubmitButtonProps) => {
@@ -50,7 +51,7 @@ const SubmitButton = ({
     handleSubmit,
     formState: { isSubmitting }
   } = useForm<FormData>({
-    defaultValues: { teamId, sessionId, sessionMemberIndex }
+    defaultValues: { teamId, session, sessionMemberIndex }
   })
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -66,7 +67,7 @@ const SubmitButton = ({
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input type="hidden" {...register("teamId")} />
-        <Input type="hidden" {...register("sessionId")} />
+        <Input type="hidden" {...register("session")} />
         <Input type="hidden" {...register("sessionMemberIndex")} />
 
         {mode === "signup" && (
@@ -155,7 +156,7 @@ const MemberSessionTableRow = ({
   return (
     <TableRow>
       <TableCell className={cellClassName}>
-        {memberSession.session.name}
+        {memberSession.session}
         <br />({memberSession.members.length}/
         {memberSession.requiredMemberCount})
       </TableCell>
@@ -165,7 +166,7 @@ const MemberSessionTableRow = ({
             isApplied(index, memberSession) ? (
               <SubmitButton
                 teamId={team.id}
-                sessionId={memberSession.session.id}
+                session={memberSession.session}
                 sessionMemberIndex={index}
                 initialMode="cancel"
               />
@@ -175,7 +176,7 @@ const MemberSessionTableRow = ({
           ) : isMissing(index, memberSession) ? (
             <SubmitButton
               teamId={team.id}
-              sessionId={memberSession.session.id}
+              session={memberSession.session}
               sessionMemberIndex={index}
               initialMode="signup"
             />
