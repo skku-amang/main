@@ -96,19 +96,16 @@ const reducer = (state: State, action: Action) => {
       throw new TypeError(`Invalid action type`)
   }
 
-  // TODO: 여기서 `action`을 참조하는 모든 코드는 지워야 함
-  // 왜냐하면 action을 참조한다는 것은 이번에 한시적으로 추가/수정된 action의 내용만을 반영한다는 것임
-  // 이전의 모든 필터를 적용시켜야 하기 때문에
-  // action이 아니라 state.filters 만을 참조해야 함
-
   // 실제 데이터에 반영
-  // 모두 선택시
+
+  // 모두 선택시 최적화
   if (
-    Object.values(newState.filters.필요세션).length === 0 &&
+    newState.filters.필요세션.size === 0 &&
     newState.filters.모집상태 === "all"
   ) {
     return { ...newState, result: newState.originalData }
   }
+
   // 필터 값 존재시
   newState.result = state.originalData.filter((team) => {
     return Object.entries(newState.filters).every(
@@ -123,6 +120,7 @@ const reducer = (state: State, action: Action) => {
             return true
           // eslint-disable-next-line no-fallthrough
           case "필요세션":
+            console.log(newState)
             if ((filterValues as Set<string>).size === 0) return true
             return new MemberSessionSet(team.memberSessions)
               .getSessionsWithMissingMembers()
