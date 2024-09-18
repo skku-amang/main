@@ -1,24 +1,11 @@
 import RelatedPerformanceList from "@/app/(general)/teams/[id]/_components/RelatedPerformanceList"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
-import { generateDummys } from "@/lib/dummy"
-import { createTeam } from "@/lib/dummy/Team"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Team } from "@/types/Team"
 
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
-
-const _TEAMS = generateDummys(45, createTeam)
-// const _teams: TeamColumn[] = _TEAMS.map((team) => ({
-//   id: team.id,
-//   songName: team.songName,
-//   songArtist: team.songArtist,
-//   leaderName: team.leader?.name,
-//   memberSessions: team.memberSessions,
-//   coverUrl: team.songYoutubeVideoId,
-//   isFreshmanFixed: team.isFreshmanFixed
-// }))
 
 // TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
 // TODO: Pagination에서 1,2,3,4,5 등 추가

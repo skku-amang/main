@@ -1,14 +1,15 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
-import React from 'react'
-import { CgSpinner } from 'react-icons/cg'
-import { CiSettings } from 'react-icons/ci'
-import { HiOutlineUserGroup } from 'react-icons/hi2'
-import { IoIosLogOut } from 'react-icons/io'
-import { IoPersonOutline } from 'react-icons/io5'
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
+import React from "react"
+import { CgSpinner } from "react-icons/cg"
+import { CiSettings } from "react-icons/ci"
+import { HiOutlineUserGroup } from "react-icons/hi2"
+import { IoIosLogOut } from "react-icons/io"
+import { IoPersonOutline } from "react-icons/io5"
+import { MdOutlineDarkMode } from "react-icons/md"
 
 import {
   DropdownMenu,
@@ -17,14 +18,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu"
+import { Switch } from "@/components/ui/switch"
 
-import ROUTES from '../../constants/routes'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import ROUTES from "../../constants/routes"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 interface MenuItemProps {
   icon: React.ReactNode
-  href: string
+  href?: string
   children: React.ReactNode
 }
 
@@ -34,7 +36,9 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   return (
     <DropdownMenuItem
       className="flex items-center justify-start gap-x-3 hover:cursor-pointer"
-      onSelect={() => router.push(href)}
+      onSelect={() => {
+        if (href) router.push(href)
+      }}
     >
       {icon}
       {children}
@@ -42,14 +46,21 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   )
 }
 
+const setDarkMode = (value: boolean) => {
+  if (value) {
+    return document.documentElement.classList.add("dark")
+  }
+  document.documentElement.classList.remove("dark")
+}
+
 function Profile() {
   const { status, data: session } = useSession()
-  const RANDOM_PROFILE_IMAGE = 'https://picsum.photos/50/50'
+  const RANDOM_PROFILE_IMAGE = "https://picsum.photos/50/50"
 
   if (!session) {
     return (
       <>
-        {status === 'loading' ? (
+        {status === "loading" ? (
           <CgSpinner className="animate-spin text-white" size={30} />
         ) : (
           <div className="flex justify-center gap-x-5 font-bold text-white">
@@ -98,6 +109,19 @@ function Profile() {
         <MenuItem icon={<CiSettings size={iconSize} />} href="#">
           설정
         </MenuItem>
+        <DropdownMenuItem
+          className="flex items-center justify-start gap-x-3 hover:cursor-pointer"
+          onSelect={(e) => e.preventDefault()}
+        >
+          <MdOutlineDarkMode size={iconSize} />
+          <Switch
+            onCheckedChange={(v) => {
+              localStorage.setItem("theme", v ? "dark" : "light")
+              setDarkMode(v)
+            }}
+          />
+          다크모드
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem

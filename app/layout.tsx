@@ -1,19 +1,19 @@
-import '@/app/globals.css'
+import "@/app/globals.css"
 
-import { Metadata } from 'next'
-import { Inter as FontSans } from 'next/font/google'
-import { SessionProvider } from 'next-auth/react'
-import React from 'react'
+import { Metadata } from "next"
+import { Inter as FontSans } from "next/font/google"
+import { SessionProvider } from "next-auth/react"
+import React from "react"
 
 const fontSans = FontSans({
-  subsets: ['latin'],
-  variable: '--font-sans'
+  subsets: ["latin"],
+  variable: "--font-sans"
 })
 export const metadata: Metadata = {
-  title: 'AMANG',
-  description: 'SKKU AMANG official homepage',
+  title: "AMANG",
+  description: "SKKU AMANG official homepage",
   icons: {
-    icon: '/favicon.ico'
+    icon: "/favicon.ico"
   }
 }
 

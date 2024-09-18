@@ -120,4 +120,10 @@ export class MemberSessionSet {
   static from(memberSessions: MemberSession[]): MemberSessionSet {
     return new MemberSessionSet(memberSessions)
   }
+
+  getSessionsWithMissingMembers() {
+    return Array.from(this.memberSessions).filter(
+      (ms) => ms.requiredMemberCount > ms.members.length
+    )
+  }
 }
