@@ -1,8 +1,3 @@
-// const baseURL =
-//   process.env.NODE_ENV === "development"
-//     ? process.env.NEXT_PUBLIC_LOCAL_URL
-//     : process.env.NEXT_PUBLIC_DEPLOY_URL
-
 /**
  * 실제 서비스 배포 전까지는 라이브 DB를 사용합니다.
  * 배포 후에는 다른 방법을 고안해야 합니다.
