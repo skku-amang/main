@@ -30,6 +30,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <meta
+        httpEquiv="Content-Security-Policy"
+        content="upgrade-insecure-requests"
+      />
+
       <SessionProvider>
         <body className={fontSans.className}>{children}</body>
       </SessionProvider>

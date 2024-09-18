@@ -9,14 +9,6 @@ const nextConfig = {
         pathname: "/**"
       }
     ]
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/:path*",
-        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`
-      }
-    ]
   }
 }
 
