@@ -1,5 +1,5 @@
 import { Performance } from "./Performance"
-import { Session } from "./Session"
+import { SessionName } from "./Session"
 import { User } from "./User"
 
 export type Team = {
@@ -40,7 +40,7 @@ export type Song = {
  */
 export type MemberSession = {
   id: number
-  session: Session
+  session: SessionName
   members: User[]
   requiredMemberCount: number
 }
@@ -63,10 +63,8 @@ export class MemberSessionSet {
     this.memberSessions = new Set(memberSessions)
   }
 
-  private isSessionsUnique(sessions: Session[]): boolean {
-    return (
-      sessions.length === new Set(sessions.map((session) => session.id)).size
-    )
+  private isSessionsUnique(sessions: SessionName[]): boolean {
+    return sessions.length === new Set(sessions).size
   }
 
   /**
@@ -99,8 +97,9 @@ export class MemberSessionSet {
    */
   getRequiredSessionsWithMissingUserCount(
     includeFullSessions = false
-  ): Map<Session, number> {
-    let requiredSessionsWithMissingUserCount: Map<Session, number> = new Map()
+  ): Map<SessionName, number> {
+    let requiredSessionsWithMissingUserCount: Map<SessionName, number> =
+      new Map()
     Array.from(this.memberSessions).map((memberSession) => {
       if (memberSession.members.length < memberSession.requiredMemberCount) {
         requiredSessionsWithMissingUserCount.set(
@@ -120,5 +119,11 @@ export class MemberSessionSet {
 
   static from(memberSessions: MemberSession[]): MemberSessionSet {
     return new MemberSessionSet(memberSessions)
+  }
+
+  getSessionsWithMissingMembers() {
+    return Array.from(this.memberSessions).filter(
+      (ms) => ms.requiredMemberCount > ms.members.length
+    )
   }
 }

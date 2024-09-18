@@ -103,7 +103,7 @@ function createMemberSessions(): MemberSession[] {
 
     result.push({
       id: index,
-      session: dummySessions.find((s) => s.name === sessionName)!,
+      session: dummySessions.find((s) => s.name === sessionName)!.name,
       members,
       requiredMemberCount:
         members.length + (Math.random() < 0.2 ? 1 : Math.random() < 0.1 ? 2 : 0)
