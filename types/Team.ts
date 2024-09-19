@@ -52,15 +52,19 @@ export type MemberSession = {
 export class MemberSessionSet {
   private readonly memberSessions: Set<MemberSession>
 
-  constructor(memberSessions: MemberSession[]) {
-    if (
-      !this.isSessionsUnique(
-        memberSessions.map((memberSession) => memberSession.session)
-      )
-    ) {
-      throw new Error("MemberSessionSet의 세션은 모두 고유해야 합니다.")
+  constructor(memberSessions?: MemberSession[]) {
+    if (!memberSessions) {
+      this.memberSessions = new Set()
+    } else {
+      if (
+        !this.isSessionsUnique(
+          memberSessions.map((memberSession) => memberSession.session)
+        )
+      ) {
+        throw new Error("MemberSessionSet의 세션은 모두 고유해야 합니다.")
+      }
+      this.memberSessions = new Set(memberSessions)
     }
-    this.memberSessions = new Set(memberSessions)
   }
 
   private isSessionsUnique(sessions: SessionName[]): boolean {
@@ -100,17 +104,23 @@ export class MemberSessionSet {
   ): Map<SessionName, number> {
     let requiredSessionsWithMissingUserCount: Map<SessionName, number> =
       new Map()
-    Array.from(this.memberSessions).map((memberSession) => {
-      if (memberSession.members.length < memberSession.requiredMemberCount) {
+    Array.from(this.memberSessions).map((ms) => {
+      if (ms.members.length < ms.requiredMemberCount) {
         requiredSessionsWithMissingUserCount.set(
-          memberSession.session,
-          memberSession.requiredMemberCount - memberSession.members.length
+          ms.session,
+          ms.requiredMemberCount - ms.members.length
         )
       } else if (includeFullSessions) {
-        requiredSessionsWithMissingUserCount.set(memberSession.session, 0)
+        requiredSessionsWithMissingUserCount.set(ms.session, 0)
       }
     })
     return requiredSessionsWithMissingUserCount
+  }
+
+  getSatisfiedSessions() {
+    return Array.from(this.memberSessions).filter(
+      (ms) => ms.requiredMemberCount === ms.members.length
+    )
   }
 
   get isSatisfied(): boolean {

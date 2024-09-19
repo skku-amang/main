@@ -9,6 +9,8 @@ import { FiPaperclip } from "react-icons/fi"
 import { GoPencil } from "react-icons/go"
 import { GoTrash } from "react-icons/go"
 
+import SessionBadge from "@/components/SessionBadge"
+import StatusBadge from "@/components/StatusBadge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,11 +20,8 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
-import { SessionName } from "@/types/Session"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
 
-type TeamStatus = "Inactive" | "Active"
 export type TeamColumn = {
   id: number
   songName: string
@@ -48,30 +47,6 @@ const SortButton = ({
       {children}
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
-  )
-}
-
-const SessionBadge = ({ session }: { session: SessionName }) => {
-  return <Badge className="rounded-lg bg-slate-200 text-black">{session}</Badge>
-}
-
-const StatusBadge = ({ status }: { status: TeamStatus }) => {
-  const className =
-    status === "Inactive"
-      ? "bg-red-100 text-destructive"
-      : "bg-green-100 text-green-600"
-  return (
-    <div className="flex justify-center">
-      <Badge
-        variant="outline"
-        className={cn(
-          className,
-          "rounded-full border-none px-3 py-2 font-bold"
-        )}
-      >
-        ● {status}
-      </Badge>
-    </div>
   )
 }
 
@@ -131,9 +106,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
-      const status: TeamStatus = memberSessionsSet.isSatisfied
-        ? "Inactive"
-        : "Active"
+      const status = memberSessionsSet.isSatisfied ? "Inactive" : "Active"
       return <StatusBadge status={status} />
     }
   },
