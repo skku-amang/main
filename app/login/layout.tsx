@@ -18,7 +18,7 @@ export default function RootLayout({
       <Header position="fixed" height={headerHeight} />
 
       <div
-        className="h-full"
+        className="h-auto"
         style={{
           paddingTop: headerHeight,
           paddingBottom: footerHeight

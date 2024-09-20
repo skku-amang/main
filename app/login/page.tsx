@@ -9,8 +9,7 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { emailSchema, passwordSchema } from "@/constants/zodSchema"
-
-import styles from "./login.module.css"
+import { Label } from "@/components/ui/label"
 
 const formSchema = z.object({
   email: emailSchema,
@@ -29,40 +28,43 @@ const Login = () => {
   }
 
   return (
-    <div className="flex h-full min-h-full w-full items-center justify-center py-10">
-      <div className="flex h-full items-center justify-center gap-0 rounded-lg bg-white px-0 md:px-20 md:shadow-2xl lg:w-8/12 lg:gap-16">
-        <div
-          className={`${styles.gradation} w-0 flex-shrink-0 rounded-3xl xl:h-[90%] xl:w-1/3 xl:flex-1`}
-        ></div>
-        <div className="flex flex-1 flex-col items-center justify-center">
-          <h3 className="mb-10 text-4xl font-[600]">Login</h3>
-          <div className="flex flex-col">
+    <div className="flex h-full min-h-full w-full items-center justify-center mt-16 mb-16">
+      <div className="relative xl:w-[70rem] lg:w-[60rem] h-[653px] items-center justify-center gap-0 rounded-lg bg-white px-0 md:px-20 md:shadow-2xl lg:gap-16">
+        <div className="flex flex-1 items-center justify-center">
+          <img className="absolute xl:scale-x-100 lg:scale-x-90 xl:-left-3 lg:-left-9 lg:top-0" src="/loginwave.svg" alt="Icon"/>
+          <div className="absolute lg:top-24 lg:right-24 flex flex-col justify-center items-center">
+            <h3 className="mb-3 text-slate-900 text-3xl font-medium">Sign In</h3>
+            <h5 className="text-lg font-slate-500 mb-10">Let's build something great</h5>
+            <div className="flex flex-col">
             {/* 일반 로그인 */}
-            <form onSubmit={handleSubmit(onValid)} className="space-y-6">
-              <Input
-                {...register("email")}
-                name="email"
-                placeholder="Email"
-                className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
-              />
-              <div className="text-destructive">{errors.email?.message}</div>
-              <Input
-                {...register("password")}
-                name="password"
-                placeholder="PW"
-                type="password"
-                className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
-              />
-              <div className="text-destructive">{errors.password?.message}</div>
-
-              <Button
-                type="submit"
-                className="h-14 w-full rounded-full text-2xl font-extrabold"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "로그인 중..." : "로그인"}
-              </Button>
-            </form>
+              <form onSubmit={handleSubmit(onValid)} className="space-y-6">
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="email">ID</Label>
+                  <Input    
+                    {...register("email")}
+                    name="email"
+                    placeholder="Email"
+                    className="text-gray50 h-14 border-slate-300 bg-white px-7 text-xl lg:w-80"/>
+                </div>             
+                <div className="text-destructive">{errors.email?.message}</div>
+                <div className="grid w-full max-w-sm items-center gap-1.5"></div>
+                  <Label htmlFor="password">PassWord</Label>
+                  <Input
+                    {...register("password")}
+                    name="password"
+                    placeholder="PW"
+                    type="password"
+                    className="text-gray50 h-14 border-slate-300 bg-white px-7 text-xl lg:w-80"/>
+                <div className="text-destructive">{errors.password?.message}</div>
+                <Button
+                  type="submit"
+                  className="h-14 w-full bg-blue-500 text-2xl font-extrabold"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Login on Progress..." : "Login"}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
