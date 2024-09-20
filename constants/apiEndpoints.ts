@@ -18,16 +18,16 @@ export interface ApiEndpoint {
 const API_ENDPOINTS = {
   AUTH: {
     LOGIN: {
-      url: `${baseURL}/${API_PREFIX}/auth/`,
-      method: "GET"
-    },
-    REGISTER: {
-      url: `${baseURL}/${API_PREFIX}/auth/`,
+      url: `${baseURL}/${API_PREFIX}/auth/login/`,
       method: "POST"
     },
-    LOGOUT: {
-      url: `${baseURL}/${API_PREFIX}/auth/`,
-      method: "DELETE"
+    REGISTER: {
+      url: `${baseURL}/${API_PREFIX}/auth/register/`,
+      method: "POST"
+    },
+    REFRESH: {
+      url: `${baseURL}/${API_PREFIX}/auth/refresh/`,
+      method: "POST"
     }
   },
   GENERATION: {

@@ -8,23 +8,20 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { emailSchema, passwordSchema } from "@/constants/zodSchema"
+import { signInSchema } from "@/constants/zodSchema"
 
 import styles from "./login.module.css"
-
-const formSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema
-})
 
 const Login = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof formSchema>>({ resolver: zodResolver(formSchema) })
+  } = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema)
+  })
 
-  async function onValid(formData: z.infer<typeof formSchema>) {
+  async function onValid(formData: z.infer<typeof signInSchema>) {
     await signIn("credentials", formData)
   }
 

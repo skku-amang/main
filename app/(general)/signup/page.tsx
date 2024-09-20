@@ -4,13 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import {
-  emailSchema,
-  nameSchema,
-  nicknameSchema,
-  passwordSchema
-} from "@/constants/zodSchema"
-
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
 import { Button } from "@/components/ui/button"
@@ -24,36 +17,20 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
+import { signUpSchema } from "@/constants/zodSchema"
 import dummySessions from "@/lib/dummy/Session"
 
 const sessions = dummySessions
 
-const formSchema = z.object({
-  name: nameSchema,
-  nickname: nicknameSchema,
-  email: emailSchema,
-  sessions: z
-    .array(z.string())
-    .min(1, {
-      message: "최소 1개의 세션을 선택해주세요."
-    })
-    .refine((value) => value.some((item) => item)),
-  password: passwordSchema,
-  confirmPassword: z
-    .string({ required_error: "필수 항목" })
-    .min(8, { message: "8자리 이상 입력해 주세요." })
-    .max(20, { message: "20자리 이하 입력해 주세요." })
-})
-
 const Signup = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       sessions: []
     }
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof signUpSchema>) {
     console.log(values)
   }
 
@@ -70,7 +47,7 @@ const Signup = () => {
             label="이름"
             placeholder="김아망"
             description="실명을 입력해주세요."
-            required={!(formSchema.shape.name instanceof z.ZodOptional)}
+            required={!(signUpSchema.shape.name instanceof z.ZodOptional)}
           />
           <SimpleStringField
             form={form}
@@ -78,21 +55,21 @@ const Signup = () => {
             label="닉네임"
             placeholder="베이스 !== 기타"
             description="개성 넘치는 닉네임을 입력해주세요."
-            required={!(formSchema.shape.nickname instanceof z.ZodOptional)}
+            required={!(signUpSchema.shape.nickname instanceof z.ZodOptional)}
           />
           <SimpleStringField
             form={form}
             name="password"
             label="비밀번호"
             description="5~20자, 영문+숫자"
-            required={!(formSchema.shape.password instanceof z.ZodOptional)}
+            required={!(signUpSchema.shape.password instanceof z.ZodOptional)}
           />
           <SimpleStringField
             form={form}
             name="confirmPassword"
             label="비밀번호 확인"
             required={
-              !(formSchema.shape.confirmPassword instanceof z.ZodOptional)
+              !(signUpSchema.shape.confirmPassword instanceof z.ZodOptional)
             }
           />
 
@@ -101,7 +78,7 @@ const Signup = () => {
             name="email"
             label="이메일"
             placeholder="example@g.skku.edu"
-            required={!(formSchema.shape.email instanceof z.ZodOptional)}
+            required={!(signUpSchema.shape.email instanceof z.ZodOptional)}
           />
 
           <FormField
@@ -112,7 +89,7 @@ const Signup = () => {
                 <div>
                   <SimpleLabel
                     required={
-                      !(formSchema.shape.sessions instanceof z.ZodOptional)
+                      !(signUpSchema.shape.sessions instanceof z.ZodOptional)
                     }
                   >
                     세션
