@@ -1,5 +1,7 @@
+"use client"
+
 import Link from "next/link"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
 import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
@@ -10,7 +12,6 @@ import SessionBadge from "@/components/SessionBadge"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
-import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import YoutubePlayer from "@/lib/youtube/Player"
 import { MemberSessionSet, Team } from "@/types/Team"
 
@@ -20,13 +21,22 @@ interface Props {
   }
 }
 
-const TeamDetail = async ({ params }: Props) => {
+const TeamDetail = ({ params }: Props) => {
   const { id } = params
+  const [team, setTeam] = useState<Team>()
 
-  const res = await fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
-    cache: "no-cache"
-  })
-  const team = (await res.json()) as CreateRetrieveUpdateResponse<Team>
+  useEffect(() => {
+    fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
+      cache: "no-cache"
+    })
+      .then((res) => res.json())
+      .then((data) => setTeam(data))
+  }, [id])
+
+  if (!team) {
+    // TODO: 로딩 화면 구성
+    return <div>Loading...</div>
+  }
 
   const missingMemberSessions = new MemberSessionSet(
     team.memberSessions
@@ -70,9 +80,13 @@ const TeamDetail = async ({ params }: Props) => {
         {/* 신청가능한 세션 */}
         <SessionSetCard header="신청가능한 세션">
           <div className="flex items-center gap-x-1">
-            {missingMemberSessions.map((ms) => (
-              <SessionBadge key={ms.session} session={ms.session} />
-            ))}
+            {missingMemberSessions.length > 0 ? (
+              missingMemberSessions.map((ms) => (
+                <SessionBadge key={ms.session} session={ms.session} />
+              ))
+            ) : (
+              <div>마감</div>
+            )}
           </div>
         </SessionSetCard>
 
@@ -88,8 +102,10 @@ const TeamDetail = async ({ params }: Props) => {
               ms.members.map((member) => (
                 <MemberSessionCard
                   key={member.id}
+                  teamId={team.id}
                   session={ms.session}
                   user={member}
+                  onUnapplySuccess={setTeam}
                 />
               ))
             )}
@@ -109,9 +125,18 @@ const TeamDetail = async ({ params }: Props) => {
             </li>
           </ul>
           <div className="flex items-center justify-start gap-x-4">
-            {missingMemberSessions.map((ms) => (
-              <ApplyButton key={ms.session} session={ms.session} />
-            ))}
+            {missingMemberSessions.length > 0 ? (
+              missingMemberSessions.map((ms) => (
+                <ApplyButton
+                  key={ms.session}
+                  teamId={team.id}
+                  session={ms.session}
+                  onApplySuccess={setTeam}
+                />
+              ))
+            ) : (
+              <div>마감</div>
+            )}
           </div>
         </SessionSetCard>
       </div>

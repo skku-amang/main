@@ -136,4 +136,8 @@ export class MemberSessionSet {
       (ms) => ms.requiredMemberCount > ms.members.length
     )
   }
+
+  isEmpty() {
+    return this.memberSessions.size === 0
+  }
 }
