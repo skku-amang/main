@@ -123,6 +123,10 @@ export class MemberSessionSet {
     )
   }
 
+  getSessionsWithAtleastOneMember() {
+    return Array.from(this.memberSessions).filter((ms) => ms.members.length > 0)
+  }
+
   get isSatisfied(): boolean {
     return this.getRequiredSessionsWithMissingUserCount().size === 0
   }

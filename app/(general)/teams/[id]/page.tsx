@@ -41,9 +41,9 @@ const TeamDetail = ({ params }: Props) => {
   const missingMemberSessions = new MemberSessionSet(
     team.memberSessions
   ).getSessionsWithMissingMembers()
-  const satisfiedMemberSessions = new MemberSessionSet(
+  const sessionsWithAtleastOneMember = new MemberSessionSet(
     team.memberSessions
-  ).getSatisfiedSessions()
+  ).getSessionsWithAtleastOneMember()
 
   return (
     <div className="container pt-16">
@@ -93,12 +93,12 @@ const TeamDetail = ({ params }: Props) => {
         {/* 마감된 세션 */}
         <SessionSetCard header="마감된 세션" className="col-span-2">
           <div className="mb-7 mt-3 flex items-center gap-x-1">
-            {satisfiedMemberSessions.map((ms) => (
+            {sessionsWithAtleastOneMember.map((ms) => (
               <SessionBadge key={ms.session} session={ms.session} />
             ))}
           </div>
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 lg:grid-cols-3">
-            {satisfiedMemberSessions.map((ms) =>
+            {sessionsWithAtleastOneMember.map((ms) =>
               ms.members.map((member) => (
                 <MemberSessionCard
                   key={member.id}
