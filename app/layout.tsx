@@ -5,6 +5,8 @@ import { Inter as FontSans } from "next/font/google"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
+import { Toaster } from "@/components/ui/toaster"
+
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans"
@@ -31,7 +33,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <body className={fontSans.className}>{children}</body>
+        <body className={fontSans.className}>
+          {children}
+          <Toaster />
+        </body>
       </SessionProvider>
     </html>
   )

@@ -1,4 +1,4 @@
-import RelatedPerformanceList from "@/app/(general)/teams/[id]/_components/RelatedPerformanceList"
+import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
