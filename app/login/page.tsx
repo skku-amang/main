@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import React from "react"
 import { useForm } from "react-hook-form"
@@ -8,21 +9,39 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import ROUTES from "@/constants/routes"
 import { signInSchema } from "@/constants/zodSchema"
+import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 
 import styles from "./login.module.css"
 
 const Login = () => {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema)
   })
 
   async function onValid(formData: z.infer<typeof signInSchema>) {
-    await signIn("credentials", formData)
+    const res = await signIn("credentials", { ...formData, redirect: false })
+    if (!res?.error) return router.push(ROUTES.HOME.url)
+
+    switch (res.code) {
+      case InvalidSigninErrorCode:
+        setError("email", {
+          type: "manual",
+          message: "이메일 또는 비밀번호가 일치하지 않습니다."
+        })
+        setError("password", {
+          type: "manual",
+          message: "이메일 또는 비밀번호가 일치하지 않습니다."
+        })
+        return
+    }
   }
 
   return (
