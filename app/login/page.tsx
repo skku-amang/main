@@ -7,6 +7,7 @@ import React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import ROUTES from "@/constants/routes"
@@ -17,6 +18,8 @@ import styles from "./login.module.css"
 
 const Login = () => {
   const router = useRouter()
+  const { toast } = useToast()
+
   const {
     register,
     handleSubmit,
@@ -40,7 +43,14 @@ const Login = () => {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
         })
-        return
+        break
+
+      default:
+        toast({
+          title: "회원가입 실패",
+          description: "알 수 없는 에러 발생!",
+          variant: "destructive"
+        })
     }
   }
 
@@ -57,16 +67,15 @@ const Login = () => {
             <form onSubmit={handleSubmit(onValid)} className="space-y-6">
               <Input
                 {...register("email")}
-                name="email"
+                type="email"
                 placeholder="Email"
                 className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.email?.message}</div>
               <Input
                 {...register("password")}
-                name="password"
-                placeholder="PW"
                 type="password"
+                placeholder="PW"
                 className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.password?.message}</div>

@@ -68,46 +68,46 @@ const Signup = () => {
       sessions: formData.sessions,
       redirect: false
     })
+    if (!res?.error) return router.push(ROUTES.HOME.url)
 
-    if (!res) {
-      toast({
-        title: "회원가입 실패",
-        description: "알 수 없는 에러",
-        variant: "destructive"
-      })
-    }
-    if (res?.code === DuplicatedCredentialsErrorCode) {
-      const shouldBeUniqueFields = ["nickname", "email"]
-      shouldBeUniqueFields.forEach((key) => {
-        form.setError(key as keyof z.infer<typeof signUpSchema>, {
-          type: "manual",
-          message: "이미 가입된 회원 정보입니다."
+    const shouldBeUniqueFields = ["nickname", "email"]
+    const allFields = Object.keys(signUpSchema._def.schema.shape)
+    switch (res.code) {
+      case DuplicatedCredentialsErrorCode:
+        shouldBeUniqueFields.forEach((key) => {
+          form.setError(key as keyof z.infer<typeof signUpSchema>, {
+            type: "manual",
+            message: "이미 가입된 회원 정보입니다."
+          })
         })
-      })
-      toast({
-        title: "회원가입 실패",
-        description: "이미 가입된 회원 정보입니다.",
-        variant: "destructive"
-      })
-      return
-    }
-    if (res?.code === InvalidSignupCredentialsErrorCode) {
-      const allFields = Object.keys(signUpSchema._def.schema.shape)
-      allFields.forEach((key) => {
-        form.setError(key as keyof z.infer<typeof signUpSchema>, {
-          type: "manual",
-          message: "회원가입 정보가 올바르지 않습니다."
+        toast({
+          title: "회원가입 실패",
+          description: "이미 가입된 회원 정보입니다.",
+          variant: "destructive"
         })
-      })
-      toast({
-        title: "회원가입 실패",
-        description: "회원가입 정보가 올바르지 않습니다.",
-        variant: "destructive"
-      })
-      return
-    }
+        break
 
-    router.push(ROUTES.HOME.url)
+      case InvalidSignupCredentialsErrorCode:
+        allFields.forEach((key) => {
+          form.setError(key as keyof z.infer<typeof signUpSchema>, {
+            type: "manual",
+            message: "회원가입 정보가 올바르지 않습니다."
+          })
+        })
+        toast({
+          title: "회원가입 실패",
+          description: "회원가입 정보가 올바르지 않습니다.",
+          variant: "destructive"
+        })
+        break
+
+      default:
+        toast({
+          title: "회원가입 실패",
+          description: "알 수 없는 에러 발생!",
+          variant: "destructive"
+        })
+    }
   }
 
   return (
@@ -122,7 +122,7 @@ const Signup = () => {
             name="name"
             label="이름"
             placeholder="김아망"
-            description="실명을 입력해주세요."
+            description={signUpSchema._def.schema.shape.name.description}
             required={
               !(signUpSchema._def.schema.shape.name instanceof z.ZodOptional)
             }
@@ -132,7 +132,7 @@ const Signup = () => {
             name="nickname"
             label="닉네임"
             placeholder="베이스 !== 기타"
-            description="개성 넘치는 닉네임을 입력해주세요."
+            description={signUpSchema._def.schema.shape.nickname.description}
             required={
               !(
                 signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional
@@ -143,23 +143,28 @@ const Signup = () => {
             form={form}
             name="password"
             label="비밀번호"
-            description="5~20자, 영문+숫자"
+            placeholder="비밀번호"
+            description={signUpSchema._def.schema.shape.password.description}
             required={
               !(
                 signUpSchema._def.schema.shape.password instanceof z.ZodOptional
               )
             }
+            inputType="password"
           />
           <SimpleStringField
             form={form}
             name="confirmPassword"
             label="비밀번호 확인"
+            placeholder="비밀번호 확인"
+            description={signUpSchema._def.schema.shape.password.description}
             required={
               !(
                 signUpSchema._def.schema.shape.confirmPassword instanceof
                 z.ZodOptional
               )
             }
+            inputType="password"
           />
 
           <SimpleStringField
@@ -167,6 +172,7 @@ const Signup = () => {
             name="email"
             label="이메일"
             placeholder="example@g.skku.edu"
+            description={signUpSchema._def.schema.shape.email.description}
             required={
               !(signUpSchema._def.schema.shape.email instanceof z.ZodOptional)
             }
