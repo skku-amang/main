@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
@@ -22,16 +24,26 @@ interface Props {
 }
 
 const TeamDetail = ({ params }: Props) => {
-  const { id } = params
-  const [team, setTeam] = useState<Team>()
+  const session = useSession()
+  const router = useRouter()
 
+  const { id } = params
+
+  const [team, setTeam] = useState<Team>()
   useEffect(() => {
-    fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
-      cache: "no-cache"
-    })
-      .then((res) => res.json())
-      .then((data) => setTeam(data))
-  }, [id])
+    if (session.data?.access) {
+      fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
+        cache: "no-cache",
+        headers: {
+          Authorization: `Bearer ${session.data?.access}`
+        }
+      })
+        .then((res) => res.json())
+        .then((data) => setTeam(data))
+    }
+  }, [id, session.data?.access])
+
+  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
 
   if (!team) {
     // TODO: 로딩 화면 구성
@@ -97,7 +109,7 @@ const TeamDetail = ({ params }: Props) => {
               <SessionBadge key={ms.session} session={ms.session} />
             ))}
           </div>
-          <div className="grid grid-cols-1 gap-x-12 gap-y-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             {sessionsWithAtleastOneMember.map((ms) =>
               ms.members.map((member) => (
                 <MemberSessionCard

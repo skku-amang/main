@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { AiFillExclamationCircle } from "react-icons/ai"
@@ -44,13 +45,19 @@ const SecondPage = ({
 }: SecondPageProps) => {
   const [users, setMembers] = useState<User[]>([])
   const schema = createDynamicSchema(schemaMetadata)
+  const session = useSession()
 
   // 유저 목록 가져오기
   useEffect(() => {
-    fetchData(API_ENDPOINTS.USER.LIST)
+    fetchData(API_ENDPOINTS.USER.LIST, {
+      cache: "no-cache",
+      headers: {
+        Authorization: `Bearer ${session.data?.access}`
+      }
+    })
       .then((data) => data.json())
       .then((users) => setMembers(users))
-  }, [])
+  }, [session.data?.access])
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),

@@ -1,4 +1,5 @@
 export type AuthData = {
+  id: string | undefined
   name: string
   nickname: string
   image?: string | null

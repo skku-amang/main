@@ -1,8 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { StatusCodes } from "http-status-codes"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
@@ -11,6 +13,7 @@ import Description from "@/app/(general)/teams/create/_components/TeamCreateForm
 import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/MemberSessionRequiredCheckbox"
 import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/paginator"
 import SecondPage from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage"
+import { useToast } from "@/components/hooks/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
@@ -47,7 +50,9 @@ const TeamCreateForm = ({
   performanceOptions
 }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
+  const session = useSession()
   const router = useRouter()
+  const { toast } = useToast()
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof firstPageSchema>>({
@@ -101,18 +106,34 @@ const TeamCreateForm = ({
 
     const res = await fetchData(API_ENDPOINTS.TEAM.CREATE, {
       cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${session.data?.access}`
+      },
       body: JSON.stringify(allFormData)
     })
     if (!res.ok) {
+      const data = await res.json()
       switch (res.status) {
-        case 400:
-          console.error("Error:", await res.json())
+        case StatusCodes.BAD_REQUEST:
+          toast({
+            title: res.statusText,
+            description: data.detail,
+            variant: "destructive"
+          })
           break
-        case 401:
-          console.error("Unauthorized")
+        case StatusCodes.UNAUTHORIZED:
+          toast({
+            title: res.statusText,
+            description: data.details,
+            variant: "destructive"
+          })
           break
         default:
-          console.error("Unknown error")
+          toast({
+            title: res.statusText,
+            description: data.detail,
+            variant: "destructive"
+          })
           break
       }
       return
@@ -123,12 +144,6 @@ const TeamCreateForm = ({
   function onSecondPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
   }
-
-  // Debug
-  const formData = firstPageForm.watch()
-  useEffect(() => {
-    // console.log(formData)
-  }, [formData])
 
   const memberSessionRequiredFormStructure: {
     [label: string]: string[]

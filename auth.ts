@@ -50,6 +50,7 @@ const authOptions: NextAuthConfig = {
       // 토큰 없는 상태(로그인 X)에서 로그인 시도 -> 토큰에 저장
       if (user?.email) {
         return {
+          id: user.id,
           name: user.name,
           nickname: user.nickname,
           image: user.image,
@@ -75,7 +76,13 @@ const authOptions: NextAuthConfig = {
   }
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)
+export const {
+  handlers,
+  signIn,
+  signOut,
+  auth,
+  unstable_update: update
+} = NextAuth(authOptions)
 
 async function refreshAccessToken(prevToken: JWT) {
   const res = await fetchData(API_ENDPOINTS.AUTH.REFRESH as ApiEndpoint, {
@@ -96,7 +103,7 @@ async function refreshAccessToken(prevToken: JWT) {
   const data = await res.json()
   return {
     ...prevToken,
-    accessToken: data.access
+    access: data.access
   }
 }
 
