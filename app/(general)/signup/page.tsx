@@ -1,11 +1,15 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
+import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -17,28 +21,100 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
-import { signUpSchema } from "@/constants/zodSchema"
-import dummySessions from "@/lib/dummy/Session"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
+import { password, signUpSchema as _signUpSchema } from "@/constants/zodSchema"
+import {
+  DuplicatedCredentialsErrorCode,
+  InvalidSignupCredentialsErrorCode
+} from "@/lib/auth/errors"
+import fetchData from "@/lib/fetch"
+import { Session } from "@/types/Session"
 
-const sessions = dummySessions
+const signUpSchema = _signUpSchema
+  .merge(z.object({ confirmPassword: password }))
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "패스워드가 일치하지 않습니다.",
+    path: ["confirmPassword"]
+  })
 
 const Signup = () => {
+  const router = useRouter()
+  const { toast } = useToast()
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       sessions: []
     }
   })
+  const [sessions, setSessions] = useState<Session[]>()
+  useEffect(() => {
+    fetchData(API_ENDPOINTS.SESSION.LIST, {
+      cache: "no-cache"
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setSessions(json)
+      })
+  }, [])
 
-  function onSubmit(values: z.infer<typeof signUpSchema>) {
-    console.log(values)
+  async function onSubmit(formData: z.infer<typeof signUpSchema>) {
+    const res = await signIn("credentials", {
+      name: formData.name,
+      nickname: formData.nickname,
+      email: formData.email,
+      password: formData.password,
+      sessions: formData.sessions,
+      redirect: false
+    })
+
+    if (!res) {
+      toast({
+        title: "회원가입 실패",
+        description: "알 수 없는 에러",
+        variant: "destructive"
+      })
+    }
+    if (res?.code === DuplicatedCredentialsErrorCode) {
+      const shouldBeUniqueFields = ["nickname", "email"]
+      shouldBeUniqueFields.forEach((key) => {
+        form.setError(key as keyof z.infer<typeof signUpSchema>, {
+          type: "manual",
+          message: "이미 가입된 회원 정보입니다."
+        })
+      })
+      toast({
+        title: "회원가입 실패",
+        description: "이미 가입된 회원 정보입니다.",
+        variant: "destructive"
+      })
+      return
+    }
+    if (res?.code === InvalidSignupCredentialsErrorCode) {
+      const allFields = Object.keys(signUpSchema._def.schema.shape)
+      allFields.forEach((key) => {
+        form.setError(key as keyof z.infer<typeof signUpSchema>, {
+          type: "manual",
+          message: "회원가입 정보가 올바르지 않습니다."
+        })
+      })
+      toast({
+        title: "회원가입 실패",
+        description: "회원가입 정보가 올바르지 않습니다.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    router.push(ROUTES.HOME.url)
   }
 
   return (
     <div className="container">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)} // TODO: 부모 요소인 Form으로 이전
+          onSubmit={form.handleSubmit(onSubmit)}
           className="mb-3 w-full space-y-6"
         >
           <SimpleStringField
@@ -47,7 +123,9 @@ const Signup = () => {
             label="이름"
             placeholder="김아망"
             description="실명을 입력해주세요."
-            required={!(signUpSchema.shape.name instanceof z.ZodOptional)}
+            required={
+              !(signUpSchema._def.schema.shape.name instanceof z.ZodOptional)
+            }
           />
           <SimpleStringField
             form={form}
@@ -55,21 +133,32 @@ const Signup = () => {
             label="닉네임"
             placeholder="베이스 !== 기타"
             description="개성 넘치는 닉네임을 입력해주세요."
-            required={!(signUpSchema.shape.nickname instanceof z.ZodOptional)}
+            required={
+              !(
+                signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional
+              )
+            }
           />
           <SimpleStringField
             form={form}
             name="password"
             label="비밀번호"
             description="5~20자, 영문+숫자"
-            required={!(signUpSchema.shape.password instanceof z.ZodOptional)}
+            required={
+              !(
+                signUpSchema._def.schema.shape.password instanceof z.ZodOptional
+              )
+            }
           />
           <SimpleStringField
             form={form}
             name="confirmPassword"
             label="비밀번호 확인"
             required={
-              !(signUpSchema.shape.confirmPassword instanceof z.ZodOptional)
+              !(
+                signUpSchema._def.schema.shape.confirmPassword instanceof
+                z.ZodOptional
+              )
             }
           />
 
@@ -78,7 +167,9 @@ const Signup = () => {
             name="email"
             label="이메일"
             placeholder="example@g.skku.edu"
-            required={!(signUpSchema.shape.email instanceof z.ZodOptional)}
+            required={
+              !(signUpSchema._def.schema.shape.email instanceof z.ZodOptional)
+            }
           />
 
           <FormField
@@ -89,7 +180,10 @@ const Signup = () => {
                 <div>
                   <SimpleLabel
                     required={
-                      !(signUpSchema.shape.sessions instanceof z.ZodOptional)
+                      !(
+                        signUpSchema._def.schema.shape.sessions instanceof
+                        z.ZodOptional
+                      )
                     }
                   >
                     세션
@@ -98,42 +192,43 @@ const Signup = () => {
                     연주 가능한 세션을 선택해주세요.
                   </FormDescription>
                 </div>
-                {sessions.map((session) => (
-                  <FormField
-                    key={session.name}
-                    control={form.control}
-                    name="sessions"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={session.name}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(session.name)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([
-                                      ...field.value,
-                                      session.name
-                                    ])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== session.name
+                {sessions &&
+                  sessions.map((session) => (
+                    <FormField
+                      key={session.id}
+                      control={form.control}
+                      name="sessions"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={session.id}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(session.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([
+                                        ...field.value,
+                                        session.id
+                                      ])
+                                    : field.onChange(
+                                        field.value?.filter(
+                                          (value) => value !== session.id
+                                        )
                                       )
-                                    )
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {session.name}
-                          </FormLabel>
-                        </FormItem>
-                      )
-                    }}
-                  />
-                ))}
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              {session.name}
+                            </FormLabel>
+                          </FormItem>
+                        )
+                      }}
+                    />
+                  ))}
                 <FormMessage />
               </FormItem>
             )}

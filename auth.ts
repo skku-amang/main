@@ -22,8 +22,10 @@ const authOptions: NextAuthConfig = {
     Credentials({
       credentials: {
         name: { label: "Name", type: "text" },
+        nickname: { label: "Nickname", type: "text" },
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        sessions: { label: "Sessions", type: "text" }
       },
       /**
        * 로그인 또는 회원가입 시 호출되는 함수
@@ -31,7 +33,10 @@ const authOptions: NextAuthConfig = {
        * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `token`으로 전달됨
        */
       authorize: async (credentials) => {
-        if (credentials.name) {
+        if (credentials.name && credentials.nickname && credentials.sessions) {
+          credentials.sessions = (credentials.sessions as string)
+            .split(",")
+            .map((s) => +s)
           const userInfo = await signUpSchema.parseAsync(credentials)
           return _signIn("signup", userInfo)
         }
@@ -130,8 +135,5 @@ async function _signIn(
 
   // 결과 반환
   const data = await res.json()
-  const userData = data.user
-  const { access, refresh } = data
-
-  return { ...userData, access, refresh } as AuthData
+  return { ...data } as AuthData
 }
