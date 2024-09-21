@@ -4,8 +4,8 @@ export type AuthData = {
   image?: string | null
   email: string
   position: string
-  accessToken: string
-  refreshToken: string
+  access: string
+  refresh: string
 }
 
 export declare module "next-auth" {

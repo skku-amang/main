@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes"
 import NextAuth, { NextAuthConfig, User } from "next-auth"
+import { JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 
@@ -12,6 +13,7 @@ import {
   InvalidSigninError,
   InvalidSignupCredentialsError
 } from "@/lib/auth/errors"
+import { isAccessTokenExpired } from "@/lib/auth/utils"
 import fetchData from "@/lib/fetch"
 import { AuthData } from "@/types/auth"
 
@@ -40,12 +42,27 @@ const authOptions: NextAuthConfig = {
   ],
   callbacks: {
     jwt: async ({ token, user }) => {
-      // 토큰 없는 상태(로그인 X)에서 로그인 시도
+      // 토큰 없는 상태(로그인 X)에서 로그인 시도 -> 토큰에 저장
       if (user?.email) {
-        return { ...user }
+        return {
+          name: user.name,
+          nickname: user.nickname,
+          image: user.image,
+          email: user.email,
+          position: user.position,
+          access: user.access,
+          refresh: user.refresh
+        }
       }
 
-      return token
+      // 토큰 정상
+      if (!isAccessTokenExpired(token.access)) {
+        return token
+      }
+
+      // 액세스 토큰이 만료된 -> 리프레시 토큰을 사용하여 새로운 액세스 토큰 발급
+      const refreshedTokenOrNull = await refreshAccessToken(token)
+      return refreshedTokenOrNull
     },
     session: async ({ session, token }) => {
       return { ...session, ...token }
@@ -54,6 +71,29 @@ const authOptions: NextAuthConfig = {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)
+
+async function refreshAccessToken(prevToken: JWT) {
+  const res = await fetchData(API_ENDPOINTS.AUTH.REFRESH as ApiEndpoint, {
+    body: JSON.stringify({ refresh: prevToken.refresh }),
+    cache: "no-store"
+  })
+
+  if (!res.ok) {
+    switch (res.status) {
+      // Refresh Token 만료
+      case StatusCodes.UNAUTHORIZED:
+        return null
+      default:
+        throw new InternalServerError()
+    }
+  }
+
+  const data = await res.json()
+  return {
+    ...prevToken,
+    accessToken: data.access
+  }
+}
 
 async function _signIn(
   type: "signup" | "login",
@@ -89,9 +129,9 @@ async function _signIn(
   }
 
   // 결과 반환
-  const data = (await res.json()).data as AuthData
+  const data = await res.json()
+  const userData = data.user
+  const { access, refresh } = data
 
-  return {
-    ...data
-  }
+  return { ...userData, access, refresh } as AuthData
 }
