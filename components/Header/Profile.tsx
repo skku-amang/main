@@ -55,7 +55,6 @@ const setDarkMode = (value: boolean) => {
 
 function Profile() {
   const { status, data: session } = useSession()
-  const RANDOM_PROFILE_IMAGE = "https://picsum.photos/50/50"
 
   if (!session) {
     return (
@@ -73,6 +72,7 @@ function Profile() {
   }
 
   const iconSize = 20
+  const RANDOM_PROFILE_IMAGE = "https://picsum.photos/50/50"
 
   return (
     <DropdownMenu>

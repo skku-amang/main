@@ -1,3 +1,5 @@
+import { useSession } from "next-auth/react"
+
 import { useToast } from "@/components/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -21,14 +23,22 @@ const MemberSessionCard = ({
   user,
   onUnapplySuccess
 }: MemberSessionCardProps) => {
+  const authSession = useSession()
   const { toast } = useToast()
+
+  if (!authSession) {
+    return <div>로그인 필요</div>
+  }
 
   async function onUnapply() {
     const res = await fetchData(
       API_ENDPOINTS.TEAM.UNAPPLY(teamId) as ApiEndpoint,
       {
         body: JSON.stringify({ session }),
-        cache: "no-store"
+        cache: "no-store",
+        headers: {
+          Authorization: `Bearer ${authSession.data?.access}`
+        }
       }
     )
 
@@ -73,13 +83,19 @@ const MemberSessionCard = ({
           <div>
             {user.generation?.order}기 {user.name}
           </div>
-          <span className="text-sm text-gray-400"># {user.nickname}</span>
-        </div>
+          <div className="text-sm text-gray-400"># {user.nickname}</div>
 
-        {/* 탈퇴 버튼 */}
-        <Button variant="destructive" onClick={onUnapply}>
-          탈퇴
-        </Button>
+          {/* 탈퇴 버튼 */}
+          {user.id.toString() === authSession.data?.id && (
+            <Button
+              variant="destructive"
+              onClick={onUnapply}
+              className="h-6 px-2"
+            >
+              탈퇴
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

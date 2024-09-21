@@ -1,31 +1,57 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { emailSchema, passwordSchema } from "@/constants/zodSchema"
+import ROUTES from "@/constants/routes"
+import { signInSchema } from "@/constants/zodSchema"
+import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 
 import styles from "./login.module.css"
 
-const formSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema
-})
-
 const Login = () => {
+  const router = useRouter()
+  const { toast } = useToast()
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof formSchema>>({ resolver: zodResolver(formSchema) })
+  } = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema)
+  })
 
-  async function onValid(formData: z.infer<typeof formSchema>) {
-    await signIn("credentials", formData)
+  async function onValid(formData: z.infer<typeof signInSchema>) {
+    const res = await signIn("credentials", { ...formData, redirect: false })
+    if (!res?.error) return router.push(ROUTES.HOME.url)
+
+    switch (res.code) {
+      case InvalidSigninErrorCode:
+        setError("email", {
+          type: "manual",
+          message: "이메일 또는 비밀번호가 일치하지 않습니다."
+        })
+        setError("password", {
+          type: "manual",
+          message: "이메일 또는 비밀번호가 일치하지 않습니다."
+        })
+        break
+
+      default:
+        toast({
+          title: "회원가입 실패",
+          description: "알 수 없는 에러 발생!",
+          variant: "destructive"
+        })
+    }
   }
 
   return (
@@ -41,16 +67,15 @@ const Login = () => {
             <form onSubmit={handleSubmit(onValid)} className="space-y-6">
               <Input
                 {...register("email")}
-                name="email"
+                type="email"
                 placeholder="Email"
                 className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.email?.message}</div>
               <Input
                 {...register("password")}
-                name="password"
-                placeholder="PW"
                 type="password"
+                placeholder="PW"
                 className="text-gray50 h-14 rounded-full border-none bg-gray-100 px-7 text-xl lg:w-80"
               />
               <div className="text-destructive">{errors.password?.message}</div>

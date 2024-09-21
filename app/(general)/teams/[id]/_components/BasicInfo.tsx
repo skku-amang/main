@@ -28,7 +28,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
         </Avatar>
         <div>
           <div className="text-primary">
-            {team.leader?.generation.order}기 {team.leader?.name}
+            {team.leader?.generation?.order}기 {team.leader?.name}
             <span># {team.leader?.nickname}</span>
           </div>
           <div className="text-xs text-gray-300">{team.createdDatetime}</div>

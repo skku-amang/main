@@ -1,5 +1,7 @@
 "use client"
 
+import { useSession } from "next-auth/react"
+
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
@@ -15,6 +17,7 @@ interface ApplyButtonProps {
 }
 
 const ApplyButton = ({ teamId, session, onApplySuccess }: ApplyButtonProps) => {
+  const authSession = useSession()
   const { toast } = useToast()
 
   async function onApply() {
@@ -22,7 +25,10 @@ const ApplyButton = ({ teamId, session, onApplySuccess }: ApplyButtonProps) => {
       API_ENDPOINTS.TEAM.APPLY(teamId) as ApiEndpoint,
       {
         body: JSON.stringify({ session }),
-        cache: "no-store"
+        cache: "no-store",
+        headers: {
+          Authorization: `Bearer ${authSession.data?.access}`
+        }
       }
     )
 
