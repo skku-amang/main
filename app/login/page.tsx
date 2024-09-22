@@ -48,7 +48,7 @@ const Login = () => {
           </div>
           <div className="lg:absolute lg:top-[8.5rem] lg:right-20 xl:right-32 flex flex-col justify-center items-center">
             <h3 className={cn(Poppin.className, 'mb-1 text-slate-900 text-2xl font-black')}>Sign In</h3>
-            <h5 className={cn(Poppin.className, 'text-base text-slate-500 mb-8')}>Let's build something great</h5>
+            <h5 className={cn(Poppin.className, 'text-base text-slate-500 mb-8')}>Let&apos;s build something great</h5>
             {/* 일반 로그인 */}
             <form className="flex flex-col items-center" onSubmit={handleSubmit(onValid)}>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -78,9 +78,9 @@ const Login = () => {
                   {isSubmitting ? "Login on Progress..." : "Login"}
                 </Button>
                 <div className={cn(Poppin.className, "flex justify-center pt-5")}>
-                  <div className="pr-2">
-                  Don't have an account? 
-                  </div>
+                <div className="pr-2">
+                  Don&apos;t have an account?
+                </div>
                   <Link href={ROUTES.SIGNUP.url} className={cn(Poppin.className, "text-blue-400")}>
                     Sign up
                   </Link>

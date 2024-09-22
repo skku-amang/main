@@ -2,7 +2,6 @@ import '@/app/globals.css'
 
 import React from 'react'
 
-import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 
 export default function RootLayout({
@@ -18,7 +17,7 @@ export default function RootLayout({
       <Header position="fixed" height={headerHeight} />
 
       <div
-        className="h-auto"
+        className="h-full"
         style={{
           paddingTop: headerHeight,
           paddingBottom: footerHeight
@@ -26,8 +25,6 @@ export default function RootLayout({
       >
         {children}
       </div>
-
-      <Footer height={footerHeight} />
     </div>
   )
 }
