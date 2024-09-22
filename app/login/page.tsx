@@ -1,6 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Poppins } from "next/font/google"
+import Image from "next/image"
+import Link from "next/link"
 import { signIn } from "next-auth/react"
 import React from "react"
 import { useForm } from "react-hook-form"
@@ -8,13 +11,10 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { emailSchema, passwordSchema } from "@/constants/zodSchema"
 import { Label } from "@/components/ui/label"
-
-import { Poppins } from "next/font/google"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
 import ROUTES from "@/constants/routes"
+import { emailSchema, passwordSchema } from "@/constants/zodSchema"
+import { cn } from "@/lib/utils"
 
 const Poppin = Poppins({ subsets: ['latin'], weight: '400' })
 
@@ -37,7 +37,7 @@ const Login = () => {
   return (
     <div className="flex h-full w-full items-center justify-center md:mt-3 mb-16">
       <div className="flex flex-col items-center justify-center lg:relative xl:w-[70rem] lg:w-[60rem] h-[653px] rounded-lg bg-white lg:shadow-xl">
-          <img className="hidden lg:block lg:absolute xl:scale-x-100 lg:scale-x-90 xl:-left-3 lg:-left-9 lg:top-0" src="/loginwave.svg" alt="Icon"/>
+          <Image width="680" height="753" className="hidden lg:block lg:absolute xl:scale-x-100 lg:scale-x-90 xl:-left-3 lg:-left-9 lg:top-0" src="/loginwave.svg" alt="Icon"/>
           <div className="hidden lg:block lg:absolute lg:left-16 lg:top-36">
             <div className="font-bold text-5xl text-white mb-7">
               Welcome to <br/>Amang
