@@ -26,7 +26,7 @@ export default function RootLayout({
       >
         {children}
       </div>
-      <Footer height={footerHeight}></Footer>
+      <Footer height={footerHeight}/>
     </div>
   )
 }
