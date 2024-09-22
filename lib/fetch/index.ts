@@ -12,8 +12,8 @@ export default async function fetchData(
     ...init,
     method,
     headers: {
-      ...init?.headers,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...init?.headers
     }
   })
 }
