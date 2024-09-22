@@ -3,6 +3,7 @@ import '@/app/globals.css'
 import React from 'react'
 
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 export default function RootLayout({
   children
@@ -25,6 +26,7 @@ export default function RootLayout({
       >
         {children}
       </div>
+      <Footer height={footerHeight}></Footer>
     </div>
   )
 }

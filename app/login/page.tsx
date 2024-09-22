@@ -35,7 +35,7 @@ const Login = () => {
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center md:mt-16 mb-16">
+    <div className="flex h-full w-full items-center justify-center md:mt-3 mb-16">
       <div className="flex flex-col items-center justify-center lg:relative xl:w-[70rem] lg:w-[60rem] h-[653px] rounded-lg bg-white lg:shadow-xl">
           <img className="hidden lg:block lg:absolute xl:scale-x-100 lg:scale-x-90 xl:-left-3 lg:-left-9 lg:top-0" src="/loginwave.svg" alt="Icon"/>
           <div className="hidden lg:block lg:absolute lg:left-16 lg:top-36">
