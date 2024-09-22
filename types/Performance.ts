@@ -8,10 +8,10 @@ export const PerformanceStatusValues: PerformanceStatus[] = [
 export type Performance = {
   id: number
   name: string
-  description: string
+  description?: string
   representativeImage?: string
-  location: string
-  startDatetime: string
-  endDatetime: string
+  location?: string
+  startDatetime?: string
+  endDatetime?: string
   status: PerformanceStatus
 }
