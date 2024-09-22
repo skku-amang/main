@@ -15,6 +15,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
 
@@ -116,8 +117,7 @@ const PerformanceForm = () => {
       description: "성공적으로 공연이 생성되었습니다!"
     })
     const data = (await res.json()) as CreateRetrieveUpdateResponse<Performance>
-    console.log(data)
-    // router.push(ROUTES.PERFORMANCE.DETAIL(data.id).url)
+    router.push(ROUTES.PERFORMANCE.DETAIL(data.id).url)
   }
 
   return (

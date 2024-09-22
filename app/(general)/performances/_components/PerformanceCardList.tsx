@@ -52,7 +52,9 @@ const PerformanceList = async () => {
               name={p.name}
               representativeSrc={p.representativeImage}
               location={p.location}
-              startDatetime={new Date(p.startDatetime)}
+              startDatetime={
+                p.startDatetime ? new Date(p.startDatetime) : undefined
+              }
             />
           </div>
         ))}

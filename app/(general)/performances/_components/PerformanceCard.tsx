@@ -20,8 +20,8 @@ interface PerformanceCardProp {
   name: string
   representativeSrc?: string
   description?: string
-  location: string
-  startDatetime: Date
+  location?: string
+  startDatetime?: Date
   className?: string
 }
 
@@ -82,7 +82,9 @@ const PerformanceCard = ({
       <CardHeader className="pb-0">
         <CardTitle>{name}</CardTitle>
         <CardDescription>
-          {`${startDatetime.getFullYear()}년 ${startDatetime.getMonth()}월 ${startDatetime.getDate()}일`}
+          {startDatetime
+            ? `${startDatetime.getFullYear()}년 ${startDatetime.getMonth()}월 ${startDatetime.getDate()}일`
+            : "미정"}
         </CardDescription>
       </CardHeader>
 
