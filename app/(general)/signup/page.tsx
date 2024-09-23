@@ -1,14 +1,15 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import SimpleStringField from "@/app/(general)/signup/_components/SimpleStringField"
 import SimpleLabel from "@/components/Form/SimpleLabel"
-import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -111,138 +112,141 @@ const Signup = () => {
   }
 
   return (
-    <div className="container">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="mb-3 w-full space-y-6"
-        >
-          <SimpleStringField
-            form={form}
-            name="name"
-            label="이름"
-            placeholder="김아망"
-            description={signUpSchema._def.schema.shape.name.description}
-            required={
-              !(signUpSchema._def.schema.shape.name instanceof z.ZodOptional)
-            }
-          />
-          <SimpleStringField
-            form={form}
-            name="nickname"
-            label="닉네임"
-            placeholder="베이스 !== 기타"
-            description={signUpSchema._def.schema.shape.nickname.description}
-            required={
-              !(
-                signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional
-              )
-            }
-          />
-          <SimpleStringField
-            form={form}
-            name="password"
-            label="비밀번호"
-            placeholder="비밀번호"
-            description={signUpSchema._def.schema.shape.password.description}
-            required={
-              !(
-                signUpSchema._def.schema.shape.password instanceof z.ZodOptional
-              )
-            }
-            inputType="password"
-          />
-          <SimpleStringField
-            form={form}
-            name="confirmPassword"
-            label="비밀번호 확인"
-            placeholder="비밀번호 확인"
-            description={signUpSchema._def.schema.shape.password.description}
-            required={
-              !(
-                signUpSchema._def.schema.shape.confirmPassword instanceof
-                z.ZodOptional
-              )
-            }
-            inputType="password"
-          />
-
-          <SimpleStringField
-            form={form}
-            name="email"
-            label="이메일"
-            placeholder="example@g.skku.edu"
-            description={signUpSchema._def.schema.shape.email.description}
-            required={
-              !(signUpSchema._def.schema.shape.email instanceof z.ZodOptional)
-            }
-          />
-
-          <FormField
-            control={form.control}
-            name="sessions"
-            render={() => (
-              <FormItem>
-                <div>
-                  <SimpleLabel
-                    required={
-                      !(
-                        signUpSchema._def.schema.shape.sessions instanceof
-                        z.ZodOptional
-                      )
-                    }
-                  >
-                    세션
-                  </SimpleLabel>
-                  <FormDescription>
-                    연주 가능한 세션을 선택해주세요.
-                  </FormDescription>
-                </div>
-                {sessions &&
-                  sessions.map((session) => (
-                    <FormField
-                      key={session.id}
-                      control={form.control}
-                      name="sessions"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={session.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(session.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([
-                                        ...field.value,
-                                        session.id
-                                      ])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== session.id
-                                        )
-                                      )
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {session.name}
-                            </FormLabel>
-                          </FormItem>
+    
+    <div className="flex justify-center items-center w-full h-full lg:pt-20 lg:pb-28">
+      <div className="w-[68rem] h-full flex bg-white rounded-md lg:shadow-xl overflow-hidden"> 
+        <Image className="hidden lg:block" width="466" height="1231" src="/gradients.svg" alt="Icon"/>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mb-3 w-[38.875rem] h-full space-y-6 px-10 lg:pl-20 lg:pr-24 py-28 xl:w-full"
+          >
+            <SimpleStringField
+              form={form}
+              name="name"
+              label="이름"
+              placeholder="김아망"
+              description={signUpSchema._def.schema.shape.name.description}
+              required={
+                !(signUpSchema._def.schema.shape.name instanceof z.ZodOptional)
+              }
+            />
+            <SimpleStringField
+              form={form}
+              name="nickname"
+              label="닉네임"
+              placeholder="베이스 !== 기타"
+              description={signUpSchema._def.schema.shape.nickname.description}
+              required={
+                !(
+                  signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional
+                )
+              }
+            />
+            <SimpleStringField
+              form={form}
+              name="email"
+              label="이메일"
+              placeholder="example@g.skku.edu"
+              description={signUpSchema._def.schema.shape.email.description}
+              required={
+                !(signUpSchema._def.schema.shape.email instanceof z.ZodOptional)
+              }
+            />
+            <SimpleStringField
+              form={form}
+              name="password"
+              label="비밀번호"
+              placeholder="비밀번호"
+              description={signUpSchema._def.schema.shape.password.description}
+              required={
+                !(
+                  signUpSchema._def.schema.shape.password instanceof z.ZodOptional
+                )
+              }
+              inputType="password"
+            />
+            <SimpleStringField
+              form={form}
+              name="confirmPassword"
+              label="비밀번호 확인"
+              placeholder="비밀번호 확인"
+              description={signUpSchema._def.schema.shape.password.description}
+              required={
+                !(
+                  signUpSchema._def.schema.shape.confirmPassword instanceof
+                  z.ZodOptional
+                )
+              }
+              inputType="password"
+            />
+            <FormField
+              control={form.control}
+              name="sessions"
+              render={() => (
+                <FormItem>
+                  <div>
+                    <SimpleLabel
+                      required={
+                        !(
+                          signUpSchema._def.schema.shape.sessions instanceof
+                          z.ZodOptional
                         )
-                      }}
-                    />
-                  ))}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">회원가입</Button>
-        </form>
-      </Form>
+                      }
+                    >
+                      세션
+                    </SimpleLabel>
+                    <FormDescription>
+                      연주 가능한 세션을 선택해주세요.
+                    </FormDescription>
+                  </div>
+                  {sessions &&
+                    sessions.map((session) => (
+                      <FormField
+                        key={session.id}
+                        control={form.control}
+                        name="sessions"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={session.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(session.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value,
+                                          session.id
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== session.id
+                                          )
+                                        )
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {session.name}
+                              </FormLabel>
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    ))}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">회원가입</Button>
+          </form>
+        </Form>
+      </div>
     </div>
+
   )
 }
 
