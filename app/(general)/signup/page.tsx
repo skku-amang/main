@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { useEffect, useState } from "react"
@@ -112,14 +111,20 @@ const Signup = () => {
   }
 
   return (
-    
-    <div className="flex justify-center items-center w-full h-full lg:pt-20 lg:pb-28">
-      <div className="w-[68rem] h-full flex bg-white rounded-md lg:shadow-xl overflow-hidden"> 
-        <Image className="hidden lg:block" width="466" height="1231" src="/gradients.svg" alt="Icon"/>
+    <div className="flex h-full w-full items-center justify-center lg:py-20">
+      <div className="flex h-full overflow-hidden rounded-xl bg-white lg:w-[1156px] lg:shadow-2xl xl:w-[1536px]">
+        <div
+          className="hidden h-auto min-h-full w-full lg:block"
+          style={{
+            backgroundImage: `url('/gradients.svg')`,
+            backgroundPosition: "top",
+            backgroundSize: "cover"
+          }}
+        ></div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mb-3 w-[38.875rem] h-full space-y-6 px-10 lg:pl-20 lg:pr-24 py-28 xl:w-full"
+            className="h-full w-[38.875rem] space-y-6 p-5 lg:p-24 xl:w-full"
           >
             <SimpleStringField
               form={form}
@@ -139,7 +144,8 @@ const Signup = () => {
               description={signUpSchema._def.schema.shape.nickname.description}
               required={
                 !(
-                  signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional
+                  signUpSchema._def.schema.shape.nickname instanceof
+                  z.ZodOptional
                 )
               }
             />
@@ -161,7 +167,8 @@ const Signup = () => {
               description={signUpSchema._def.schema.shape.password.description}
               required={
                 !(
-                  signUpSchema._def.schema.shape.password instanceof z.ZodOptional
+                  signUpSchema._def.schema.shape.password instanceof
+                  z.ZodOptional
                 )
               }
               inputType="password"
@@ -246,7 +253,6 @@ const Signup = () => {
         </Form>
       </div>
     </div>
-
   )
 }
 
