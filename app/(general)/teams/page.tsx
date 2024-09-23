@@ -1,5 +1,9 @@
+import { redirect } from "next/navigation"
+
 import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"
+import { auth } from "@/auth"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Team } from "@/types/Team"
@@ -10,9 +14,16 @@ import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 // TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
 // TODO: Pagination에서 1,2,3,4,5 등 추가
 const TeamList = async () => {
+  const session = await auth()
+  if (!session) redirect(ROUTES.LOGIN.url)
+
   const res = await fetchData(API_ENDPOINTS.TEAM.LIST, {
-    cache: "no-cache"
+    cache: "no-cache",
+    headers: {
+      Authorization: `Bearer ${session.access}`
+    }
   })
+
   const data = (await res.json()) as ListResponse<Team>
   const teams = data.map((team) => ({
     id: team.id,

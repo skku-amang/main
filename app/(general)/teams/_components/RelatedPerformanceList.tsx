@@ -1,5 +1,7 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
+import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
@@ -8,8 +10,15 @@ import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
 
 const RelatedPerformanceList = async () => {
+  const session = await auth()
+  if (!session) redirect(ROUTES.LOGIN.url)
+
   const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
-    cache: "no-cache"
+    cache: "no-cache",
+    credentials: "include",
+    headers: {
+      Authorization: `Bearer ${session.access}`
+    }
   })
   const data = (await res.json()) as ListResponse<Performance>
 

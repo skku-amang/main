@@ -1,13 +1,13 @@
+import { redirect } from "next/dist/client/components/redirect"
 import Image from "next/image"
-import Link from "next/link"
 import { FaClock } from "react-icons/fa"
 import { IoLocationSharp } from "react-icons/io5"
 
 import TeamList from "@/app/(general)/teams/page"
-import { Badge } from "@/components/ui/badge"
+import { auth } from "@/auth"
+import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import { generateDummys } from "@/lib/dummy"
-import { createPerformance } from "@/lib/dummy/Performance"
+import fetchData from "@/lib/fetch"
 
 interface PerformanceDetailProp {
   params: {
@@ -15,11 +15,22 @@ interface PerformanceDetailProp {
   }
 }
 
-const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
+const PerformanceDetail = async ({ params }: PerformanceDetailProp) => {
   const { id } = params
-  const performance = createPerformance(id)
-  // const rows: TeamColumn[] = performance.teams
-  const relatedPerformances = generateDummys(3, createPerformance)
+  const session = await auth()
+  if (!session) redirect(ROUTES.LOGIN.url)
+
+  const res = await fetchData(
+    API_ENDPOINTS.PERFORMANCE.RETRIEVE(id) as ApiEndpoint,
+    {
+      cache: "no-cache",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${session.access}`
+      }
+    }
+  )
+  const performance = await res.json()
 
   return (
     <>
@@ -58,25 +69,7 @@ const PerformanceDetail = ({ params }: PerformanceDetailProp) => {
         </div>
       </div>
 
-      {/* 연관 공연 */}
-      <div className="flex flex-col items-center justify-center px-10">
-        <p className="mb-2 text-sm font-bold">모집 중인 공연</p>
-        <div className="flex gap-x-2">
-          {relatedPerformances.map((p) => (
-            <Link key={p.id} href={ROUTES.PERFORMANCE.DETAIL(p.id).url}>
-              <Badge className="bg-slate-200 p-2 px-3 text-black">
-                {p.name}
-              </Badge>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* 팀 목록 */}
-      <div>
-        {/* <TeamListDataTable columns={columns} data={rows} /> */}
-        <TeamList />
-      </div>
+      <TeamList />
     </>
   )
 }

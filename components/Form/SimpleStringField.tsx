@@ -1,7 +1,7 @@
-import { FormControl, FormField, FormItem, FormMessage } from '../ui/form'
-import { Input } from '../ui/input'
-import SimpleDescription from './SimpleDescription'
-import SimpleLabel from './SimpleLabel'
+import { FormControl, FormField, FormItem, FormMessage } from "../ui/form"
+import { Input } from "../ui/input"
+import SimpleDescription from "./SimpleDescription"
+import SimpleLabel from "./SimpleLabel"
 
 interface Prop {
   form: any
@@ -10,6 +10,7 @@ interface Prop {
   placeholder?: string
   description?: string
   required?: boolean
+  inputType?: "text" | "password" | "email" | "number" | "url" | "tel" | "date"
 }
 
 const SimpleStringField = ({
@@ -18,7 +19,8 @@ const SimpleStringField = ({
   label,
   placeholder,
   description,
-  required
+  required,
+  inputType
 }: Prop) => (
   <FormField
     control={form.control}
@@ -32,7 +34,8 @@ const SimpleStringField = ({
           <Input
             placeholder={placeholder}
             {...fieldProps}
-            style={{ marginTop: '0.2rem' }}
+            style={{ marginTop: "0.2rem" }}
+            type={inputType}
           />
         </FormControl>
 

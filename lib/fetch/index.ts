@@ -12,9 +12,8 @@ export default async function fetchData(
     ...init,
     method,
     headers: {
-      ...init?.headers,
       "Content-Type": "application/json",
-      Authorization: `Api-Key ${process.env.NEXT_PUBLIC_API_KEY}`
+      ...init?.headers
     }
   })
 }

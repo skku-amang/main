@@ -6,7 +6,7 @@ export type Team = {
   id: number
   name?: string
   description: string
-  leader?: User
+  leader: User
   performance: Performance
   isFreshmanFixed: boolean
   posterImage?: string

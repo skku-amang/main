@@ -1,22 +1,28 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import React from "react"
 import { CiCirclePlus } from "react-icons/ci"
 
 import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
+import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import { generateDummys } from "@/lib/dummy"
-import { createPerformance } from "@/lib/dummy/Performance"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
 
 const PerformanceList = async () => {
-  const _performances = generateDummys(10, createPerformance)
+  const session = await auth()
+  if (!session) redirect(ROUTES.LOGIN.url)
+
   const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
-    cache: "no-cache"
+    cache: "no-cache",
+    credentials: "include",
+    headers: {
+      Authorization: `Bearer ${session.access}`
+    }
   })
   const performances = (await res.json()) as ListResponse<Performance>
 
@@ -46,7 +52,9 @@ const PerformanceList = async () => {
               name={p.name}
               representativeSrc={p.representativeImage}
               location={p.location}
-              startDatetime={new Date(p.startDatetime)}
+              startDatetime={
+                p.startDatetime ? new Date(p.startDatetime) : undefined
+              }
             />
           </div>
         ))}

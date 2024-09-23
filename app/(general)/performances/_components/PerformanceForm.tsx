@@ -1,6 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { StatusCodes } from "http-status-codes"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
@@ -8,8 +11,13 @@ import { zfd } from "zod-form-data"
 import SimpleDateField from "@/components/Form/SimpleDateField"
 import SimpleImageField from "@/components/Form/SimpleImageField"
 import SimpleStringField from "@/components/Form/SimpleStringField"
+import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
+import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { Performance } from "@/types/Performance"
 
 import PerformanceCard from "./PerformanceCard"
 
@@ -42,6 +50,10 @@ const formSchema = z.object({
 })
 
 const PerformanceForm = () => {
+  const session = useSession()
+  const { toast } = useToast()
+  const router = useRouter()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema)
   })
@@ -49,8 +61,63 @@ const PerformanceForm = () => {
   // Watch all form values
   const formValues = form.watch()
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  async function onSubmit(formData: z.infer<typeof formSchema>) {
+    const formDataToSend = new FormData()
+    formDataToSend.append("name", formData.name)
+    if (formData.description) {
+      formDataToSend.append("description", formData.description)
+    }
+    if (formData.representativeImage) {
+      formDataToSend.append("representativeImage", formData.representativeImage)
+    }
+    if (formData.location) {
+      formDataToSend.append("location", formData.location)
+    }
+    if (formData.startDatetime) {
+      formDataToSend.append(
+        "startDatetime",
+        formData.startDatetime.toISOString()
+      )
+    }
+    if (formData.endDatetime) {
+      formDataToSend.append("endDatetime", formData.endDatetime.toISOString())
+    }
+
+    const res = await fetch(API_ENDPOINTS.PERFORMANCE.CREATE.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.data?.access}`
+      },
+      body: formDataToSend
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      switch (res.status) {
+        case StatusCodes.BAD_REQUEST:
+          toast({
+            title: res.statusText,
+            description: data.detail,
+            variant: "destructive"
+          })
+          break
+        default:
+          toast({
+            title: res.statusText,
+            description: data.detail,
+            variant: "destructive"
+          })
+          break
+      }
+      return
+    }
+
+    toast({
+      title: "공연 생성 성공",
+      description: "성공적으로 공연이 생성되었습니다!"
+    })
+    const data = (await res.json()) as CreateRetrieveUpdateResponse<Performance>
+    router.push(ROUTES.PERFORMANCE.DETAIL(data.id).url)
   }
 
   return (
