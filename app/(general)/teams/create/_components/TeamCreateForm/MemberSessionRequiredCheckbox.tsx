@@ -1,13 +1,13 @@
 import { UseFormReturn } from "react-hook-form"
 import z from "zod"
 
-import { firstPageSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/schema"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 
 export interface CheckboxFieldProps {
-  firstPageForm: UseFormReturn<z.infer<typeof firstPageSchema>>
-  fieldName: keyof z.infer<typeof firstPageSchema>
+  firstPageForm: UseFormReturn<z.infer<typeof memberSessionRequiredBaseSchema>>
+  fieldName: keyof z.infer<typeof memberSessionRequiredBaseSchema>
   label: string
 }
 

@@ -3,6 +3,7 @@ export interface Route {
   url: string | ((...args: string[]) => string)
 }
 
+// TODO: name 다 지워도 될듯
 const ROUTES = {
   HOME: {
     name: "Home",

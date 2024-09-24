@@ -1,62 +1,6 @@
 import { z } from "zod"
 
-const basicInfoSchema = z.object({
-  performanceId: z.number({ required_error: "필수 항목" }),
-  songName: z
-    .string({ required_error: "필수 항목" })
-    .min(1, { message: "1글자 이상 입력해주세요" }),
-  songArtist: z
-    .string({ required_error: "필수 항목" })
-    .min(1, { message: "1글자 이상 입력해주세요" }),
-  isFreshmenFixed: z.boolean().default(false).optional(),
-  isSelfMade: z.boolean().default(false).optional(),
-  description: z.string().optional()
-})
-
-export const memberSessionRequiredField = ({
-  sessionName,
-  index
-}: {
-  sessionName: string
-  index: number
-}) =>
-  z.object({
-    sessionName: z.string().default(sessionName).readonly(),
-    index: z.number({ required_error: "필수 항목" }).default(index).readonly(),
-    required: z.boolean({ required_error: "필수 항목" }).default(false)
-  })
-
-export const memberSessionRequiredBaseSchema = z.object({
-  보컬1: memberSessionRequiredField({ sessionName: "보컬", index: 1 }),
-  보컬2: memberSessionRequiredField({ sessionName: "보컬", index: 2 }),
-  보컬3: memberSessionRequiredField({ sessionName: "보컬", index: 3 }),
-  기타1: memberSessionRequiredField({ sessionName: "기타", index: 1 }),
-  기타2: memberSessionRequiredField({ sessionName: "기타", index: 2 }),
-  기타3: memberSessionRequiredField({ sessionName: "기타", index: 3 }),
-  베이스1: memberSessionRequiredField({ sessionName: "베이스", index: 1 }),
-  베이스2: memberSessionRequiredField({ sessionName: "베이스", index: 2 }),
-  드럼: memberSessionRequiredField({ sessionName: "드럼", index: 1 }),
-  신디1: memberSessionRequiredField({ sessionName: "신디", index: 1 }),
-  신디2: memberSessionRequiredField({ sessionName: "신디", index: 2 }),
-  신디3: memberSessionRequiredField({ sessionName: "신디", index: 3 }),
-  현악기: memberSessionRequiredField({ sessionName: "현악기", index: 1 }),
-  관악기: memberSessionRequiredField({ sessionName: "관악기", index: 1 })
-})
-const memberSessionRequiredSchema = z.object({
-  memberSessions: memberSessionRequiredBaseSchema
-})
-
-export const firstPageSchema = basicInfoSchema.merge(
-  memberSessionRequiredSchema
-)
-
-export type SecondPageFormSchema = z.ZodObject<{
-  [key: string]: z.ZodObject<{
-    session: z.ZodString
-    members: z.ZodArray<z.ZodNumber>
-    requiredMemberCount: z.ZodNumber
-  }>
-}>
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
 
 export const createDynamicSchema = (
   baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>
@@ -64,7 +8,7 @@ export const createDynamicSchema = (
   const dynamicShape: { [key: string]: z.ZodType<any> } = {}
 
   const sessionNameRequiredMemberCountMap = new Map<string, number>()
-  Object.values(baseSchema).forEach((value) => {
+  Object.values(baseSchema.memberSessions).forEach((value) => {
     if (!value.required) {
       return
     }
@@ -121,7 +65,7 @@ export function getFormDefaultValeus(
 ) {
   const formDefaultValues: { [key: string]: z.infer<any> } = {}
 
-  Object.values(baseSchema).forEach((value) => {
+  Object.values(baseSchema.memberSessions).forEach((value) => {
     if (!value.required) {
       return
     }
