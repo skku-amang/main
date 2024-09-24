@@ -36,6 +36,7 @@ const SimpleStringField = ({
             {...fieldProps}
             style={{ marginTop: "0.2rem" }}
             type={inputType}
+            className="border-slate-300 shadow-sm"
           />
         </FormControl>
 
