@@ -54,7 +54,8 @@ const config = {
         }
       },
       boxShadow: {
-        "custom-light": "0 4px 4px rgba(0, 0, 0, 0.25)"
+        custom: "0 4px 4px rgba(0, 0, 0, 0.25)",
+        checkbox: "0 4px 10px rgba(155, 169, 176, 0.2)"
       },
       borderRadius: {
         lg: "var(--radius)",
