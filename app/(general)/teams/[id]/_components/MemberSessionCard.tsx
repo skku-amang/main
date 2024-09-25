@@ -12,6 +12,7 @@ import { User } from "@/types/User"
 interface MemberSessionCardProps {
   teamId: number
   session: SessionName
+  sessionIndex: number
   user?: User
   // eslint-disable-next-line no-unused-vars
   onUnapplySuccess: (team: Team) => void
@@ -20,6 +21,7 @@ interface MemberSessionCardProps {
 const MemberSessionCard = ({
   teamId,
   session,
+  sessionIndex,
   user,
   onUnapplySuccess
 }: MemberSessionCardProps) => {
@@ -63,9 +65,10 @@ const MemberSessionCard = ({
   return (
     <div>
       {/* 세션 라벨 */}
-      <div className="flex items-center justify-center">
+      <div className="flex select-none items-center justify-center">
         <div className="rounded-t-md bg-secondary px-2 py-1 text-sm font-semibold">
           {session}
+          {sessionIndex}
         </div>
         <div className="flex-auto" />
       </div>

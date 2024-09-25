@@ -44,6 +44,15 @@ export type MemberSession = {
   members: User[]
   requiredMemberCount: number
 }
+export const SessionOrder = [
+  "보컬",
+  "기타",
+  "베이스",
+  "드럼",
+  "신디",
+  "현악기",
+  "관악기"
+]
 
 /**
  * 팀의 세션별 멤버 정보를 담은 Set

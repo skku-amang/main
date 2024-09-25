@@ -15,7 +15,7 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { MemberSessionSet, Team } from "@/types/Team"
+import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
 
 interface Props {
   params: {
@@ -81,41 +81,31 @@ const TeamDetail = ({ params }: Props) => {
         {/* 세션 구성 */}
         {team.memberSessions && (
           <SessionSetCard header="세션구성">
-            <div className="flex items-center gap-x-1">
-              {team.memberSessions.map((ms) => (
-                <SessionBadge key={ms.session} session={ms.session} />
-              ))}
+            <div className="flex items-center gap-x-2">
+              {team.memberSessions
+                .sort((a, b) => {
+                  return (
+                    SessionOrder.indexOf(a.session) -
+                    SessionOrder.indexOf(b.session)
+                  )
+                })
+                .map((ms) => (
+                  <SessionBadge key={ms.session} session={ms.session} />
+                ))}
             </div>
           </SessionSetCard>
         )}
 
-        {/* 신청가능한 세션 */}
-        <SessionSetCard header="신청가능한 세션">
-          <div className="flex items-center gap-x-1">
-            {missingMemberSessions.length > 0 ? (
-              missingMemberSessions.map((ms) => (
-                <SessionBadge key={ms.session} session={ms.session} />
-              ))
-            ) : (
-              <div>마감</div>
-            )}
-          </div>
-        </SessionSetCard>
-
         {/* 마감된 세션 */}
         <SessionSetCard header="마감된 세션" className="col-span-2">
-          <div className="mb-7 mt-3 flex items-center gap-x-1">
-            {sessionsWithAtleastOneMember.map((ms) => (
-              <SessionBadge key={ms.session} session={ms.session} />
-            ))}
-          </div>
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             {sessionsWithAtleastOneMember.map((ms) =>
-              ms.members.map((member) => (
+              ms.members.map((member, index) => (
                 <MemberSessionCard
                   key={member.id}
                   teamId={team.id}
                   session={ms.session}
+                  sessionIndex={index + 1}
                   user={member}
                   onUnapplySuccess={setTeam}
                 />
