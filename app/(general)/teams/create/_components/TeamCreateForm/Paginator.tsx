@@ -8,8 +8,8 @@ interface PaginatorProps {
   onNext?: () => void
   previousButtonLabel?: string
   nextButtonLabel?: string
-  isFirstPage?: boolean
-  isLastPage?: boolean
+  isPrevButtonDisabled?: boolean
+  isNextButtonDisabled?: boolean
   totalPage: number
   currentPage: number
 }
@@ -19,17 +19,20 @@ const Paginator = ({
   onNext,
   previousButtonLabel,
   nextButtonLabel,
-  isFirstPage,
-  isLastPage,
+  isPrevButtonDisabled,
+  isNextButtonDisabled,
   totalPage,
   currentPage
 }: PaginatorProps) => {
+  isPrevButtonDisabled ?? currentPage === 1
+  isNextButtonDisabled ?? totalPage === currentPage
+
   return (
     <div className="mt-24 flex items-center justify-around">
       <Button
         className="h-12 rounded-none"
         variant="outline"
-        disabled={isFirstPage}
+        disabled={isPrevButtonDisabled}
         onClick={onPrevious}
         type="button"
       >
@@ -48,7 +51,7 @@ const Paginator = ({
       <Button
         className="h-12 rounded-none"
         variant="outline"
-        disabled={isLastPage}
+        disabled={isNextButtonDisabled}
         onClick={onNext}
         type="button"
       >

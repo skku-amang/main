@@ -1,8 +1,10 @@
 export interface Route {
   name: string
+  // eslint-disable-next-line no-unused-vars
   url: string | ((...args: string[]) => string)
 }
 
+// TODO: name 다 지워도 될듯
 const ROUTES = {
   HOME: {
     name: "Home",
