@@ -19,6 +19,7 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
+import YoutubeVideo from "@/lib/youtube"
 import { Team } from "@/types/Team"
 
 interface TeamCreateFormProps {
@@ -94,12 +95,16 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
   const [thirdPageSchemaMetadata, setThirdPageSchemaMetadata] =
     useState<z.infer<any>>()
   async function onThirdPageValid(secondPageFormData: z.infer<any>) {
+    const youtubeVideoId = firstPageForm.getValues("songYoutubeVideoId")
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       songArtist: firstPageForm.getValues("songArtist"),
       memberSessions: Object.values(secondPageFormData),
-      description: firstPageForm.getValues("description")
+      description: firstPageForm.getValues("description"),
+      songYoutubeVideoId:
+        youtubeVideoId && YoutubeVideo.getValidVideoIdOrNull(youtubeVideoId),
+      posterImage: firstPageForm.getValues("posterImage")
     }
 
     const res = await fetchData(API_ENDPOINTS.TEAM.CREATE, {

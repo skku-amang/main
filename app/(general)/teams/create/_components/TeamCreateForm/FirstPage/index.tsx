@@ -5,6 +5,7 @@ import { z } from "zod"
 
 import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
 import basicInfoSchema from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/schema"
+import YoutubeDialog from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/YoutubeDialog"
 import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -212,7 +213,7 @@ const FirstPage = ({
         {/* 디바이더 */}
         <hr className="my-14" />
 
-        {/* 게시글 작성 */}
+        {/* 게시글, 유튜브 링크 */}
         <div>
           <Description
             header={
@@ -220,8 +221,22 @@ const FirstPage = ({
             }
             className="mb-6"
           >
-            <AiFillExclamationCircle />
-            자유롭게 팀을 홍보해주세요
+            <div className="flex w-full items-center justify-between">
+              <div className="flex items-center justify-between gap-x-2">
+                <AiFillExclamationCircle />
+                자유롭게 팀을 홍보해주세요
+              </div>
+
+              {/* 유튜브 링크 팝업 */}
+              <div>
+                <YoutubeDialog form={form} fieldName="songYoutubeVideoId" />
+                {form.formState.errors.songYoutubeVideoId && (
+                  <div className="mt-1 text-end text-xs text-destructive">
+                    {form.formState.errors.songYoutubeVideoId.message}
+                  </div>
+                )}
+              </div>
+            </div>
           </Description>
           <Textarea
             id="descriptionInput"
@@ -229,6 +244,12 @@ const FirstPage = ({
             placeholder="팀 홍보 글을 작성해주세요"
             {...form.register("description")}
           />
+          {/* 에러 표시 */}
+          {form.formState.errors.description && (
+            <div className="text-destructive">
+              {form.formState.errors.description.message}
+            </div>
+          )}
         </div>
 
         {/* 페이지 이동 */}
