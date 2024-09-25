@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
+import { cn } from "@/lib/utils"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -33,9 +34,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <body className={fontSans.className}>
-          {children}
-          <Toaster />
+        <body className={cn(fontSans.className, "bg-neutral-50")}>
+          <div className="bg-white">
+            {children}
+            <Toaster />
+          </div>
         </body>
       </SessionProvider>
     </html>
