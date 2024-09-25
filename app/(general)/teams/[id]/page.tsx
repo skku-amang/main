@@ -69,9 +69,15 @@ const TeamDetail = ({ params }: Props) => {
       <h2 className="text-center text-4xl italic">Join Your Team</h2>
 
       {/* 유튜브 임베드 */}
-      {team.songYoutubeVideoId && (
-        <YoutubePlayer videoId={team.songYoutubeVideoId} />
-      )}
+      <div className="mb-16 mt-6 flex items-center justify-center">
+        {team.songYoutubeVideoId && (
+          <YoutubePlayer
+            videoId={team.songYoutubeVideoId}
+            width={750}
+            className="aspect-video"
+          />
+        )}
+      </div>
 
       {/* 기본 정보 */}
       <BasicInfo team={team} />
