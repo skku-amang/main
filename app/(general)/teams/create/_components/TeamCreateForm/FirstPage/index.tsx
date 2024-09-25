@@ -54,7 +54,7 @@ const FirstPage = ({
     })
       .then((res) => res.json())
       .then((json) => setPerformances(json))
-  }, [])
+  }, [accessToken])
 
   return (
     <Form {...form}>

@@ -1,5 +1,6 @@
 export interface Route {
   name: string
+  // eslint-disable-next-line no-unused-vars
   url: string | ((...args: string[]) => string)
 }
 

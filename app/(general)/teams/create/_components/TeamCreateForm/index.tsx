@@ -55,22 +55,20 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
   >({
     resolver: zodResolver(memberSessionRequiredBaseSchema),
     defaultValues: {
-      memberSessions: {
-        보컬1: { required: false },
-        보컬2: { required: false },
-        보컬3: { required: false },
-        기타1: { required: false },
-        기타2: { required: false },
-        기타3: { required: false },
-        베이스1: { required: false },
-        베이스2: { required: false },
-        드럼: { required: false },
-        신디1: { required: false },
-        신디2: { required: false },
-        신디3: { required: false },
-        현악기: { required: false },
-        관악기: { required: false }
-      }
+      보컬1: { required: false },
+      보컬2: { required: false },
+      보컬3: { required: false },
+      기타1: { required: false },
+      기타2: { required: false },
+      기타3: { required: false },
+      베이스1: { required: false },
+      베이스2: { required: false },
+      드럼: { required: false },
+      신디1: { required: false },
+      신디2: { required: false },
+      신디3: { required: false },
+      현악기: { required: false },
+      관악기: { required: false }
     }
   })
   function onSecondPageValid(
@@ -83,7 +81,7 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
       return
     }
     console.log(result.data)
-    setThirdPageSchemaMetadata(result.data.memberSessions)
+    setThirdPageSchemaMetadata(result.data)
     setCurrentPage(3)
   }
   function onSecondPageInvalid(
@@ -163,6 +161,7 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
           form={secondPageForm}
           onValid={onSecondPageValid}
           onInvalid={onSecondPageInvalid}
+          onPrevious={() => setCurrentPage(1)}
         />
       )}
       {currentPage === 3 && (
@@ -170,7 +169,7 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
           schemaMetadata={thirdPageSchemaMetadata}
           onValid={onThirdPageValid}
           onInvalid={onThirdPageInvalid}
-          onPreviousButtonClick={() => setCurrentPage(1)}
+          onPrevious={() => setCurrentPage(2)}
           firstPageForm={firstPageForm}
         />
       )}

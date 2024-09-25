@@ -1,10 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { useForm } from "react-hook-form"
 import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
 
 import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
-import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/MemberSessionRequiredCheckbox"
 import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
+import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/MemberSessionRequiredCheckbox"
 import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
 import { Form } from "@/components/ui/form"
 
@@ -12,13 +13,17 @@ interface SecondPageProps {
   form: ReturnType<
     typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
   >
-  // eslint-disable-next-line no-unused-vars
   onValid: (formData: z.infer<any>) => void
-  // eslint-disable-next-line no-unused-vars
   onInvalid: (formData: z.infer<any>) => void
+  onPrevious: () => void
 }
 
-const SecondPage = ({ form, onValid, onInvalid }: SecondPageProps) => {
+const SecondPage = ({
+  form,
+  onValid,
+  onInvalid,
+  onPrevious
+}: SecondPageProps) => {
   const memberSessionRequiredFormStructure: {
     [label: string]: string[]
   } = {
@@ -51,7 +56,7 @@ const SecondPage = ({ form, onValid, onInvalid }: SecondPageProps) => {
                       <td key={`${label}-${fieldName}`} className="p-4">
                         <MemberSessionRequiredCheckbox
                           firstPageForm={form}
-                          fieldName={`memberSessions.${fieldName}` as any}
+                          fieldName={fieldName}
                           label={fieldName}
                         />
                       </td>
@@ -65,6 +70,7 @@ const SecondPage = ({ form, onValid, onInvalid }: SecondPageProps) => {
 
         {/* 페이지 이동 */}
         <Paginator
+          onPrevious={onPrevious}
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={2}

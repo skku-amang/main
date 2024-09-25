@@ -8,7 +8,7 @@ export const createDynamicSchema = (
   const dynamicShape: { [key: string]: z.ZodType<any> } = {}
 
   const sessionNameRequiredMemberCountMap = new Map<string, number>()
-  Object.values(baseSchema.memberSessions).forEach((value) => {
+  Object.values(baseSchema).forEach((value) => {
     if (!value.required) {
       return
     }
@@ -65,7 +65,7 @@ export function getFormDefaultValeus(
 ) {
   const formDefaultValues: { [key: string]: z.infer<any> } = {}
 
-  Object.values(baseSchema.memberSessions).forEach((value) => {
+  Object.values(baseSchema).forEach((value) => {
     if (!value.required) {
       return
     }

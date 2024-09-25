@@ -15,13 +15,13 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
 
-import { createDynamicSchema, getFormDefaultValeus } from "../schema"
+import { createDynamicSchema, getFormDefaultValeus } from "./schema"
 
 interface ThirdPageProps {
   schemaMetadata: z.infer<typeof memberSessionRequiredBaseSchema>
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
-  onPreviousButtonClick: () => void
+  onPrevious: () => void
   firstPageForm: ReturnType<typeof useForm<any>>
 }
 
@@ -36,7 +36,7 @@ const ThirdPage = ({
   schemaMetadata,
   onValid,
   onInvalid,
-  onPreviousButtonClick
+  onPrevious
 }: ThirdPageProps) => {
   const [users, setMembers] = useState<User[]>([])
   const schema = createDynamicSchema(schemaMetadata)
@@ -73,7 +73,7 @@ const ThirdPage = ({
         {/* 팀원 정보 입력 */}
         <table className="table-auto border-separate border-spacing-5">
           <tbody>
-            {Object.entries(schema.shape).map(([key, s]) => {
+            {Object.entries(schema._def.shape()).map(([key, s]) => {
               return Array.from({ length: requiredMemberCount(s) }).map(
                 (_, index) => (
                   <tr key={`${key}-${index}`} className="my-3">
@@ -103,7 +103,7 @@ const ThirdPage = ({
         {/* 페이지 이동 */}
         <Paginator
           nextButtonLabel="Complete"
-          onPrevious={onPreviousButtonClick}
+          onPrevious={onPrevious}
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={3}
