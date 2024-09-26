@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import React from "react"
 import { CgSpinner } from "react-icons/cg"
 import { CiSettings } from "react-icons/ci"
@@ -125,7 +125,7 @@ function Profile() {
 
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onSelect={() => signOut()}
+          // onSelect={() => signOut()}
           className="flex h-full w-full items-center justify-start gap-x-3 p-2 hover:cursor-pointer"
         >
           <IoIosLogOut size={iconSize} />
