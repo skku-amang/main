@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { useEffect, useState } from "react"
@@ -248,7 +249,10 @@ const Signup = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">회원가입</Button>
+            <div className="flex w-full h-50 gap-10 pt-10 justify-center items-center ">
+              <Link className="flex w-36 h-14 bg-slate-200 rounded-lg text-slate-700 font-semibold text-lg justify-center items-center" href={ROUTES.HOME.url}>취소하기</Link>
+              <Button className="w-36 h-14 bg-primary rounded-lg text-lg font-semibold" type="submit">회원가입</Button>
+            </div>
           </form>
         </Form>
       </div>
