@@ -249,9 +249,19 @@ const Signup = () => {
                 </FormItem>
               )}
             />
-            <div className="flex w-full h-50 gap-10 pt-10 justify-center items-center ">
-              <Link className="flex w-36 h-14 bg-slate-200 rounded-lg text-slate-700 font-semibold text-lg justify-center items-center" href={ROUTES.HOME.url}>취소하기</Link>
-              <Button className="w-36 h-14 bg-primary rounded-lg text-lg font-semibold" type="submit">회원가입</Button>
+            <div className="h-50 flex w-full items-center justify-center gap-10 pt-10 ">
+              <Link
+                className="flex h-14 w-36 items-center justify-center rounded-lg bg-slate-200 text-lg font-semibold text-slate-700"
+                href={ROUTES.HOME.url}
+              >
+                취소하기
+              </Link>
+              <Button
+                className="h-14 w-36 rounded-lg bg-primary text-lg font-semibold"
+                type="submit"
+              >
+                회원가입
+              </Button>
             </div>
           </form>
         </Form>
