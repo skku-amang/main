@@ -6,7 +6,7 @@ import { z } from "zod"
 
 import basicInfoSchema, {
   songYoutubeVideoIdSchema
-} from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/schema"
+} from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,

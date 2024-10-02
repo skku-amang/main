@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import TeamCreateForm from "@/app/(general)/teams/create/_components/TeamCreateForm"
+import TeamForm from "@/app/(general)/teams/_components/TeamForm"
 import { auth } from "@/auth"
 import ROUTES from "@/constants/routes"
 
@@ -10,7 +10,7 @@ const TeamCreatePage = async () => {
 
   return (
     <div>
-      <TeamCreateForm />
+      <TeamForm />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 
 export const createDynamicSchema = (
   baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>

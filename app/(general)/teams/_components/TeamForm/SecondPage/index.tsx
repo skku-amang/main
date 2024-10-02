@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form"
 import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
-import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
-import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/MemberSessionRequiredCheckbox"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
+import Description from "@/app/(general)/teams/_components/TeamForm/Description"
+import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
+import MemberSessionRequiredCheckbox from "@/app/(general)/teams/_components/TeamForm/SecondPage/MemberSessionRequiredCheckbox"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Form } from "@/components/ui/form"
 
 interface SecondPageProps {

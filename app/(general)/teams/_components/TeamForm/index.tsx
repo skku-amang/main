@@ -8,11 +8,11 @@ import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import FirstPage from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage"
-import basicInfoSchema from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/schema"
-import SecondPage from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
-import ThirdPage from "@/app/(general)/teams/create/_components/TeamCreateForm/ThirdPage"
+import FirstPage from "@/app/(general)/teams/_components/TeamForm/FirstPage"
+import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
+import SecondPage from "@/app/(general)/teams/_components/TeamForm/SecondPage"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
+import ThirdPage from "@/app/(general)/teams/_components/TeamForm/ThirdPage"
 import { useToast } from "@/components/hooks/use-toast"
 import Loading from "@/components/Loading"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
@@ -26,7 +26,7 @@ interface TeamCreateFormProps {
   initialData?: any
 }
 
-const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
+const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const session = useSession()
   const router = useRouter()
@@ -182,4 +182,4 @@ const TeamCreateForm = ({ initialData }: TeamCreateFormProps) => {
   )
 }
 
-export default TeamCreateForm
+export default TeamForm
