@@ -124,7 +124,7 @@ const Login = () => {
             <div className="text-destructive">{errors.password?.message}</div>
             <Button
               type="submit"
-              className="mt-8 h-12 w-72 bg-blue-500 text-base font-semibold"
+              className="bg-third mt-8 h-12 w-72 text-base font-semibold"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Login on Progress..." : "Login"}
@@ -137,9 +137,6 @@ const Login = () => {
               >
                 Sign up
               </Link>
-            </div>
-            <div className={cn(Poppin.className, "pt-6 text-blue-400")}>
-              Forgot Password?
             </div>
           </form>
         </div>
