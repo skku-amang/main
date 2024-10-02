@@ -13,6 +13,7 @@ export type Team = {
 
   songName: string
   songArtist: string
+  isSelfMade: boolean
   songYoutubeVideoId?: string // 아망 공식 홈페이지 유튜브 영상
 
   createdDatetime: string

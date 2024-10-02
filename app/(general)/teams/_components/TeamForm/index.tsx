@@ -23,7 +23,7 @@ import YoutubeVideo from "@/lib/youtube"
 import { Team } from "@/types/Team"
 
 interface TeamCreateFormProps {
-  initialData?: z.infer<typeof basicInfoSchema>
+  initialData?: Team
 }
 
 const TeamForm = ({ initialData }: TeamCreateFormProps) => {
@@ -34,7 +34,16 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
-    resolver: zodResolver(basicInfoSchema)
+    resolver: zodResolver(basicInfoSchema),
+    defaultValues: {
+      performanceId: initialData?.performance.id,
+      songName: initialData?.songName,
+      isFreshmenFixed: initialData?.isFreshmanFixed,
+      songArtist: initialData?.songArtist,
+      isSelfMade: initialData?.isSelfMade,
+      description: initialData?.description,
+      songYoutubeVideoId: initialData?.songYoutubeVideoId
+    }
   })
   function onFirstPageValid(formData: z.infer<typeof basicInfoSchema>) {
     const firstPageResult = basicInfoSchema.safeParse(formData)
