@@ -1,3 +1,4 @@
+import { PenLine, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -48,7 +49,7 @@ const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
 
   return (
     <div className="rounded-2xl p-14 shadow-md">
-      <div>
+      <div className="flex items-center justify-between">
         <div>
           {/* 곡 정보 */}
           <div className="flex items-center gap-x-3">
@@ -59,13 +60,19 @@ const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
           </div>
           <h4 className="mb-3 text-2xl text-gray-500">{team.songArtist}</h4>
         </div>
-        <div className="flex items-center justify-center gap-x-2">
-          <Button asChild variant="outline">
-            <Link href={ROUTES.TEAM.EDIT(team.id).url}>편집</Link>
+        <div className="flex items-center justify-center gap-x-5">
+          <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
+            <Link href={ROUTES.TEAM.EDIT(team.id).url}>
+              <PenLine strokeWidth={1.25} />
+            </Link>
           </Button>
           <form action={onDeleteButtonClick}>
-            <Button type="submit" variant="outline">
-              삭제
+            <Button
+              type="submit"
+              variant="outline"
+              className="h-12 w-12 p-2 shadow"
+            >
+              <Trash2 strokeWidth={1.25} />
             </Button>
           </form>
         </div>
