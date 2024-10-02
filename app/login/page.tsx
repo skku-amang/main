@@ -52,7 +52,7 @@ const Login = () => {
 
       default:
         toast({
-          title: "회원가입 실패",
+          title: "로그인 실패",
           description: "알 수 없는 에러 발생!",
           variant: "destructive"
         })

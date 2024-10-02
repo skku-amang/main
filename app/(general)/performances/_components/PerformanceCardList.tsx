@@ -4,7 +4,7 @@ import { CiCirclePlus } from "react-icons/ci"
 
 import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
 import { auth } from "@/auth"
-import Loading from "@/components/Loading"
+import Loading from "@/app/_(errors)/Loading"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"

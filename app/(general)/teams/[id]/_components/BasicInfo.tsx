@@ -1,24 +1,75 @@
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+import { useToast } from "@/components/hooks/use-toast"
 import StatusBadge from "@/components/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
+import fetchData from "@/lib/fetch"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
   team: Team
+  accessToken?: string
 }
 
-const BasicInfo = ({ team }: BasicInfoProps) => {
+const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
+  const router = useRouter()
+  const { toast } = useToast()
+
   const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
+
+  function onDeleteButtonClick() {
+    fetchData(API_ENDPOINTS.TEAM.DELETE(team.id) as ApiEndpoint, {
+      cache: "no-cache",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }).then(async (res) => {
+      if (!res.ok) {
+        switch (res.status) {
+          default:
+            toast({
+              title: "팀 삭제 실패",
+              description: "알 수 없는 이유",
+              variant: "destructive"
+            })
+        }
+      }
+      toast({
+        title: "팀 삭제 성공",
+        description: "성공적으로 팀을 삭제했습니다."
+      })
+      router.push(ROUTES.TEAM.LIST.url)
+    })
+  }
 
   return (
     <div className="rounded-2xl p-14 shadow-md">
-      {/* 곡 정보 */}
-      <div className="flex items-center gap-x-3">
-        <h3 className="text-4xl font-extrabold">{team.songName}</h3>
-        <StatusBadge
-          status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
-        />
+      <div>
+        <div>
+          {/* 곡 정보 */}
+          <div className="flex items-center gap-x-3">
+            <h3 className="text-4xl font-extrabold">{team.songName}</h3>
+            <StatusBadge
+              status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
+            />
+          </div>
+          <h4 className="mb-3 text-2xl text-gray-500">{team.songArtist}</h4>
+        </div>
+        <div className="flex items-center justify-center gap-x-2">
+          <Button asChild variant="outline">
+            <Link href={ROUTES.TEAM.EDIT(team.id).url}>편집</Link>
+          </Button>
+          <form action={onDeleteButtonClick}>
+            <Button type="submit" variant="outline">
+              삭제
+            </Button>
+          </form>
+        </div>
       </div>
-      <h4 className="mb-3 text-2xl text-gray-500">{team.songArtist}</h4>
 
       {/* 팀장 */}
       <div className="mb-8 flex items-center justify-start gap-x-4">

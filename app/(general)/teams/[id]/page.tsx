@@ -1,11 +1,14 @@
 "use client"
 
+import { StatusCodes } from "http-status-codes"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
+import Loading from "@/app/_(errors)/Loading"
+import NotFoundPage from "@/app/_(errors)/NotFound"
 import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/teams/[id]/_components/BasicInfo"
 import MemberSessionCard from "@/app/(general)/teams/[id]/_components/MemberSessionCard"
@@ -29,7 +32,7 @@ const TeamDetail = ({ params }: Props) => {
 
   const { id } = params
 
-  const [team, setTeam] = useState<Team>()
+  const [team, setTeam] = useState<Team | null>()
   useEffect(() => {
     if (session.data?.access) {
       fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
@@ -37,17 +40,28 @@ const TeamDetail = ({ params }: Props) => {
         headers: {
           Authorization: `Bearer ${session.data?.access}`
         }
+      }).then(async (res) => {
+        if (!res.ok) {
+          switch (res.status) {
+            case StatusCodes.NOT_FOUND:
+              setTeam(null)
+              break
+            default:
+              router.push(ROUTES.HOME.url)
+          }
+        } else {
+          setTeam(await res.json())
+        }
       })
-        .then((res) => res.json())
-        .then((data) => setTeam(data))
     }
-  }, [id, session.data?.access])
+  }, [id, session.data?.access, router])
 
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
 
-  if (!team) {
-    // TODO: 로딩 화면 구성
-    return <div>Loading...</div>
+  if (team === undefined) {
+    return <Loading />
+  } else if (team === null) {
+    return <NotFoundPage />
   }
 
   const missingMemberSessions = new MemberSessionSet(
@@ -80,7 +94,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo team={team} />
+      <BasicInfo team={team} accessToken={session.data?.access} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">

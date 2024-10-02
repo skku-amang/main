@@ -8,13 +8,13 @@ import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
+import Loading from "@/app/_(errors)/Loading"
 import FirstPage from "@/app/(general)/teams/_components/TeamForm/FirstPage"
 import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
 import SecondPage from "@/app/(general)/teams/_components/TeamForm/SecondPage"
 import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import ThirdPage from "@/app/(general)/teams/_components/TeamForm/ThirdPage"
 import { useToast } from "@/components/hooks/use-toast"
-import Loading from "@/components/Loading"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -23,7 +23,7 @@ import YoutubeVideo from "@/lib/youtube"
 import { Team } from "@/types/Team"
 
 interface TeamCreateFormProps {
-  initialData?: any
+  initialData?: z.infer<typeof basicInfoSchema>
 }
 
 const TeamForm = ({ initialData }: TeamCreateFormProps) => {
