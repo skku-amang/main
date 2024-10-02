@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Switch } from "@/components/ui/switch"
 
-import ROUTES from "../../constants/routes"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import ROUTES from "../../../constants/routes"
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
 
 interface MenuItemProps {
   icon: React.ReactNode

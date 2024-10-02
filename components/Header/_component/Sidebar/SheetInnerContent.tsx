@@ -9,7 +9,7 @@ import ROUTES from "@/constants/routes"
 
 const iconcolor = "text-gray-500"
 
-const SheetContentProps = () => {
+const SheetInnerContent = () => {
 
  return (
 
@@ -64,4 +64,4 @@ const SheetContentProps = () => {
 
 }
 
-export default SheetContentProps
+export default SheetInnerContent 

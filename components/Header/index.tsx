@@ -1,15 +1,13 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { RxHamburgerMenu } from "react-icons/rx";
 
-import { Sheet, SheetContent, SheetTrigger } from '@/components/Header/_component/sheet';
-import SheetContentProps from '@/components/Header/_component/sheetcontetprops';
+import Sidebar from '@/components/Header/_component/Sidebar';
 
 import ROUTES from '../../constants/routes'
 import { cn } from '../../lib/utils'
 import NavLink from '../NavLink'
-import Profile from './Profile'
+import Profile from './_component/Profile'
 
 const Header = ({
   position,
@@ -39,19 +37,14 @@ const Header = ({
         <Link href="/">
           <Image src="/Logo.png" alt="logo" width={50} height={50} />
         </Link>
-        <Sheet>
-        <SheetTrigger><RxHamburgerMenu className="text-white w-9 h-9"/></SheetTrigger>
-          <SheetContent>
-            <SheetContentProps/>
-         </SheetContent>
-        </Sheet>
+        <Sidebar/>
       </nav>
 
       {/* Tablet & Desktop */}
       <nav className="hidden h-full w-full items-center px-10 md:visible md:flex">
         <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
-          <Link href="/">
+          <Link href={ROUTES.HOME.url}>
             <Image src="/Logo.png" alt="logo" width={47} height={47} />
           </Link>
 
