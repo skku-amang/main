@@ -57,7 +57,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
           }
           type="button"
           className={cn(
-            "bg-blue-600 text-white",
+            "bg-secondary text-white",
             form.formState.errors.songYoutubeVideoId?.message &&
               "border-destructive bg-destructive"
           )}
@@ -92,7 +92,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
                 />
                 <Button
                   type="submit"
-                  className="bg-blue-600"
+                  className="bg-secondary"
                   disabled={!!innerForm.formState.errors.songYoutubeVideoId}
                 >
                   Upload
