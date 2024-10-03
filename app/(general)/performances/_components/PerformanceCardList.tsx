@@ -1,10 +1,10 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import React from "react"
 import { CiCirclePlus } from "react-icons/ci"
 
 import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
 import { auth } from "@/auth"
-import Loading from "@/components/Loading"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
@@ -15,9 +15,7 @@ import { Performance } from "@/types/Performance"
 
 const PerformanceList = async () => {
   const session = await auth()
-  if (!session) {
-    return <Loading />
-  }
+  if (!session) redirect(ROUTES.LOGIN.url)
 
   const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
     cache: "no-cache",
