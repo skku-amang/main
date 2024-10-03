@@ -1,7 +1,9 @@
+import { redirect } from "next/navigation"
+
 import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"
 import { auth } from "@/auth"
-import Loading from "@/components/Loading"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
+import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Team } from "@/types/Team"
@@ -13,9 +15,7 @@ import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 // TODO: Pagination에서 1,2,3,4,5 등 추가
 const TeamList = async () => {
   const session = await auth()
-  if (!session) {
-    return <Loading />
-  }
+  if (!session) redirect(ROUTES.LOGIN.url)
 
   const res = await fetchData(API_ENDPOINTS.TEAM.LIST, {
     cache: "no-cache",
