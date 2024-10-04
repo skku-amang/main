@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
+import { CircleAlert } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
 
 import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
@@ -41,7 +41,7 @@ const SecondPage = ({
         <div>
           {/* 설명 */}
           <Description header="세션 정보" className="mb-6">
-            <AiFillExclamationCircle />
+            <CircleAlert />
             곡에 필요한 모든 세션을 체크해주세요
           </Description>
 

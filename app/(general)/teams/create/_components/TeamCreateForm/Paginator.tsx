@@ -1,5 +1,5 @@
+import { ArrowLeft, ArrowRight } from "lucide-react"
 import { GoDot, GoDotFill } from "react-icons/go"
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 
 import { Button } from "@/components/ui/button"
 
@@ -36,7 +36,7 @@ const Paginator = ({
         onClick={onPrevious}
         type="button"
       >
-        <IoIosArrowBack className="me-3" />
+        <ArrowLeft className="me-3" />
         {previousButtonLabel ?? "Back"}
       </Button>
       <div className="flex items-center gap-x-3">
@@ -56,7 +56,7 @@ const Paginator = ({
         type="button"
       >
         {nextButtonLabel ?? "Next"}
-        <IoIosArrowForward className="ms-3" />
+        <ArrowRight className="ms-3" />
       </Button>
     </div>
   )

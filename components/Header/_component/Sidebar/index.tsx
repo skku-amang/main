@@ -1,4 +1,4 @@
-import { RxHamburgerMenu } from "react-icons/rx"
+import { Menu } from "lucide-react"
 
 import {
   Sheet,
@@ -11,7 +11,7 @@ const Sidebar = () => {
   return (
     <Sheet>
       <SheetTrigger>
-        <RxHamburgerMenu className="h-9 w-9 text-white" />
+        <Menu className="h-9 w-9 text-white" />
       </SheetTrigger>
       <SheetContent>
         <SheetInnerContent />
