@@ -2,25 +2,9 @@ import { z } from "zod"
 
 import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 
-function createBlankUserIdArray(length: number): null[] {
+function generateNullUserIdArray(length: number): null[] {
   return Array.from({ length }, () => null)
 }
-
-const thirdPageMemberSessionField = z.record(
-  z.string(),
-  z
-    .array(z.number())
-    .refine(
-      (data) => {
-        // 멤버 중복 체크
-        return new Set<number>(data).size === data.length
-      },
-      {
-        message: "멤버가 중복되었습니다"
-      }
-    )
-    .default([])
-)
 
 export const createDynamicSchema = (
   baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>
@@ -51,23 +35,8 @@ export const createDynamicSchema = (
         session: z.string().default(session).readonly(),
         membersId: z
           .array(z.union([z.number(), z.null()]))
-          .default(createBlankUserIdArray(requiredMemberCount))
+          .default(generateNullUserIdArray(requiredMemberCount))
       })
-      .refine(
-        (data) => {
-          // 멤버 중복 체크
-          const dataWithoutBlankUserId = data.membersId.filter(
-            (memberId) => memberId !== null
-          )
-          return (
-            new Set<number>(dataWithoutBlankUserId).size ===
-            dataWithoutBlankUserId.length
-          )
-        },
-        {
-          message: "멤버가 중복되었습니다"
-        }
-      )
       .optional()
   })
 
@@ -100,50 +69,20 @@ export function getFormDefaultValeus(
   baseSchema: z.infer<typeof memberSessionRequiredBaseSchema>
 ): z.infer<ReturnType<typeof createDynamicSchema>> {
   const formDefaultValues: {
-    [key: string]: { session: string; membersId: number | null[] }
+    [key: string]: { session: string; membersId: (number | null)[] }
   } = {}
 
-  // required === true인 필드에 대해서만
-  const sessionNameRequiredMemberCountMap = new Map<string, number>()
   Object.values(baseSchema).forEach((value) => {
-    if (!value.required) return
-    const requiredMemberCount = sessionNameRequiredMemberCountMap.get(
-      value.session
-    )
-
-    if (requiredMemberCount) {
-      sessionNameRequiredMemberCountMap.set(
-        value.session,
-        requiredMemberCount + 1
-      )
-    } else {
-      sessionNameRequiredMemberCountMap.set(value.session, 1)
+    const { required, session, member, index } = value
+    if (!required) return
+    if (!formDefaultValues[session]) {
+      formDefaultValues[session] = {
+        session,
+        membersId: []
+      }
     }
+    formDefaultValues[session].membersId[index - 1] = member
   })
 
-  sessionNameRequiredMemberCountMap.forEach((requiredMemberCount, session) => {
-    formDefaultValues[session] = {
-      session,
-      membersId: createBlankUserIdArray(requiredMemberCount)
-    }
-    // z
-    //   .object({
-    //     session: z.string().default(session).readonly(),
-    //     membersId: z
-    //       .array(z.number().default(BLANK_USER_ID))
-    //       .default(createBlankUserIdArray(requiredMemberCount))
-    //   })
-    //   .refine(
-    //     (data) => {
-    //       // 멤버 중복 체크
-    //       return new Set<number>(data.membersId).size === data.membersId.length
-    //     },
-    //     {
-    //       message: "멤버가 중복되었습니다"
-    //     }
-    //   )
-    //   .optional()
-  })
-  console.log("formDefaultValues:", formDefaultValues)
   return formDefaultValues
 }

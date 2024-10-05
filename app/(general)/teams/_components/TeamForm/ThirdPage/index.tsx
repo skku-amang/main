@@ -70,10 +70,9 @@ const ThirdPage = ({
             {Object.entries(schema._def.shape()).map(([key, s]) => {
               // TODO: 타입 설정해야 함
               let a = s as any
-              const defaultMembers = a
-                ._def!.innerType!._def.schema._def.shape()
+              const defaultMembers = a._def.innerType._def
+                .shape()
                 .membersId._def.defaultValue()
-              console.log("defaultMembers:", defaultMembers)
               return Array.from({
                 length: defaultMembers.length
               }).map((_, index) => (

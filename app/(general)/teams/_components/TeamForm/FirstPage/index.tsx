@@ -36,13 +36,15 @@ interface FirstPageProps {
   // eslint-disable-next-line no-unused-vars
   onInvalid: (formData: z.infer<any>) => void
   accessToken?: string
+  onPrevious?: () => void
 }
 
 const FirstPage = ({
   form,
   onValid,
   onInvalid,
-  accessToken
+  accessToken,
+  onPrevious
 }: FirstPageProps) => {
   const [performances, setPerformances] = useState<Performance[]>([])
   useEffect(() => {
@@ -258,6 +260,7 @@ const FirstPage = ({
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={1}
+          onPrevious={onPrevious}
         />
       </form>
     </Form>

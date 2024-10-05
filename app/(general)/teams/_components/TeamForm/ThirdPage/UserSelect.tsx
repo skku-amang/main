@@ -29,9 +29,17 @@ interface UserSelectProps {
 
 const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
   const hasError = !!form.formState.errors[fieldName]
+  let initialMemberIdWithName = ""
+  const userId = form.getValues(fieldName)
+  if (userId) {
+    const userName = users.find((user) => user.id === userId)?.name
+    initialMemberIdWithName = `${userId}-${userName}`
+  }
 
   const [open, setOpen] = useState(false)
-  const [memberIdWithName, setMemberIdWithName] = useState("") // {id}-{name}
+  const [memberIdWithName, setMemberIdWithName] = useState(
+    initialMemberIdWithName
+  ) // {id}-{name}
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

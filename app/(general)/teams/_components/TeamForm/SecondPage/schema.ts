@@ -1,23 +1,21 @@
 import { z } from "zod"
 
-import { BLANK_USER_ID } from "@/types/User"
-
 export const memberSessionRequiredField = ({
   session,
   index,
   required = false,
-  member = BLANK_USER_ID
+  member = null
 }: {
   session: string
   index: number
   required?: boolean
-  member?: number
+  member?: number | null
 }) =>
   z.object({
     session: z.string().default(session).readonly(),
     index: z.number({ required_error: "필수 항목" }).default(index).readonly(),
     required: z.boolean({ required_error: "필수 항목" }).default(required),
-    member: z.number().default(member).optional()
+    member: z.union([z.number(), z.null()]).default(member ?? null)
   })
 
 export const memberSessionRequiredBaseSchema = z.object({

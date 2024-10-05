@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { StatusCodes } from "http-status-codes"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -69,71 +69,85 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
       보컬1: {
         session: "보컬",
         required: false,
+        member: null,
         index: 1
       },
       보컬2: {
         session: "보컬",
         required: false,
+        member: null,
         index: 2
       },
       보컬3: {
         session: "보컬",
         required: false,
+        member: null,
         index: 3
       },
       기타1: {
         session: "기타",
         required: false,
+        member: null,
         index: 1
       },
       기타2: {
         session: "기타",
         required: false,
+        member: null,
         index: 2
       },
       기타3: {
         session: "기타",
         required: false,
+        member: null,
         index: 3
       },
       베이스1: {
         session: "베이스",
         required: false,
+        member: null,
         index: 1
       },
       베이스2: {
         session: "베이스",
         required: false,
+        member: null,
         index: 2
       },
       드럼: {
         session: "드럼",
         required: false,
+        member: null,
         index: 1
       },
       신디1: {
         session: "신디",
         required: false,
+        member: null,
         index: 1
       },
       신디2: {
         session: "신디",
         required: false,
+        member: null,
         index: 2
       },
       신디3: {
         session: "신디",
         required: false,
+        member: null,
         index: 3
       },
       현악기: {
         session: "현악기",
         required: false,
+        member: null,
         index: 1
       },
       관악기: {
         session: "관악기",
         required: false,
+        member: null,
         index: 1
       }
     }
@@ -150,9 +164,12 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
             fieldName as keyof z.infer<typeof memberSessionRequiredBaseSchema>
           ]
         fieldKey.required = true
-        fieldKey.member = member?.id
+        if (member) {
+          fieldKey.member = member.id
+        }
       })
     })
+    console.log("defaultValues:", defaultValues)
     return defaultValues
   }
   const secondPageForm = useForm<
@@ -236,11 +253,6 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
     console.warn("FormInvalid:", errors)
   }
 
-  const w = secondPageForm.watch()
-  useEffect(() => {
-    console.log(w)
-  }, [w])
-
   if (session.status === "loading") return <Loading />
   if (!session.data) router.push(ROUTES.HOME.url)
 
@@ -252,6 +264,11 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
           onValid={onFirstPageValid}
           onInvalid={onFirstPageInvalid}
           accessToken={session.data?.access}
+          onPrevious={
+            initialData
+              ? () => router.push(ROUTES.TEAM.DETAIL(initialData.id).url)
+              : undefined
+          }
         />
       )}
       {currentPage === 2 && (

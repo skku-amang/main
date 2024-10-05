@@ -44,6 +44,12 @@ export type MemberSession = {
   session: SessionName
   members: (User | null)[]
 }
+export type MemberSessionMembership = {
+  id: number
+  session: string
+  member: User
+  index: number
+}
 export const SessionOrder = [
   "보컬",
   "기타",

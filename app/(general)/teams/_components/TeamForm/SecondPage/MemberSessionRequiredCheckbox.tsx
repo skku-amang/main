@@ -5,7 +5,6 @@ import z from "zod"
 import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { BLANK_USER_ID } from "@/types/User"
 
 export interface CheckboxFieldProps {
   secondPageForm: UseFormReturn<z.infer<typeof memberSessionRequiredBaseSchema>>
@@ -31,8 +30,7 @@ const MemberSessionRequiredCheckbox = ({
         className="h-5 w-5"
         onCheckedChange={(e) => {
           secondPageForm.setValue(requiredFieldName, !!e)
-          secondPageForm.setValue(memberFieldName, BLANK_USER_ID)
-          console.log("secondPageForm:", secondPageForm.getValues())
+          secondPageForm.setValue(memberFieldName, null)
           setChecked(!!e)
         }}
         checked={checked}
