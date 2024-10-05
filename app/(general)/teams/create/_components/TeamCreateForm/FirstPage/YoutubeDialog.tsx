@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Youtube } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { FaYoutube } from "react-icons/fa"
 import { z } from "zod"
 
 import basicInfoSchema, {
@@ -64,7 +64,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
           onClick={() => setOpen(true)}
         >
           <div className="flex items-center justify-center gap-x-1">
-            <FaYoutube size={24} />
+            <Youtube size={24} />
             Youtube Embed
           </div>
         </Button>

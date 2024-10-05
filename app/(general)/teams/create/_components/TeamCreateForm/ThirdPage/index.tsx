@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CircleAlert } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
-import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
 
 import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
@@ -63,7 +63,7 @@ const ThirdPage = ({
     <Form {...form}>
       <form>
         <Description header="팀원 정보" className="mb-6">
-          <AiFillExclamationCircle />
+          <CircleAlert />
           이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 후 멤버를
           선택해주세요
           <br />

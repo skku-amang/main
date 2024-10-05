@@ -1,6 +1,6 @@
+import { CircleAlert } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { AiFillExclamationCircle } from "react-icons/ai"
 import { z } from "zod"
 
 import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
@@ -64,7 +64,7 @@ const FirstPage = ({
         <div>
           {/* 설명 */}
           <Description header="공연 및 곡 정보" className="mb-6">
-            <AiFillExclamationCircle />
+            <CircleAlert />
             <HoverCard>
               <HoverCardTrigger>
                 입력 시 주의사항을 확인해주세요
@@ -223,7 +223,7 @@ const FirstPage = ({
           >
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center justify-between gap-x-2">
-                <AiFillExclamationCircle />
+                <CircleAlert />
                 자유롭게 팀을 홍보해주세요
               </div>
 

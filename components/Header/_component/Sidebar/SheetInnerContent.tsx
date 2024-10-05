@@ -1,7 +1,13 @@
-import { FileText, ImageIcon, LogIn, Megaphone, Music4 } from "lucide-react"
+import {
+  FileText,
+  ImageIcon,
+  Instagram,
+  LogIn,
+  Megaphone,
+  Music4,
+  Youtube
+} from "lucide-react"
 import Link from "next/link"
-import { FaInstagram } from "react-icons/fa"
-import { RiYoutubeLine } from "react-icons/ri"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
@@ -67,11 +73,11 @@ const SheetInnerContent = () => {
           LINKS
         </div>
         <div className="flex h-[41.4%] w-full items-center text-gray-500">
-          <RiYoutubeLine size={30} className={iconcolor} />
+          <Youtube size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">YouTube</div>
         </div>
         <div className="flex h-[41.4%] w-full items-center text-gray-500">
-          <FaInstagram size={30} className={iconcolor} />
+          <Instagram size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">
             Instagram
           </div>
