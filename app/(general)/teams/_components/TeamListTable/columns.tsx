@@ -83,19 +83,19 @@ export const columns: ColumnDef<TeamColumn>[] = [
     id: "requiredSessions",
     header: "필요 세션",
     cell: ({ row }) => {
-      const memberSessions = row.original.memberSessions
-      const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
-      const requiredMembers =
-        memberSessionsSet.getRequiredSessionsWithMissingUserCount()
-
       return (
         <div className="flex justify-start gap-1 text-right font-medium">
-          {Array.from(requiredMembers.entries()).map(
-            ([session, requiredMemberCount]) => {
-              if (requiredMemberCount === 0) return
-              return <SessionBadge key={session} session={session} />
-            }
-          )}
+          {row.original.memberSessions?.map((ms) => {
+            return ms.members.map((member, index) => {
+              if (member !== null) return null
+              return (
+                <SessionBadge
+                  key={`${ms.session}-${index}`}
+                  session={`${ms.session}${index + 1}`}
+                />
+              )
+            })
+          })}
         </div>
       )
     }

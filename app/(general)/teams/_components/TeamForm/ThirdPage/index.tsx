@@ -25,13 +25,6 @@ interface ThirdPageProps {
   firstPageForm: ReturnType<typeof useForm<any>>
 }
 
-const requiredMemberCount = (shape: any) => {
-  return shape._def.innerType._def.schema._def
-    .shape()
-    .requiredMemberCount.default()
-    ._def.innerType._def.defaultValue()
-}
-
 const ThirdPage = ({
   schemaMetadata,
   onValid,
@@ -54,9 +47,10 @@ const ThirdPage = ({
       .then((users) => setMembers(users))
   }, [session.data?.access])
 
+  const defaultValues = getFormDefaultValeus(schemaMetadata)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: getFormDefaultValeus(schemaMetadata)
+    defaultValues
   })
 
   return (
@@ -74,25 +68,34 @@ const ThirdPage = ({
         <table className="table-auto border-separate border-spacing-5">
           <tbody>
             {Object.entries(schema._def.shape()).map(([key, s]) => {
-              return Array.from({ length: requiredMemberCount(s) }).map(
-                (_, index) => (
-                  <tr key={`${key}-${index}`} className="my-3">
-                    <td className="w-32">
-                      {key}
-                      {index + 1}
-                    </td>
-                    <td>
-                      <UserSelect
-                        key={`${key}-${index}`}
-                        users={users}
-                        form={form}
-                        fieldName={`${key}.members`}
-                        fieldArrayIndex={index}
-                      />
-                    </td>
-                  </tr>
-                )
-              )
+              // TODO: 타입 설정해야 함
+              let a = s as any
+              const defaultMembers = a
+                ._def!.innerType!._def.schema._def.shape()
+                .membersId._def.defaultValue()
+              console.log("defaultMembers:", defaultMembers)
+              return Array.from({
+                length: defaultMembers.length
+              }).map((_, index) => (
+                <tr key={`${key}-${index}`} className="my-3">
+                  <td className="w-32">
+                    {key}
+                    {index + 1}
+                  </td>
+                  <td>
+                    <UserSelect
+                      key={`${key}-${index}`}
+                      users={users}
+                      form={form}
+                      fieldName={
+                        `${key}.membersId.${index}` as keyof ReturnType<
+                          typeof createDynamicSchema
+                        >
+                      }
+                    />
+                  </td>
+                </tr>
+              ))
             })}
           </tbody>
         </table>

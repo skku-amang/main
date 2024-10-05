@@ -1,6 +1,5 @@
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
-import { UseFormReturn } from "react-hook-form"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -20,24 +19,19 @@ import {
 import { cn } from "@/lib/utils"
 import { User } from "@/types/User"
 
+import { createDynamicSchema } from "./schema"
+
 interface UserSelectProps {
   users: User[]
-  form: UseFormReturn<any>
-  fieldName: string
-  fieldArrayIndex: number
+  form: any
+  fieldName: keyof ReturnType<typeof createDynamicSchema>
 }
 
-const UserSelect = ({
-  users,
-  form,
-  fieldName,
-  fieldArrayIndex
-}: UserSelectProps) => {
-  const fieldNameWithIndex = `${fieldName}.${fieldArrayIndex}`
-  const hasError = !!form.formState.errors[fieldNameWithIndex]
+const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
+  const hasError = !!form.formState.errors[fieldName]
 
   const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
+  const [memberIdWithName, setMemberIdWithName] = useState("") // {id}-{name}
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -51,9 +45,10 @@ const UserSelect = ({
             hasError && "border-destructive"
           )}
         >
-          {value
-            ? users.find((user) => user.id.toString() === value.split("-")[0])
-                ?.name
+          {memberIdWithName
+            ? users.find(
+                (user) => user.id.toString() === memberIdWithName.split("-")[0]
+              )?.name
             : "미정"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -68,18 +63,31 @@ const UserSelect = ({
                 <CommandItem
                   key={user.id}
                   value={`${user.id}-${user.name}`}
-                  onSelect={(currentValue) => {
-                    const parsedValue = currentValue.split("-")[0]
-                    form.setValue(fieldNameWithIndex, +parsedValue)
-                    form.clearErrors("memberSessions")
-                    setValue(parsedValue)
+                  onSelect={(currentValue: string) => {
+                    const [userId, userName] = currentValue.split("-")
+                    form.setValue(fieldName, +userId as any)
+                    // const previousMembers = form.getValues(
+                    //   fieldName
+                    // ) as number[]
+                    // console.log("fieldName:", fieldName)
+                    // console.log("form:", form.getValues("보컬.membersId.0"))
+                    // console.log("previousMembers:", previousMembers)
+                    // const parsedValue = currentValue.split("-")[0]
+                    // form.setValue(fieldName, [
+                    //   ...previousMembers,
+                    //   +parsedValue
+                    // ])
+                    form.clearErrors(fieldName)
+                    setMemberIdWithName(`${userId}-${userName}`)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === user.id.toString() ? "opacity-100" : "opacity-0"
+                      memberIdWithName === user.id.toString()
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
                   <div className="flex items-center gap-x-5">

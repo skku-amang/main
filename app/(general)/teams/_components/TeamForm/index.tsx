@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { StatusCodes } from "http-status-codes"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -12,14 +12,16 @@ import Loading from "@/app/_(errors)/Loading"
 import FirstPage from "@/app/(general)/teams/_components/TeamForm/FirstPage"
 import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
 import SecondPage from "@/app/(general)/teams/_components/TeamForm/SecondPage"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
+import {
+  memberSessionRequiredBaseSchema,
+  memberSessionRequiredField
+} from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import ThirdPage from "@/app/(general)/teams/_components/TeamForm/ThirdPage"
 import { useToast } from "@/components/hooks/use-toast"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
+import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
-import YoutubeVideo from "@/lib/youtube"
 import { Team } from "@/types/Team"
 
 interface TeamCreateFormProps {
@@ -60,37 +62,113 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   }
 
   // Second Page
+  function constructDefaultValues(initialData?: Team) {
+    let defaultValues: {
+      [key: string]: z.infer<ReturnType<typeof memberSessionRequiredField>>
+    } = {
+      보컬1: {
+        session: "보컬",
+        required: false,
+        index: 1
+      },
+      보컬2: {
+        session: "보컬",
+        required: false,
+        index: 2
+      },
+      보컬3: {
+        session: "보컬",
+        required: false,
+        index: 3
+      },
+      기타1: {
+        session: "기타",
+        required: false,
+        index: 1
+      },
+      기타2: {
+        session: "기타",
+        required: false,
+        index: 2
+      },
+      기타3: {
+        session: "기타",
+        required: false,
+        index: 3
+      },
+      베이스1: {
+        session: "베이스",
+        required: false,
+        index: 1
+      },
+      베이스2: {
+        session: "베이스",
+        required: false,
+        index: 2
+      },
+      드럼: {
+        session: "드럼",
+        required: false,
+        index: 1
+      },
+      신디1: {
+        session: "신디",
+        required: false,
+        index: 1
+      },
+      신디2: {
+        session: "신디",
+        required: false,
+        index: 2
+      },
+      신디3: {
+        session: "신디",
+        required: false,
+        index: 3
+      },
+      현악기: {
+        session: "현악기",
+        required: false,
+        index: 1
+      },
+      관악기: {
+        session: "관악기",
+        required: false,
+        index: 1
+      }
+    }
+
+    // Create: 디폴트 값 없음
+    if (!initialData) return defaultValues
+
+    // Edit: 디폴트 값 존재
+    initialData.memberSessions?.forEach((ms) => {
+      ms.members.forEach((member, index) => {
+        const fieldName = `${ms.session}${index + 1}`
+        let fieldKey =
+          defaultValues[
+            fieldName as keyof z.infer<typeof memberSessionRequiredBaseSchema>
+          ]
+        fieldKey.required = true
+        fieldKey.member = member?.id
+      })
+    })
+    return defaultValues
+  }
   const secondPageForm = useForm<
     z.infer<typeof memberSessionRequiredBaseSchema>
   >({
     resolver: zodResolver(memberSessionRequiredBaseSchema),
-    defaultValues: {
-      보컬1: { required: false },
-      보컬2: { required: false },
-      보컬3: { required: false },
-      기타1: { required: false },
-      기타2: { required: false },
-      기타3: { required: false },
-      베이스1: { required: false },
-      베이스2: { required: false },
-      드럼: { required: false },
-      신디1: { required: false },
-      신디2: { required: false },
-      신디3: { required: false },
-      현악기: { required: false },
-      관악기: { required: false }
-    }
+    defaultValues: constructDefaultValues(initialData)
   })
   function onSecondPageValid(
     formData: z.infer<typeof memberSessionRequiredBaseSchema>
   ) {
-    console.log(formData)
     const result = memberSessionRequiredBaseSchema.safeParse(formData)
     if (!result.success) {
       // console.log(result.error)
       return
     }
-    console.log(result.data)
     setThirdPageSchemaMetadata(result.data)
     setCurrentPage(3)
   }
@@ -104,19 +182,20 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   const [thirdPageSchemaMetadata, setThirdPageSchemaMetadata] =
     useState<z.infer<any>>()
   async function onThirdPageValid(secondPageFormData: z.infer<any>) {
-    const youtubeVideoId = firstPageForm.getValues("songYoutubeVideoId")
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       songArtist: firstPageForm.getValues("songArtist"),
       memberSessions: Object.values(secondPageFormData),
       description: firstPageForm.getValues("description"),
-      songYoutubeVideoId:
-        youtubeVideoId && YoutubeVideo.getValidVideoIdOrNull(youtubeVideoId),
+      songYoutubeVideoId: firstPageForm.getValues("songYoutubeVideoId"),
       posterImage: firstPageForm.getValues("posterImage")
     }
 
-    const res = await fetchData(API_ENDPOINTS.TEAM.CREATE, {
+    const endpoint = initialData?.id
+      ? API_ENDPOINTS.TEAM.UPDATE(initialData.id)
+      : API_ENDPOINTS.TEAM.CREATE
+    const res = await fetchData(endpoint as ApiEndpoint, {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${session.data?.access}`
@@ -156,6 +235,11 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
   }
+
+  const w = secondPageForm.watch()
+  useEffect(() => {
+    console.log(w)
+  }, [w])
 
   if (session.status === "loading") return <Loading />
   if (!session.data) router.push(ROUTES.HOME.url)

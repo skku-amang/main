@@ -1,6 +1,6 @@
+import Loading from "@/app/_(errors)/Loading"
 import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"
 import { auth } from "@/auth"
-import Loading from "@/app/_(errors)/Loading"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"

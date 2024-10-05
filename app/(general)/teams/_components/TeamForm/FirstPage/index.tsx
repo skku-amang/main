@@ -94,7 +94,7 @@ const FirstPage = ({
                   form.setValue("performanceId", +e)
                   form.clearErrors("performanceId")
                 }}
-                value={form.getValues("performanceId").toString()}
+                value={form.getValues("performanceId")?.toString()}
               >
                 <SelectTrigger
                   id="performanceIdInput"

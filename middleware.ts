@@ -6,7 +6,6 @@ import ROUTES from "@/constants/routes"
 
 export async function middleware(req: NextRequest) {
   const session = await auth()
-  console.log(session)
 
   // If the user is not logged in and is trying to access a protected route
   if (!session) {

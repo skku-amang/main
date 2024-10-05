@@ -120,16 +120,19 @@ const TeamDetail = ({ params }: Props) => {
         <SessionSetCard header="마감된 세션" className="col-span-2">
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             {sessionsWithAtleastOneMember.map((ms) =>
-              ms.members.map((member, index) => (
-                <MemberSessionCard
-                  key={member.id}
-                  teamId={team.id}
-                  session={ms.session}
-                  sessionIndex={index + 1}
-                  user={member}
-                  onUnapplySuccess={setTeam}
-                />
-              ))
+              ms.members.map((member, index) => {
+                if (member === null) return
+                return (
+                  <MemberSessionCard
+                    key={`${ms.session}-${index}`}
+                    teamId={team.id}
+                    session={ms.session}
+                    sessionIndex={index + 1}
+                    user={member}
+                    onUnapplySuccess={setTeam}
+                  />
+                )
+              })
             )}
           </div>
         </SessionSetCard>
@@ -147,15 +150,21 @@ const TeamDetail = ({ params }: Props) => {
             </li>
           </ul>
           <div className="flex items-center justify-start gap-x-4">
-            {missingMemberSessions.length > 0 ? (
-              missingMemberSessions.map((ms) => (
-                <ApplyButton
-                  key={ms.session}
-                  teamId={team.id}
-                  session={ms.session}
-                  onApplySuccess={setTeam}
-                />
-              ))
+            {team.memberSessions && team.memberSessions?.length > 0 ? (
+              team.memberSessions?.map((ms) =>
+                ms.members.map(
+                  (member, index) =>
+                    member === null && (
+                      <ApplyButton
+                        key={`${ms.session}-${index}`}
+                        teamId={team.id}
+                        session={ms.session}
+                        memberSessionIndex={index + 1}
+                        onApplySuccess={setTeam}
+                      />
+                    )
+                )
+              )
             ) : (
               <div>마감</div>
             )}

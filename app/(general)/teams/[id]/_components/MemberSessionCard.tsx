@@ -13,7 +13,7 @@ interface MemberSessionCardProps {
   teamId: number
   session: SessionName
   sessionIndex: number
-  user?: User
+  user: User
   // eslint-disable-next-line no-unused-vars
   onUnapplySuccess: (team: Team) => void
 }
@@ -36,7 +36,7 @@ const MemberSessionCard = ({
     const res = await fetchData(
       API_ENDPOINTS.TEAM.UNAPPLY(teamId) as ApiEndpoint,
       {
-        body: JSON.stringify({ session }),
+        body: JSON.stringify({ session, index: sessionIndex }),
         cache: "no-store",
         headers: {
           Authorization: `Bearer ${authSession.data?.access}`
@@ -61,7 +61,6 @@ const MemberSessionCard = ({
     onUnapplySuccess(data)
   }
 
-  if (!user) return
   return (
     <div>
       {/* 세션 라벨 */}

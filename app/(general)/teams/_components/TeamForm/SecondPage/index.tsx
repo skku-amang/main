@@ -55,7 +55,7 @@ const SecondPage = ({
                     {fieldNames.map((fieldName) => (
                       <td key={`${label}-${fieldName}`} className="p-4">
                         <MemberSessionRequiredCheckbox
-                          firstPageForm={form}
+                          secondPageForm={form}
                           fieldName={fieldName}
                           label={fieldName}
                         />
