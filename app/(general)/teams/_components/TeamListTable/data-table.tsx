@@ -11,10 +11,9 @@ import {
   SortingState,
   useReactTable
 } from "@tanstack/react-table"
+import { CirclePlus, Filter } from "lucide-react"
 import Link from "next/link"
 import { useReducer, useState } from "react"
-import { CiCirclePlus } from "react-icons/ci"
-import { TbFilter } from "react-icons/tb"
 
 import TeamListTableFilter, {
   FilterValue
@@ -295,7 +294,7 @@ export function TeamListDataTable<TValue>({
           {/* 생성 버튼 */}
           <Button asChild className="h-8 rounded-md py-1">
             <Link href={ROUTES.TEAM.CREATE.url}>
-              <CiCirclePlus size={22} />
+              <CirclePlus size={22} />
               &nbsp;Create
             </Link>
           </Button>
@@ -310,7 +309,7 @@ export function TeamListDataTable<TValue>({
                 variant={filterOpen ? "outline" : undefined}
               >
                 <div>
-                  <TbFilter size={22} />
+                  <Filter size={22} />
                   &nbsp;Filter
                 </div>
               </Button>

@@ -1,13 +1,15 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import {
+  ArrowUpDown,
+  EllipsisVertical,
+  Paperclip,
+  Pencil,
+  Trash
+} from "lucide-react"
 import Link from "next/link"
 import React from "react"
-import { BsThreeDotsVertical } from "react-icons/bs"
-import { FiPaperclip } from "react-icons/fi"
-import { GoPencil } from "react-icons/go"
-import { GoTrash } from "react-icons/go"
 
 import SessionBadge from "@/components/SessionBadge"
 import StatusBadge from "@/components/StatusBadge"
@@ -118,7 +120,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
       if (songYoutubeVideoId) {
         return (
           <Link href={songYoutubeVideoId}>
-            <FiPaperclip size={24} />
+            <Paperclip size={24} />
           </Link>
         )
       }
@@ -136,7 +138,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
               className="flex w-full items-center justify-center p-0"
             >
               <span className="sr-only">Open menu</span>
-              <BsThreeDotsVertical className="h-4 w-4" />
+              <EllipsisVertical className="h-5 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-none text-sm">
@@ -145,7 +147,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
                 href={ROUTES.TEAM.EDIT(row.original.id).url}
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               >
-                <GoPencil />
+                <Pencil />
                 편집하기
               </Link>
             </DropdownMenuItem>
@@ -154,7 +156,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
                 href="#" // TODO: 삭제 로직 추가
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               >
-                <GoTrash />
+                <Trash />
                 삭제하기
               </Link>
             </DropdownMenuItem>

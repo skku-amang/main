@@ -1,15 +1,10 @@
 "use client"
 
+import { LoaderCircle, LogOut, Moon, Settings, User, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import React from "react"
-import { CgSpinner } from "react-icons/cg"
-import { CiSettings } from "react-icons/ci"
-import { HiOutlineUserGroup } from "react-icons/hi2"
-import { IoIosLogOut } from "react-icons/io"
-import { IoPersonOutline } from "react-icons/io5"
-import { MdOutlineDarkMode } from "react-icons/md"
 
 import {
   DropdownMenu,
@@ -21,8 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Switch } from "@/components/ui/switch"
 
-import ROUTES from "../../constants/routes"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import ROUTES from "../../../constants/routes"
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
 
 interface MenuItemProps {
   icon: React.ReactNode
@@ -60,7 +55,7 @@ function Profile() {
     return (
       <>
         {status === "loading" ? (
-          <CgSpinner className="animate-spin text-white" size={30} />
+          <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
           <div className="flex justify-center gap-x-5 font-bold text-white">
             <Link href={ROUTES.LOGIN.url}>로그인</Link>|
@@ -96,24 +91,24 @@ function Profile() {
 
         <DropdownMenuSeparator />
         <MenuItem
-          icon={<IoPersonOutline size={iconSize} />}
+          icon={<User size={iconSize} />}
           href={ROUTES.PROFILE.INDEX.url}
         >
           내 프로필
         </MenuItem>
-        <MenuItem icon={<HiOutlineUserGroup size={iconSize} />} href="#">
+        <MenuItem icon={<Users size={iconSize} />} href="#">
           참여 중인 팀
         </MenuItem>
 
         <DropdownMenuSeparator />
-        <MenuItem icon={<CiSettings size={iconSize} />} href="#">
+        <MenuItem icon={<Settings size={iconSize} />} href="#">
           설정
         </MenuItem>
         <DropdownMenuItem
           className="flex items-center justify-start gap-x-3 hover:cursor-pointer"
           onSelect={(e) => e.preventDefault()}
         >
-          <MdOutlineDarkMode size={iconSize} />
+          <Moon size={iconSize} />
           <Switch
             onCheckedChange={(v) => {
               localStorage.setItem("theme", v ? "dark" : "light")
@@ -128,7 +123,7 @@ function Profile() {
           onSelect={() => signOut()}
           className="flex h-full w-full items-center justify-start gap-x-3 p-2 hover:cursor-pointer"
         >
-          <IoIosLogOut size={iconSize} />
+          <LogOut size={iconSize} />
           로그아웃
         </DropdownMenuItem>
       </DropdownMenuContent>

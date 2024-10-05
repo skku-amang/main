@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Youtube } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { FaYoutube } from "react-icons/fa"
 import { z } from "zod"
 
 import basicInfoSchema, {
@@ -62,14 +62,14 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
           }
           type="button"
           className={cn(
-            "bg-blue-600 text-white",
+            "bg-secondary text-white",
             form.formState.errors.songYoutubeVideoId?.message &&
               "border-destructive bg-destructive"
           )}
           onClick={() => setOpen(true)}
         >
           <div className="flex items-center justify-center gap-x-1">
-            <FaYoutube size={24} />
+            <Youtube size={24} />
             Youtube Embed
           </div>
         </Button>
@@ -97,7 +97,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
                 />
                 <Button
                   type="submit"
-                  className="bg-blue-600"
+                  className="bg-secondary"
                   disabled={!!innerForm.formState.errors.songYoutubeVideoId}
                 >
                   Upload
