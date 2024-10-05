@@ -65,7 +65,7 @@ const MemberSessionCard = ({
     <div>
       {/* 세션 라벨 */}
       <div className="flex select-none items-center justify-center">
-        <div className="rounded-t-md bg-secondary px-2 py-1 text-sm font-semibold">
+        <div className="rounded-t-md bg-slate-200 px-2 py-1 text-sm font-semibold">
           {session}
           {sessionIndex}
         </div>
@@ -73,7 +73,7 @@ const MemberSessionCard = ({
       </div>
 
       {/* 유저 정보 */}
-      <div className="flex items-center justify-start gap-x-8 rounded-lg border-2 border-secondary px-8 py-2">
+      <div className="flex items-center justify-start gap-x-8 rounded-lg rounded-tl-none border border-slate-200 px-8 py-2">
         {/* 아바타 */}
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -85,7 +85,7 @@ const MemberSessionCard = ({
           <div>
             {user.generation?.order}기 {user.name}
           </div>
-          <div className="text-sm text-gray-400"># {user.nickname}</div>
+          <div className="text-sm text-gray-400">#{user.nickname}</div>
 
           {/* 탈퇴 버튼 */}
           {user.id.toString() === authSession.data?.id && (

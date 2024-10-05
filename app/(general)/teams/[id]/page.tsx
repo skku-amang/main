@@ -64,9 +64,6 @@ const TeamDetail = ({ params }: Props) => {
     return <NotFoundPage />
   }
 
-  const missingMemberSessions = new MemberSessionSet(
-    team.memberSessions
-  ).getSessionsWithMissingMembers()
   const sessionsWithAtleastOneMember = new MemberSessionSet(
     team.memberSessions
   ).getSessionsWithAtleastOneMember()
@@ -109,9 +106,17 @@ const TeamDetail = ({ params }: Props) => {
                     SessionOrder.indexOf(b.session)
                   )
                 })
-                .map((ms) => (
-                  <SessionBadge key={ms.session} session={ms.session} />
-                ))}
+                .map((ms) =>
+                  ms.members.map((_, index) => {
+                    const sessionWithIndex = `${ms.session}${index + 1}`
+                    return (
+                      <SessionBadge
+                        key={sessionWithIndex}
+                        session={sessionWithIndex}
+                      />
+                    )
+                  })
+                )}
             </div>
           </SessionSetCard>
         )}

@@ -1,4 +1,3 @@
-import Loading from "@/app/_(errors)/Loading"
 import { redirect } from "next/navigation"
 
 import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"
@@ -12,8 +11,6 @@ import { Team } from "@/types/Team"
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 
-// TODO: 검색 기준을 곡명이 아니라 모든 것으로 확장
-// TODO: Pagination에서 1,2,3,4,5 등 추가
 const TeamList = async () => {
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN.url)
@@ -25,6 +22,7 @@ const TeamList = async () => {
     }
   })
 
+  const TEMPORARY_PERFORMANCE_ID = 1 // TODO: performanceId 받아와야 함
   const data = (await res.json()) as ListResponse<Team>
   const teams = data.map((team) => ({
     id: team.id,
@@ -45,7 +43,9 @@ const TeamList = async () => {
         </h2>
 
         {/* 연관된 공연 목록 */}
-        <RelatedPerformanceList />
+        <RelatedPerformanceList
+          currentPerformanceId={TEMPORARY_PERFORMANCE_ID}
+        />
       </div>
 
       {/* 팀 목록 테이블 */}
