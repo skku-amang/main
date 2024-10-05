@@ -2,23 +2,26 @@ import { useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import z from "zod"
 
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 
 export interface CheckboxFieldProps {
-  firstPageForm: UseFormReturn<z.infer<typeof memberSessionRequiredBaseSchema>>
+  secondPageForm: UseFormReturn<z.infer<typeof memberSessionRequiredBaseSchema>>
   fieldName: string
   label: string
 }
 
 const MemberSessionRequiredCheckbox = ({
-  firstPageForm,
+  secondPageForm,
   fieldName,
   label
 }: CheckboxFieldProps) => {
   const requiredFieldName = `${fieldName}.required` as any
-  const [checked, setChecked] = useState<boolean>()
+  const memberFieldName = `${fieldName}.member` as any
+  const [checked, setChecked] = useState<boolean>(
+    secondPageForm.getValues(requiredFieldName)
+  )
 
   return (
     <div className="flex items-center gap-x-2">
@@ -26,7 +29,8 @@ const MemberSessionRequiredCheckbox = ({
         id={requiredFieldName}
         className="h-5 w-5"
         onCheckedChange={(e) => {
-          firstPageForm.setValue(requiredFieldName, !!e)
+          secondPageForm.setValue(requiredFieldName, !!e)
+          secondPageForm.setValue(memberFieldName, null)
           setChecked(!!e)
         }}
         checked={checked}

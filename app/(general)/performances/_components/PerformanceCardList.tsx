@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import React from "react"
 import { CiCirclePlus } from "react-icons/ci"
 
+import Loading from "@/app/_(errors)/Loading"
 import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
 import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
@@ -15,8 +15,9 @@ import { Performance } from "@/types/Performance"
 
 const PerformanceList = async () => {
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN.url)
-
+  if (!session) {
+    return <Loading />
+  }
   const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
     cache: "no-cache",
     credentials: "include",
@@ -25,7 +26,6 @@ const PerformanceList = async () => {
     }
   })
   const performances = (await res.json()) as ListResponse<Performance>
-
   return (
     <div className="mb-10">
       {/* 도구 모음 */}
@@ -34,7 +34,6 @@ const PerformanceList = async () => {
           <Input className="w-72" />
           <Button>검색</Button>
         </div>
-
         <Button asChild className="flex items-center">
           <Link href={ROUTES.PERFORMANCE.CREATE.url}>
             <CiCirclePlus size={20} />
@@ -42,7 +41,6 @@ const PerformanceList = async () => {
           </Link>
         </Button>
       </div>
-
       {/* 공연 카드 목록 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {performances.map((p) => (
@@ -62,5 +60,4 @@ const PerformanceList = async () => {
     </div>
   )
 }
-
 export default PerformanceList

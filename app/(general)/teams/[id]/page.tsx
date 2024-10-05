@@ -1,11 +1,14 @@
 "use client"
 
+import { StatusCodes } from "http-status-codes"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
+import Loading from "@/app/_(errors)/Loading"
+import NotFoundPage from "@/app/_(errors)/NotFound"
 import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/teams/[id]/_components/BasicInfo"
 import MemberSessionCard from "@/app/(general)/teams/[id]/_components/MemberSessionCard"
@@ -29,7 +32,7 @@ const TeamDetail = ({ params }: Props) => {
 
   const { id } = params
 
-  const [team, setTeam] = useState<Team>()
+  const [team, setTeam] = useState<Team | null>()
   useEffect(() => {
     if (session.data?.access) {
       fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
@@ -37,17 +40,28 @@ const TeamDetail = ({ params }: Props) => {
         headers: {
           Authorization: `Bearer ${session.data?.access}`
         }
+      }).then(async (res) => {
+        if (!res.ok) {
+          switch (res.status) {
+            case StatusCodes.NOT_FOUND:
+              setTeam(null)
+              break
+            default:
+              router.push(ROUTES.HOME.url)
+          }
+        } else {
+          setTeam(await res.json())
+        }
       })
-        .then((res) => res.json())
-        .then((data) => setTeam(data))
     }
-  }, [id, session.data?.access])
+  }, [id, session.data?.access, router])
 
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
 
-  if (!team) {
-    // TODO: 로딩 화면 구성
-    return <div>Loading...</div>
+  if (team === undefined) {
+    return <Loading />
+  } else if (team === null) {
+    return <NotFoundPage />
   }
 
   const missingMemberSessions = new MemberSessionSet(
@@ -80,7 +94,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo team={team} />
+      <BasicInfo team={team} accessToken={session.data?.access} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -106,16 +120,19 @@ const TeamDetail = ({ params }: Props) => {
         <SessionSetCard header="마감된 세션" className="col-span-2">
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             {sessionsWithAtleastOneMember.map((ms) =>
-              ms.members.map((member, index) => (
-                <MemberSessionCard
-                  key={member.id}
-                  teamId={team.id}
-                  session={ms.session}
-                  sessionIndex={index + 1}
-                  user={member}
-                  onUnapplySuccess={setTeam}
-                />
-              ))
+              ms.members.map((member, index) => {
+                if (member === null) return
+                return (
+                  <MemberSessionCard
+                    key={`${ms.session}-${index}`}
+                    teamId={team.id}
+                    session={ms.session}
+                    sessionIndex={index + 1}
+                    user={member}
+                    onUnapplySuccess={setTeam}
+                  />
+                )
+              })
             )}
           </div>
         </SessionSetCard>
@@ -133,15 +150,21 @@ const TeamDetail = ({ params }: Props) => {
             </li>
           </ul>
           <div className="flex items-center justify-start gap-x-4">
-            {missingMemberSessions.length > 0 ? (
-              missingMemberSessions.map((ms) => (
-                <ApplyButton
-                  key={ms.session}
-                  teamId={team.id}
-                  session={ms.session}
-                  onApplySuccess={setTeam}
-                />
-              ))
+            {team.memberSessions && team.memberSessions?.length > 0 ? (
+              team.memberSessions?.map((ms) =>
+                ms.members.map(
+                  (member, index) =>
+                    member === null && (
+                      <ApplyButton
+                        key={`${ms.session}-${index}`}
+                        teamId={team.id}
+                        session={ms.session}
+                        memberSessionIndex={index + 1}
+                        onApplySuccess={setTeam}
+                      />
+                    )
+                )
+              )
             ) : (
               <div>마감</div>
             )}

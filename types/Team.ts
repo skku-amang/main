@@ -13,6 +13,7 @@ export type Team = {
 
   songName: string
   songArtist: string
+  isSelfMade: boolean
   songYoutubeVideoId?: string // 아망 공식 홈페이지 유튜브 영상
 
   createdDatetime: string
@@ -41,8 +42,13 @@ export type Song = {
 export type MemberSession = {
   id: number
   session: SessionName
-  members: User[]
-  requiredMemberCount: number
+  members: (User | null)[]
+}
+export type MemberSessionMembership = {
+  id: number
+  session: string
+  member: User
+  index: number
 }
 export const SessionOrder = [
   "보컬",
@@ -80,44 +86,19 @@ export class MemberSessionSet {
     return sessions.length === new Set(sessions).size
   }
 
-  /**
-   * 세션별 필요한 멤버 수를 계산합니다.
-   * @param includeFullSessions 충족된 세션도 반환할지 여부(default: false)
-   * @returns 세션별 필요한 멤버 수를 모두 더한 값
-   * @example
-   * const memberSessions = new MemberSessionSet([
-   *  {
-   *    session: 보컬,
-   *    members: [멤버1, 멤버2],
-   *    requiredMemberCount: 3
-   *  },
-   *  {
-   *    session: dummySessions[1],
-   *    members: [멤버3],
-   *    requiredMemberCount: 1
-   *  }
-   * ])
-   *
-   * memberSessions.getRequiredSessionsWithMissingUserCount(true)
-   * // Map {
-   * //   Session 보컬: 1
-   * //   Session 기타: 0
-   * // }
-   * memberSessions.getRequiredSessionsWithMissingUserCount(false)
-   * // Map {
-   * //   Session 보컬: 1
-   * // }
-   */
   getRequiredSessionsWithMissingUserCount(
     includeFullSessions = false
   ): Map<SessionName, number> {
     let requiredSessionsWithMissingUserCount: Map<SessionName, number> =
       new Map()
     Array.from(this.memberSessions).map((ms) => {
-      if (ms.members.length < ms.requiredMemberCount) {
+      const requiredMemberCount =
+        MemberSessionSet.getRequiredMemberCountOfMemberSession(ms)
+
+      if (ms.members.length < requiredMemberCount) {
         requiredSessionsWithMissingUserCount.set(
           ms.session,
-          ms.requiredMemberCount - ms.members.length
+          requiredMemberCount
         )
       } else if (includeFullSessions) {
         requiredSessionsWithMissingUserCount.set(ms.session, 0)
@@ -127,13 +108,17 @@ export class MemberSessionSet {
   }
 
   getSatisfiedSessions() {
-    return Array.from(this.memberSessions).filter(
-      (ms) => ms.requiredMemberCount === ms.members.length
-    )
+    return Array.from(this.memberSessions).filter((ms) => {
+      const requiredMemberCount =
+        MemberSessionSet.getRequiredMemberCountOfMemberSession(ms)
+      return requiredMemberCount === ms.members.length
+    })
   }
 
   getSessionsWithAtleastOneMember() {
-    return Array.from(this.memberSessions).filter((ms) => ms.members.length > 0)
+    return Array.from(this.memberSessions).filter(
+      (ms) => ms.members.filter((member) => member !== null).length > 0
+    )
   }
 
   get isSatisfied(): boolean {
@@ -145,12 +130,18 @@ export class MemberSessionSet {
   }
 
   getSessionsWithMissingMembers() {
-    return Array.from(this.memberSessions).filter(
-      (ms) => ms.requiredMemberCount > ms.members.length
-    )
+    return Array.from(this.memberSessions).filter((ms) => {
+      const requiredMemberCount =
+        MemberSessionSet.getRequiredMemberCountOfMemberSession(ms)
+      return requiredMemberCount > 0
+    })
   }
 
   isEmpty() {
     return this.memberSessions.size === 0
+  }
+
+  static getRequiredMemberCountOfMemberSession(memberSession: MemberSession) {
+    return memberSession.members.filter((member) => member === null).length
   }
 }

@@ -6,7 +6,7 @@ import { z } from "zod"
 
 import basicInfoSchema, {
   songYoutubeVideoIdSchema
-} from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/schema"
+} from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -35,13 +35,18 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
   const innerForm = useForm<z.infer<typeof innerSchema>>({
     resolver: zodResolver(innerSchema),
     defaultValues: {
-      songYoutubeVideoId: form.getValues(fieldName) as string
+      songYoutubeVideoId: YoutubeVideo.getURL(
+        form.getValues(fieldName) as string
+      )
     }
   })
 
   function onInnerFormValid(formData: any) {
-    form.setValue("songYoutubeVideoId", formData.songYoutubeVideoId)
     form.clearErrors("songYoutubeVideoId")
+    form.setValue(
+      "songYoutubeVideoId",
+      YoutubeVideo.getVideoId(formData.songYoutubeVideoId)
+    )
     setOpen(false)
   }
 

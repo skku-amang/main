@@ -1,45 +1,36 @@
 /* eslint-disable no-unused-vars */
-import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleAlert } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
-import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
-import UserSelect from "@/app/(general)/teams/create/_components/TeamCreateForm/ThirdPage/UserSelect"
+import Description from "@/app/(general)/teams/_components/TeamForm/Description"
+import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
+import UserSelect from "@/app/(general)/teams/_components/TeamForm/ThirdPage/UserSelect"
 import { Form } from "@/components/ui/form"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
 
-import { createDynamicSchema, getFormDefaultValeus } from "./schema"
-
 interface ThirdPageProps {
-  schemaMetadata: z.infer<typeof memberSessionRequiredBaseSchema>
+  form: ReturnType<
+    typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
+  >
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
   onPrevious: () => void
   firstPageForm: ReturnType<typeof useForm<any>>
 }
 
-const requiredMemberCount = (shape: any) => {
-  return shape._def.innerType._def.schema._def
-    .shape()
-    .requiredMemberCount.default()
-    ._def.innerType._def.defaultValue()
-}
-
 const ThirdPage = ({
-  schemaMetadata,
+  form,
   onValid,
   onInvalid,
   onPrevious
 }: ThirdPageProps) => {
   const [users, setMembers] = useState<User[]>([])
-  const schema = createDynamicSchema(schemaMetadata)
   const session = useSession()
 
   // 유저 목록 가져오기
@@ -53,11 +44,6 @@ const ThirdPage = ({
       .then((data) => data.json())
       .then((users) => setMembers(users))
   }, [session.data?.access])
-
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues: getFormDefaultValeus(schemaMetadata)
-  })
 
   return (
     <Form {...form}>
@@ -73,25 +59,24 @@ const ThirdPage = ({
         {/* 팀원 정보 입력 */}
         <table className="table-auto border-separate border-spacing-5">
           <tbody>
-            {Object.entries(schema._def.shape()).map(([key, s]) => {
-              return Array.from({ length: requiredMemberCount(s) }).map(
-                (_, index) => (
-                  <tr key={`${key}-${index}`} className="my-3">
-                    <td className="w-32">
-                      {key}
-                      {index + 1}
-                    </td>
-                    <td>
-                      <UserSelect
-                        key={`${key}-${index}`}
-                        users={users}
-                        form={form}
-                        fieldName={`${key}.members`}
-                        fieldArrayIndex={index}
-                      />
-                    </td>
-                  </tr>
-                )
+            {Object.values(form.getValues()).map((formValue) => {
+              const { session, required, index } = formValue
+              const fieldName = `${session}${index}.member`
+              if (!required) return
+              return (
+                <tr key={`${session}-${index}`} className="my-3">
+                  <td className="w-32">
+                    {session}
+                    {index}
+                  </td>
+                  <td>
+                    <UserSelect
+                      users={users}
+                      form={form}
+                      fieldName={fieldName}
+                    />
+                  </td>
+                </tr>
               )
             })}
           </tbody>

@@ -3,10 +3,10 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
-import basicInfoSchema from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/schema"
-import YoutubeDialog from "@/app/(general)/teams/create/_components/TeamCreateForm/FirstPage/YoutubeDialog"
-import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
+import Description from "@/app/(general)/teams/_components/TeamForm/Description"
+import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
+import YoutubeDialog from "@/app/(general)/teams/_components/TeamForm/FirstPage/YoutubeDialog"
+import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
@@ -36,13 +36,15 @@ interface FirstPageProps {
   // eslint-disable-next-line no-unused-vars
   onInvalid: (formData: z.infer<any>) => void
   accessToken?: string
+  onPrevious?: () => void
 }
 
 const FirstPage = ({
   form,
   onValid,
   onInvalid,
-  accessToken
+  accessToken,
+  onPrevious
 }: FirstPageProps) => {
   const [performances, setPerformances] = useState<Performance[]>([])
   useEffect(() => {
@@ -94,6 +96,7 @@ const FirstPage = ({
                   form.setValue("performanceId", +e)
                   form.clearErrors("performanceId")
                 }}
+                value={form.getValues("performanceId")?.toString()}
               >
                 <SelectTrigger
                   id="performanceIdInput"
@@ -257,6 +260,7 @@ const FirstPage = ({
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={1}
+          onPrevious={onPrevious}
         />
       </form>
     </Form>

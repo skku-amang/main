@@ -12,19 +12,26 @@ import { Team } from "@/types/Team"
 interface ApplyButtonProps {
   teamId: number
   session: SessionName
+  memberSessionIndex: number
   // eslint-disable-next-line no-unused-vars
   onApplySuccess: (team: Team) => void
 }
 
-const ApplyButton = ({ teamId, session, onApplySuccess }: ApplyButtonProps) => {
+const ApplyButton = ({
+  teamId,
+  session,
+  memberSessionIndex,
+  onApplySuccess
+}: ApplyButtonProps) => {
   const authSession = useSession()
   const { toast } = useToast()
+  const memberSessionWithIndex = `${session}${memberSessionIndex}`
 
   async function onApply() {
     const res = await fetchData(
       API_ENDPOINTS.TEAM.APPLY(teamId) as ApiEndpoint,
       {
-        body: JSON.stringify({ session }),
+        body: JSON.stringify({ session, index: memberSessionIndex }),
         cache: "no-store",
         headers: {
           Authorization: `Bearer ${authSession.data?.access}`
@@ -57,7 +64,7 @@ const ApplyButton = ({ teamId, session, onApplySuccess }: ApplyButtonProps) => {
       }}
     >
       {/* 세션명 */}
-      <div className="mb-2 text-center">{session}</div>
+      <div className="mb-2 text-center">{memberSessionWithIndex}</div>
 
       {/* 지원 버튼 */}
       <div className="flex justify-center">

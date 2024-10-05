@@ -1,3 +1,4 @@
+import Loading from "@/app/_(errors)/Loading"
 import { redirect } from "next/navigation"
 
 import RelatedPerformanceList from "@/app/(general)/teams/_components/RelatedPerformanceList"

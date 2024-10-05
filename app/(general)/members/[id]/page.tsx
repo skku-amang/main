@@ -1,7 +1,6 @@
-import React from 'react'
+import React from "react"
 
-import DescribeToJSX from '@/components/DescribeToJSX'
-import { createUser } from '@/lib/dummy/User'
+import DescribeToJSX from "@/components/DescribeToJSX"
 
 interface Props {
   params: {
@@ -11,7 +10,7 @@ interface Props {
 
 const MemberDetail = ({ params }: Props) => {
   const { id } = params
-  const user = createUser(id)
+  const user = undefined // not implemented
 
   return (
     <div>

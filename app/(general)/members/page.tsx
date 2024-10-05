@@ -1,13 +1,5 @@
 import { columns } from "@/app/(general)/members/_components/MemberListTable/columns"
 import { MemberListDataTable } from "@/app/(general)/members/_components/MemberListTable/data-table"
-import { generateDummys } from "@/lib/dummy"
-import { createUser } from "@/lib/dummy/User"
-import { User } from "@/types/User"
-
-const USERS = generateDummys(45, createUser)
-const rows: User[] = USERS.map((user) => ({
-  ...user
-}))
 
 const MemberListPage = () => {
   return (
@@ -21,7 +13,7 @@ const MemberListPage = () => {
       </div>
 
       {/* 팀 목록 테이블 */}
-      <MemberListDataTable columns={columns} data={rows} />
+      <MemberListDataTable columns={columns} data={[]} />
     </div>
   )
 }

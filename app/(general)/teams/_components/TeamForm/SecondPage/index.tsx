@@ -3,10 +3,10 @@ import { CircleAlert } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/create/_components/TeamCreateForm/Description"
-import Paginator from "@/app/(general)/teams/create/_components/TeamCreateForm/Paginator"
-import MemberSessionRequiredCheckbox from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/MemberSessionRequiredCheckbox"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/create/_components/TeamCreateForm/SecondPage/schema"
+import Description from "@/app/(general)/teams/_components/TeamForm/Description"
+import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
+import MemberSessionRequiredCheckbox from "@/app/(general)/teams/_components/TeamForm/SecondPage/MemberSessionRequiredCheckbox"
+import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Form } from "@/components/ui/form"
 
 interface SecondPageProps {
@@ -29,9 +29,9 @@ const SecondPage = ({
   } = {
     보컬: ["보컬1", "보컬2", "보컬3"],
     기타: ["기타1", "기타2", "기타3"],
-    "베이스 및 드럼": ["베이스1", "베이스2", "드럼"],
+    "베이스 및 드럼": ["베이스1", "베이스2", "드럼1"],
     신디: ["신디1", "신디2", "신디3"],
-    "그 외": ["관악기", "현악기"]
+    "그 외": ["관악기1", "현악기1"]
   }
 
   return (
@@ -55,7 +55,7 @@ const SecondPage = ({
                     {fieldNames.map((fieldName) => (
                       <td key={`${label}-${fieldName}`} className="p-4">
                         <MemberSessionRequiredCheckbox
-                          firstPageForm={form}
+                          secondPageForm={form}
                           fieldName={fieldName}
                           label={fieldName}
                         />
