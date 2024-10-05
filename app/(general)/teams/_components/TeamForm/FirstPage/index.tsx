@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
+import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
 
@@ -48,8 +49,7 @@ const FirstPage = ({
 }: FirstPageProps) => {
   const [performances, setPerformances] = useState<Performance[]>([])
   useEffect(() => {
-    fetch(API_ENDPOINTS.PERFORMANCE.LIST.url, {
-      method: API_ENDPOINTS.PERFORMANCE.LIST.method,
+    fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
       cache: "no-cache",
       headers: {
         Authorization: `Bearer ${accessToken}`
