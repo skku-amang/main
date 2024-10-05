@@ -42,7 +42,6 @@ const RelatedPerformanceList = async ({
                   "border-2 border-primary font-extrabold text-primary"
               )}
             >
-              {currentPerformanceId === p.id && "Current: "}
               {p.name}
             </Button>
           </Link>

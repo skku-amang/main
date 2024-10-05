@@ -11,6 +11,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
+import DeleteButton from "@/app/(general)/teams/_components/TeamListTable/DeleteButton"
 import SessionBadge from "@/components/SessionBadge"
 import StatusBadge from "@/components/StatusBadge"
 import { Badge } from "@/components/ui/badge"
@@ -83,7 +84,9 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     id: "requiredSessions",
-    header: "필요 세션",
+    header: () => (
+      <div className="flex w-full items-center justify-center">필요 세션</div>
+    ),
     cell: ({ row }) => {
       return (
         <div className="flex justify-start gap-1 text-right font-medium">
@@ -104,7 +107,9 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "status",
-    header: () => <div className="flex w-full justify-center">모집상태</div>,
+    header: () => (
+      <div className="flex items-center justify-center">모집상태</div>
+    ),
     cell: ({ row }) => {
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
@@ -114,12 +119,17 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "songYoutubeVideoId",
-    header: () => <div className="flex w-full justify-center">영상링크</div>,
+    header: () => (
+      <div className="flex items-center justify-center">영상링크</div>
+    ),
     cell: ({ row }) => {
       const songYoutubeVideoId = row.getValue("songYoutubeVideoId") as string
       if (songYoutubeVideoId) {
         return (
-          <Link href={songYoutubeVideoId}>
+          <Link
+            href={songYoutubeVideoId}
+            className="flex w-full items-center justify-center"
+          >
             <Paperclip size={24} />
           </Link>
         )
@@ -152,13 +162,13 @@ export const columns: ColumnDef<TeamColumn>[] = [
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="p-0">
-              <Link
-                href="#" // TODO: 삭제 로직 추가
+              <DeleteButton
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
+                teamId={row.original.id}
               >
                 <Trash />
                 삭제하기
-              </Link>
+              </DeleteButton>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

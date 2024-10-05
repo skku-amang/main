@@ -95,7 +95,7 @@ export class MemberSessionSet {
       const requiredMemberCount =
         MemberSessionSet.getRequiredMemberCountOfMemberSession(ms)
 
-      if (ms.members.length < requiredMemberCount) {
+      if (requiredMemberCount > 0) {
         requiredSessionsWithMissingUserCount.set(
           ms.session,
           requiredMemberCount
