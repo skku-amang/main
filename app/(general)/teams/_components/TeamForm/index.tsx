@@ -114,7 +114,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
         member: null,
         index: 2
       },
-      드럼: {
+      드럼1: {
         session: "드럼",
         required: false,
         member: null,
@@ -138,13 +138,13 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
         member: null,
         index: 3
       },
-      현악기: {
+      현악기1: {
         session: "현악기",
         required: false,
         member: null,
         index: 1
       },
-      관악기: {
+      관악기1: {
         session: "관악기",
         required: false,
         member: null,
@@ -158,18 +158,17 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
     // Edit: 디폴트 값 존재
     initialData.memberSessions?.forEach((ms) => {
       ms.members.forEach((member, index) => {
-        const fieldName = `${ms.session}${index + 1}`
-        let fieldKey =
-          defaultValues[
-            fieldName as keyof z.infer<typeof memberSessionRequiredBaseSchema>
-          ]
+        const fieldName = `${ms.session}${index + 1}` as keyof z.infer<
+          typeof memberSessionRequiredBaseSchema
+        >
+        let fieldKey = defaultValues[fieldName]
+        if (!fieldKey) return
         fieldKey.required = true
         if (member) {
           fieldKey.member = member.id
         }
       })
     })
-    console.log("defaultValues:", defaultValues)
     return defaultValues
   }
   const secondPageForm = useForm<
@@ -186,7 +185,6 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
       // console.log(result.error)
       return
     }
-    setThirdPageSchemaMetadata(result.data)
     setCurrentPage(3)
   }
   function onSecondPageInvalid(
@@ -196,14 +194,27 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   }
 
   // Third Page
-  const [thirdPageSchemaMetadata, setThirdPageSchemaMetadata] =
-    useState<z.infer<any>>()
-  async function onThirdPageValid(secondPageFormData: z.infer<any>) {
+  async function onThirdPageValid(
+    secondPageFormData: z.infer<typeof memberSessionRequiredBaseSchema>
+  ) {
+    let memberSessionData: { [key: string]: (number | null)[] } = {}
+    Object.values(secondPageFormData).map((ms) => {
+      if (!ms.required) return
+      if (!(ms.session in memberSessionData)) {
+        memberSessionData[ms.session] = []
+      }
+      memberSessionData[ms.session][ms.index - 1] = ms.member
+    })
+    const memberSessions = Object.entries(memberSessionData).map(
+      ([session, membersId]) => ({ session, membersId })
+    )
+    console.log("memberSessions", memberSessions)
+
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       songArtist: firstPageForm.getValues("songArtist"),
-      memberSessions: Object.values(secondPageFormData),
+      memberSessions,
       description: firstPageForm.getValues("description"),
       songYoutubeVideoId: firstPageForm.getValues("songYoutubeVideoId"),
       posterImage: firstPageForm.getValues("posterImage")
@@ -281,7 +292,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
       )}
       {currentPage === 3 && (
         <ThirdPage
-          schemaMetadata={thirdPageSchemaMetadata}
+          form={secondPageForm}
           onValid={onThirdPageValid}
           onInvalid={onThirdPageInvalid}
           onPrevious={() => setCurrentPage(2)}

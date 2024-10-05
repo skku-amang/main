@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
@@ -15,10 +14,10 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
 
-import { createDynamicSchema, getFormDefaultValeus } from "./schema"
-
 interface ThirdPageProps {
-  schemaMetadata: z.infer<typeof memberSessionRequiredBaseSchema>
+  form: ReturnType<
+    typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
+  >
   onValid: (formData: z.infer<any>) => void
   onInvalid: (errors: FieldErrors<z.infer<any>>) => void
   onPrevious: () => void
@@ -26,13 +25,12 @@ interface ThirdPageProps {
 }
 
 const ThirdPage = ({
-  schemaMetadata,
+  form,
   onValid,
   onInvalid,
   onPrevious
 }: ThirdPageProps) => {
   const [users, setMembers] = useState<User[]>([])
-  const schema = createDynamicSchema(schemaMetadata)
   const session = useSession()
 
   // 유저 목록 가져오기
@@ -46,12 +44,6 @@ const ThirdPage = ({
       .then((data) => data.json())
       .then((users) => setMembers(users))
   }, [session.data?.access])
-
-  const defaultValues = getFormDefaultValeus(schemaMetadata)
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues
-  })
 
   return (
     <Form {...form}>
@@ -67,34 +59,25 @@ const ThirdPage = ({
         {/* 팀원 정보 입력 */}
         <table className="table-auto border-separate border-spacing-5">
           <tbody>
-            {Object.entries(schema._def.shape()).map(([key, s]) => {
-              // TODO: 타입 설정해야 함
-              let a = s as any
-              const defaultMembers = a._def.innerType._def
-                .shape()
-                .membersId._def.defaultValue()
-              return Array.from({
-                length: defaultMembers.length
-              }).map((_, index) => (
-                <tr key={`${key}-${index}`} className="my-3">
+            {Object.values(form.getValues()).map((formValue) => {
+              const { session, required, index } = formValue
+              const fieldName = `${session}${index}.member`
+              if (!required) return
+              return (
+                <tr key={`${session}-${index}`} className="my-3">
                   <td className="w-32">
-                    {key}
-                    {index + 1}
+                    {session}
+                    {index}
                   </td>
                   <td>
                     <UserSelect
-                      key={`${key}-${index}`}
                       users={users}
                       form={form}
-                      fieldName={
-                        `${key}.membersId.${index}` as keyof ReturnType<
-                          typeof createDynamicSchema
-                        >
-                      }
+                      fieldName={fieldName}
                     />
                   </td>
                 </tr>
-              ))
+              )
             })}
           </tbody>
         </table>

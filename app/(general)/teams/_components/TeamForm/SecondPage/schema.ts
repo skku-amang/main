@@ -27,11 +27,11 @@ export const memberSessionRequiredBaseSchema = z.object({
   기타3: memberSessionRequiredField({ session: "기타", index: 3 }),
   베이스1: memberSessionRequiredField({ session: "베이스", index: 1 }),
   베이스2: memberSessionRequiredField({ session: "베이스", index: 2 }),
-  드럼: memberSessionRequiredField({ session: "드럼", index: 1 }),
+  드럼1: memberSessionRequiredField({ session: "드럼", index: 1 }),
   신디1: memberSessionRequiredField({ session: "신디", index: 1 }),
   신디2: memberSessionRequiredField({ session: "신디", index: 2 }),
-  현악기: memberSessionRequiredField({ session: "현악기", index: 1 }),
-  관악기: memberSessionRequiredField({ session: "관악기", index: 1 })
+  현악기1: memberSessionRequiredField({ session: "현악기", index: 1 }),
+  관악기1: memberSessionRequiredField({ session: "관악기", index: 1 })
 })
 
 export type SecondPageFormSchema = z.ZodObject<{

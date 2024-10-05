@@ -19,12 +19,10 @@ import {
 import { cn } from "@/lib/utils"
 import { User } from "@/types/User"
 
-import { createDynamicSchema } from "./schema"
-
 interface UserSelectProps {
   users: User[]
   form: any
-  fieldName: keyof ReturnType<typeof createDynamicSchema>
+  fieldName: string
 }
 
 const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
