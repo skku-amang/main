@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Poppins } from "next/font/google"
+import { Oleo_Script, Poppins } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -18,6 +18,8 @@ import ROUTES from "@/constants/routes"
 import { signInSchema } from "@/constants/zodSchema"
 import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
+
+const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
 const Poppin = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -60,8 +62,8 @@ const Login = () => {
   }
 
   return (
-    <div className="mb-16 flex h-full w-full items-center justify-center md:mt-3">
-      <div className="flex h-[653px] flex-col items-center justify-center rounded-lg bg-white lg:relative lg:w-[60rem] lg:shadow-xl xl:w-[70rem]">
+    <div className="mb-16 flex h-full w-full items-center justify-center">
+      <div className="flex h-[653px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-white lg:relative lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
         <Image
           width="680"
           height="753"
@@ -69,12 +71,26 @@ const Login = () => {
           src="/loginwave.svg"
           alt="Icon"
         />
-        <div className="hidden lg:absolute lg:left-16 lg:top-36 lg:block">
-          <div className="mb-7 text-5xl font-bold text-white">
-            Welcome to <br />
-            Amang
+        <div className="hidden lg:absolute lg:left-16 lg:top-28 lg:block">
+          <div className="flex flex-col">
+            <div
+              className={cn(
+                OleoScript.className,
+                "h-20 text-[4.8rem] font-bold text-white"
+              )}
+            >
+              Welcome to
+            </div>
+            <div
+              className={cn(
+                OleoScript.className,
+                " text-[4.8rem] font-bold text-white"
+              )}
+            >
+              Amang
+            </div>
           </div>
-          <div className="text-white">
+          <div className="font-semibold text-white">
             Please log in to get started
             <br />
             Log in and join the rhythm
@@ -84,13 +100,18 @@ const Login = () => {
           <h3
             className={cn(
               Poppin.className,
-              "mb-1 text-2xl font-black text-slate-900"
+              "mb-2 text-2xl font-black text-slate-900"
             )}
           >
-            Sign In
+            로그인
           </h3>
-          <h5 className={cn(Poppin.className, "mb-8 text-base text-slate-500")}>
-            Let&apos;s build something great
+          <h5
+            className={cn(
+              Poppin.className,
+              "mb-8 text-sm font-black text-slate-500"
+            )}
+          >
+            계속하려면 로그인해주세요
           </h5>
           {/* 일반 로그인 */}
           <form
@@ -99,7 +120,7 @@ const Login = () => {
           >
             <div className="grid w-full max-w-sm items-center gap-1.5">
               <Label htmlFor="email" className="font-semibold">
-                ID
+                아이디
               </Label>
               <Input
                 {...register("email")}
@@ -111,7 +132,7 @@ const Login = () => {
             <div className="mb-6 text-destructive">{errors.email?.message}</div>
             <div className="grid w-full max-w-sm items-center gap-1.5">
               <Label htmlFor="password" className="font-semibold">
-                PassWord
+                비밀번호
               </Label>
               <Input
                 {...register("password")}
@@ -124,18 +145,20 @@ const Login = () => {
             <div className="text-destructive">{errors.password?.message}</div>
             <Button
               type="submit"
-              className="bg-third mt-8 h-12 w-72 text-base font-semibold"
+              className="mt-8 h-12 w-72 bg-third text-base font-semibold"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Login on Progress..." : "Login"}
+              {isSubmitting ? "Login on Progress..." : "로그인"}
             </Button>
-            <div className={cn(Poppin.className, "flex justify-center pt-5")}>
-              <div className="pr-2">Don&apos;t have an account?</div>
+            <div className={cn(Poppin.className, "flex justify-center pt-4")}>
+              <div className="pr-2 text-sm font-extrabold text-slate-900">
+                아직 계정이 없으신가요?
+              </div>
               <Link
                 href={ROUTES.SIGNUP.url}
-                className={cn(Poppin.className, "text-blue-400")}
+                className={cn(Poppin.className, "text-sm text-blue-400")}
               >
-                Sign up
+                회원가입
               </Link>
             </div>
           </form>
