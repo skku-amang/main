@@ -1,6 +1,7 @@
 "use client"
 
 import { StatusCodes } from "http-status-codes"
+import { Oleo_Script } from "next/font/google"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -17,8 +18,11 @@ import SessionBadge from "@/components/SessionBadge"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
+import { cn } from "@/lib/utils"
 import YoutubePlayer from "@/lib/youtube/Player"
 import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
+
+const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
 interface Props {
   params: {
@@ -70,14 +74,74 @@ const TeamDetail = ({ params }: Props) => {
 
   return (
     <div className="container pt-16">
-      <Link
-        href={ROUTES.TEAM.LIST.url}
-        className="flex items-center gap-x-5 font-semibold"
-      >
-        <RiArrowGoBackLine />
-        돌아가기
-      </Link>
-      <h2 className="text-center text-4xl italic">Join Your Team</h2>
+      <div
+        className="absolute left-0 top-0 z-0 h-[25rem] w-screen bg-slate-300"
+        style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
+      ></div>
+      <div
+        className="absolute left-0 top-0 h-[28rem] w-screen bg-primary"
+        style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
+      ></div>
+      <div className="relative flex items-center justify-between">
+        <Link
+          href={ROUTES.TEAM.LIST.url}
+          className="flex items-center gap-x-5 font-semibold text-white"
+        >
+          <RiArrowGoBackLine className="text-white" />
+          돌아가기
+        </Link>
+        <div className="flex">
+          <div
+            className={cn(
+              OleoScript.className,
+              "z-0 bg-primary text-8xl italic text-gray-100"
+            )}
+          >
+            J
+          </div>
+          <div
+            className={cn(
+              OleoScript.className,
+              "text-border-white font-outline-2-white bg-primary text-8xl italic text-primary"
+            )}
+          >
+            oin
+          </div>
+          <div
+            className={cn(
+              OleoScript.className,
+              "bg-primary text-8xl italic text-gray-100"
+            )}
+          >
+            Y
+          </div>
+          <div
+            className={cn(
+              OleoScript.className,
+              "font-outline-2-white z-0 bg-primary text-8xl italic text-primary"
+            )}
+          >
+            our
+          </div>
+          <div
+            className={cn(
+              OleoScript.className,
+              "bg-primary text-8xl italic text-gray-100"
+            )}
+          >
+            T
+          </div>
+          <div
+            className={cn(
+              OleoScript.className,
+              "font-outline-2-white bg-primary text-8xl italic text-primary"
+            )}
+          >
+            eam
+          </div>
+        </div>
+        <div className="w-[100px]" />
+      </div>
 
       {/* 유튜브 임베드 */}
       <div className="mb-16 mt-6 flex items-center justify-center">
@@ -85,7 +149,7 @@ const TeamDetail = ({ params }: Props) => {
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
             width={750}
-            className="aspect-video"
+            className="z-0 aspect-video"
           />
         )}
       </div>
@@ -143,8 +207,8 @@ const TeamDetail = ({ params }: Props) => {
         </SessionSetCard>
 
         {/* 팀 참여 신청 */}
-        <SessionSetCard header="팀 참여 신청" className="col-span-2">
-          <ul className="mb-6">
+        <SessionSetCard header="팀 참여 신청" className="col-span-2 mb-10">
+          <ul className="mb-10">
             <li>
               ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며, 선착순으로
               마감됩니다
