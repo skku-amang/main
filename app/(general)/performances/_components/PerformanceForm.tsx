@@ -14,8 +14,9 @@ import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
+import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
+import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
 
@@ -83,9 +84,9 @@ const PerformanceForm = () => {
       formDataToSend.append("endDatetime", formData.endDatetime.toISOString())
     }
 
-    const res = await fetch(API_ENDPOINTS.PERFORMANCE.CREATE.url, {
-      method: "POST",
+    const res = await fetchData(API_ENDPOINTS.PERFORMANCE.CREATE as ApiEndpoint, {
       headers: {
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${session.data?.access}`
       },
       body: formDataToSend

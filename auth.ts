@@ -73,7 +73,9 @@ const authOptions: NextAuthConfig = {
     session: async ({ session, token }) => {
       return { ...session, ...token }
     }
-  }
+  },
+  debug: process.env.NODE_ENV === "development",
+  trustHost: true
 }
 
 export const {
