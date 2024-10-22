@@ -1,6 +1,8 @@
+const isServer = typeof window === "undefined"
+const localUrl = isServer ? "http://backend:8000/" : process.env.NEXT_PUBLIC_LOCAL_URL
 const baseURL =
   process.env.NODE_ENV === "development"
-    ? process.env.NEXT_PUBLIC_LOCAL_URL
+    ? localUrl
     : process.env.NEXT_PUBLIC_DEPLOY_URL
 
 const API_PREFIX = "api"
@@ -14,15 +16,15 @@ export interface ApiEndpoint {
 const API_ENDPOINTS = {
   AUTH: {
     LOGIN: {
-      url: `${baseURL}/${API_PREFIX}/auth/login/`,
+      url: `${baseURL}/${API_PREFIX}/backend/auth/login/`,
       method: "POST"
     },
     REGISTER: {
-      url: `${baseURL}/${API_PREFIX}/auth/register/`,
+      url: `${baseURL}/${API_PREFIX}/backend/auth/register/`,
       method: "POST"
     },
     REFRESH: {
-      url: `${baseURL}/${API_PREFIX}/auth/refresh/`,
+      url: `${baseURL}/${API_PREFIX}/backend/auth/refresh/`,
       method: "POST"
     }
   },
