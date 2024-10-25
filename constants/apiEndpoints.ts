@@ -1,5 +1,5 @@
 const isServer = typeof window === "undefined"
-const localUrl = isServer ? "http://backend:8000/" : process.env.NEXT_PUBLIC_LOCAL_URL
+const localUrl = isServer ? process.env.NEXT_PUBLIC_TEST_URL : process.env.NEXT_PUBLIC_LOCAL_URL
 const baseURL =
   process.env.NODE_ENV === "development"
     ? localUrl
