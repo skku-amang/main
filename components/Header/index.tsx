@@ -19,7 +19,7 @@ const Header = ({
   const menuItems: { name: string; url: string; active: boolean }[] = [
     { name: "공지사항", url: ROUTES.NOTICE.LIST.url, active: false },
     { name: "공연목록", url: ROUTES.PERFORMANCE.LIST.url, active: true },
-    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAMS(1).url, active: true },
+    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAMS(1).url, active: true }, // TODO: 실제 기본 공연 ID로 변경
     { name: "맴버목록", url: ROUTES.MEMBER.LIST.url, active: true }
   ]
 

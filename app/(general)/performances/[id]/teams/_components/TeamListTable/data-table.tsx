@@ -503,7 +503,7 @@ export function TeamListDataTable<TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <div key={row.id}>
-                TODO: image 추가
+                {/* TODO: image 추가 */}
                 <TeamCard
                   id={row.original.id}
                   songName={row.original.songName}
