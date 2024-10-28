@@ -86,7 +86,6 @@ const PerformanceForm = () => {
 
     const res = await fetchData(API_ENDPOINTS.PERFORMANCE.CREATE as ApiEndpoint, {
       headers: {
-        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${session.data?.access}`
       },
       body: formDataToSend

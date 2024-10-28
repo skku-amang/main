@@ -71,7 +71,7 @@ const TeamDetail = ({ params }: Props) => {
   return (
     <div className="container pt-16">
       <Link
-        href={ROUTES.TEAM.LIST.url}
+        href={ROUTES.PERFORMANCE.TEAMS(team.performance.id).url}
         className="flex items-center gap-x-5 font-semibold"
       >
         <RiArrowGoBackLine />

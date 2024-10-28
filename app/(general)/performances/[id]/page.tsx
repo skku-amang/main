@@ -3,7 +3,6 @@ import Image from "next/image"
 import { FaClock } from "react-icons/fa"
 import { IoLocationSharp } from "react-icons/io5"
 
-import TeamList from "@/app/(general)/teams/page"
 import { auth } from "@/auth"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
@@ -68,8 +67,6 @@ const PerformanceDetail = async ({ params }: PerformanceDetailProp) => {
           </p>
         </div>
       </div>
-
-      <TeamList />
     </>
   )
 }

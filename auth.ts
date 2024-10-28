@@ -89,7 +89,10 @@ export const {
 async function refreshAccessToken(prevToken: JWT) {
   const res = await fetchData(API_ENDPOINTS.AUTH.REFRESH as ApiEndpoint, {
     body: JSON.stringify({ refresh: prevToken.refresh }),
-    cache: "no-store"
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json"
+    }
   })
 
   if (!res.ok) {
@@ -118,7 +121,10 @@ async function _signIn(
     type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
   const res = await fetchData(apiEndpoint as ApiEndpoint, {
     body: JSON.stringify(body),
-    cache: "no-store"
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json"
+    }
   })
 
   // 에러 처리

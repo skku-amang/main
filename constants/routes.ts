@@ -55,6 +55,10 @@ const ROUTES = {
       name: "공연 상세",
       url: `/performances/${id}`
     }),
+    TEAMS: (id: number) => ({
+      name: "공연 팀 목록",
+      url: `/performances/${id}/teams`
+    }),
     EDIT: (id: number) => ({
       name: "공연 수정",
       url: `/performances/${id}/edit`
@@ -64,10 +68,6 @@ const ROUTES = {
     CREATE: {
       name: "팀 생성",
       url: "/teams/create"
-    },
-    LIST: {
-      name: "팀 생성",
-      url: "/teams"
     },
     DETAIL: (id: number) => ({
       name: "팀 상세",

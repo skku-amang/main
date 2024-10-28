@@ -11,7 +11,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
-import DeleteButton from "@/app/(general)/teams/_components/TeamListTable/DeleteButton"
+import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
 import SessionBadge from "@/components/SessionBadge"
 import StatusBadge from "@/components/StatusBadge"
 import { Badge } from "@/components/ui/badge"
