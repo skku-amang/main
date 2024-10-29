@@ -13,6 +13,7 @@ import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/teams/[id]/_components/BasicInfo"
 import MemberSessionCard from "@/app/(general)/teams/[id]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/teams/[id]/_components/SessionSetCard"
+import PageHeader from "@/components/PageHeader"
 import SessionBadge from "@/components/SessionBadge"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
@@ -70,13 +71,25 @@ const TeamDetail = ({ params }: Props) => {
 
   return (
     <div className="container pt-16">
-      <Link
-        href={ROUTES.TEAM.LIST.url}
-        className="flex items-center gap-x-5 font-semibold"
-      >
-        <RiArrowGoBackLine />
-        돌아가기
-      </Link>
+      <div
+        className="absolute left-0 top-0 z-0 h-[25rem] w-screen bg-slate-300"
+        style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
+      ></div>
+      <div
+        className="absolute left-0 top-0 h-[28rem] w-screen bg-primary"
+        style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
+      ></div>
+      <div className="relative flex items-center justify-between">
+        <Link
+          href={ROUTES.TEAM.LIST.url}
+          className="flex items-center gap-x-5 font-semibold text-white"
+        >
+          <RiArrowGoBackLine className="text-white" />
+          돌아가기
+        </Link>
+        <PageHeader inputSentence="Join Your Team" textSize="text-8xl" />
+        <div className="w-[100px]" />
+      </div>
       <h2 className="text-center text-4xl italic">Join Your Team</h2>
 
       {/* 유튜브 임베드 */}
@@ -85,7 +98,7 @@ const TeamDetail = ({ params }: Props) => {
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
             width={750}
-            className="aspect-video"
+            className="z-0 aspect-video"
           />
         )}
       </div>
