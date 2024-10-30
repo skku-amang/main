@@ -63,6 +63,10 @@ const API_ENDPOINTS = {
       url: `${baseURL}/${API_PREFIX}/performances/${id}/`,
       method: "GET"
     }),
+    RETRIEVE_TEAMS: (id: number) => ({
+      url: `${baseURL}/${API_PREFIX}/performances/${id}/teams/`,
+      method: "GET"
+    }),
     UPDATE: (id: number) => ({
       url: `${baseURL}/${API_PREFIX}/performances/${id}/`,
       method: "PUT"

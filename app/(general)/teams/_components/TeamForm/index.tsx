@@ -208,7 +208,6 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
     const memberSessions = Object.entries(memberSessionData).map(
       ([session, membersId]) => ({ session, membersId })
     )
-    console.log("memberSessions", memberSessions)
 
     let allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
@@ -226,6 +225,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
     const res = await fetchData(endpoint as ApiEndpoint, {
       cache: "no-store",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${session.data?.access}`
       },
       body: JSON.stringify(allFormData)

@@ -26,6 +26,7 @@ const PerformanceList = async () => {
     }
   })
   const performances = (await res.json()) as ListResponse<Performance>
+
   return (
     <div className="mb-10">
       {/* 도구 모음 */}
@@ -41,6 +42,7 @@ const PerformanceList = async () => {
           </Link>
         </Button>
       </div>
+      
       {/* 공연 카드 목록 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {performances.map((p) => (

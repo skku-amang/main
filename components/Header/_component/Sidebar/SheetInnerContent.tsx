@@ -53,7 +53,7 @@ const SheetInnerContent = () => {
           <div className="pl-4 text-lg font-medium text-gray-500">공연목록</div>
         </Link>
         <Link
-          href={ROUTES.TEAM.LIST.url}
+          href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 실제 기본 공연 ID로 변경
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <FileText size={30} className={iconcolor} />

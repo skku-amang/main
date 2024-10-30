@@ -43,7 +43,7 @@ const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
         title: "팀 삭제 성공",
         description: "성공적으로 팀을 삭제했습니다."
       })
-      router.push(ROUTES.TEAM.LIST.url)
+      router.push(ROUTES.PERFORMANCE.TEAMS(1).url) // TODO: 실제 기본 공연 ID로 변경
     })
   }
 
