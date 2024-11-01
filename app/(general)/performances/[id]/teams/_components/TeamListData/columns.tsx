@@ -11,6 +11,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
+import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListData/DeleteButton"
 import SessionBadge from "@/components/SessionBadge"
 import StatusBadge from "@/components/StatusBadge"
 import { Badge } from "@/components/ui/badge"
@@ -23,7 +24,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
-import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListData/DeleteButton"
 
 export type TeamColumn = {
   id: number

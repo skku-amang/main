@@ -12,9 +12,9 @@ import {
 } from "@tanstack/react-table"
 import { useReducer, useState } from "react"
 
+import { FilterValue } from "@/app/(general)/performances/[id]/teams/_components/TeamListData/filter"
 import TeamListCard from "@/app/(general)/performances/[id]/teams/_components/TeamListData/TeamListCard"
 import TeamListTable from "@/app/(general)/performances/[id]/teams/_components/TeamListData/TeamListTable"
-import { FilterValue } from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/filter"
 import { Performance } from "@/types/Performance"
 import { MemberSessionSet } from "@/types/Team"
 
