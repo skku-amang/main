@@ -8,8 +8,8 @@ import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Team } from "@/types/Team"
 
-import { columns } from "./_components/TeamListTable/columns"
-import { TeamListDataTable } from "./_components/TeamListTable/data-table"
+import { TeamListData } from "./_components/TeamListData"
+import { columns } from "./_components/TeamListData/columns"
 
 interface TeamListProps {
   params: {
@@ -60,7 +60,7 @@ const TeamList = async ({ params }: TeamListProps) => {
       </div>
 
       {/* 팀 목록 */}
-      <TeamListDataTable
+      <TeamListData
         columns={columns}
         data={teams}
         relatedPerformances={relatedPerformances}
