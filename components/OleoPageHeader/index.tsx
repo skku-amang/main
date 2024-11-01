@@ -1,40 +1,42 @@
-import OleoPageHeaderFirstLetters from "@/components/OleoPageHeader/OleoPageHeaderFirstLetters"
-import OleoPageHeaderLetters from "@/components/OleoPageHeader/OleoPageHeaderLetters"
+import { Oleo_Script } from "next/font/google"
+import React from "react"
+
+import { cn } from "@/lib/utils"
+
+const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
 const OleoPageHeader = ({
-  inputSentence,
-  textSize
+  title
 }: {
-  inputSentence: string
-  textSize: string // text-9xl과 같은 형식으로 입력
+  title: string
 }) => {
-  let sentence: string[] = inputSentence.split(" ")
-
-  let firstLetters: { id: number; letter: string }[] = sentence.map(
-    (word, index) => ({
-      id: index + 1,
-      letter: word.charAt(0)
-    })
-  )
-
-  let modifiedSentence: { id: number; modifiedWord: string }[] = sentence.map(
-    (word, index) => ({
-      id: index + 1,
-      modifiedWord: word.slice(1)
-    })
-  )
+  const words = title.split(" ")
 
   return (
-    <div className="flex">
-      {firstLetters.map((firstLetter, i) => (
-        <div className="mr-2 flex" key={firstLetter.id}>
-          <OleoPageHeaderFirstLetters word={firstLetter} textSize={textSize} />
-          <OleoPageHeaderLetters
-            word={modifiedSentence[i]}
-            textSize={textSize}
-          />
+    <div className="flex mb-10">
+      {words.map((word, i) => {
+        const firstLetter = word.charAt(0)
+        const rest = word.slice(1)
+
+        return (
+        <div className="flex" key={i}>
+          <div className={cn(
+            OleoScript.className,
+            "italic text-gray-100 text-9xl"
+          )}>
+            {firstLetter}
+          </div>
+          <div className={cn(
+            OleoScript.className,
+            "italic text-primary text-9xl"
+          )}
+          style={{
+            WebkitTextStroke: "2px white"
+          }}>
+            {rest}
+          </div>
         </div>
-      ))}
+      )})}
     </div>
   )
 }

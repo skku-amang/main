@@ -21,10 +21,7 @@ const TeamCreatePage = async () => {
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
-        <OleoPageHeader
-          inputSentence="Create New Team"
-          textSize="text-[7rem]"
-        />
+        <OleoPageHeader title="Create Your Team" />
         <div className="h-10 w-10 " />
       </div>
       <TeamForm className="z-10 w-2/3 bg-white" />
