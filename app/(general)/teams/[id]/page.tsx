@@ -71,15 +71,20 @@ const TeamDetail = ({ params }: Props) => {
 
   return (
     <div className="container pt-16">
+      {/* 기울어진 배경 - 슬레이트 */}
       <div
-        className="absolute left-0 top-0 z-0 h-[25rem] w-screen bg-slate-300"
+        className="absolute left-0 top-0 z-0 h-[25rem] w-full bg-slate-300"
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
       ></div>
+      {/* 기울어진 배경 - 프라이머리 */}
       <div
-        className="absolute left-0 top-0 h-[28rem] w-screen bg-primary"
+        className="absolute left-0 top-0 h-[28rem] w-full bg-primary"
         style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
       ></div>
+
+      {/* 뒤로가기 버튼 및 페이지 헤더 */}
       <div className="relative flex items-center justify-between">
+        {/* 뒤로가기 버튼 */}
         <Link
           href={ROUTES.TEAM.LIST.url}
           className="flex items-center gap-x-5 font-semibold text-white"
@@ -87,10 +92,11 @@ const TeamDetail = ({ params }: Props) => {
           <RiArrowGoBackLine className="text-white" />
           돌아가기
         </Link>
+        
+        {/* 페이지 헤더 */}
         <PageHeader inputSentence="Join Your Team" textSize="text-8xl" />
         <div className="w-[100px]" />
       </div>
-      <h2 className="text-center text-4xl italic">Join Your Team</h2>
 
       {/* 유튜브 임베드 */}
       <div className="mb-16 mt-6 flex items-center justify-center">

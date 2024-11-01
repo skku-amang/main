@@ -10,7 +10,7 @@ interface FirstLetterProps {
     id: number
     letter: string
   }
-  textSize?: string // 텍스트 크기를 받아오는 props 추가
+  textSize?: string
 }
 
 const PageHeaderFirstLetters: React.FC<FirstLetterProps> = ({

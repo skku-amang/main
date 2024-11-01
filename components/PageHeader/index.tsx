@@ -1,5 +1,5 @@
 import PageHeaderFirstLetters from "@/components/PageHeader/PageHeaderFirstLetters"
-import PageHeaderLetters from "@/components/PageHeader/PageHeaderLetters" // PageHeaderLetters import 추가
+import PageHeaderLetters from "@/components/PageHeader/PageHeaderLetters"
 
 const PageHeader = ({
   inputSentence,

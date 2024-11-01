@@ -10,7 +10,7 @@ interface LetterProps {
     id: number
     modifiedWord: string
   }
-  textSize?: string // 텍스트 크기를 받아오는 props 추가
+  textSize?: string
 }
 
 const PageHeaderLetters: React.FC<LetterProps> = ({ word, textSize }) => {
@@ -19,10 +19,10 @@ const PageHeaderLetters: React.FC<LetterProps> = ({ word, textSize }) => {
       className={cn(
         OleoScript.className,
         "z-0 bg-primary italic text-primary",
-        textSize // 동적으로 텍스트 크기 적용
+        textSize
       )}
       style={{
-        WebkitTextStroke: "2px white" // -webkit-text-stroke 속성 적용
+        WebkitTextStroke: "2px white"
       }}
     >
       {word.modifiedWord}
