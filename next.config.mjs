@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const baseURL = process.env.NODE_ENV === "development" ?
-  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.NEXT_PUBLIC_VERCEL_URL;
+  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.VERCEL_URL;
 
 if (!baseURL) {
-  throw new Error("Base URL is not defined. Please set NEXT_PUBLIC_DEVELOPMENT_URL and NEXT_PUBLIC_VERCEL_URL in your .env file.");
+  throw new Error("Base URL is not defined. Please set NEXT_PUBLIC_DEVELOPMENT_URL and VERCEL_URL in your .env file.");
 }
 
 const nextConfig = {
