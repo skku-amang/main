@@ -30,7 +30,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: process.env.NEXT_PUBLIC_VERCEL_URL,
+            value: 'amang.net',
           },
         ],
         destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
