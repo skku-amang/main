@@ -30,10 +30,10 @@ const nextConfig = {
         source: '/api/auth/:path*',
         destination: '/api/auth/:path*',
       },
-      // 나머지 api 경로는 프록시
+      // 나머지 api 경로는 http로 변환
       {
         source: "/api/:path*",
-        destination: `${baseURL}/api/:path*`,
+        destination: `${baseURL.replace('https', 'http')}/api/:path*`,
       },
     ];
   },
