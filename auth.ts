@@ -127,6 +127,8 @@ async function _signIn(
     }
   })
 
+  console.log(res)
+
   // 에러 처리
   if (!res.ok) {
     if (type === "signup") {
