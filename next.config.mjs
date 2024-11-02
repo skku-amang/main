@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const baseURL = process.env.NODE_ENV === "development" ?
-process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.NEXT_PUBLIC_DEPLOY_URL;
+  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.NEXT_PUBLIC_VERCEL_URL;
 
 if (!baseURL) {
-  throw new Error("Base URL is not defined. Please set NEXT_PUBLIC_DEVELOPMENT_URL and NEXT_PUBLIC_DEPLOY_URL in your .env file.");
+  throw new Error("Base URL is not defined. Please set NEXT_PUBLIC_DEVELOPMENT_URL and NEXT_PUBLIC_VERCEL_URL in your .env file.");
 }
 
 const nextConfig = {
@@ -23,6 +23,21 @@ const nextConfig = {
       }
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/api/:path*',
+        has: [
+          {
+            type: 'host',
+            value: process.env.NEXT_PUBLIC_VERCEL_URL,
+          },
+        ],
+        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       // api/auth 경로는 프록시하지 않음
@@ -30,13 +45,8 @@ const nextConfig = {
         source: '/api/auth/:path*',
         destination: '/api/auth/:path*',
       },
-      // 나머지 api 경로는 http로 변환
-      {
-        source: "/api/:path*",
-        destination: `${baseURL.replace('https', 'http')}/api/:path*`,
-      },
     ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

@@ -1,20 +1,5 @@
-let baseURL: string
-switch (process.env.NODE_ENV) {
-  case "development":
-    if (!process.env.NEXT_PUBLIC_DEVELOPMENT_URL) {
-      throw new Error("NEXT_PUBLIC_DEVELOPMENT_URL is not defined")
-    }
-    baseURL = process.env.NEXT_PUBLIC_DEVELOPMENT_URL
-    break
-  case "production":
-    if (!process.env.NEXT_PUBLIC_DEPLOY_URL) {
-      throw new Error("NEXT_PUBLIC_DEPLOY_URL is not defined")
-    }
-    baseURL = process.env.NEXT_PUBLIC_DEPLOY_URL
-    break
-  default:
-    throw new Error(`Unexpected NODE_ENV: ${process.env.NODE_ENV}`)
-}
+const baseURL = process.env.NODE_ENV === "development" ?
+  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.NEXT_PUBLIC_DEPLOY_URL;
 const API_PREFIX = "api"
 
 export interface ApiEndpoint {
