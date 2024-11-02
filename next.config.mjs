@@ -30,7 +30,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: baseURL,
+            value: process.env.NEXT_PUBLIC_VERCEL_URL,
           },
         ],
         destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
