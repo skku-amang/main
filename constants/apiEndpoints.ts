@@ -1,10 +1,20 @@
-const isServer = typeof window === "undefined"
-const localUrl = isServer ? process.env.NEXT_PUBLIC_SERVER_URL : process.env.NEXT_PUBLIC_CLIENT_URL
-const baseURL =
-  process.env.NODE_ENV === "development"
-    ? localUrl
-    : process.env.NEXT_PUBLIC_DEPLOY_URL
-
+let baseURL: string
+switch (process.env.NODE_ENV) {
+  case "development":
+    if (!process.env.NEXT_PUBLIC_DEVELOPMENT_URL) {
+      throw new Error("NEXT_PUBLIC_DEVELOPMENT_URL is not defined")
+    }
+    baseURL = process.env.NEXT_PUBLIC_DEVELOPMENT_URL
+    break
+  case "production":
+    if (!process.env.NEXT_PUBLIC_DEPLOY_URL) {
+      throw new Error("NEXT_PUBLIC_DEPLOY_URL is not defined")
+    }
+    baseURL = process.env.NEXT_PUBLIC_DEPLOY_URL
+    break
+  default:
+    throw new Error(`Unexpected NODE_ENV: ${process.env.NODE_ENV}`)
+}
 const API_PREFIX = "api"
 
 export interface ApiEndpoint {
