@@ -15,6 +15,7 @@ const TeamCreatePage = async () => {
     <div className="relative flex h-full w-full flex-col items-center justify-center">
       {/* 헤더 */}
       <div className="z-10 mt-20 flex w-2/3 items-center justify-between">
+        {/* 뒤로가기 버튼 */}
         <Link
           href={ROUTES.PERFORMANCE.TEAMS(1).url}  // TODO: 공연 ID 동적으로 받기
           className="mt-2 flex items-center gap-x-5 font-semibold text-white"
@@ -22,7 +23,10 @@ const TeamCreatePage = async () => {
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
+        
+        {/* 페이지 제목 */}
         <OleoPageHeader title="Create Your Team" />
+
         <div className="h-10 w-10 " />
       </div>
 

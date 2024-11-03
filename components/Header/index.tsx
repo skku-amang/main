@@ -27,7 +27,7 @@ const Header = ({
     <header
       className={cn(
         position,
-        "top-0 z-10 flex h-full w-full justify-center bg-primary"
+        "top-0 z-50 flex h-full w-full justify-center bg-primary"
       )}
       style={{ height }}
     >
