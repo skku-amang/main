@@ -119,36 +119,37 @@ async function _signIn(
   // 요청 전송
   const apiEndpoint =
     type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
-  const res = await fetchData(apiEndpoint as ApiEndpoint, {
-    body: JSON.stringify(body),
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
+  throw new Error(`${apiEndpoint}`)
+  // const res = await fetchData(apiEndpoint as ApiEndpoint, {
+  //   body: JSON.stringify(body),
+  //   cache: "no-store",
+  //   headers: {
+  //     "Content-Type": "application/json"
+  //   }
+  // })
 
-  // 에러 처리
-  if (!res.ok) {
-    if (type === "signup") {
-      switch (res.status) {
-        case StatusCodes.BAD_REQUEST:
-          throw new InvalidSignupCredentialsError()
-        case StatusCodes.CONFLICT:
-          throw new DuplicatedCredentialsError()
-        default:
-          throw new InternalServerError()
-      }
-    } else {
-      switch (res.status) {
-        case StatusCodes.UNAUTHORIZED:
-          throw new InvalidSigninError()
-        default:
-          throw new InternalServerError()
-      }
-    }
-  }
+  // // 에러 처리
+  // if (!res.ok) {
+  //   if (type === "signup") {
+  //     switch (res.status) {
+  //       case StatusCodes.BAD_REQUEST:
+  //         throw new InvalidSignupCredentialsError()
+  //       case StatusCodes.CONFLICT:
+  //         throw new DuplicatedCredentialsError()
+  //       default:
+  //         throw new InternalServerError()
+  //     }
+  //   } else {
+  //     switch (res.status) {
+  //       case StatusCodes.UNAUTHORIZED:
+  //         throw new InvalidSigninError()
+  //       default:
+  //         throw new InternalServerError()
+  //     }
+  //   }
+  // }
 
-  // 결과 반환
-  const data = await res.json()
-  return { ...data } as AuthData
+  // // 결과 반환
+  // const data = await res.json()
+  // return { ...data } as AuthData
 }
