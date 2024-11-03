@@ -14,7 +14,7 @@ import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
 import { FaCircle } from "react-icons/fa"
 
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import SOCIAL from "@/constants/social"
 
 import NavLink from "./NavLink"
@@ -29,7 +29,7 @@ const SheetInnerContent = () => {
   return (
     <div className="h-full flex flex-col items-between justify-center">
       <Link
-        href={!session ? ROUTES.LOGIN.url : ROUTES.PROFILE.INDEX.url}
+        href={!session ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
         className="flex w-full items-center justify-start py-[4%]"
       >
         {!session ? (
@@ -68,25 +68,25 @@ const SheetInnerContent = () => {
 
           <div className="space-y-7">
             <NavLink
-              href={ROUTES.NOTICE.LIST.url}
+              href={ROUTES.NOTICE.LIST}
               icon={<Megaphone size={iconSize} className={iconcolor} />}
             >
               공지사항
             </NavLink>
             <NavLink
-              href={ROUTES.PERFORMANCE.LIST.url}
+              href={ROUTES.PERFORMANCE.LIST}
               icon={<Music4 size={iconSize} className={iconcolor} />}
             >
               공연목록
             </NavLink>
             <NavLink
-              href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 실제 기본 공연 ID로 변경
+              href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
               icon={<FileText size={iconSize} className={iconcolor} />}
             >
               세션지원
             </NavLink>
             <NavLink
-              href={ROUTES.MEMBER.LIST.url}
+              href={ROUTES.MEMBER.LIST}
               icon={<ImageIcon size={iconSize} className={iconcolor} />}
             >
               멤버목록
@@ -127,7 +127,7 @@ const SheetInnerContent = () => {
           <>
             <LogIn size={iconSize} className="text-primary" />
             <Link
-              href={ROUTES.LOGIN.url}
+              href={ROUTES.LOGIN}
               className="text-xl font-medium text-primary"
             >
               Login Account
