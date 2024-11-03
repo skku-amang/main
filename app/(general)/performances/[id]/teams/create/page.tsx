@@ -2,10 +2,11 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
-import TeamForm from "@/app/(general)/teams/_components/TeamForm"
 import { auth } from "@/auth"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import ROUTES from "@/constants/routes"
+
+import TeamForm from "./_components/TeamForm"
 
 interface TeamCreatePageProps {
   params: {
