@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import {
@@ -27,9 +28,9 @@ const SelectView = ({
   const router = useRouter()
 
   return (
-    <Select onValueChange={id => router.push(ROUTES.PERFORMANCE.DETAIL(+id))}>
+    <Select value={currentPerformanceId.toString()} onValueChange={(performanceId) => router.push(ROUTES.PERFORMANCE.TEAM.LIST(+performanceId))}>
       <SelectTrigger className="font-semibold text-gray-400">
-        <SelectValue placeholder={currentPerformance?.name ?? "공연 선택"} />
+        <SelectValue placeholder={currentPerformance?.name} />
       </SelectTrigger>
       <SelectContent>
         {performanceOptions.map((p) => (
@@ -37,7 +38,9 @@ const SelectView = ({
             key={p.id}
             value={p.id.toString()}
           >
+          <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>
             {p.name}
+          </Link>
           </SelectItem>
         ))}
       </SelectContent>
