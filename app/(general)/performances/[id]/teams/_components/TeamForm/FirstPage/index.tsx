@@ -27,9 +27,9 @@ import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
 
 import Description from "../Description"
-import basicInfoSchema from "../FirstPage/schema"
-import YoutubeDialog from "../FirstPage/YoutubeDialog"
 import Paginator from "../Paginator"
+import basicInfoSchema from "./schema"
+import YoutubeDialog from "./YoutubeDialog"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
