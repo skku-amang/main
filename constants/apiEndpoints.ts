@@ -1,5 +1,5 @@
 const baseURL = process.env.NODE_ENV === "development" ?
-  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : process.env.NEXT_PUBLIC_DEPLOY_URL;
+  process.env.NEXT_PUBLIC_DEVELOPMENT_URL : `${process.env.NEXT_PUBLIC_DEPLOY_URL}:443`;
 const API_PREFIX = "api"
 
 export interface ApiEndpoint {
