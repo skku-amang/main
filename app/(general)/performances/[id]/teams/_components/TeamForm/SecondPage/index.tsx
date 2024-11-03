@@ -7,8 +7,8 @@ import { Form } from "@/components/ui/form"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
-import MemberSessionRequiredCheckbox from "../SecondPage/MemberSessionRequiredCheckbox"
-import { memberSessionRequiredBaseSchema } from "../SecondPage/schema"
+import MemberSessionRequiredCheckbox from "./MemberSessionRequiredCheckbox"
+import { memberSessionRequiredBaseSchema } from "./schema"
 
 interface SecondPageProps {
   form: ReturnType<

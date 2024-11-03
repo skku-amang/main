@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
+import { formatGenerationOrder } from "@/lib/utils"
 import { SessionName } from "@/types/Session"
 import { Team } from "@/types/Team"
 import { User } from "@/types/User"
@@ -83,7 +84,7 @@ const MemberSessionCard = ({
         {/* 설명 */}
         <div>
           <div>
-            {user.generation?.order}기 {user.name}
+            {formatGenerationOrder(user.generation?.order)}기 {user.name}
           </div>
           <div className="text-sm text-gray-400">#{user.nickname}</div>
 

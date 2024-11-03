@@ -25,7 +25,8 @@ const authOptions: NextAuthConfig = {
         nickname: { label: "Nickname", type: "text" },
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        sessions: { label: "Sessions", type: "text" }
+        sessions: { label: "Sessions", type: "text" },
+        generationId: { label: "Generation", type: "text" }
       },
       /**
        * 로그인 또는 회원가입 시 호출되는 함수

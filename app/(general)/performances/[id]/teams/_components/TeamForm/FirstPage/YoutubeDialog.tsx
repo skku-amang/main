@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
 
-import basicInfoSchema, { songYoutubeVideoIdSchema } from "../../TeamForm/FirstPage/schema"
+import basicInfoSchema, { songYoutubeVideoIdSchema } from "./schema"
 
 interface YoutubeDialog {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>

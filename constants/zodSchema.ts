@@ -22,6 +22,7 @@ export const password = z
   .regex(passwordRegex, {
     message: "영문, 숫자를 모두 조합해 주세요."
   })
+const generationId = z.string({ required_error: "필수 항목" }).refine(data => (+data).toString() == data)
 
 export const signInSchema = z.object({
   email,
@@ -32,6 +33,7 @@ export const signUpSchema = z.object({
   name,
   nickname,
   email,
+  generationId,
   sessions: z.array(z.number()).min(1, {
     message: "최소 1개의 세션을 선택해주세요."
   }),

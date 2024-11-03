@@ -5,12 +5,13 @@ import { RiArrowGoBackLine } from "react-icons/ri"
 
 import ErrorPage from "@/app/_(errors)/Error"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import TeamForm from "@/app/(general)/performances/[id]/teams/create/_components/TeamForm"
 import { auth } from "@/auth"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
+
+import TeamForm from "../../_components/TeamForm"
 
 interface TeamEditPageProps {
   params: {

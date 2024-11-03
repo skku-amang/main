@@ -13,7 +13,7 @@ import { User } from "@/types/User"
 import Description from "../Description"
 import Paginator from "../Paginator"
 import { memberSessionRequiredBaseSchema } from "../SecondPage/schema"
-import UserSelect from "../ThirdPage/UserSelect"
+import UserSelect from "./UserSelect"
 
 interface ThirdPageProps {
   form: ReturnType<

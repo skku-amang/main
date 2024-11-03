@@ -6,6 +6,7 @@ import React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { formatGenerationOrder } from "@/lib/utils"
 import { Session } from "@/types/Session"
 import { User } from "@/types/User"
 
@@ -54,7 +55,7 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.original.generation.order}
+        {formatGenerationOrder(row.original.generation.order)}
         <br />
       </div>
     )
