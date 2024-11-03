@@ -1,0 +1,156 @@
+"use Client"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import {
+  FileText,
+  ImageIcon,
+  Instagram,
+  LogIn,
+  Megaphone,
+  Music4,
+  Youtube
+} from "lucide-react"
+import Link from "next/link"
+import { signOut, useSession } from "next-auth/react"
+import { FaCircle } from "react-icons/fa"
+
+import ROUTES from "@/constants/routes"
+import SOCIAL from "@/constants/social"
+
+import NavLink from "./NavLink"
+import NavLinkHeader from "./NavLinkHeader"
+
+const iconSize = 24
+const iconcolor = "text-gray-500"
+
+const SheetInnerContent = () => {
+  const { data: session } = useSession()
+
+  return (
+    <div className="h-full flex flex-col items-between justify-center">
+      <Link
+        href={!session ? ROUTES.LOGIN.url : ROUTES.PROFILE.INDEX.url}
+        className="flex w-full items-center justify-start py-[4%]"
+      >
+        {!session ? (
+          <>
+            <FaCircle className="h-14 w-14 text-gray-100"></FaCircle>
+            <div className="w-full">
+              <div className="h-full w-full pl-2 text-left font-medium text-black">
+                로그인 해주세요
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <Avatar className="h-13 w-16 overflow-hidden rounded-full">
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className="w-full">
+              <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">
+                {session.name}
+              </div>
+              <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400">
+                <span>&gt;</span> 마이페이지
+              </div>
+            </div>
+          </>
+        )}
+      </Link>
+
+      <div className="space-y-10 flex-auto">
+        {/* Main */}
+        <div>
+          <NavLinkHeader className="mb-3">
+            MAIN
+          </NavLinkHeader>
+
+          <div className="space-y-7">
+            <NavLink
+              href={ROUTES.NOTICE.LIST.url}
+              icon={<Megaphone size={iconSize} className={iconcolor} />}
+            >
+              공지사항
+            </NavLink>
+            <NavLink
+              href={ROUTES.PERFORMANCE.LIST.url}
+              icon={<Music4 size={iconSize} className={iconcolor} />}
+            >
+              공연목록
+            </NavLink>
+            <NavLink
+              href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 실제 기본 공연 ID로 변경
+              icon={<FileText size={iconSize} className={iconcolor} />}
+            >
+              세션지원
+            </NavLink>
+            <NavLink
+              href={ROUTES.MEMBER.LIST.url}
+              icon={<ImageIcon size={iconSize} className={iconcolor} />}
+            >
+              멤버목록
+            </NavLink>
+          </div>
+        </div>
+
+        {/* Links */}
+        <div>
+          <NavLinkHeader className="mb-3">
+            LINKS
+          </NavLinkHeader>
+
+          <div className="space-y-7">
+            <NavLink
+              href={SOCIAL.Youtube.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={<Youtube size={iconSize} className={iconcolor} />}
+            >
+              YouTube
+            </NavLink>
+            <NavLink
+              href={SOCIAL.Instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={<Instagram size={iconSize} className={iconcolor} />}
+            >
+              Instagram
+            </NavLink>
+          </div>
+        </div>
+      </div>
+
+      {/* Login & Logout */}
+      <div className="flex w-full items-center justify-center gap-4 pt-[85%]">
+        {!session ? (
+          <>
+            <LogIn size={iconSize} className="text-primary" />
+            <Link
+              href={ROUTES.LOGIN.url}
+              className="text-xl font-medium text-primary"
+            >
+              Login Account
+            </Link>
+          </>
+        ) : (
+          <>
+            <LogIn
+              onClick={() => signOut()}
+              size={iconSize}
+              className="cursor-pointer text-red-600"
+            />
+            <div
+              className="cursor-pointer text-xl font-medium text-red-600"
+              onClick={() => signOut()}
+            >
+              Logout Account
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default SheetInnerContent
