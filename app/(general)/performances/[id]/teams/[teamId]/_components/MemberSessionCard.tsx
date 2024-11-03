@@ -40,7 +40,8 @@ const MemberSessionCard = ({
         body: JSON.stringify({ session, index: sessionIndex }),
         cache: "no-store",
         headers: {
-          Authorization: `Bearer ${authSession.data?.access}`
+          Authorization: `Bearer ${authSession.data?.access}`,
+          "Content-Type": "application/json"
         }
       }
     )
