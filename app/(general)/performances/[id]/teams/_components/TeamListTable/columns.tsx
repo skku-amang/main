@@ -12,9 +12,10 @@ import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
+import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
+import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -25,8 +26,6 @@ import {
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
-import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
-import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 
 export type TeamColumn = {
   id: number
