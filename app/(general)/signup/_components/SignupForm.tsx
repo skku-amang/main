@@ -32,6 +32,7 @@ import {
   DuplicatedCredentialsErrorCode,
   InvalidSignupCredentialsErrorCode
 } from "@/lib/auth/errors"
+import { formatGenerationOrder } from "@/lib/utils"
 import { Generation } from "@/types/Generation"
 import { Session } from "@/types/Session"
 
@@ -65,7 +66,7 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
       email: formData.email,
       password: formData.password,
       sessions: formData.sessions,
-      generation: formData.generation,
+      generationId: formData.generationId,
       redirect: false
     })
     if (!res?.error) return router.push(ROUTES.HOME)
@@ -174,14 +175,14 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
 
         <FormField
           control={form.control}
-          name="generation"
+          name="generationId"
           render={({ field }) => (
             <FormItem>
               <div>
                 <SimpleLabel
                   required={
                     !(
-                      signUpSchema._def.schema.shape.generation instanceof
+                      signUpSchema._def.schema.shape.generationId instanceof
                       z.ZodOptional
                     )
                   }
@@ -196,7 +197,7 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                 <SelectContent>
                   {generations.map((generation) => (
                     <SelectItem key={generation.order} value={generation.id.toString()}>
-                      {generation.order}기
+                      {formatGenerationOrder(generation.order)}기
                     </SelectItem>
                   ))}
                 </SelectContent>
