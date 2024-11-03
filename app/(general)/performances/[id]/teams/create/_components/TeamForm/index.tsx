@@ -9,14 +9,6 @@ import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import Loading from "@/app/_(errors)/Loading"
-import FirstPage from "@/app/(general)/teams/_components/TeamForm/FirstPage"
-import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
-import SecondPage from "@/app/(general)/teams/_components/TeamForm/SecondPage"
-import {
-  memberSessionRequiredBaseSchema,
-  memberSessionRequiredField
-} from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
-import ThirdPage from "@/app/(general)/teams/_components/TeamForm/ThirdPage"
 import { useToast } from "@/components/hooks/use-toast"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
@@ -24,6 +16,15 @@ import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { cn } from "@/lib/utils"
 import { Team } from "@/types/Team"
+
+import FirstPage from "./FirstPage"
+import basicInfoSchema from "./FirstPage/schema"
+import SecondPage from "./SecondPage"
+import {
+  memberSessionRequiredBaseSchema,
+  memberSessionRequiredField
+} from "./SecondPage/schema"
+import ThirdPage from "./ThirdPage"
 
 interface TeamCreateFormProps {
   initialData?: Team

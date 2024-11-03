@@ -5,14 +5,15 @@ import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/_components/TeamForm/Description"
-import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
-import UserSelect from "@/app/(general)/teams/_components/TeamForm/ThirdPage/UserSelect"
 import { Form } from "@/components/ui/form"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
+
+import Description from "../Description"
+import Paginator from "../Paginator"
+import { memberSessionRequiredBaseSchema } from "../SecondPage/schema"
+import UserSelect from "../ThirdPage/UserSelect"
 
 interface ThirdPageProps {
   form: ReturnType<

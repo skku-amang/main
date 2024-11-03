@@ -4,9 +4,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import basicInfoSchema, {
-  songYoutubeVideoIdSchema
-} from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -20,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
+
+import basicInfoSchema, { songYoutubeVideoIdSchema } from "../../TeamForm/FirstPage/schema"
 
 interface YoutubeDialog {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
