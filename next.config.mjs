@@ -23,21 +23,21 @@ const nextConfig = {
       }
     ]
   },
-  async redirects() {
-    return [
-      {
-        source: '/api/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'amang.net',
-          },
-        ],
-        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
-        permanent: true,
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       has: [
+  //         {
+  //           type: 'host',
+  //           value: 'amang.net',
+  //         },
+  //       ],
+  //       destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
   async rewrites() {
     return [
       // api/auth 경로는 프록시하지 않음
@@ -45,6 +45,10 @@ const nextConfig = {
         source: '/api/auth/:path*',
         destination: '/api/auth/:path*',
       },
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL}/api/:path*`,
+      }
     ];
   },
 };
