@@ -16,7 +16,7 @@ const ButtonView = ({ currentPerformanceId, performanceOptions }: SelectViewProp
       <p className="my-8 text-center font-bold">Performances</p>
       <div className="flex gap-x-4">
         {performanceOptions.map((p) => (
-          <Link key={p.id} href={ROUTES.PERFORMANCE.TEAMS(p.id).url}>
+          <Link key={p.id} href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>
             <Button
               className={cn(
                 "rounded-xl bg-zinc-100 py-0 text-black shadow hover:bg-zinc-200",

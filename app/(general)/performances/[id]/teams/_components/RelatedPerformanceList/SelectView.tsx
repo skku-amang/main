@@ -27,7 +27,7 @@ const SelectView = ({
   const router = useRouter()
 
   return (
-    <Select onValueChange={id => router.push(ROUTES.PERFORMANCE.DETAIL(+id).url)}>
+    <Select onValueChange={id => router.push(ROUTES.PERFORMANCE.DETAIL(+id))}>
       <SelectTrigger className="font-semibold text-gray-400">
         <SelectValue placeholder={currentPerformance?.name ?? "공연 선택"} />
       </SelectTrigger>

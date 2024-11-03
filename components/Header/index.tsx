@@ -17,10 +17,10 @@ const Header = ({
   height: string
 }) => {
   const menuItems: { name: string; url: string; active: boolean }[] = [
-    // { name: "공지사항", url: ROUTES.NOTICE.LIST.url, active: false },
-    { name: "공연목록", url: ROUTES.PERFORMANCE.LIST.url, active: true },
-    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAMS(1).url, active: true }, // TODO: 실제 기본 공연 ID로 변경
-    // { name: "맴버목록", url: ROUTES.MEMBER.LIST.url, active: true }
+    // { name: "공지사항", url: ROUTES.NOTICE.LIST, active: false },
+    { name: "공연목록", url: ROUTES.PERFORMANCE.LIST, active: true },
+    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAM.LIST(1), active: true }, // TODO: 실제 기본 공연 ID로 변경
+    // { name: "맴버목록", url: ROUTES.MEMBER.LIST, active: true }
   ]
 
   return (
@@ -34,7 +34,7 @@ const Header = ({
       {/* Mobile */}
       <nav className="visible relative flex h-full w-11/12 items-center justify-between md:hidden">
         <div className="f-full w-9 bg-none"></div>
-        <Link href={ROUTES.HOME.url}>
+        <Link href={ROUTES.HOME}>
           <Image src="/Logo.png" alt="logo" width={50} height={50} />
         </Link>
         <Sidebar />
@@ -44,7 +44,7 @@ const Header = ({
       <nav className="hidden h-full w-full items-center px-10 md:visible md:flex">
         <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
-          <Link href={ROUTES.HOME.url}>
+          <Link href={ROUTES.HOME}>
             <Image src="/Logo.png" alt="logo" width={47} height={47} />
           </Link>
 

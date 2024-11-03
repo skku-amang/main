@@ -262,14 +262,14 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       return
     }
     const data = (await res.json()) as CreateRetrieveUpdateResponse<Team>
-    router.push(ROUTES.TEAM.DETAIL(data.id).url)
+    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performance.id, data.id))
   }
   function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
   }
 
   if (session.status === "loading") return <Loading />
-  if (!session.data) router.push(ROUTES.HOME.url)
+  if (!session.data) router.push(ROUTES.HOME)
 
   return (
     <div className={cn(`mb-20 rounded-2xl p-20 shadow-2xl ${className}`)}>
@@ -281,7 +281,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
           accessToken={session.data?.access}
           onPrevious={
             initialData
-              ? () => router.push(ROUTES.TEAM.DETAIL(initialData.id).url)
+              ? () => router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(initialData.performance.id, initialData.id))
               : undefined
           }
         />

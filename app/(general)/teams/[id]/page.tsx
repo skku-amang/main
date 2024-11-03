@@ -48,7 +48,7 @@ const TeamDetail = ({ params }: Props) => {
               setTeam(null)
               break
             default:
-              router.push(ROUTES.HOME.url)
+              router.push(ROUTES.HOME)
           }
         } else {
           setTeam(await res.json())
@@ -57,7 +57,7 @@ const TeamDetail = ({ params }: Props) => {
     }
   }, [id, session.data?.access, router])
 
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
+  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
   if (team === undefined) {
     return <Loading />
@@ -87,7 +87,7 @@ const TeamDetail = ({ params }: Props) => {
       <div className="relative flex items-center justify-between">
         {/* 뒤로가기 버튼 */}
         <Link
-          href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 공연 ID 동적으로 받기
+          href={ROUTES.PERFORMANCE.TEAM.LIST(1)} // TODO: 공연 ID 동적으로 받기
           className="flex items-center gap-x-5 font-semibold text-white"
         >
           <RiArrowGoBackLine className="text-white" />

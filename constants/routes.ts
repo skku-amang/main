@@ -1,98 +1,36 @@
-export interface Route {
-  name: string
-  // eslint-disable-next-line no-unused-vars
-  url: string | ((...args: string[]) => string)
-}
-
-// TODO: name 다 지워도 될듯
 const ROUTES = {
-  HOME: {
-    name: "Home",
-    url: "/"
-  },
-  LOGIN: {
-    name: "Log in",
-    url: "/login"
-  },
-  SIGNUP: {
-    name: "Sign up",
-    url: "/signup"
-  },
+  HOME: "/",
+  LOGIN: "/login",
+  SIGNUP: "/signup",
   ADMIN: {
-    INDEX: {
-      name: "Admin",
-      url: "/admin"
-    }
+    INDEX: "/admin"
   },
   NOTICE: {
-    CREATE: {
-      name: "공지사항 생성",
-      url: "/notices/create"
-    },
-    LIST: {
-      name: "공지사항 목록",
-      url: "/notices"
-    },
-    DETAIL: (id: number) => ({
-      name: "공지사항 상세",
-      url: `/notices/${id}`
-    }),
-    EDIT: (id: number) => ({
-      name: "공지사항 수정",
-      url: `/notices/${id}/edit`
-    })
+    CREATE: "/notices/create",
+    LIST: "/notices",
+    DETAIL: (id: number) => `/notices/${id}`,
+    EDIT: (id: number) => `/notices/${id}/edit`
   },
   PERFORMANCE: {
-    CREATE: {
-      name: "공연 생성",
-      url: "/performances/create"
+    CREATE: "/performances/create",
+    LIST: "/performances",
+    DETAIL: (id: number) => `/performances/${id}`,
+    TEAM: {
+      LIST: (id: number) => `/performances/${id}/teams`,
+      DETAIL: (performanceId: number, teamId: number) => `/performances/${performanceId}/teams/${teamId}/detail`,
+      EDIT: (performanceId: number, teamId: number) => `/performances/${performanceId}/teams/${teamId}edit`
     },
-    LIST: {
-      name: "공연 목록",
-      url: "/performances"
-    },
-    DETAIL: (id: number) => ({
-      name: "공연 상세",
-      url: `/performances/${id}`
-    }),
-    TEAMS: (id: number) => ({
-      name: "공연 팀 목록",
-      url: `/performances/${id}/teams`
-    }),
-    EDIT: (id: number) => ({
-      name: "공연 수정",
-      url: `/performances/${id}/edit`
-    })
+    EDIT: (id: number) => `/performances/${id}/edit`
   },
   TEAM: {
-    CREATE: {
-      name: "팀 생성",
-      url: "/teams/create"
-    },
-    DETAIL: (id: number) => ({
-      name: "팀 상세",
-      url: `/teams/${id}`
-    }),
-    EDIT: (id: number) => ({
-      name: "팀 수정",
-      url: `/teams/${id}/edit`
-    })
+    CREATE: "/teams/create",
   },
   MEMBER: {
-    LIST: {
-      name: "유저 목록",
-      url: "/members"
-    },
-    DETAIL: (id: number) => ({
-      name: "유저 상세",
-      url: `/members/${id}`
-    })
+    LIST: "/members",
+    DETAIL: (id: number) => `/members/${id}`
   },
   PROFILE: {
-    INDEX: {
-      name: "프로필",
-      url: "/profile"
-    }
+    INDEX: "/profile"
   }
 }
 

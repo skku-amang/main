@@ -38,7 +38,7 @@ const Login = () => {
 
   async function onValid(formData: z.infer<typeof signInSchema>) {
     const res = await signIn("credentials", { ...formData, redirect: false })
-    if (!res?.error) return router.push(ROUTES.HOME.url)
+    if (!res?.error) return router.push(ROUTES.HOME)
 
     switch (res.code) {
       case InvalidSigninErrorCode:
@@ -155,7 +155,7 @@ const Login = () => {
                 아직 계정이 없으신가요?
               </div>
               <Link
-                href={ROUTES.SIGNUP.url}
+                href={ROUTES.SIGNUP}
                 className={cn(Poppin.className, "text-sm text-blue-400")}
               >
                 회원가입

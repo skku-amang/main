@@ -58,8 +58,8 @@ function Profile() {
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
           <div className="flex justify-center gap-x-5 font-bold text-white">
-            <Link href={ROUTES.LOGIN.url}>로그인</Link>|
-            <Link href={ROUTES.SIGNUP.url}>회원가입</Link>
+            <Link href={ROUTES.LOGIN}>로그인</Link>|
+            <Link href={ROUTES.SIGNUP}>회원가입</Link>
           </div>
         )}
       </>
@@ -92,7 +92,7 @@ function Profile() {
         <DropdownMenuSeparator />
         <MenuItem
           icon={<User size={iconSize} />}
-          href={ROUTES.PROFILE.INDEX.url}
+          href={ROUTES.PROFILE.INDEX}
         >
           내 프로필
         </MenuItem>

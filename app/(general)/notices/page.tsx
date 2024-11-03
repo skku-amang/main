@@ -41,7 +41,7 @@ const NoticeList = () => {
   return (
     <>
       <Button asChild>
-        <Link href={ROUTES.NOTICE.CREATE.url}>추가</Link>
+        <Link href={ROUTES.NOTICE.CREATE}>추가</Link>
       </Button>
 
       <div></div>

@@ -36,7 +36,7 @@ const PerformanceList = async () => {
           <Button>검색</Button>
         </div>
         <Button asChild className="flex items-center">
-          <Link href={ROUTES.PERFORMANCE.CREATE.url}>
+          <Link href={ROUTES.PERFORMANCE.CREATE}>
             <CiCirclePlus size={20} />
             &nbsp;추가
           </Link>
