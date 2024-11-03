@@ -3,7 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import Sidebar from "@/components/Header/_component/Sidebar"
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 import NavLink from "../NavLink"
@@ -19,7 +19,7 @@ const Header = ({
   const menuItems: { name: string; url: string; active: boolean }[] = [
     // { name: "공지사항", url: ROUTES.NOTICE.LIST, active: false },
     { name: "공연목록", url: ROUTES.PERFORMANCE.LIST, active: true },
-    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAM.LIST(1), active: true }, // TODO: 실제 기본 공연 ID로 변경
+    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID), active: true },
     // { name: "맴버목록", url: ROUTES.MEMBER.LIST, active: true }
   ]
 

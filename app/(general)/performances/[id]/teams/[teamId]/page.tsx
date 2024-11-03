@@ -114,7 +114,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo team={team} accessToken={session.data?.access} />
+      <BasicInfo performanceId={performanceId} team={team} accessToken={session.data?.access} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">

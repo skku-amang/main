@@ -1,3 +1,5 @@
+export const DEFAULT_PERFORMANCE_ID = 1
+
 const ROUTES = {
   HOME: "/",
   LOGIN: "/login",

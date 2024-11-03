@@ -11,7 +11,7 @@ import Link from "next/link"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 
 const iconcolor = "text-gray-500"
 
@@ -53,7 +53,7 @@ const SheetInnerContent = () => {
           <div className="pl-4 text-lg font-medium text-gray-500">공연목록</div>
         </Link>
         <Link
-          href={ROUTES.PERFORMANCE.TEAM.LIST(1)} // TODO: 실제 기본 공연 ID로 변경
+          href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <FileText size={30} className={iconcolor} />

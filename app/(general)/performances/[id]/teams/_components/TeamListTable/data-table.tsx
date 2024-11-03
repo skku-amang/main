@@ -37,7 +37,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
 import { MemberSessionSet } from "@/types/Team"
 
@@ -489,7 +489,7 @@ export function TeamListDataTable<TValue>({
 
             {/* 생성 버튼 */}
             <Button asChild className="h-full rounded-md py-1">
-              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(1)}>  {/* TODO: 실제 기본 공연 ID로 변경 */}
+              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}>
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>

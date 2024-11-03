@@ -21,8 +21,6 @@ export type Team = {
 
   memberSessions?: MemberSession[]
 }
-// TODO: 각 모델별 DTO 작성: API에서 받은 JSON 형태 정의
-// TODO: 각 모델별 refine 함수 작성 -> DTO를 받아서 해당 모델로 변환
 
 export type Song = {
   name: string
