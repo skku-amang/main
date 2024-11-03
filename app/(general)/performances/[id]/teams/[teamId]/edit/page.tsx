@@ -5,7 +5,7 @@ import { RiArrowGoBackLine } from "react-icons/ri"
 
 import ErrorPage from "@/app/_(errors)/Error"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import TeamForm from "@/app/(general)/teams/_components/TeamForm"
+import TeamForm from "@/app/(general)/performances/[id]/teams/create/_components/TeamForm"
 import { auth } from "@/auth"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
@@ -15,14 +15,16 @@ import fetchData from "@/lib/fetch"
 interface TeamEditPageProps {
   params: {
     id: number
+    teamId: number
   }
 }
 
 const TeamEditPage = async ({ params }: TeamEditPageProps) => {
-  const { id } = params
+  const performanceId = params.id
+  const id = params.teamId
 
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN.url)
+  if (!session) redirect(ROUTES.LOGIN)
 
   const res = await fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
     cache: "no-cache",
@@ -48,7 +50,7 @@ const TeamEditPage = async ({ params }: TeamEditPageProps) => {
       {/* 헤더 */}
       <div className="z-10 mt-20 flex w-2/3 items-center justify-between">
         <Link
-          href={ROUTES.PERFORMANCE.TEAMS(1).url}  // TODO: 공연 ID 동적으로 받기
+          href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}
           className="mt-2 flex items-center gap-x-5 font-semibold text-white"
         >
           <RiArrowGoBackLine className="text-white" />

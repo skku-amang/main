@@ -2,14 +2,23 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
-import TeamForm from "@/app/(general)/teams/_components/TeamForm"
 import { auth } from "@/auth"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
-const TeamCreatePage = async () => {
+import TeamForm from "./_components/TeamForm"
+
+interface TeamCreatePageProps {
+  params: {
+    id: number
+  }
+}
+
+const TeamCreatePage = async ({ params }: TeamCreatePageProps) => {
+  const performanceId = params.id
+
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN.url)
+  if (!session) redirect(ROUTES.LOGIN)
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center">
@@ -17,7 +26,7 @@ const TeamCreatePage = async () => {
       <div className="z-10 mt-20 flex w-2/3 items-center justify-between">
         {/* 뒤로가기 버튼 */}
         <Link
-          href={ROUTES.PERFORMANCE.TEAMS(1).url}  // TODO: 공연 ID 동적으로 받기
+          href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
           className="mt-2 flex items-center gap-x-5 font-semibold text-white"
         >
           <RiArrowGoBackLine className="text-white" />

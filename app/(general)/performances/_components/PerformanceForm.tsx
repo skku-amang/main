@@ -117,7 +117,7 @@ const PerformanceForm = () => {
       description: "성공적으로 공연이 생성되었습니다!"
     })
     const data = (await res.json()) as CreateRetrieveUpdateResponse<Performance>
-    router.push(ROUTES.PERFORMANCE.DETAIL(data.id).url)
+    router.push(ROUTES.PERFORMANCE.DETAIL(data.id))
   }
 
   return (

@@ -9,10 +9,10 @@ import { RiArrowGoBackLine } from "react-icons/ri"
 
 import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
-import BasicInfo from "@/app/(general)/teams/[id]/_components/BasicInfo"
-import MemberSessionCard from "@/app/(general)/teams/[id]/_components/MemberSessionCard"
-import SessionSetCard from "@/app/(general)/teams/[id]/_components/SessionSetCard"
+import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
+import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
+import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
+import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
@@ -24,6 +24,7 @@ import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
 interface Props {
   params: {
     id: number
+    teamId: number
   }
 }
 
@@ -31,7 +32,8 @@ const TeamDetail = ({ params }: Props) => {
   const session = useSession()
   const router = useRouter()
 
-  const { id } = params
+  const performanceId = params.id
+  const id = params.teamId
 
   const [team, setTeam] = useState<Team | null>()
   useEffect(() => {
@@ -48,7 +50,7 @@ const TeamDetail = ({ params }: Props) => {
               setTeam(null)
               break
             default:
-              router.push(ROUTES.HOME.url)
+              router.push(ROUTES.HOME)
           }
         } else {
           setTeam(await res.json())
@@ -57,7 +59,7 @@ const TeamDetail = ({ params }: Props) => {
     }
   }, [id, session.data?.access, router])
 
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
+  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
   if (team === undefined) {
     return <Loading />
@@ -87,7 +89,7 @@ const TeamDetail = ({ params }: Props) => {
       <div className="relative flex items-center justify-between">
         {/* 뒤로가기 버튼 */}
         <Link
-          href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 공연 ID 동적으로 받기
+          href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
           className="flex items-center gap-x-5 font-semibold text-white"
         >
           <RiArrowGoBackLine className="text-white" />
@@ -112,7 +114,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo team={team} accessToken={session.data?.access} />
+      <BasicInfo performanceId={performanceId} team={team} accessToken={session.data?.access} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">

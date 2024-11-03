@@ -11,7 +11,7 @@ import Link from "next/link"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 
 const iconcolor = "text-gray-500"
 
@@ -19,7 +19,7 @@ const SheetInnerContent = () => {
   return (
     <div className="flex h-full w-full flex-col">
       <Link
-        href={ROUTES.LOGIN.url}
+        href={ROUTES.LOGIN}
         className="flex h-[10%] w-full items-center justify-start py-[4%]"
       >
         <Avatar className="h-12 w-12">
@@ -39,28 +39,28 @@ const SheetInnerContent = () => {
           MAIN
         </div>
         <Link
-          href={ROUTES.NOTICE.LIST.url}
+          href={ROUTES.NOTICE.LIST}
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <Megaphone size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">공지사항</div>
         </Link>
         <Link
-          href={ROUTES.PERFORMANCE.LIST.url}
+          href={ROUTES.PERFORMANCE.LIST}
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <Music4 size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">공연목록</div>
         </Link>
         <Link
-          href={ROUTES.PERFORMANCE.TEAMS(1).url} // TODO: 실제 기본 공연 ID로 변경
+          href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <FileText size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">세션지원</div>
         </Link>
         <Link
-          href={ROUTES.MEMBER.LIST.url}
+          href={ROUTES.MEMBER.LIST}
           className="flex h-[22%] w-full items-center text-lg font-medium text-gray-500"
         >
           <ImageIcon size={30} className={iconcolor} />
@@ -84,7 +84,7 @@ const SheetInnerContent = () => {
         </div>
       </div>
       <Link
-        href={ROUTES.LOGIN.url}
+        href={ROUTES.LOGIN}
         className="flex h-[9%] w-full items-center justify-center gap-4 pt-[85%]"
       >
         <LogIn size={30} className={iconcolor} />

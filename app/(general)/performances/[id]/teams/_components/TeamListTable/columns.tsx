@@ -12,9 +12,10 @@ import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
+import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
+import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -25,10 +26,9 @@ import {
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
-import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
-import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 
 export type TeamColumn = {
+  performanceId: number
   id: number
   songName: string
   songArtist: string
@@ -62,7 +62,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     accessorKey: "songName",
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
-      <Link href={ROUTES.TEAM.DETAIL(row.original.id).url}>
+      <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(row.original.performanceId, row.original.id)}>
         {row.original.songName}
         <br />
         <div className="flex items-center justify-start gap-x-1">
@@ -165,7 +165,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
           <DropdownMenuContent align="end" className="rounded-none text-sm">
             <DropdownMenuItem className="p-0">
               <Link
-                href={ROUTES.TEAM.EDIT(row.original.id).url}
+                href={ROUTES.PERFORMANCE.TEAM.EDIT(row.original.performanceId, row.original.id)}
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               >
                 <Pencil />

@@ -37,7 +37,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import ROUTES from "@/constants/routes"
+import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
 import { MemberSessionSet } from "@/types/Team"
 
@@ -311,7 +311,7 @@ export function TeamListDataTable<TValue>({
           <div className="relative flex gap-3">
             {/* 생성 버튼 */}
             <Button asChild className="h-8 rounded-md py-1">
-              <Link href={ROUTES.TEAM.CREATE.url}>
+              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>
@@ -489,7 +489,7 @@ export function TeamListDataTable<TValue>({
 
             {/* 생성 버튼 */}
             <Button asChild className="h-full rounded-md py-1">
-              <Link href={ROUTES.TEAM.CREATE.url}>
+              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}>
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>
@@ -505,6 +505,7 @@ export function TeamListDataTable<TValue>({
               <div key={row.id}>
                 {/* TODO: image 추가 */}
                 <TeamCard
+                  performanceId={performanceId}
                   id={row.original.id}
                   songName={row.original.songName}
                   songArtist={row.original.songArtist}

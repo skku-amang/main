@@ -12,11 +12,12 @@ import fetchData from "@/lib/fetch"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
+  performanceId: number
   team: Team
   accessToken?: string
 }
 
-const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
+const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
   const router = useRouter()
   const { toast } = useToast()
 
@@ -43,7 +44,7 @@ const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
         title: "팀 삭제 성공",
         description: "성공적으로 팀을 삭제했습니다."
       })
-      router.push(ROUTES.PERFORMANCE.TEAMS(1).url) // TODO: 실제 기본 공연 ID로 변경
+      router.push(ROUTES.PERFORMANCE.TEAM.LIST(performanceId))
     })
   }
 
@@ -62,7 +63,7 @@ const BasicInfo = ({ team, accessToken }: BasicInfoProps) => {
         </div>
         <div className="flex items-center justify-center gap-x-5">
           <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
-            <Link href={ROUTES.TEAM.EDIT(team.id).url}>
+            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}>
               <PenLine strokeWidth={1.25} />
             </Link>
           </Button>

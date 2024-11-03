@@ -68,7 +68,7 @@ const Signup = () => {
       sessions: formData.sessions,
       redirect: false
     })
-    if (!res?.error) return router.push(ROUTES.HOME.url)
+    if (!res?.error) return router.push(ROUTES.HOME)
 
     const shouldBeUniqueFields = ["nickname", "email"]
     const allFields = Object.keys(signUpSchema._def.schema.shape)
