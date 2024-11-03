@@ -4,6 +4,5 @@ declare namespace NodeJS {
     AUTH_SECRET: string;
     NEXT_PUBLIC_DEVELOPMENT_URL?: string;          // 개발환경에서의 백엔드 서버 주소
     NEXT_PUBLIC_DEPLOY_URL?: string;               // 배포환경에서의 백엔드 서버 주소
-    NEXT_PUBLIC_VERCEL_URL?: string;               // Vercel에서 배포된 애플리케이션의 URL
   }
 }
