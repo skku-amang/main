@@ -13,9 +13,21 @@ const nextConfig = {
         hostname: "localhost",
         port: "8000",
         pathname: "/**"
+      },
+      {
+        protocol: "http",
+        hostname: "amang.net",
+        port: "",
+        pathname: "/media/**"
+      },
+      {
+        protocol: "https",
+        hostname: "amang.net",
+        port: "",
+        pathname: "/media/**"
       }
     ]
   }
-}
+};
 
-export default nextConfig
+export default nextConfig;

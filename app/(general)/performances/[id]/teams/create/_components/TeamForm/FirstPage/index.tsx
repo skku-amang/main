@@ -3,10 +3,6 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/_components/TeamForm/Description"
-import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
-import YoutubeDialog from "@/app/(general)/teams/_components/TeamForm/FirstPage/YoutubeDialog"
-import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
@@ -29,6 +25,11 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
+
+import Description from "../Description"
+import basicInfoSchema from "../FirstPage/schema"
+import YoutubeDialog from "../FirstPage/YoutubeDialog"
+import Paginator from "../Paginator"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>

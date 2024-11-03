@@ -2,9 +2,10 @@ import { useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import z from "zod"
 
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+
+import { memberSessionRequiredBaseSchema } from "./schema"
 
 export interface CheckboxFieldProps {
   secondPageForm: UseFormReturn<z.infer<typeof memberSessionRequiredBaseSchema>>

@@ -9,26 +9,29 @@ import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import Loading from "@/app/_(errors)/Loading"
-import FirstPage from "@/app/(general)/teams/_components/TeamForm/FirstPage"
-import basicInfoSchema from "@/app/(general)/teams/_components/TeamForm/FirstPage/schema"
-import SecondPage from "@/app/(general)/teams/_components/TeamForm/SecondPage"
-import {
-  memberSessionRequiredBaseSchema,
-  memberSessionRequiredField
-} from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
-import ThirdPage from "@/app/(general)/teams/_components/TeamForm/ThirdPage"
 import { useToast } from "@/components/hooks/use-toast"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { cn } from "@/lib/utils"
 import { Team } from "@/types/Team"
+
+import FirstPage from "./FirstPage"
+import basicInfoSchema from "./FirstPage/schema"
+import SecondPage from "./SecondPage"
+import {
+  memberSessionRequiredBaseSchema,
+  memberSessionRequiredField
+} from "./SecondPage/schema"
+import ThirdPage from "./ThirdPage"
 
 interface TeamCreateFormProps {
   initialData?: Team
+  className?: string
 }
 
-const TeamForm = ({ initialData }: TeamCreateFormProps) => {
+const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const session = useSession()
   const router = useRouter()
@@ -40,7 +43,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
     defaultValues: {
       performanceId: initialData?.performance.id,
       songName: initialData?.songName,
-      isFreshmenFixed: initialData?.isFreshmanFixed,
+      isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
       isSelfMade: initialData?.isSelfMade,
       description: initialData?.description,
@@ -216,7 +219,9 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
       memberSessions,
       description: firstPageForm.getValues("description"),
       songYoutubeVideoId: firstPageForm.getValues("songYoutubeVideoId"),
-      posterImage: firstPageForm.getValues("posterImage")
+      posterImage: firstPageForm.getValues("posterImage"),
+      isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed"),
+      isSelfMade: firstPageForm.getValues("isSelfMade")
     }
 
     const endpoint = initialData?.id
@@ -258,17 +263,17 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
       return
     }
     const data = (await res.json()) as CreateRetrieveUpdateResponse<Team>
-    router.push(ROUTES.TEAM.DETAIL(data.id).url)
+    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performance.id, data.id))
   }
   function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
   }
 
   if (session.status === "loading") return <Loading />
-  if (!session.data) router.push(ROUTES.HOME.url)
+  if (!session.data) router.push(ROUTES.HOME)
 
   return (
-    <div className="m-20 rounded-2xl p-20 shadow-2xl">
+    <div className={cn(`mb-20 rounded-2xl p-20 shadow-2xl ${className}`)}>
       {currentPage === 1 && (
         <FirstPage
           form={firstPageForm}
@@ -277,7 +282,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
           accessToken={session.data?.access}
           onPrevious={
             initialData
-              ? () => router.push(ROUTES.TEAM.DETAIL(initialData.id).url)
+              ? () => router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(initialData.performance.id, initialData.id))
               : undefined
           }
         />

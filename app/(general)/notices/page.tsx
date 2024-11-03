@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Button } from '../../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,9 +8,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../../components/ui/card'
-import ROUTES from '../../../constants/routes'
-import { User } from '../../../types/User'
+} from '@/components/ui/card'
+import ROUTES from '@/constants/routes'
+import { User } from '@/types/User'
 
 const NoticeCard = ({
   title,
@@ -41,7 +41,7 @@ const NoticeList = () => {
   return (
     <>
       <Button asChild>
-        <Link href={ROUTES.NOTICE.CREATE.url}>추가</Link>
+        <Link href={ROUTES.NOTICE.CREATE}>추가</Link>
       </Button>
 
       <div></div>

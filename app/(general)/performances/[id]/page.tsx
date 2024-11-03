@@ -17,7 +17,7 @@ interface PerformanceDetailProp {
 const PerformanceDetail = async ({ params }: PerformanceDetailProp) => {
   const { id } = params
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN.url)
+  if (!session) redirect(ROUTES.LOGIN)
 
   const res = await fetchData(
     API_ENDPOINTS.PERFORMANCE.RETRIEVE(id) as ApiEndpoint,

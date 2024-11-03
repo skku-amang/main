@@ -3,11 +3,12 @@ import { CircleAlert } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Description from "@/app/(general)/teams/_components/TeamForm/Description"
-import Paginator from "@/app/(general)/teams/_components/TeamForm/Paginator"
-import MemberSessionRequiredCheckbox from "@/app/(general)/teams/_components/TeamForm/SecondPage/MemberSessionRequiredCheckbox"
-import { memberSessionRequiredBaseSchema } from "@/app/(general)/teams/_components/TeamForm/SecondPage/schema"
 import { Form } from "@/components/ui/form"
+
+import Description from "../Description"
+import Paginator from "../Paginator"
+import MemberSessionRequiredCheckbox from "../SecondPage/MemberSessionRequiredCheckbox"
+import { memberSessionRequiredBaseSchema } from "../SecondPage/schema"
 
 interface SecondPageProps {
   form: ReturnType<

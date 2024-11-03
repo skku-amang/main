@@ -119,6 +119,7 @@ async function _signIn(
   // 요청 전송
   const apiEndpoint =
     type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
+  
   const res = await fetchData(apiEndpoint as ApiEndpoint, {
     body: JSON.stringify(body),
     cache: "no-store",

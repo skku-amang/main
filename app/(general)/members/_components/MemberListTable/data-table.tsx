@@ -128,7 +128,7 @@ export function MemberListDataTable<TValue>({
                   className="hover:cursor-pointer"
                   onClick={() =>
                     router.push(
-                      ROUTES.MEMBER.DETAIL(row.original.id).url
+                      ROUTES.MEMBER.DETAIL(row.original.id)
                     )
                   }
                 >

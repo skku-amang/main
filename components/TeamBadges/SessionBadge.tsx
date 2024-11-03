@@ -8,7 +8,7 @@ interface SessionBadgeProps {
 
 const SessionBadge = ({ session, className }: SessionBadgeProps) => {
   return (
-    <Badge className={cn("h-6 select-none rounded bg-slate-200 font-normal text-black hover:bg-slate-200", className)}>
+    <Badge className={cn("h-6 rounded bg-neutral-200 font-normal text-black hover:bg-neutral-200", className)}>
       {session}
     </Badge>
   )

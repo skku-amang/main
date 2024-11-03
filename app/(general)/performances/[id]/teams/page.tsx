@@ -20,7 +20,7 @@ interface TeamListProps {
 const TeamList = async ({ params }: TeamListProps) => {
   const { id } = params
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN.url)
+  if (!session) redirect(ROUTES.LOGIN)
 
   const res = await fetchData(
     API_ENDPOINTS.PERFORMANCE.RETRIEVE_TEAMS(id) as ApiEndpoint,
@@ -34,13 +34,15 @@ const TeamList = async ({ params }: TeamListProps) => {
 
   const data = (await res.json()) as ListResponse<Team>
   const teams = data.map((team) => ({
+    performanceId: team.performance.id,
     id: team.id,
     songName: team.songName,
     songArtist: team.songArtist,
     leaderName: team.leader?.name,
     memberSessions: team.memberSessions,
     songYoutubeVideoId: team.songYoutubeVideoId,
-    isFreshmanFixed: team.isFreshmanFixed
+    isFreshmenFixed: team.isFreshmenFixed,
+    isSelfMade: team.isSelfMade
   }))
 
   const relatedPerformances = await (

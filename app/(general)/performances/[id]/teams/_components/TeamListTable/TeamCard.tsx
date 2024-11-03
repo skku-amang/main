@@ -1,12 +1,13 @@
 import Link from "next/link"
 
-import SessionBadge from "@/components/SessionBadge"
-import StatusBadge from "@/components/StatusBadge"
+import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 
 interface TeamCardProps {
+  performanceId: number
   id: number
   songName: string
   songArtist: string
@@ -16,6 +17,7 @@ interface TeamCardProps {
 }
 
 const TeamCard = ({
+  performanceId,
   id,
   songName,
   songArtist,
@@ -24,7 +26,7 @@ const TeamCard = ({
   memberSessions
 }: TeamCardProps) => {
   return (
-    <Link href={ROUTES.TEAM.DETAIL(id).url}>
+    <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}>
       <div className="rounded bg-white p-5 shadow-md">
         {/* 곡명 & 상태 */}
         <div className="flex items-start justify-between">

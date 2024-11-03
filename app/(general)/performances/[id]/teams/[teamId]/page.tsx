@@ -9,11 +9,12 @@ import { RiArrowGoBackLine } from "react-icons/ri"
 
 import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import ApplyButton from "@/app/(general)/teams/[id]/_components/ApplyButton"
-import BasicInfo from "@/app/(general)/teams/[id]/_components/BasicInfo"
-import MemberSessionCard from "@/app/(general)/teams/[id]/_components/MemberSessionCard"
-import SessionSetCard from "@/app/(general)/teams/[id]/_components/SessionSetCard"
-import SessionBadge from "@/components/SessionBadge"
+import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
+import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
+import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
+import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
+import OleoPageHeader from "@/components/OleoPageHeader"
+import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -23,6 +24,7 @@ import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
 interface Props {
   params: {
     id: number
+    teamId: number
   }
 }
 
@@ -30,7 +32,8 @@ const TeamDetail = ({ params }: Props) => {
   const session = useSession()
   const router = useRouter()
 
-  const { id } = params
+  const performanceId = params.id
+  const id = params.teamId
 
   const [team, setTeam] = useState<Team | null>()
   useEffect(() => {
@@ -47,7 +50,7 @@ const TeamDetail = ({ params }: Props) => {
               setTeam(null)
               break
             default:
-              router.push(ROUTES.HOME.url)
+              router.push(ROUTES.HOME)
           }
         } else {
           setTeam(await res.json())
@@ -56,7 +59,7 @@ const TeamDetail = ({ params }: Props) => {
     }
   }, [id, session.data?.access, router])
 
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN.url)
+  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
   if (team === undefined) {
     return <Loading />
@@ -70,17 +73,37 @@ const TeamDetail = ({ params }: Props) => {
 
   return (
     <div className="container pt-16">
-      <Link
-        href={ROUTES.PERFORMANCE.TEAMS(team.performance.id).url}
-        className="flex items-center gap-x-5 font-semibold"
-      >
-        <RiArrowGoBackLine />
-        돌아가기
-      </Link>
-      <h2 className="text-center text-4xl italic">Join Your Team</h2>
+      {/* 기울어진 배경 - 슬레이트 */}
+      <div
+        className="absolute left-0 top-0 z-0 h-[25rem] w-full bg-slate-300"
+        style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
+      ></div>
+      
+      {/* 기울어진 배경 - 프라이머리 */}
+      <div
+        className="absolute left-0 top-0 h-[28rem] w-full bg-primary"
+        style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
+      ></div>
+
+      {/* 뒤로가기 버튼 및 페이지 헤더 */}
+      <div className="relative flex items-center justify-between">
+        {/* 뒤로가기 버튼 */}
+        <Link
+          href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
+          className="flex items-center gap-x-5 font-semibold text-white"
+        >
+          <RiArrowGoBackLine className="text-white" />
+          돌아가기
+        </Link>
+
+        {/* 페이지 제목 */}
+        <OleoPageHeader title="Join Your Team" />
+        
+        <div className="h-10 w-10" />
+      </div>
 
       {/* 유튜브 임베드 */}
-      <div className="mb-16 mt-6 flex items-center justify-center">
+      <div className="mb-16 mt-6 flex items-center justify-center z-10 relative">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
@@ -91,7 +114,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo team={team} accessToken={session.data?.access} />
+      <BasicInfo performanceId={performanceId} team={team} accessToken={session.data?.access} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
