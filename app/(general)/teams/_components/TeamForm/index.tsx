@@ -22,13 +22,15 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { cn } from "@/lib/utils"
 import { Team } from "@/types/Team"
 
 interface TeamCreateFormProps {
   initialData?: Team
+  className?: string
 }
 
-const TeamForm = ({ initialData }: TeamCreateFormProps) => {
+const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const session = useSession()
   const router = useRouter()
@@ -268,7 +270,7 @@ const TeamForm = ({ initialData }: TeamCreateFormProps) => {
   if (!session.data) router.push(ROUTES.HOME.url)
 
   return (
-    <div className="m-20 rounded-2xl p-20 shadow-2xl">
+    <div className={cn(`mb-20 rounded-2xl p-20 shadow-2xl ${className}`)}>
       {currentPage === 1 && (
         <FirstPage
           form={firstPageForm}
