@@ -311,7 +311,7 @@ export function TeamListDataTable<TValue>({
           <div className="relative flex gap-3">
             {/* 생성 버튼 */}
             <Button asChild className="h-8 rounded-md py-1">
-              <Link href={ROUTES.TEAM.CREATE}>
+              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>
@@ -489,7 +489,7 @@ export function TeamListDataTable<TValue>({
 
             {/* 생성 버튼 */}
             <Button asChild className="h-full rounded-md py-1">
-              <Link href={ROUTES.TEAM.CREATE}>
+              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(1)}>  {/* TODO: 실제 기본 공연 ID로 변경 */}
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>
