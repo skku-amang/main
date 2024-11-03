@@ -3,6 +3,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
+import RelativeTime from "@/components/RelativeTime"
+import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -58,12 +60,23 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             <StatusBadge
               status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
             />
+            {team.isFreshmenFixed ? (
+              <>
+                <FreshmenFixedBadge teamspage={true} />
+              </>
+            ) : (
+              <></>
+            )}
           </div>
-          <h4 className="mb-3 text-2xl text-gray-500">{team.songArtist}</h4>
+          <h4 className="mb-3 text-2xl text-gray-500">
+            {team.songArtist} {team.isSelfMade ? "(자작곡)" : ""}
+          </h4>
         </div>
         <div className="flex items-center justify-center gap-x-5">
           <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
-            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}>
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+            >
               <PenLine strokeWidth={1.25} />
             </Link>
           </Button>
@@ -86,11 +99,8 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
         <div>
-          <div className="text-primary">
-            {team.leader?.generation?.order}기 {team.leader?.name}
-            <span># {team.leader?.nickname}</span>
-          </div>
-          <div className="text-xs text-gray-300">{team.createdDatetime}</div>
+          <div className="text-primary">{team.leader?.name}</div>
+          <RelativeTime time={team.createdDatetime} />
         </div>
       </div>
 

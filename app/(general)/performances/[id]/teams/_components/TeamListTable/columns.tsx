@@ -62,14 +62,17 @@ export const columns: ColumnDef<TeamColumn>[] = [
     accessorKey: "songName",
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
-      <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(row.original.performanceId, row.original.id)}>
+      <Link
+        href={ROUTES.PERFORMANCE.TEAM.DETAIL(
+          row.original.performanceId,
+          row.original.id
+        )}
+      >
         {row.original.songName}
         <br />
         <div className="flex items-center justify-start gap-x-1">
           <span className="text-neutral-400">{row.original.songArtist}</span>
-          {row.original.isSelfMade && (
-            <SelfMadeSongBadge />
-          )}
+          {row.original.isSelfMade && <SelfMadeSongBadge />}
         </div>
       </Link>
     )
@@ -86,7 +89,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
         {row.getValue("leaderName") ?? ""}
         <br />
         {row.original.isFreshmenFixed && (
-          <FreshmenFixedBadge />
+          <FreshmenFixedBadge teamspage={false} />
         )}
       </div>
     )
@@ -123,7 +126,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
       const status = memberSessionsSet.isSatisfied ? "Inactive" : "Active"
-      return <div className="flex justify-center items-center"><StatusBadge status={status} /></div>
+      return (
+        <div className="flex items-center justify-center">
+          <StatusBadge status={status} />
+        </div>
+      )
     }
   },
   {
@@ -132,17 +139,19 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="flex items-center justify-center">영상링크</div>
     ),
     cell: ({ row }) => {
-      const youtubeLink = YoutubeVideo.getURL(row.getValue("songYoutubeVideoId"))
+      const youtubeLink = YoutubeVideo.getURL(
+        row.getValue("songYoutubeVideoId")
+      )
       if (youtubeLink) {
         return (
-            <Link
-              href={youtubeLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center"
-            >
+          <Link
+            href={youtubeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center"
+          >
             <Paperclip size={24} />
-            </Link>
+          </Link>
         )
       }
     }
@@ -165,7 +174,10 @@ export const columns: ColumnDef<TeamColumn>[] = [
           <DropdownMenuContent align="end" className="rounded-none text-sm">
             <DropdownMenuItem className="p-0">
               <Link
-                href={ROUTES.PERFORMANCE.TEAM.EDIT(row.original.performanceId, row.original.id)}
+                href={ROUTES.PERFORMANCE.TEAM.EDIT(
+                  row.original.performanceId,
+                  row.original.id
+                )}
                 className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               >
                 <Pencil />

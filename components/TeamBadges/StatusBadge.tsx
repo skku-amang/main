@@ -14,7 +14,7 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
         status === "Inactive"
           ? "bg-red-100 text-destructive"
           : "bg-green-100 text-green-600",
-        "text-md font-lig rounded-full border-none px-4 py-1",
+        "text-md rounded-full border-none px-4 py-1",
         className
       )}
     >
