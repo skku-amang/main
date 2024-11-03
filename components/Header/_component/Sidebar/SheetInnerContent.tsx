@@ -1,3 +1,4 @@
+"use Client"
 import {
   FileText,
   ImageIcon,
@@ -8,30 +9,51 @@ import {
   Youtube
 } from "lucide-react"
 import Link from "next/link"
+import { signOut, useSession } from "next-auth/react"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
 import ROUTES from "@/constants/routes"
-
+import SOTIAL from "@/constants/social"
 const iconcolor = "text-gray-500"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import { FaCircle } from "react-icons/fa"
+
+import { Separator } from "@/components/ui/separator"
+
 const SheetInnerContent = () => {
+  const { data: session } = useSession()
+
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="relative flex h-full w-full flex-col">
       <Link
-        href={ROUTES.LOGIN.url}
+        href={!session ? ROUTES.LOGIN.url : ROUTES.PROFILE.INDEX.url}
         className="flex h-[10%] w-full items-center justify-start py-[4%]"
       >
-        <Avatar className="h-12 w-12">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="w-full pl-4">
-          <div className="h-full w-full text-center text-lg font-semibold text-black">
-            로그인 <br />
-            해주세요
-          </div>
-        </div>
+        {!session ? (
+          <>
+            <FaCircle className="h-14 w-14 text-gray-100"></FaCircle>
+            <div className="w-full">
+              <div className="h-full w-full pl-2 text-left text-base font-medium text-black">
+                로그인 해주세요
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <Avatar className="h-13 w-16 overflow-hidden rounded-full">
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className="w-full ">
+              <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">
+                {session.name}
+              </div>
+              <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400">
+                <span>&gt;</span> 마이페이지
+              </div>
+            </div>
+          </>
+        )}
       </Link>
       <Separator />
       <div className="h-[40%] w-full pt-[2%]">
@@ -72,24 +94,54 @@ const SheetInnerContent = () => {
         <div className="h-[21.6%] w-full pb-[13.3%] text-base text-gray-500">
           LINKS
         </div>
-        <div className="flex h-[41.4%] w-full items-center text-gray-500">
+        <Link
+          href={SOTIAL.Youtube.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-[41.4%] w-full items-center text-gray-500"
+        >
           <Youtube size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">YouTube</div>
-        </div>
-        <div className="flex h-[41.4%] w-full items-center text-gray-500">
+        </Link>
+        <Link
+          href={SOTIAL.Instagram.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-[41.4%] w-full items-center text-gray-500"
+        >
           <Instagram size={30} className={iconcolor} />
           <div className="pl-4 text-lg font-medium text-gray-500">
             Instagram
           </div>
-        </div>
+        </Link>
       </div>
-      <Link
-        href={ROUTES.LOGIN.url}
-        className="flex h-[9%] w-full items-center justify-center gap-4 pt-[85%]"
-      >
-        <LogIn size={30} className={iconcolor} />
-        <div className="text-xl font-medium text-primary">Login Account</div>
-      </Link>
+      <div className="flex h-[9%] w-full items-center justify-center gap-4 pt-[85%]">
+        {!session ? (
+          <>
+            <LogIn size={30} className="text-primary" />
+            <Link
+              href={ROUTES.LOGIN.url}
+              className="text-xl font-medium text-primary"
+            >
+              Login Account
+            </Link>
+          </>
+        ) : (
+          <>
+            <LogIn
+              onClick={() => signOut()}
+              size={30}
+              className="cursor-pointer text-red-600"
+            />
+            <div
+              className="cursor-pointer text-xl font-medium text-red-600"
+              onClick={() => signOut()}
+            >
+              Logout Account
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
