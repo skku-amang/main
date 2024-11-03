@@ -42,7 +42,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     defaultValues: {
       performanceId: initialData?.performance.id,
       songName: initialData?.songName,
-      isFreshmenFixed: initialData?.isFreshmanFixed,
+      isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
       isSelfMade: initialData?.isSelfMade,
       description: initialData?.description,
@@ -218,7 +218,9 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       memberSessions,
       description: firstPageForm.getValues("description"),
       songYoutubeVideoId: firstPageForm.getValues("songYoutubeVideoId"),
-      posterImage: firstPageForm.getValues("posterImage")
+      posterImage: firstPageForm.getValues("posterImage"),
+      isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed"),
+      isSelfMade: firstPageForm.getValues("isSelfMade")
     }
 
     const endpoint = initialData?.id

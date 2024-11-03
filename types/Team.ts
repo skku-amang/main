@@ -8,11 +8,11 @@ export type Team = {
   description: string
   leader: User
   performance: Performance
-  isFreshmanFixed: boolean
   posterImage?: string
 
   songName: string
   songArtist: string
+  isFreshmenFixed: boolean
   isSelfMade: boolean
   songYoutubeVideoId?: string // 아망 공식 홈페이지 유튜브 영상
 

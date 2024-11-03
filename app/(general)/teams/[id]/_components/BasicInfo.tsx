@@ -3,7 +3,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
-import StatusBadge from "@/components/StatusBadge"
+import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"

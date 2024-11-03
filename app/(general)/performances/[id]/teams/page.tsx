@@ -40,7 +40,8 @@ const TeamList = async ({ params }: TeamListProps) => {
     leaderName: team.leader?.name,
     memberSessions: team.memberSessions,
     songYoutubeVideoId: team.songYoutubeVideoId,
-    isFreshmanFixed: team.isFreshmanFixed
+    isFreshmenFixed: team.isFreshmenFixed,
+    isSelfMade: team.isSelfMade
   }))
 
   const relatedPerformances = await (

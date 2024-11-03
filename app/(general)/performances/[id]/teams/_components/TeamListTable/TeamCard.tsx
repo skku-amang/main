@@ -1,7 +1,7 @@
 import Link from "next/link"
 
-import SessionBadge from "@/components/SessionBadge"
-import StatusBadge from "@/components/StatusBadge"
+import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"

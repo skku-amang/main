@@ -12,8 +12,8 @@ import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
-import SessionBadge from "@/components/SessionBadge"
-import StatusBadge from "@/components/StatusBadge"
+import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,7 +23,10 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
+import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
+import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 
 export type TeamColumn = {
   id: number
@@ -32,7 +35,8 @@ export type TeamColumn = {
   leaderName?: string
   memberSessions?: MemberSession[]
   songYoutubeVideoId?: string
-  isFreshmanFixed: boolean
+  isFreshmenFixed: boolean,
+  isSelfMade: boolean
 }
 
 const SortButton = ({
@@ -61,7 +65,12 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <Link href={ROUTES.TEAM.DETAIL(row.original.id).url}>
         {row.original.songName}
         <br />
-        <span className="text-slate-300">{row.original.songArtist}</span>
+        <div className="flex items-center justify-start gap-x-1">
+          <span className="text-neutral-400">{row.original.songArtist}</span>
+          {row.original.isSelfMade && (
+            <SelfMadeSongBadge />
+          )}
+        </div>
       </Link>
     )
   },
@@ -76,8 +85,8 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="text-center">
         {row.getValue("leaderName") ?? ""}
         <br />
-        {row.original.isFreshmanFixed && (
-          <Badge className="bg-blue-900 py-0">신입고정</Badge>
+        {row.original.isFreshmenFixed && (
+          <FreshmenFixedBadge />
         )}
       </div>
     )
@@ -85,7 +94,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "requiredSessions",
     header: () => (
-      <div className="flex w-full items-center justify-center">필요 세션</div>
+      <div className="flex w-full items-center justify-start">필요 세션</div>
     ),
     cell: ({ row }) => {
       return (
@@ -114,7 +123,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
       const memberSessions = row.original.memberSessions
       const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
       const status = memberSessionsSet.isSatisfied ? "Inactive" : "Active"
-      return <StatusBadge status={status} />
+      return <div className="flex justify-center items-center"><StatusBadge status={status} /></div>
     }
   },
   {
@@ -123,15 +132,17 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="flex items-center justify-center">영상링크</div>
     ),
     cell: ({ row }) => {
-      const songYoutubeVideoId = row.getValue("songYoutubeVideoId") as string
-      if (songYoutubeVideoId) {
+      const youtubeLink = YoutubeVideo.getURL(row.getValue("songYoutubeVideoId"))
+      if (youtubeLink) {
         return (
-          <Link
-            href={songYoutubeVideoId}
-            className="flex w-full items-center justify-center"
-          >
+            <Link
+              href={youtubeLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center"
+            >
             <Paperclip size={24} />
-          </Link>
+            </Link>
         )
       }
     }
