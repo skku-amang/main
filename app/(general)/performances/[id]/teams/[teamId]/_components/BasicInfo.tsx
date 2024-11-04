@@ -3,12 +3,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
+import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
+import { formatGenerationOrder, getRepresentativeRelativeTime } from "@/lib/utils"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
@@ -58,12 +60,17 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             <StatusBadge
               status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
             />
+            {team.isFreshmenFixed && <FreshmenFixedBadge size="large" />}
           </div>
-          <h4 className="mb-3 text-2xl text-gray-500">{team.songArtist}</h4>
+          <h4 className="mb-3 text-2xl text-gray-500">
+            {team.songArtist} {team.isSelfMade && "(자작곡)"}
+          </h4>
         </div>
         <div className="flex items-center justify-center gap-x-5">
           <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
-            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}>
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+            >
               <PenLine strokeWidth={1.25} />
             </Link>
           </Button>
@@ -87,10 +94,10 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
         </Avatar>
         <div>
           <div className="text-primary">
-            {team.leader?.generation?.order}기 {team.leader?.name}
-            <span># {team.leader?.nickname}</span>
+            {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
+            {team.leader.name}
           </div>
-          <div className="text-xs text-gray-300">{team.createdDatetime}</div>
+          {getRepresentativeRelativeTime(team.createdDatetime)}
         </div>
       </div>
 

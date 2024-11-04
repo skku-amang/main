@@ -49,7 +49,7 @@ const ApplyButton = ({
       return
     }
 
-    const data = await res.json()
+    const data = await res.json() as Team
     toast({
       title: "지원 완료",
       description: "성공적으로 팀에 등록되었습니다!"
