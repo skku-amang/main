@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
-import { getRepresentativeRelativeTime } from "@/lib/utils"
+import { formatGenerationOrder, getRepresentativeRelativeTime } from "@/lib/utils"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
@@ -60,16 +60,10 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             <StatusBadge
               status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
             />
-            {team.isFreshmenFixed ? (
-              <>
-                <FreshmenFixedBadge teamspage={true} />
-              </>
-            ) : (
-              <></>
-            )}
+            {team.isFreshmenFixed && <FreshmenFixedBadge size="large" />}
           </div>
           <h4 className="mb-3 text-2xl text-gray-500">
-            {team.songArtist} {team.isSelfMade ? "(자작곡)" : ""}
+            {team.songArtist} {team.isSelfMade && "(자작곡)"}
           </h4>
         </div>
         <div className="flex items-center justify-center gap-x-5">
@@ -99,7 +93,10 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
         <div>
-          <div className="text-primary">{team.leader?.name}</div>
+          <div className="text-primary">
+            {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
+            {team.leader.name}
+          </div>
           {getRepresentativeRelativeTime(team.createdDatetime)}
         </div>
       </div>

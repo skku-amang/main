@@ -89,7 +89,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
         {row.getValue("leaderName") ?? ""}
         <br />
         {row.original.isFreshmenFixed && (
-          <FreshmenFixedBadge teamspage={false} />
+          <FreshmenFixedBadge size="small" />
         )}
       </div>
     )

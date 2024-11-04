@@ -3,16 +3,15 @@ import { cn } from "@/lib/utils"
 
 interface FreshmenFixedBadgeProps {
   className?: string
-  teamspage?: boolean
+  size: "small" | "large"
 }
-{
-  /* 팀 목록이라면 teamspage={false}, 팀 상세페이지라면 teamspage={true}로 설정 */
-}
+
 const FreshmenFixedBadge = ({
   className,
-  teamspage
+  size = "large"
 }: FreshmenFixedBadgeProps) => {
-  if (teamspage === false) {
+  // 팀 상세페이지
+  if (size === "small") {
     return (
       <Badge
         className={cn(
@@ -23,20 +22,21 @@ const FreshmenFixedBadge = ({
         신입고정
       </Badge>
     )
-  } else {
-    return (
-      <Badge
-        variant="outline"
-        className={cn(
-          "text-md rounded-full border-none bg-blue-100 px-[0.83rem] py-1 font-semibold text-third",
-          className
-        )}
-      >
-        <span className="me-2 font-extrabold">●</span>
-        신입고정
-      </Badge>
-    )
   }
+
+  // 팀 목록
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "text-md rounded-full border-none bg-blue-100 px-4 py-1 font-bold text-third",
+        className
+      )}
+    >
+      <span className="me-2 font-extrabold">●</span>
+      신입고정
+    </Badge>
+  )
 }
 
 export default FreshmenFixedBadge

@@ -40,7 +40,8 @@ const MemberSessionCard = ({
         body: JSON.stringify({ session, index: sessionIndex }),
         cache: "no-store",
         headers: {
-          Authorization: `Bearer ${authSession.data?.access}`
+          Authorization: `Bearer ${authSession.data?.access}`,
+          "Content-Type": "application/json"
         }
       }
     )
@@ -54,7 +55,7 @@ const MemberSessionCard = ({
       return
     }
 
-    const data = await res.json()
+    const data = await res.json() as Team
     toast({
       title: "탈퇴 완료",
       description: "성공적으로 팀에서 탈퇴되었습니다!"
