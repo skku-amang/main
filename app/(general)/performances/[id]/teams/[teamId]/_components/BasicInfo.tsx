@@ -3,7 +3,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
-import RelativeTime from "@/components/RelativeTime"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
+import { getRepresentativeRelativeTime } from "@/lib/utils"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
@@ -100,7 +100,7 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
         </Avatar>
         <div>
           <div className="text-primary">{team.leader?.name}</div>
-          <RelativeTime time={team.createdDatetime} />
+          {getRepresentativeRelativeTime(team.createdDatetime)}
         </div>
       </div>
 
