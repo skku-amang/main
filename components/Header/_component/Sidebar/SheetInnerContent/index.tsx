@@ -14,6 +14,7 @@ import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
 import { FaCircle } from "react-icons/fa"
 
+import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import SOCIAL from "@/constants/social"
 
@@ -27,10 +28,10 @@ const SheetInnerContent = () => {
   const { data: session } = useSession()
 
   return (
-    <div className="h-full flex flex-col items-between justify-center">
+    <div className="items-between flex h-full flex-col justify-center">
       <Link
         href={!session ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
-        className="flex w-full items-center justify-start py-[4%]"
+        className="flex w-full items-center justify-start py-3"
       >
         {!session ? (
           <>
@@ -58,13 +59,11 @@ const SheetInnerContent = () => {
           </>
         )}
       </Link>
-
-      <div className="space-y-10 flex-auto">
+      <Separator />
+      <div className="flex-auto ">
         {/* Main */}
-        <div>
-          <NavLinkHeader className="mb-3">
-            MAIN
-          </NavLinkHeader>
+        <div className="my-5">
+          <NavLinkHeader className="mb-3">MAIN</NavLinkHeader>
 
           <div className="space-y-7">
             <NavLink
@@ -93,12 +92,10 @@ const SheetInnerContent = () => {
             </NavLink>
           </div>
         </div>
-
+        <Separator />
         {/* Links */}
-        <div>
-          <NavLinkHeader className="mb-3">
-            LINKS
-          </NavLinkHeader>
+        <div className="my-5">
+          <NavLinkHeader className="mb-3">LINKS</NavLinkHeader>
 
           <div className="space-y-7">
             <NavLink
@@ -122,7 +119,7 @@ const SheetInnerContent = () => {
       </div>
 
       {/* Login & Logout */}
-      <div className="flex w-full items-center justify-center gap-4 pt-[85%]">
+      <div className="flex w-full items-center justify-center gap-4">
         {!session ? (
           <>
             <LogIn size={iconSize} className="text-primary" />
