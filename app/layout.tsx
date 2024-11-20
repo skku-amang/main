@@ -35,10 +35,8 @@ export default function RootLayout({
     <html lang="ko">
       <SessionProvider>
         <body className={cn(fontSans.className, "bg-neutral-50")}>
-          <div className="bg-white">
-            {children}
-            <Toaster />
-          </div>
+          {children}
+          <Toaster />
         </body>
       </SessionProvider>
     </html>
