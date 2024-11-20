@@ -294,7 +294,7 @@ export function TeamListDataTable<TValue>({
         </div>
 
         {/* 헤더 */}
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between pt-10">
           {/* 검색 */}
           <Input
             placeholder="검색"
@@ -406,7 +406,7 @@ export function TeamListDataTable<TValue>({
         </div>
 
         {/* 페이지네이션 */}
-        <div className="flex items-center justify-center space-x-2 py-4">
+        <div className="flex items-center justify-center space-x-2 pb-6 pt-14">
           <Button
             variant="outline"
             size="sm"
@@ -447,11 +447,7 @@ export function TeamListDataTable<TValue>({
             {/* 필터 */}
             <Popover>
               <PopoverTrigger>
-                <MobileButton
-                  asChild
-                  variant="outline"
-                  className="py-3 px-2"
-                >
+                <MobileButton asChild variant="outline" className="px-2 py-3">
                   <div>
                     <Filter />
                   </div>
@@ -489,7 +485,9 @@ export function TeamListDataTable<TValue>({
 
             {/* 생성 버튼 */}
             <Button asChild className="h-full rounded-md py-1">
-              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}>
+              <Link
+                href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}
+              >
                 <CirclePlus size={22} />
                 &nbsp;Create
               </Link>

@@ -13,7 +13,7 @@ interface SelectViewProps {
 const ButtonView = ({ currentPerformanceId, performanceOptions }: SelectViewProps) => {
   return (
     <div>
-      <p className="my-8 text-center font-bold">Performances</p>
+      <p className="mb-8 text-center font-bold">Performances</p>
       <div className="flex gap-x-4">
         {performanceOptions.map((p) => (
           <Link key={p.id} href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>
