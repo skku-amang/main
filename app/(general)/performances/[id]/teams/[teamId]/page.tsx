@@ -78,7 +78,7 @@ const TeamDetail = ({ params }: Props) => {
         className="absolute left-0 top-0 z-0 h-[25rem] w-full bg-slate-300"
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
       ></div>
-      
+
       {/* 기울어진 배경 - 프라이머리 */}
       <div
         className="absolute left-0 top-0 h-[28rem] w-full bg-primary"
@@ -98,12 +98,12 @@ const TeamDetail = ({ params }: Props) => {
 
         {/* 페이지 제목 */}
         <OleoPageHeader title="Join Your Team" />
-        
+
         <div className="h-10 w-10" />
       </div>
 
       {/* 유튜브 임베드 */}
-      <div className="mb-16 mt-6 flex items-center justify-center z-10 relative">
+      <div className="relative z-10 flex items-center justify-center pb-8">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
@@ -114,13 +114,20 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 기본 정보 */}
-      <BasicInfo performanceId={performanceId} team={team} accessToken={session.data?.access} />
+      <BasicInfo
+        performanceId={performanceId}
+        team={team}
+        accessToken={session.data?.access}
+      />
 
       {/* 세션 구성 */}
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 pb-14 md:grid-cols-2">
         {/* 세션 구성 */}
         {team.memberSessions && (
-          <SessionSetCard header="세션구성">
+          <SessionSetCard
+            header="세션구성"
+            className="col-span-2 bg-white shadow-md"
+          >
             <div className="flex items-center gap-x-2">
               {team.memberSessions
                 .sort((a, b) => {
@@ -145,7 +152,10 @@ const TeamDetail = ({ params }: Props) => {
         )}
 
         {/* 마감된 세션 */}
-        <SessionSetCard header="마감된 세션" className="col-span-2">
+        <SessionSetCard
+          header="마감된 세션"
+          className="col-span-2 bg-white shadow-md"
+        >
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             {sessionsWithAtleastOneMember.map((ms) =>
               ms.members.map((member, index) => {
@@ -166,7 +176,10 @@ const TeamDetail = ({ params }: Props) => {
         </SessionSetCard>
 
         {/* 팀 참여 신청 */}
-        <SessionSetCard header="팀 참여 신청" className="col-span-2">
+        <SessionSetCard
+          header="팀 참여 신청"
+          className="col-span-2 bg-white shadow-md"
+        >
           <ul className="mb-6">
             <li>
               ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며, 선착순으로

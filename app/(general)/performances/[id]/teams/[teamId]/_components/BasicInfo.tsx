@@ -10,7 +10,10 @@ import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
-import { formatGenerationOrder, getRepresentativeRelativeTime } from "@/lib/utils"
+import {
+  formatGenerationOrder,
+  getRepresentativeRelativeTime
+} from "@/lib/utils"
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
@@ -51,7 +54,7 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
   }
 
   return (
-    <div className="rounded-2xl p-14 shadow-md">
+    <div className="rounded-2xl bg-white px-20 pb-12 pt-14 shadow-md">
       <div className="flex items-center justify-between">
         <div>
           {/* 곡 정보 */}
@@ -62,7 +65,7 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             />
             {team.isFreshmenFixed && <FreshmenFixedBadge size="large" />}
           </div>
-          <h4 className="mb-3 text-2xl text-gray-500">
+          <h4 className="my-2 text-2xl text-gray-500">
             {team.songArtist} {team.isSelfMade && "(자작곡)"}
           </h4>
         </div>
@@ -97,7 +100,9 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
             {team.leader.name}
           </div>
-          {getRepresentativeRelativeTime(team.createdDatetime)}
+          <div className="text-gray-400">
+            {getRepresentativeRelativeTime(team.createdDatetime)}
+          </div>
         </div>
       </div>
 
