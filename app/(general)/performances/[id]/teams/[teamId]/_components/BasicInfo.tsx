@@ -54,7 +54,7 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
   }
 
   return (
-    <div className="rounded-2xl bg-white px-20 pb-12 pt-14 shadow-md">
+    <div className="w-full rounded-2xl bg-white px-20 pb-12 pt-14 shadow-md">
       <div className="flex items-center justify-between">
         <div>
           {/* 곡 정보 */}

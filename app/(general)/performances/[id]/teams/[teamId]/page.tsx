@@ -72,43 +72,44 @@ const TeamDetail = ({ params }: Props) => {
   ).getSessionsWithAtleastOneMember()
 
   return (
-    <div className="container pt-16">
+    <div className="container flex flex-col items-center pt-16">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
-        className="absolute left-0 top-0 z-0 h-[25rem] w-full bg-slate-300"
+        className="absolute left-0 top-0 z-0 h-[20rem] w-full bg-slate-300 lg:h-[25rem]"
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
       ></div>
 
       {/* 기울어진 배경 - 프라이머리 */}
       <div
-        className="absolute left-0 top-0 h-[28rem] w-full bg-primary"
+        className="absolute left-0 top-0 h-[23rem] w-full bg-primary lg:h-[28rem]"
         style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
       ></div>
 
       {/* 뒤로가기 버튼 및 페이지 헤더 */}
-      <div className="relative flex items-center justify-between">
+      <div className="relative flex w-full items-center justify-center px-12 lg:pt-4">
         {/* 뒤로가기 버튼 */}
         <Link
           href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          className="flex items-center gap-x-5 font-semibold text-white"
+          className="absolute left-8 hidden items-center gap-x-5 font-semibold text-white md:flex"
         >
-          <RiArrowGoBackLine className="text-white" />
-          돌아가기
+          <RiArrowGoBackLine className="hidden text-xl text-white min-[910px]:block" />
+          <div className="hidden lg:block">돌아가기</div>
         </Link>
 
         {/* 페이지 제목 */}
-        <OleoPageHeader title="Join Your Team" />
-
-        <div className="h-10 w-10" />
+        <OleoPageHeader
+          textsize="text-6xl min-[480px]:text-7xl md:text-8xl xl:text-9xl"
+          title="Join Your Team"
+          className="mb-10"
+        />
       </div>
 
       {/* 유튜브 임베드 */}
-      <div className="relative z-10 flex items-center justify-center pb-8">
+      <div className="relative z-10 flex w-full items-center justify-center pb-8">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
-            width={750}
-            className="aspect-video"
+            className="aspect-video w-4/5 md:w-[700px] xl:w-[800px]"
           />
         )}
       </div>
