@@ -11,6 +11,7 @@ import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
+import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import OleoPageHeader from "@/components/OleoPageHeader"
@@ -101,7 +102,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 유튜브 임베드 */}
-      <div className="relative z-10 flex w-full items-center justify-center pb-8">
+      <div className="relative z-10 flex w-full items-center justify-center pb-5">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
@@ -110,12 +111,16 @@ const TeamDetail = ({ params }: Props) => {
         )}
       </div>
 
+      {/*수정 및 삭제*/}
+      <div className="h-auto w-full justify-items-end  pb-5  min-[878px]:w-11/12 lg:w-5/6">
+        <DeleteEditButton
+          performanceId={performanceId}
+          team={team}
+          accessToken={session.data?.access}
+        />
+      </div>
       {/* 기본 정보 */}
-      <BasicInfo
-        performanceId={performanceId}
-        team={team}
-        accessToken={session.data?.access}
-      />
+      <BasicInfo team={team} />
 
       {/* 세션 구성 */}
       <div className="mt-6 grid grid-cols-1 gap-6 pb-14 md:grid-cols-2">
