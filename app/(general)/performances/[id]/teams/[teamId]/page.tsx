@@ -97,11 +97,7 @@ const TeamDetail = ({ params }: Props) => {
         </Link>
 
         {/* 페이지 제목 */}
-        <OleoPageHeader
-          textsize="text-6xl min-[480px]:text-7xl md:text-8xl xl:text-9xl"
-          title="Join Your Team"
-          className="mb-10"
-        />
+        <OleoPageHeader title="Join Your Team" className="mb-10" />
       </div>
 
       {/* 유튜브 임베드 */}
@@ -109,7 +105,7 @@ const TeamDetail = ({ params }: Props) => {
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
-            className="aspect-video w-4/5 md:w-[700px] xl:w-[800px]"
+            className="aspect-video w-4/5 max-[580px]:h-[320px] md:w-[700px] xl:w-[800px]"
           />
         )}
       </div>

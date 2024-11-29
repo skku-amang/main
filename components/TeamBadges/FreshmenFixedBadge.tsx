@@ -29,11 +29,10 @@ const FreshmenFixedBadge = ({
     <Badge
       variant="outline"
       className={cn(
-        "text-md rounded-full border-none bg-blue-100 px-4 py-1 font-bold text-third",
+        "text-md rounded-full border-none bg-blue-100 px-4 py-1 font-bold text-primary",
         className
       )}
     >
-      <span className="me-2 font-extrabold">●</span>
       신입고정
     </Badge>
   )

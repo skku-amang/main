@@ -1,12 +1,9 @@
-import { PenLine, Trash2 } from "lucide-react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -54,21 +51,37 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
   }
 
   return (
-    <div className="w-full rounded-2xl bg-white px-20 pb-12 pt-14 shadow-md">
+    <div className="w-full rounded-2xl bg-white px-12 pb-12 pt-14 shadow-md min-[600px]:px-20 min-[878px]:w-11/12 lg:w-5/6">
+      {/* 팀장 */}
+      {team.isFreshmenFixed && <FreshmenFixedBadge size="large" />}
+      <div className="mb-4 flex items-center justify-start gap-x-4 pt-4">
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
+        </Avatar>
+
+        <div className="text-primary">
+          {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
+          {team.leader.name}
+        </div>
+        <div className="text-gray-400">
+          {getRepresentativeRelativeTime(team.createdDatetime)}
+        </div>
+      </div>
       <div className="flex items-center justify-between">
         <div>
           {/* 곡 정보 */}
           <div className="flex items-center gap-x-3">
-            <h3 className="text-4xl font-extrabold">{team.songName}</h3>
+            <h3 className="text-3xl font-extrabold">{team.songName}</h3>
             <StatusBadge
               status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
             />
-            {team.isFreshmenFixed && <FreshmenFixedBadge size="large" />}
           </div>
-          <h4 className="my-2 text-2xl text-gray-500">
+          <h4 className="my-2 text-xl text-gray-500">
             {team.songArtist} {team.isSelfMade && "(자작곡)"}
           </h4>
         </div>
+        {/*}
         <div className="flex items-center justify-center gap-x-5">
           <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
             <Link
@@ -87,27 +100,11 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             </Button>
           </form>
         </div>
-      </div>
-
-      {/* 팀장 */}
-      <div className="mb-8 flex items-center justify-start gap-x-4">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="text-primary">
-            {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
-            {team.leader.name}
-          </div>
-          <div className="text-gray-400">
-            {getRepresentativeRelativeTime(team.createdDatetime)}
-          </div>
-        </div>
+        */}
       </div>
 
       {/* 설명 */}
-      <p>{team.description}</p>
+      <p className="pb-4 pt-8">{team.description}</p>
     </div>
   )
 }
