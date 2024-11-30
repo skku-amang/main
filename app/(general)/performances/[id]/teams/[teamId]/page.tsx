@@ -11,7 +11,6 @@ import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
-import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import OleoPageHeader from "@/components/OleoPageHeader"
@@ -106,12 +105,13 @@ const TeamDetail = ({ params }: Props) => {
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
-            className="aspect-video w-4/5 max-[580px]:h-[320px] md:w-[700px] xl:w-[800px]"
+            className="aspect-video w-4/5 max-[580px]:h-[240px] md:w-[700px] xl:w-[800px]"
           />
         )}
       </div>
 
       {/*수정 및 삭제*/}
+      {/*
       <div className="h-auto w-full justify-items-end  pb-5  min-[878px]:w-11/12 lg:w-5/6">
         <DeleteEditButton
           performanceId={performanceId}
@@ -119,18 +119,20 @@ const TeamDetail = ({ params }: Props) => {
           accessToken={session.data?.access}
         />
       </div>
+*/}
+
       {/* 기본 정보 */}
       <BasicInfo team={team} />
 
       {/* 세션 구성 */}
-      <div className="mt-6 grid grid-cols-1 gap-6 pb-14 md:grid-cols-2">
+      <div className="flex h-full w-full flex-col gap-y-5 py-5 min-[878px]:w-11/12  lg:w-5/6">
         {/* 세션 구성 */}
         {team.memberSessions && (
           <SessionSetCard
             header="세션구성"
             className="col-span-2 bg-white shadow-md"
           >
-            <div className="flex items-center gap-x-2">
+            <div className="flex flex-wrap gap-x-2 gap-y-2 ">
               {team.memberSessions
                 .sort((a, b) => {
                   return (
@@ -145,6 +147,7 @@ const TeamDetail = ({ params }: Props) => {
                       <SessionBadge
                         key={sessionWithIndex}
                         session={sessionWithIndex}
+                        className="w-[3rem] justify-center text-base max-sm:text-[12px] sm:w-16"
                       />
                     )
                   })
