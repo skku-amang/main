@@ -148,7 +148,7 @@ const TeamDetail = ({ params }: Props) => {
                       <SessionBadge
                         key={sessionWithIndex}
                         session={sessionWithIndex}
-                        className="w-12 justify-center px-0 py-0 text-base max-sm:text-xs sm:w-16"
+                        className="w-12 justify-center bg-slate-200 px-0 py-0 text-base hover:bg-slate-300 max-sm:text-xs sm:w-16"
                       />
                     )
                   })
