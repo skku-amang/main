@@ -1,10 +1,11 @@
 "use client"
 
+import Image from "next/image"
 import { useSession } from "next-auth/react"
 
 import { useToast } from "@/components/hooks/use-toast"
-import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
+import SESSIONIMAGE from "@/constants/sessionimage"
 import fetchData from "@/lib/fetch"
 import { SessionName } from "@/types/Session"
 import { Team } from "@/types/Team"
@@ -49,7 +50,7 @@ const ApplyButton = ({
       return
     }
 
-    const data = await res.json() as Team
+    const data = (await res.json()) as Team
     toast({
       title: "지원 완료",
       description: "성공적으로 팀에 등록되었습니다!"
@@ -59,19 +60,20 @@ const ApplyButton = ({
 
   return (
     <div
-      className="rounded border px-10 py-3"
+      className="flex items-center rounded border"
       style={{
         borderRadius: "5px"
       }}
     >
+      <Image
+        src={SESSIONIMAGE.PRESSED[session]} // session을 키로 사용
+        alt={`${session} session image`}
+        width={200} // 원하는 이미지 너비
+        height={100} // 원하는 이미지 높이
+      />
       {/* 세션명 */}
-      <div className="mb-2 text-center">{memberSessionWithIndex}</div>
-
-      {/* 지원 버튼 */}
-      <div className="flex justify-center">
-        <Button className="h-7 text-sm" onClick={onApply}>
-          지원하기
-        </Button>
+      <div className="mb-2 text-center font-['Inter'] text-2xl font-semibold text-slate-600">
+        {memberSessionWithIndex}
       </div>
     </div>
   )

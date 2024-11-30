@@ -1,7 +1,7 @@
-import { TeamsPagePadding } from "@/app/(general)/performances/[id]/teams/[teamId]/_components/TeamsPagePadding"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import TeamsPagePadding from "@/constants/teamspagepadding"
 import {
   formatGenerationOrder,
   getRepresentativeRelativeTime

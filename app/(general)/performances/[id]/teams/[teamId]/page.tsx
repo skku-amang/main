@@ -208,7 +208,7 @@ const TeamDetail = ({ params }: Props) => {
               있습니다
             </li>
           </ul>
-          <div className="flex items-center justify-start gap-x-4">
+          <div className="grid grid-cols-3 gap-x-4 gap-y-4">
             {team.memberSessions && team.memberSessions?.length > 0 ? (
               team.memberSessions?.map((ms) =>
                 ms.members.map(

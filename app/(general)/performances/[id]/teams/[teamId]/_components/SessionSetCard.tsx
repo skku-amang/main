@@ -1,6 +1,6 @@
 import React from "react"
 
-import { TeamsPagePadding } from "@/app/(general)/performances/[id]/teams/[teamId]/_components/TeamsPagePadding"
+import TeamsPagePadding from "@/constants/teamspagepadding"
 import { cn } from "@/lib/utils"
 
 interface SessionSetCardProps {
@@ -18,7 +18,8 @@ const SessionSetCard = ({
     <div
       className={cn(
         className,
-        `rounded-xl border-s-8 border-s-blue-900 bg-white ${TeamsPagePadding.Padding}`
+        `rounded-xl border-s-8 border-s-blue-900 bg-white `,
+        TeamsPagePadding.Padding
       )}
     >
       <h5 className="mb-7 select-none text-xl font-semibold">{header}</h5>
