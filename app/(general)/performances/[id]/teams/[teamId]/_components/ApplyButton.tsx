@@ -1,12 +1,15 @@
 "use client"
 
+import { Check } from "lucide-react"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
+import { useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import SESSIONIMAGE from "@/constants/sessionimage"
 import fetchData from "@/lib/fetch"
+import { cn } from "@/lib/utils"
 import { SessionName } from "@/types/Session"
 import { Team } from "@/types/Team"
 
@@ -27,6 +30,8 @@ const ApplyButton = ({
   const authSession = useSession()
   const { toast } = useToast()
   const memberSessionWithIndex = `${session}${memberSessionIndex}`
+
+  const [Pressed, setPressedState] = useState<boolean>(false)
 
   async function onApply() {
     const res = await fetchData(
@@ -60,16 +65,33 @@ const ApplyButton = ({
 
   return (
     <div
-      className="flex items-center rounded border"
+      className={cn(
+        "relative flex items-center rounded bg-slate-50",
+        Pressed ? "border-4 border-primary" : ""
+      )}
       style={{
         borderRadius: "5px"
       }}
+      onClick={() => setPressedState(!Pressed)}
     >
+      <div
+        className={cn(
+          "absolute -right-4 -top-4 ml-1 h-8 w-8 items-center justify-center rounded-full bg-primary  text-white",
+          Pressed ? "block" : "hidden"
+        )}
+      >
+        <Check width={32} height={32} className="pb-[1px] pt-[3px]" />
+      </div>
+
       <Image
-        src={SESSIONIMAGE.PRESSED[session]} // session을 키로 사용
+        src={
+          Pressed
+            ? SESSIONIMAGE.PRESSED[session]
+            : SESSIONIMAGE.UNPRESSED[session]
+        }
         alt={`${session} session image`}
-        width={200} // 원하는 이미지 너비
-        height={100} // 원하는 이미지 높이
+        width={180}
+        height={180}
       />
       {/* 세션명 */}
       <div className="mb-2 text-center font-['Inter'] text-2xl font-semibold text-slate-600">
