@@ -21,7 +21,7 @@ const SessionSetCard = ({
         `rounded-xl border-s-8 border-s-blue-900 bg-white ${TeamsPagePadding.Padding}`
       )}
     >
-      <h5 className="mb-4 select-none text-xl font-semibold">{header}</h5>
+      <h5 className="mb-7 select-none text-xl font-semibold">{header}</h5>
       {children}
     </div>
   )

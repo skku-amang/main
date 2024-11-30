@@ -1,5 +1,6 @@
 "use client"
 
+import { Separator } from "@radix-ui/react-separator"
 import { StatusCodes } from "http-status-codes"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -162,18 +163,30 @@ const TeamDetail = ({ params }: Props) => {
           className="col-span-2 bg-white shadow-md"
         >
           <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
-            {sessionsWithAtleastOneMember.map((ms) =>
+            {sessionsWithAtleastOneMember.map((ms, msIndex) =>
               ms.members.map((member, index) => {
-                if (member === null) return
+                if (member === null) return null
+
+                const key = `${ms.session}-${index}`
+                const isLastSession =
+                  msIndex === sessionsWithAtleastOneMember.length - 1 &&
+                  index === ms.members.length - 1
+
                 return (
-                  <MemberSessionCard
-                    key={`${ms.session}-${index}`}
-                    teamId={team.id}
-                    session={ms.session}
-                    sessionIndex={index + 1}
-                    user={member}
-                    onUnapplySuccess={setTeam}
-                  />
+                  <>
+                    <MemberSessionCard
+                      key={key}
+                      teamId={team.id}
+                      session={ms.session}
+                      sessionIndex={index + 1}
+                      user={member}
+                      onUnapplySuccess={setTeam}
+                    />
+                    {/* 마지막 세션에서는 Separator를 렌더링하지 않음 */}
+                    {!isLastSession && (
+                      <Separator className="block h-[1px] bg-slate-100 text-sm text-red-400 md:hidden" />
+                    )}
+                  </>
                 )
               })
             )}

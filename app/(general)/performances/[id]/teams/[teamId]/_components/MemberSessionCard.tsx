@@ -66,7 +66,7 @@ const MemberSessionCard = ({
   return (
     <div>
       {/* 세션 라벨 */}
-      <div className="flex select-none items-center justify-center">
+      <div className="hidden select-none items-center justify-center md:flex">
         <div className="rounded-t-md bg-slate-200 px-2 py-1 text-sm font-semibold">
           {session}
           {sessionIndex}
@@ -75,7 +75,7 @@ const MemberSessionCard = ({
       </div>
 
       {/* 유저 정보 */}
-      <div className="flex items-center justify-start gap-x-8 rounded-lg rounded-tl-none border border-slate-200 px-8 py-2">
+      <div className="flex items-center justify-start gap-x-8 rounded-lg rounded-tl-none border border-white px-1 md:border-slate-200 md:px-8 md:py-2">
         {/* 아바타 */}
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />
