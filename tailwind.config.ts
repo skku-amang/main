@@ -80,7 +80,11 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out"
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans]
+        sans: ["Inter", ...fontFamily.sans]
+      },
+      dropShadow: {
+        search: "0 1px 2px rgba(64, 63, 84, 0.1)",
+        filterMobile: "0 2px 6px (02, 36, 64, 0.04)"
       }
     }
   },

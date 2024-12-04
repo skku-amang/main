@@ -7,7 +7,7 @@ interface SelfMadeSongBadgeProps {
 
 const SelfMadeSongBadge = ({ className }: SelfMadeSongBadgeProps) => {
   return (
-    <Badge className={cn("bg-neutral-200 text-gray-700 hover:bg-neutral-200 h-5", className)}>
+    <Badge className={cn("h-4 text-[0.7rem] font-bold lg:h-5 p-2 bg-sky-100 text-third lg:bg-neutral-200 lg:text-gray-700 lg:hover:bg-neutral-200", className)}>
       자작곡
     </Badge>
   )

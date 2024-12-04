@@ -5,15 +5,17 @@ import { Performance } from "@/types/Performance"
 interface RelatedPerformanceListProps {
   currentPerformanceId: number
   relatedPerformances: Performance[]
+  className?: string
 }
 
 const RelatedPerformanceList = ({
   currentPerformanceId,
-  relatedPerformances
+  relatedPerformances,
+  className
 }: RelatedPerformanceListProps) => {
   return (
-    <div>
-      <div className="hidden lg:block">
+    <div className={className}>
+      <div className="hidden md:block">
         <ButtonView
           currentPerformanceId={currentPerformanceId}
           performanceOptions={relatedPerformances}
@@ -21,7 +23,7 @@ const RelatedPerformanceList = ({
       </div>
 
       {/* 모바일: Select 보기 */}
-      <div className="lg:hidden">
+      <div className="md:hidden">
         <SelectView
           currentPerformanceId={currentPerformanceId}
           performanceOptions={relatedPerformances}

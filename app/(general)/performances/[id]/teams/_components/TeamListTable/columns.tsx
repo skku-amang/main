@@ -26,13 +26,14 @@ import {
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
+import { User } from "@/types/User"
 
 export type TeamColumn = {
   performanceId: number
   id: number
   songName: string
   songArtist: string
-  leaderName?: string
+  leader: User
   memberSessions?: MemberSession[]
   songYoutubeVideoId?: string
   isFreshmenFixed: boolean,
@@ -86,7 +87,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("leaderName") ?? ""}
+        {row.original.leader.name}
         <br />
         {row.original.isFreshmenFixed && (
           <FreshmenFixedBadge size="small" />
