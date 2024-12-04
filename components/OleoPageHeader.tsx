@@ -15,12 +15,7 @@ const OleoPageHeader = ({
   const words = title.split(" ")
 
   return (
-    <div
-      className={cn(
-        className,
-        "mb-10 flex text-6xl min-[480px]:text-7xl md:text-8xl xl:text-9xl"
-      )}
-    >
+    <div className={cn(className, "mb-10 flex text-9xl")}>
       {words.map((word, i) => {
         const firstLetter = word.charAt(0)
         const rest = word.slice(1)

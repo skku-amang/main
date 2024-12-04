@@ -1,8 +1,8 @@
+import { Minus } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
@@ -55,7 +55,7 @@ const MemberSessionCard = ({
       return
     }
 
-    const data = await res.json() as Team
+    const data = (await res.json()) as Team
     toast({
       title: "탈퇴 완료",
       description: "성공적으로 팀에서 탈퇴되었습니다!"
@@ -64,20 +64,16 @@ const MemberSessionCard = ({
   }
 
   return (
-    <div>
-      {/* 세션 라벨 */}
-      <div className="hidden select-none items-center justify-center md:flex">
-        <div className="rounded-t-md bg-slate-200 px-2 py-1 text-sm font-semibold">
-          {session}
-          {sessionIndex}
-        </div>
-        <div className="flex-auto" />
+    <div className="flex py-4">
+      <div className="flex h-[48px] w-[160px] items-center pl-4">
+        {session}
+        {sessionIndex}
       </div>
 
       {/* 유저 정보 */}
-      <div className="flex items-center justify-start gap-x-8 rounded-lg rounded-tl-none border border-white px-1 md:border-slate-200 md:px-8 md:py-2">
+      <div className="relative flex h-[48px] w-[466px] items-center pl-4">
         {/* 아바타 */}
-        <Avatar>
+        <Avatar className="mr-[24px]">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>{user.name?.substring(0, 1)}</AvatarFallback>
         </Avatar>
@@ -88,18 +84,16 @@ const MemberSessionCard = ({
             {formatGenerationOrder(user.generation?.order)}기 {user.name}
           </div>
           <div className="text-sm text-gray-400">#{user.nickname}</div>
-
-          {/* 탈퇴 버튼 */}
-          {user.id.toString() === authSession.data?.id && (
-            <Button
-              variant="destructive"
-              onClick={onUnapply}
-              className="h-6 px-2"
-            >
-              탈퇴
-            </Button>
-          )}
         </div>
+        {/* 탈퇴 버튼 */}
+        {user.id.toString() === authSession.data?.id && (
+          <div
+            className="absolute right-0 flex h-6 w-6 justify-center rounded-full  bg-red-500 "
+            onClick={() => onUnapply()}
+          >
+            <Minus className="text-white" />
+          </div>
+        )}
       </div>
     </div>
   )
