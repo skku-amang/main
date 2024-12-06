@@ -33,7 +33,7 @@ const FreshmenFixedBadge = ({
         className
       )}
     >
-      <span className="me-2 font-extrabold">●</span>
+      <span className="me-2 text-[0.5rem]">●</span>
       신입고정
     </Badge>
   )

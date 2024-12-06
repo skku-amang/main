@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 import { User } from "@/types/User"
+import TeamCardDeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamCard/DeleteButton"
 
 interface TeamCardProps {
   performanceId: number
@@ -97,14 +98,13 @@ const TeamCard = ({
 
       {/* 액션: 편집, 삭제 */}
       <div className="mt-3 flex items-center justify-between gap-x-4">
-        <Button className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm border-none" variant="outline">
-          <PencilLine size={14} strokeWidth={2} className="font-bold" />
-          편집하기
+        <Button asChild className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm border-none" variant="outline">
+          <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
+            <PencilLine size={14} strokeWidth={2} className="font-bold" />
+            편집하기
+          </Link>
         </Button>
-        <Button className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm" variant="destructive">
-          <Trash2 size={14} strokeWidth={2} className="font-bold" />
-          삭제하기
-        </Button>
+        <TeamCardDeleteButton teamId={id} />
       </div>
     </div>
   )
