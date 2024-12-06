@@ -1,3 +1,4 @@
+import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -8,14 +9,21 @@ import {
 import { MemberSessionSet, Team } from "@/types/Team"
 
 interface BasicInfoProps {
+  performanceId: number
   team: Team
+  accessToken?: string
 }
 
 const BasicInfo = ({ team }: BasicInfoProps) => {
   const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
-
   return (
-    <div className="h-fit w-full rounded-2xl bg-white px-[40px] py-[40px] text-lg font-semibold shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
+    <div className="relative h-fit w-full rounded-2xl bg-white px-[40px] py-[40px] text-lg font-semibold shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
+      {/* 수정 및 삭제 버튼(데스크탑) */}
+      <DeleteEditButton
+        className="absolute right-[40px] top-[60px] hidden w-[92px]  md:flex"
+        performanceId={team.id}
+        team={team}
+      />
       {/* 팀장 */}
       {team.isFreshmenFixed && (
         <FreshmenFixedBadge
@@ -28,7 +36,6 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
-
         <div className="text-xs font-medium leading-3 text-primary md:text-base">
           {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
           {team.leader.name}
@@ -37,6 +44,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
           {getRepresentativeRelativeTime(team.createdDatetime)}
         </div>
       </div>
+
       <div className="flex items-center justify-between">
         <div>
           {/* 곡 정보 */}
@@ -56,7 +64,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
       </div>
 
       {/* 설명 */}
-      <p className="pt-[14px] text-base font-normal leading-normal tracking-wide text-slate-700 md:pt-[28px] ">
+      <p className="pt-[14px] text-base font-normal leading-snug tracking-wide text-slate-700 md:pt-[28px] md:leading-normal ">
         {team.description}
       </p>
     </div>

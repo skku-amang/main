@@ -14,6 +14,7 @@ import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
+import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import OleoPageHeader from "@/components/OleoPageHeader"
@@ -108,7 +109,7 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 유튜브 임베드 */}
-      <div className="relative z-10 flex w-full items-center justify-center pb-10 md:pb-[49px]">
+      <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
@@ -117,20 +118,19 @@ const TeamDetail = ({ params }: Props) => {
         )}
       </div>
 
-      {/*수정 및 삭제*/}
-      {/*
-      <div className="h-auto w-full justify-items-end  pb-5  min-[878px]:w-11/12 lg:w-5/6">
+      {/*수정 및 삭제 (모바일)*/}
+      <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
         <DeleteEditButton
           performanceId={performanceId}
           team={team}
           accessToken={session.data?.access}
         />
       </div>
-*/}
+
       <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-[93%] flex-col gap-y-[24px]">
-          <BasicInfo team={team} />
+          <BasicInfo team={team} performanceId={performanceId} />
           <div className="relative hidden h-[731px] w-[466px] md:block">
             <Image
               className="rounded-[20px]"

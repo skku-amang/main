@@ -1,5 +1,5 @@
 "use client"
-import { Link, PenLine, Trash2 } from "lucide-react"
+import { Edit3, Link, Trash2 } from "lucide-react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -8,17 +8,23 @@ import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { Team } from "@/types/Team"
 
-interface BasicInfoProps {
+interface DeleteEditButtonProps {
   performanceId: number
   team: Team
+  className?: string
   accessToken?: string
 }
-// 수정버튼 제대로 해놔야함
+
 const DeleteEditButton = ({
   performanceId,
   team,
+  className,
   accessToken
-}: BasicInfoProps) => {
+}: DeleteEditButtonProps) => {
+  {
+    /*const router = useRouter()*/
+  } // 여기서 자꾸 오류가 발생합니다...
+
   const { toast } = useToast()
 
   function onDeleteButtonClick() {
@@ -42,23 +48,31 @@ const DeleteEditButton = ({
         title: "팀 삭제 성공",
         description: "성공적으로 팀을 삭제했습니다."
       })
+      {
+        /*router.push(ROUTES.PERFORMANCE.TEAM.LIST(performanceId))*/
+      }
     })
   }
 
   return (
-    <div className="flex items-center justify-center gap-x-5">
-      <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
-        <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}>
-          <PenLine strokeWidth={1.25} />
+    <div
+      className={`flex items-center justify-center gap-x-[12px] ${className}`}
+    >
+      <Button variant="outline" className="h-[40px] w-[40px] p-[5px] shadow">
+        <Link
+          className="h-full w-full text-white hover:animate-none"
+          href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+        >
+          <Edit3 strokeWidth={1} className="text-gray-600" />
         </Link>
       </Button>
-      <form action={onDeleteButtonClick}>
+      <form className="h-[40px] w-[40px]" action={onDeleteButtonClick}>
         <Button
           type="submit"
           variant="outline"
-          className="h-12 w-12 p-2 shadow"
+          className="h-[40px] w-[40px] p-[5px] shadow"
         >
-          <Trash2 strokeWidth={1.25} />
+          <Trash2 strokeWidth={1.25} className="text-gray-600 " />
         </Button>
       </form>
     </div>
