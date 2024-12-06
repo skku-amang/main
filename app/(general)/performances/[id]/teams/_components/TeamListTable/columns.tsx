@@ -6,8 +6,9 @@ import {
   EllipsisVertical,
   Paperclip,
   Pencil,
-  Trash
+  Trash2
 } from "lucide-react"
+import { Image } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import React from "react"
@@ -36,6 +37,7 @@ export type TeamColumn = {
   songArtist: string
   leader: User
   memberSessions?: MemberSession[]
+  posterImage?: string
   songYoutubeVideoId?: string
   isFreshmenFixed: boolean,
   isSelfMade: boolean
@@ -92,7 +94,7 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
               className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               teamId={row.original.id}
             >
-              <Trash />
+              <Trash2 />
               삭제하기
             </DeleteButton>
           </DropdownMenuItem>
@@ -114,8 +116,14 @@ export const columns: ColumnDef<TeamColumn>[] = [
           row.original.id
         )}
       >
-        {row.original.songName}
-        <br />
+        {/* 곡명 */}
+        <div className="flex items-center gap-x-1">
+          {row.original.songName}
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          {!row.original.posterImage && <span><Image className="w-3 h-3 font-normal text-neutral-500" /></span>}
+        </div>
+
+        {/* 아티스트명 */}
         <div className="flex items-center justify-start gap-x-1">
           <span className="text-neutral-400">{row.original.songArtist}</span>
           {row.original.isSelfMade && <SelfMadeSongBadge />}

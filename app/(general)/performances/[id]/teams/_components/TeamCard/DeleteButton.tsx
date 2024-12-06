@@ -1,6 +1,7 @@
 "use client"
 
 import { Trash2 } from "lucide-react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/dialog"
 import useTeamDelete from "@/hooks/useTeamDelete"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
 
 interface TeamCardDeleteButtonProps {
   teamId: number

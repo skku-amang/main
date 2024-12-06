@@ -516,7 +516,6 @@ export function TeamListDataTable<TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <div key={row.id}>
-                {/* TODO: image 추가 */}
                 <TeamCard
                   performanceId={performanceId}
                   id={row.original.id}
@@ -524,7 +523,7 @@ export function TeamListDataTable<TValue>({
                   songArtist={row.original.songArtist}
                   isFreshmenFixed={row.original.isFreshmenFixed}
                   isSelfMade={row.original.isSelfMade}
-                  // image={row.original}
+                  image={row.original.posterImage}
                   leader={row.original.leader}
                   memberSessions={row.original.memberSessions ?? []}
                 />
