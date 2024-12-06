@@ -3,7 +3,7 @@
 import { Check } from "lucide-react"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
@@ -32,6 +32,22 @@ const ApplyButton = ({
   const memberSessionWithIndex = `${session}${memberSessionIndex}`
 
   const [Pressed, setPressedState] = useState<boolean>(false)
+  const [isLargeScreen, setIsLargeScreen] = useState(true) // 기본적으로 768px 이상으로 설정
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 768)
+    }
+
+    // Resize 이벤트 리스너 추가
+    window.addEventListener("resize", handleResize)
+
+    // 초기 화면 크기 체크
+    handleResize()
+
+    // cleanup
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   async function onApply() {
     const res = await fetchData(
@@ -66,7 +82,7 @@ const ApplyButton = ({
   return (
     <div
       className={cn(
-        "relative flex items-center rounded bg-slate-50",
+        "relative flex h-[160px] w-full items-center rounded bg-slate-50 md:w-[250px]",
         Pressed ? "border-4 border-primary" : ""
       )}
       style={{
@@ -90,11 +106,14 @@ const ApplyButton = ({
             : SESSIONIMAGE.UNPRESSED[session]
         }
         alt={`${session} session image`}
-        width={180}
-        height={180}
+        className="absolute left-0 top-0"
+        // 768px 이상이면 fill 적용, 그렇지 않으면 width와 height를 200으로 설정
+        width={isLargeScreen ? undefined : 100}
+        height={isLargeScreen ? undefined : 100}
+        fill={isLargeScreen ? true : undefined} // 768px 이상일 때만 fill 적용
       />
       {/* 세션명 */}
-      <div className="mb-2 text-center font-['Inter'] text-2xl font-semibold text-slate-600">
+      <div className="absolute right-[16px] mb-2 text-center font-['Inter'] text-2xl font-semibold text-slate-600">
         {memberSessionWithIndex}
       </div>
     </div>

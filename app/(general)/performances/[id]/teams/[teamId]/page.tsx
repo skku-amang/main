@@ -2,6 +2,8 @@
 
 import { Separator } from "@radix-ui/react-separator"
 import { StatusCodes } from "http-status-codes"
+import { ChevronRight, Maximize2 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -35,7 +37,6 @@ const TeamDetail = ({ params }: Props) => {
 
   const performanceId = params.id
   const id = params.teamId
-
 
   const [team, setTeam] = useState<Team | null>()
   useEffect(() => {
@@ -73,28 +74,32 @@ const TeamDetail = ({ params }: Props) => {
     team.memberSessions
   ).getSessionsWithAtleastOneMember()
 
+  const MemberSessionsFullorNot = !team.memberSessions?.some((ms) =>
+    ms.members.includes(null)
+  )
+
   return (
-    <div className="container flex flex-col items-center pt-16">
+    <div className="container flex w-full flex-col items-center px-0 pt-16 md:w-[1440px]">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
-        className="absolute left-0 top-0 z-0 h-[25rem] w-full bg-slate-300"
+        className="absolute left-0 top-0 z-0 h-[283px]  w-full bg-slate-300 md:h-[25rem] md:w-[1440px] min-[1440px]:w-full "
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
       ></div>
 
       {/* 기울어진 배경 - 프라이머리 */}
       <div
-        className="absolute left-0 top-0 h-[28rem] w-full bg-primary "
+        className="absolute left-0 top-0 h-[283px] w-full bg-primary md:h-[28rem] md:w-[1440px] min-[1440px]:w-full "
         style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
       ></div>
 
       {/* 뒤로가기 버튼 및 페이지 헤더 */}
-      <div className="relative flex w-[1300px] items-center justify-center px-12">
+      <div className="relative flex w-full items-center justify-center px-12 md:w-[1300px]">
         {/* 뒤로가기 버튼 */}
         <Link
           href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          className="absolute left-8 hidden items-center gap-x-5 font-semibold text-white md:flex"
+          className="absolute left-8 hidden  items-center gap-x-5 font-semibold text-white md:flex "
         >
-          <RiArrowGoBackLine className="hidden text-xl text-white min-[910px]:block" />
+          <RiArrowGoBackLine className="text-xl text-white" />
           <div>돌아가기</div>
         </Link>
 
@@ -103,11 +108,11 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/* 유튜브 임베드 */}
-      <div className="relative z-10 flex w-full items-center justify-center pb-[49px]">
+      <div className="relative z-10 flex w-full items-center justify-center pb-10 md:pb-[49px]">
         {team.songYoutubeVideoId && (
           <YoutubePlayer
             videoId={team.songYoutubeVideoId}
-            className="aspect-video h-[673px] w-[1152px]"
+            className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
           />
         )}
       </div>
@@ -122,12 +127,26 @@ const TeamDetail = ({ params }: Props) => {
         />
       </div>
 */}
-      <div className="flex w-[1152px] gap-[24px]">
-        {/* 기본 정보 */}
-        <BasicInfo team={team} />
+      <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
+        {/* 기본 정보 및 포스터*/}
+        <div className="flex w-[93%] flex-col gap-y-[24px]">
+          <BasicInfo team={team} />
+          <div className="relative hidden h-[731px] w-[466px] md:block">
+            <Image
+              className="rounded-[20px]"
+              src="/poster.png"
+              alt="poster"
+              width={466}
+              height={731}
+            />
+            <div className="absolute bottom-[16px] right-[16px] flex h-11 w-11 animate-pulse items-center justify-center rounded-[10px] bg-gray-600/50">
+              <Maximize2 className=" text-white" />
+            </div>
+          </div>
+        </div>
 
         {/* 세션 구성 */}
-        <div className="flex h-full w-[662px] flex-col gap-y-5">
+        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
           {/* 세션 구성 */}
           {team.memberSessions && (
             <SessionSetCard
@@ -202,7 +221,7 @@ const TeamDetail = ({ params }: Props) => {
             className="col-span-2 bg-white shadow-md"
           >
             <></>
-            <ul className="mb-6 w-[537px] pt-[16px] text-xs font-normal leading-normal text-gray-600">
+            <ul className="mb-6 w-full pt-[16px] text-xs font-normal leading-normal text-gray-600 md:w-[537px]">
               <li className="mb-[10px]">
                 ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                 선착순으로 마감됩니다
@@ -212,25 +231,42 @@ const TeamDetail = ({ params }: Props) => {
                 수 있습니다
               </li>
             </ul>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-              {team.memberSessions && team.memberSessions?.length > 0 ? (
-                team.memberSessions?.map((ms) =>
-                  ms.members.map(
-                    (member, index) =>
-                      member === null && (
-                        <ApplyButton
-                          key={`${ms.session}-${index}`}
-                          teamId={team.id}
-                          session={ms.session}
-                          memberSessionIndex={index + 1}
-                          onApplySuccess={setTeam}
-                        />
-                      )
+            <div className=" w-full">
+              <div className="grid grid-cols-2 gap-x-[26px] gap-y-[26px]">
+                {team.memberSessions &&
+                team.memberSessions?.length &&
+                MemberSessionsFullorNot === false ? (
+                  team.memberSessions?.map((ms) =>
+                    ms.members.map(
+                      (member, index) =>
+                        member === null && (
+                          <ApplyButton
+                            key={`${ms.session}-${index}`}
+                            teamId={team.id}
+                            session={ms.session}
+                            memberSessionIndex={index + 1}
+                            onApplySuccess={setTeam}
+                          />
+                        )
+                    )
                   )
-                )
-              ) : (
-                <div>마감</div>
-              )}
+                ) : (
+                  <div className="col-span-2 mb-5 mt-10 flex h-[24px] w-full justify-center text-lg font-medium leading-normal text-gray-500">
+                    참여가능한 세션이 없습니다
+                  </div>
+                )}
+              </div>
+              {team.memberSessions?.length && !MemberSessionsFullorNot ? (
+                <Separator className="mt-[26px] h-[1.5px] w-full bg-slate-200" />
+              ) : null}
+            </div>
+            <div className="mt-[24px] flex h-[40px] w-full justify-end">
+              <div className="inline-flex h-10 w-[120px] items-center justify-center gap-2 rounded-md border-2 border-primary bg-white px-2 py-2 shadow">
+                <div className="flex justify-center text-base font-bold leading-normal text-primary">
+                  지원하기
+                </div>
+                <ChevronRight className="h-6 w-6 text-primary" />
+              </div>
             </div>
           </SessionSetCard>
         </div>

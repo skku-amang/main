@@ -15,7 +15,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
   const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
 
   return (
-    <div className="h-fit w-[466px] rounded-2xl bg-white px-[40px] py-[60px] text-lg font-semibold shadow-md">
+    <div className="h-fit w-full rounded-2xl bg-white px-[40px] py-[60px] text-lg font-semibold shadow-md md:w-[466px]">
       {/* 팀장 */}
       {team.isFreshmenFixed && (
         <FreshmenFixedBadge

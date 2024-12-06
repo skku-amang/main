@@ -48,10 +48,13 @@ const Footer = ({
 }) => {
   return (
     <footer
-      className={cn(className, 'hidden md:block')}
+      className={cn(
+        className,
+        "hidden w-[1440px] md:block min-[1440px]:w-full"
+      )}
       style={{
         height,
-        transform: 'translateY(-100%)'
+        transform: "translateY(-100%)"
       }}
     >
       <FooterInner height={height} />
