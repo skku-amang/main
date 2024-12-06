@@ -151,9 +151,9 @@ const TeamDetail = ({ params }: Props) => {
           {team.memberSessions && (
             <SessionSetCard
               header="세션구성"
-              className="col-span-2 h-fit bg-white shadow-md"
+              className="h-fit bg-white shadow-md"
             >
-              <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[40px]">
+              <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">
                 {team.memberSessions
                   .sort((a, b) => {
                     return (
@@ -168,7 +168,7 @@ const TeamDetail = ({ params }: Props) => {
                         <SessionBadge
                           key={sessionWithIndex}
                           session={sessionWithIndex}
-                          className="h-[34px] w-[66px] justify-center rounded-[20px] bg-slate-200 px-0 text-sm hover:bg-slate-300"
+                          className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
                         />
                       )
                     })
@@ -182,7 +182,7 @@ const TeamDetail = ({ params }: Props) => {
             className="col-span-2 bg-white shadow-md"
           >
             <div className="grid grid-cols-1">
-              <div className="mt-4 flex text-sm font-medium leading-normal text-slate-500">
+              <div className="mt-4 hidden text-sm font-medium leading-normal text-slate-500 md:flex">
                 <div className="flex h-[48px] w-[160px] items-center pl-4">
                   Session
                 </div>
@@ -190,7 +190,7 @@ const TeamDetail = ({ params }: Props) => {
                   Member
                 </div>
               </div>
-              <Separator className="h-[1.5px] w-full bg-slate-200" />
+              <Separator className="hidden h-[1.5px] w-full bg-slate-200 md:block" />
               {sessionsWithAtleastOneMember.map((ms) =>
                 ms.members.map((member, index) => {
                   if (member === null) return null
@@ -221,8 +221,8 @@ const TeamDetail = ({ params }: Props) => {
             className="col-span-2 bg-white shadow-md"
           >
             <></>
-            <ul className="mb-6 w-full pt-[16px] text-xs font-normal leading-normal text-gray-600 md:w-[537px]">
-              <li className="mb-[10px]">
+            <ul className="mb-6 w-full pt-[12px] text-xs font-normal leading-normal text-gray-600 md:w-[537px] md:pt-[16px]">
+              <li className="mb-1 md:mb-[10px]">
                 ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                 선착순으로 마감됩니다
               </li>
@@ -257,16 +257,19 @@ const TeamDetail = ({ params }: Props) => {
                 )}
               </div>
               {team.memberSessions?.length && !MemberSessionsFullorNot ? (
-                <Separator className="mt-[26px] h-[1.5px] w-full bg-slate-200" />
+                <Separator className="mt-[26px] hidden h-[1.5px] w-full bg-slate-200 md:block" />
               ) : null}
             </div>
-            <div className="mt-[24px] flex h-[40px] w-full justify-end">
+            <div className=" mt-[24px] hidden h-[40px] w-full justify-end md:flex">
               <div className="inline-flex h-10 w-[120px] items-center justify-center gap-2 rounded-md border-2 border-primary bg-white px-2 py-2 shadow">
                 <div className="flex justify-center text-base font-bold leading-normal text-primary">
                   지원하기
                 </div>
                 <ChevronRight className="h-6 w-6 text-primary" />
               </div>
+            </div>
+            <div className="mt-6 flex h-[40px] w-full items-center justify-center rounded-[20px] bg-primary text-sm text-white shadow md:hidden">
+              지원하기
             </div>
           </SessionSetCard>
         </div>

@@ -82,7 +82,7 @@ const ApplyButton = ({
   return (
     <div
       className={cn(
-        "relative flex h-[160px] w-full items-center rounded bg-slate-50 md:w-[250px]",
+        "relative flex h-[100px] w-full items-center overflow-hidden rounded bg-slate-50 max-[470px]:h-[60px] md:h-[160px] md:w-[250px] md:overflow-visible",
         Pressed ? "border-4 border-primary" : ""
       )}
       style={{
@@ -93,7 +93,7 @@ const ApplyButton = ({
       <div
         className={cn(
           "absolute -right-4 -top-4 ml-1 h-8 w-8 items-center justify-center rounded-full bg-primary  text-white",
-          Pressed ? "block" : "hidden"
+          Pressed ? "op opactiy-100 block overflow-visible" : "hidden"
         )}
       >
         <Check width={32} height={32} className="pb-[1px] pt-[3px]" />
@@ -108,12 +108,12 @@ const ApplyButton = ({
         alt={`${session} session image`}
         className="absolute left-0 top-0"
         // 768px 이상이면 fill 적용, 그렇지 않으면 width와 height를 200으로 설정
-        width={isLargeScreen ? undefined : 100}
-        height={isLargeScreen ? undefined : 100}
+        width={isLargeScreen ? undefined : 80}
+        height={isLargeScreen ? undefined : 80}
         fill={isLargeScreen ? true : undefined} // 768px 이상일 때만 fill 적용
       />
       {/* 세션명 */}
-      <div className="absolute right-[16px] mb-2 text-center font-['Inter'] text-2xl font-semibold text-slate-600">
+      <div className="absolute right-[8px] z-10 text-center font-['Inter'] text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
         {memberSessionWithIndex}
       </div>
     </div>
