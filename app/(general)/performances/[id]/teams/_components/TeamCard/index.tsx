@@ -1,6 +1,10 @@
-import { PencilLine, Trash2 } from "lucide-react"
-import Link from "next/link"
+"use client"
 
+import { Image, PencilLine } from "lucide-react"
+import Link from "next/link"
+import { useSession } from "next-auth/react"
+
+import TeamCardDeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamCard/DeleteButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -10,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 import { User } from "@/types/User"
-import TeamCardDeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamCard/DeleteButton"
 
 interface TeamCardProps {
   performanceId: number
@@ -35,6 +38,9 @@ const TeamCard = ({
   leader,
   memberSessions
 }: TeamCardProps) => {
+  const session = useSession()
+  const user = session?.data
+
   return (
     <div className="rounded-lg bg-white p-5 shadow-md">
       <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}>
@@ -42,7 +48,13 @@ const TeamCard = ({
           {/* 곡명 & 상태 */}
           <div className="text-md flex items-start justify-between">
             {/* 곡명 */}
-            <h4 className="font-bold text-slate-700">{songName}</h4>
+            <div className="flex items-center gap-x-2">
+              <h4 className="font-bold text-slate-700 self-stretch flex items-center gap-x-1">
+                {songName}
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                {image && <span><Image className="w-3 h-3 font-normal text-neutral-500" /></span>}
+              </h4>
+            </div>
 
             {/* 상태 */}
             <StatusBadge
@@ -97,15 +109,17 @@ const TeamCard = ({
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      <div className="mt-3 flex items-center justify-between gap-x-4">
-        <Button asChild className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm border-none" variant="outline">
-          <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
-            <PencilLine size={14} strokeWidth={2} className="font-bold" />
-            편집하기
-          </Link>
-        </Button>
-        <TeamCardDeleteButton teamId={id} />
-      </div>
+      {user && (user.is_admin || user.id && +user?.id === leader.id) && (
+        <div className="mt-3 flex items-center justify-between gap-x-4">
+          <Button asChild className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm border-none" variant="outline">
+            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
+              <PencilLine size={14} strokeWidth={2} className="font-bold" />
+              편집하기
+            </Link>
+          </Button>
+          <TeamCardDeleteButton teamId={id} />
+        </div>
+      )}
     </div>
   )
 }

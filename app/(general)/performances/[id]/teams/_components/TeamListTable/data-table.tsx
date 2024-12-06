@@ -16,6 +16,7 @@ import Link from "next/link"
 import { useReducer, useState } from "react"
 
 import RelatedPerformanceList from "@/app/(general)/performances/[id]/teams/_components/RelatedPerformanceList"
+import TeamCard from "@/app/(general)/performances/[id]/teams/_components/TeamCard"
 import TeamListTableFilter, {
   FilterValue
 } from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/filter"
@@ -28,7 +29,6 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/table"
-import TeamCard from "@/app/(general)/performances/[id]/teams/_components/TeamCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {

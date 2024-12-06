@@ -1,6 +1,6 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { CellContext, ColumnDef } from "@tanstack/react-table"
 import {
   ArrowUpDown,
   EllipsisVertical,
@@ -9,6 +9,7 @@ import {
   Trash
 } from "lucide-react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
@@ -56,6 +57,50 @@ const SortButton = ({
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
   )
+}
+
+const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
+  const { data: user } = useSession()
+
+  if (user && (user.id && row.original.leader.id === +user.id || user.is_admin)) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex w-full items-center justify-center p-0"
+          >
+            <span className="sr-only">Open menu</span>
+            <EllipsisVertical className="h-5 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="rounded-none text-sm">
+          <DropdownMenuItem className="p-0">
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.EDIT(
+                row.original.performanceId,
+                row.original.id
+              )}
+              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
+            >
+              <Pencil />
+              편집하기
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0">
+            <DeleteButton
+              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
+              teamId={row.original.id}
+            >
+              <Trash />
+              삭제하기
+            </DeleteButton>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+  return null
 }
 
 export const columns: ColumnDef<TeamColumn>[] = [
@@ -160,43 +205,6 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex w-full items-center justify-center p-0"
-            >
-              <span className="sr-only">Open menu</span>
-              <EllipsisVertical className="h-5 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-none text-sm">
-            <DropdownMenuItem className="p-0">
-              <Link
-                href={ROUTES.PERFORMANCE.TEAM.EDIT(
-                  row.original.performanceId,
-                  row.original.id
-                )}
-                className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-              >
-                <Pencil />
-                편집하기
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="p-0">
-              <DeleteButton
-                className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-                teamId={row.original.id}
-              >
-                <Trash />
-                삭제하기
-              </DeleteButton>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
+    cell: (props) => <ActionsCell {...props} />
   }
 ]

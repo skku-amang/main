@@ -1,6 +1,7 @@
 import { PenLine, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
@@ -22,10 +23,12 @@ interface BasicInfoProps {
 const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: user } = useSession()
 
   const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
 
   function onDeleteButtonClick() {
+    // TODO: 확인 모달 추가
     fetchData(API_ENDPOINTS.TEAM.DELETE(team.id) as ApiEndpoint, {
       cache: "no-cache",
       headers: {
@@ -66,24 +69,28 @@ const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
             {team.songArtist} {team.isSelfMade && "(자작곡)"}
           </h4>
         </div>
-        <div className="flex items-center justify-center gap-x-5">
-          <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
-            <Link
-              href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
-            >
-              <PenLine strokeWidth={1.25} />
-            </Link>
-          </Button>
-          <form action={onDeleteButtonClick}>
-            <Button
-              type="submit"
-              variant="outline"
-              className="h-12 w-12 p-2 shadow"
-            >
-              <Trash2 strokeWidth={1.25} />
+        
+        {/* 팀 편집, 삭제 버튼 */}
+        {user && (user.is_admin || (user.id && +user.id === team.leader.id)) && (
+          <div className="flex items-center justify-center gap-x-5">
+            <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
+              <Link
+                href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+              >
+                <PenLine strokeWidth={1.25} />
+              </Link>
             </Button>
-          </form>
-        </div>
+            <form action={onDeleteButtonClick}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="h-12 w-12 p-2 shadow"
+              >
+                <Trash2 strokeWidth={1.25} />
+              </Button>
+            </form>
+          </div>
+        )}
       </div>
 
       {/* 팀장 */}
