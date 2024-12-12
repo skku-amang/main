@@ -84,7 +84,8 @@ const config = {
       },
       dropShadow: {
         search: "0 1px 2px rgba(64, 63, 84, 0.1)",
-        filterMobile: "0 2px 6px (02, 36, 64, 0.04)"
+        filterMobile: "0 2px 6px (02, 36, 64, 0.04)",
+        table: "0 1px 2px rgba(0, 0, 0, 0.06)"
       }
     }
   },

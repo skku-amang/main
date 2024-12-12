@@ -39,9 +39,17 @@ import {
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
-import { MemberSessionSet } from "@/types/Team"
+import { MemberSession, MemberSessionSet } from "@/types/Team"
 
 import { TeamColumn } from "./columns"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./drawer"
 
 type State = {
   filters: { 필요세션: Set<string>; 모집상태: "all" | "active" | "inactive" }
@@ -281,6 +289,10 @@ export function TeamListDataTable<TValue>({
     }
   })
 
+  const missingMemberSessions = (memberSessions: MemberSession[]) => {
+    return new MemberSessionSet(memberSessions).getSessionsWithMissingMembers()
+  }
+
   return (
     <div>
       {/* 데스크톱: 테이블 보기 */}
@@ -445,26 +457,34 @@ export function TeamListDataTable<TValue>({
             />
 
             {/* 필터 */}
-            <Popover>
-              <PopoverTrigger>
+            <Drawer>
+              <DrawerTrigger>
                 <MobileButton asChild variant="outline">
                   <div className="h-9 w-9 drop-shadow-search">
                     <Filter className="text-gray-400" size={16} />
                   </div>
                 </MobileButton>
-              </PopoverTrigger>
-              <PopoverContent className="flex gap-8 p-8">
-                <TeamListTableFilter
-                  header="필요세션"
-                  filterValues={filterValues.필요세션}
-                />
-                <Separator orientation="vertical" className="h-64" />
-                <TeamListTableFilter
-                  header="모집상태"
-                  filterValues={filterValues.모집상태}
-                />
-              </PopoverContent>
-            </Popover>
+              </DrawerTrigger>
+              <DrawerContent className="px-0 pb-10">
+                <DrawerHeader className="py-0 px-7">
+                  <DrawerTitle className="text-left font-semibold text-md pt-5 pb-3">Property Filter</DrawerTitle>
+                </DrawerHeader>
+
+                <Separator orientation="horizontal" className="w-full drop-shadow-table bg-slate-100" />
+
+                <div className="pt-4 px-7 space-y-7">
+                  <TeamListTableFilter
+                    header="필요세션"
+                    filterValues={filterValues.필요세션}
+                  />
+                  <TeamListTableFilter
+                    header="모집상태"
+                    filterValues={filterValues.모집상태}
+                  />
+                </div>
+              </DrawerContent>
+            </Drawer>
+
 
             {/* 정렬 */}
             {/* TODO: 정렬 기능 구현 */}
@@ -525,7 +545,7 @@ export function TeamListDataTable<TValue>({
                   isSelfMade={row.original.isSelfMade}
                   image={row.original.posterImage}
                   leader={row.original.leader}
-                  memberSessions={row.original.memberSessions ?? []}
+                  memberSessions={missingMemberSessions(row.original.memberSessions ?? [])}
                 />
               </div>
             ))
