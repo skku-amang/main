@@ -11,7 +11,7 @@ import {
   SortingState,
   useReactTable
 } from "@tanstack/react-table"
-import { ArrowDownUp, CirclePlus, Filter, Plus } from "lucide-react"
+import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import Link from "next/link"
 import { useReducer, useState } from "react"
 
@@ -466,8 +466,9 @@ export function TeamListDataTable<TValue>({
                 </MobileButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
-                <DrawerHeader className="py-0 px-7">
+                <DrawerHeader className="py-0 px-7 flex items-center justify-between">
                   <DrawerTitle className="text-left font-semibold text-md pt-5 pb-3">Property Filter</DrawerTitle>
+                  <DrawerClose><X className="text-slate-500 w-4 h-4" /></DrawerClose>
                 </DrawerHeader>
 
                 <Separator orientation="horizontal" className="w-full drop-shadow-table bg-slate-100" />
