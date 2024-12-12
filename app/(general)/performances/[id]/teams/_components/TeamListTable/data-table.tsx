@@ -11,11 +11,12 @@ import {
   SortingState,
   useReactTable
 } from "@tanstack/react-table"
-import { ArrowDownUp, CirclePlus, Filter } from "lucide-react"
+import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import Link from "next/link"
 import { useReducer, useState } from "react"
 
 import RelatedPerformanceList from "@/app/(general)/performances/[id]/teams/_components/RelatedPerformanceList"
+import TeamCard from "@/app/(general)/performances/[id]/teams/_components/TeamCard"
 import TeamListTableFilter, {
   FilterValue
 } from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/filter"
@@ -28,7 +29,6 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/table"
-import TeamCard from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/TeamCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -39,9 +39,17 @@ import {
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
-import { MemberSessionSet } from "@/types/Team"
+import { MemberSession, MemberSessionSet } from "@/types/Team"
 
 import { TeamColumn } from "./columns"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./drawer"
 
 type State = {
   filters: { 필요세션: Set<string>; 모집상태: "all" | "active" | "inactive" }
@@ -281,10 +289,14 @@ export function TeamListDataTable<TValue>({
     }
   })
 
+  const missingMemberSessions = (memberSessions: MemberSession[]) => {
+    return new MemberSessionSet(memberSessions).getSessionsWithMissingMembers()
+  }
+
   return (
     <div>
       {/* 데스크톱: 테이블 보기 */}
-      <div className="hidden lg:block">
+      <div className="hidden md:block">
         {/* 연관된 공연 목록 */}
         <div className="flex w-full items-center justify-center">
           <RelatedPerformanceList
@@ -351,7 +363,7 @@ export function TeamListDataTable<TValue>({
         </div>
 
         {/* 테이블 */}
-        <div className="overflow-hidden rounded-sm">
+        <div>
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -427,11 +439,11 @@ export function TeamListDataTable<TValue>({
       </div>
 
       {/* 모바일: 카드 보기 */}
-      <div className="lg:hidden">
+      <div className="md:hidden">
         {/* 헤더 */}
         <div className="space-y-3">
           {/* 검색, 필터, 정렬 */}
-          <div className="flex justify-center gap-x-3">
+          <div className="flex items-center justify-center gap-x-3">
             {/* 검색 */}
             <Input
               placeholder="검색"
@@ -441,80 +453,107 @@ export function TeamListDataTable<TValue>({
               onChange={(event) =>
                 table.getColumn("songName")?.setFilterValue(event.target.value)
               }
-              className="max-w-sm"
+              className="h-9 w-full max-w-full border-gray-200 drop-shadow-search"
             />
 
             {/* 필터 */}
-            <Popover>
-              <PopoverTrigger>
-                <MobileButton asChild variant="outline" className="px-2 py-3">
-                  <div>
-                    <Filter />
+            <Drawer>
+              <DrawerTrigger>
+                <MobileButton asChild variant="outline">
+                  <div className="h-9 w-9 drop-shadow-search">
+                    <Filter className="text-gray-400" size={16} />
                   </div>
                 </MobileButton>
-              </PopoverTrigger>
-              <PopoverContent className="flex gap-8 p-8">
-                <TeamListTableFilter
-                  header="필요세션"
-                  filterValues={filterValues.필요세션}
-                />
-                <Separator orientation="vertical" className="h-64" />
-                <TeamListTableFilter
-                  header="모집상태"
-                  filterValues={filterValues.모집상태}
-                />
-              </PopoverContent>
-            </Popover>
+              </DrawerTrigger>
+              <DrawerContent className="px-0 pb-10">
+                <DrawerHeader className="py-0 px-7 flex items-center justify-between">
+                  <DrawerTitle className="text-left font-semibold text-md pt-5 pb-3">Property Filter</DrawerTitle>
+                  <DrawerClose><X className="text-slate-500 w-4 h-4" /></DrawerClose>
+                </DrawerHeader>
+
+                <Separator orientation="horizontal" className="w-full drop-shadow-table bg-slate-100" />
+
+                <div className="pt-4 px-7 space-y-7">
+                  <TeamListTableFilter
+                    header="필요세션"
+                    filterValues={filterValues.필요세션}
+                  />
+                  <TeamListTableFilter
+                    header="모집상태"
+                    filterValues={filterValues.모집상태}
+                  />
+                </div>
+              </DrawerContent>
+            </Drawer>
+
 
             {/* 정렬 */}
             {/* TODO: 정렬 기능 구현 */}
             <MobileButton asChild variant="outline">
-              <div>
-                <ArrowDownUp strokeWidth={1.75} />
+              <div className="h-9 w-9 drop-shadow-search">
+                <ArrowDownUp
+                  strokeWidth={1.75}
+                  className="text-gray-400"
+                  size={16}
+                />
               </div>
             </MobileButton>
           </div>
 
           {/* 공연 선택 및 생성 버튼 */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-x-4">
             {/* 연관된 공연 목록 */}
             <RelatedPerformanceList
               currentPerformanceId={performanceId}
               relatedPerformances={relatedPerformances}
+              className="drop-shadow-search"
             />
 
             {/* 생성 버튼 */}
-            <Button asChild className="h-full rounded-md py-1">
-              <Link
-                href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}
-              >
-                <CirclePlus size={22} />
-                &nbsp;Create
-              </Link>
-            </Button>
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}
+              className="flex items-center gap-x-1"
+            >
+              <div className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow w-full">
+                <div className="relative h-4 w-4">
+                  <div className="absolute left-0 top-0 h-4 w-4">
+                    <Plus size={18} />
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <div className="font-['inter'] text-sm font-medium leading-tight">
+                    Create
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
 
         <Separator orientation="horizontal" className="my-3" />
 
+        {/* 카드 목록 */}
         <div className="space-y-3">
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <div key={row.id}>
-                {/* TODO: image 추가 */}
                 <TeamCard
                   performanceId={performanceId}
                   id={row.original.id}
                   songName={row.original.songName}
                   songArtist={row.original.songArtist}
-                  // image={row.original}
-                  leaderName={row.original.leaderName}
-                  memberSessions={row.original.memberSessions ?? []}
+                  isFreshmenFixed={row.original.isFreshmenFixed}
+                  isSelfMade={row.original.isSelfMade}
+                  image={row.original.posterImage}
+                  leader={row.original.leader}
+                  memberSessions={missingMemberSessions(row.original.memberSessions ?? [])}
                 />
               </div>
             ))
           ) : (
-            <div>결과 없음</div>
+            <div className="flex flex-col items-center justify-center">
+              No results.
+            </div>
           )}
         </div>
       </div>

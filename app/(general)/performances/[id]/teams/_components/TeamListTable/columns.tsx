@@ -1,14 +1,16 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { CellContext, ColumnDef } from "@tanstack/react-table"
 import {
   ArrowUpDown,
   EllipsisVertical,
   Paperclip,
   Pencil,
-  Trash
+  Trash2
 } from "lucide-react"
+import { Image } from "lucide-react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
@@ -26,14 +28,16 @@ import {
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
+import { User } from "@/types/User"
 
 export type TeamColumn = {
   performanceId: number
   id: number
   songName: string
   songArtist: string
-  leaderName?: string
+  leader: User
   memberSessions?: MemberSession[]
+  posterImage?: string
   songYoutubeVideoId?: string
   isFreshmenFixed: boolean,
   isSelfMade: boolean
@@ -57,6 +61,50 @@ const SortButton = ({
   )
 }
 
+const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
+  const { data: user } = useSession()
+
+  if (user && (user.id && row.original.leader.id === +user.id || user.is_admin)) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex w-full items-center justify-center p-0"
+          >
+            <span className="sr-only">Open menu</span>
+            <EllipsisVertical className="h-5 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="rounded-none text-sm">
+          <DropdownMenuItem className="p-0">
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.EDIT(
+                row.original.performanceId,
+                row.original.id
+              )}
+              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
+            >
+              <Pencil />
+              편집하기
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0">
+            <DeleteButton
+              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
+              teamId={row.original.id}
+            >
+              <Trash2 />
+              삭제하기
+            </DeleteButton>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+  return null
+}
+
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
@@ -68,8 +116,14 @@ export const columns: ColumnDef<TeamColumn>[] = [
           row.original.id
         )}
       >
-        {row.original.songName}
-        <br />
+        {/* 곡명 */}
+        <div className="flex items-center gap-x-1">
+          {row.original.songName}
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          {!row.original.posterImage && <span><Image className="w-3 h-3 font-normal text-neutral-500" /></span>}
+        </div>
+
+        {/* 아티스트명 */}
         <div className="flex items-center justify-start gap-x-1">
           <span className="text-neutral-400">{row.original.songArtist}</span>
           {row.original.isSelfMade && <SelfMadeSongBadge />}
@@ -86,7 +140,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("leaderName") ?? ""}
+        {row.original.leader.name}
         <br />
         {row.original.isFreshmenFixed && (
           <FreshmenFixedBadge size="small" />
@@ -159,43 +213,6 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex w-full items-center justify-center p-0"
-            >
-              <span className="sr-only">Open menu</span>
-              <EllipsisVertical className="h-5 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-none text-sm">
-            <DropdownMenuItem className="p-0">
-              <Link
-                href={ROUTES.PERFORMANCE.TEAM.EDIT(
-                  row.original.performanceId,
-                  row.original.id
-                )}
-                className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-              >
-                <Pencil />
-                편집하기
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="p-0">
-              <DeleteButton
-                className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-                teamId={row.original.id}
-              >
-                <Trash />
-                삭제하기
-              </DeleteButton>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
+    cell: (props) => <ActionsCell {...props} />
   }
 ]

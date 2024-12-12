@@ -26,7 +26,8 @@ const nextConfig = {
         port: "",
         pathname: "/media/**"
       }
-    ]
+    ],
+    unoptimized: true
   }
 };
 

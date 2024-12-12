@@ -5,6 +5,7 @@ export type AuthData = {
   image?: string | null
   email: string
   position: string
+  is_admin: boolean
   access: string
   refresh: string
 }
