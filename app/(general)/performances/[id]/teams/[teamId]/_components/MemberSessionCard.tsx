@@ -19,6 +19,7 @@ interface MemberSessionCardProps {
   onUnapplySuccess: (team: Team) => void
 }
 
+// TODO: Table으로 변경
 const MemberSessionCard = ({
   teamId,
   session,
@@ -29,15 +30,11 @@ const MemberSessionCard = ({
   const authSession = useSession()
   const { toast } = useToast()
 
-  if (!authSession) {
-    return <div>로그인 필요</div>
-  }
-
   async function onUnapply() {
     const res = await fetchData(
       API_ENDPOINTS.TEAM.UNAPPLY(teamId) as ApiEndpoint,
       {
-        body: JSON.stringify({ session, index: sessionIndex }),
+        body: JSON.stringify({ session, index: sessionIndex - 1 }),
         cache: "no-store",
         headers: {
           Authorization: `Bearer ${authSession.data?.access}`,
@@ -91,14 +88,15 @@ const MemberSessionCard = ({
             #{user.nickname}
           </div>
         </div>
+        
         {/* 탈퇴 버튼 */}
         {user.id.toString() === authSession.data?.id && (
-          <div
-            className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-red-500 "
-            onClick={() => onUnapply()}
+          <button
+            className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
+            onClick={onUnapply}
           >
             <Minus className="text-white" />
-          </div>
+          </button>
         )}
       </div>
     </div>

@@ -1,5 +1,8 @@
 "use client"
-import { Edit3, Link, Trash2 } from "lucide-react"
+
+import { Edit3, Trash2 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -21,9 +24,7 @@ const DeleteEditButton = ({
   className,
   accessToken
 }: DeleteEditButtonProps) => {
-  {
-    /*const router = useRouter()*/
-  } // 여기서 자꾸 오류가 발생합니다...
+  const router = useRouter()
 
   const { toast } = useToast()
 
@@ -48,33 +49,25 @@ const DeleteEditButton = ({
         title: "팀 삭제 성공",
         description: "성공적으로 팀을 삭제했습니다."
       })
-      {
-        /*router.push(ROUTES.PERFORMANCE.TEAM.LIST(performanceId))*/
-      }
+      router.push(ROUTES.PERFORMANCE.TEAM.LIST(performanceId))
     })
   }
 
   return (
     <div
-      className={`flex items-center justify-center gap-x-[12px] ${className}`}
+      className={`flex items-center justify-center gap-x-3 ${className}`}
     >
-      <Button variant="outline" className="h-[40px] w-[40px] p-[5px] shadow">
+      <Button asChild variant="outline" className="shadow py-1.5 px-2">
         <Link
-          className="h-full w-full text-white hover:animate-none"
+          className="text-white hover:animate-none"
           href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
         >
-          <Edit3 strokeWidth={1} className="text-gray-600" />
+          <Edit3 strokeWidth={1} className="text-gray-600 h-5 w-5" />
         </Link>
       </Button>
-      <form className="h-[40px] w-[40px]" action={onDeleteButtonClick}>
-        <Button
-          type="submit"
-          variant="outline"
-          className="h-[40px] w-[40px] p-[5px] shadow"
-        >
-          <Trash2 strokeWidth={1.25} className="text-gray-600 " />
-        </Button>
-      </form>
+      <Button variant="outline" className="shadow py-1.5 px-2">
+        <Trash2 strokeWidth={1} className="text-gray-600 h-5 w-5" />
+      </Button>
     </div>
   )
 }
