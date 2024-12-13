@@ -38,7 +38,7 @@ const TeamList = async ({ params }: TeamListProps) => {
     id: team.id,
     songName: team.songName,
     songArtist: team.songArtist,
-    leaderName: team.leader?.name,
+    leader: team.leader,
     memberSessions: team.memberSessions,
     songYoutubeVideoId: team.songYoutubeVideoId,
     isFreshmenFixed: team.isFreshmenFixed,

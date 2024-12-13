@@ -10,12 +10,12 @@ const FreshmenFixedBadge = ({
   className,
   size = "large"
 }: FreshmenFixedBadgeProps) => {
-  // 팀 상세페이지
+  // 팀 목록
   if (size === "small") {
     return (
       <Badge
         className={cn(
-          "h-5 border-[0.5px] border-gray-200 bg-blue-100 text-primary hover:bg-blue-100",
+          "h-4 text-[0.7rem] font-bold lg:h-5 p-2 bg-blue-100 text-primary hover:bg-blue-100",
           className
         )}
       >
@@ -24,7 +24,7 @@ const FreshmenFixedBadge = ({
     )
   }
 
-  // 팀 목록
+  // 팀 상세페이지
   return (
     <Badge
       variant="outline"
@@ -33,6 +33,7 @@ const FreshmenFixedBadge = ({
         className
       )}
     >
+      <span className="me-2 text-[0.5rem]">●</span>
       신입고정
     </Badge>
   )

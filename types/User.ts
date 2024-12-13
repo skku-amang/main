@@ -12,6 +12,8 @@ export const Position = ["회장", "부회장", "총무", "일반"] as const
 export type Position = keyof typeof Position
 
 export type User = {
+  is_admin: boolean
+  
   id: number
   email: string
   name: string

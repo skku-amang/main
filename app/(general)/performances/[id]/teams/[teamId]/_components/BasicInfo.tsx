@@ -1,3 +1,9 @@
+import { PenLine, Trash2 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+
+import { useToast } from "@/components/hooks/use-toast"
 import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
@@ -14,8 +20,39 @@ interface BasicInfoProps {
   accessToken?: string
 }
 
-const BasicInfo = ({ team }: BasicInfoProps) => {
+const BasicInfo = ({ performanceId, team, accessToken }: BasicInfoProps) => {
+  const router = useRouter()
+  const { toast } = useToast()
+  const { data: user } = useSession()
+
   const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
+
+  function onDeleteButtonClick() {
+    // TODO: 확인 모달 추가
+    fetchData(API_ENDPOINTS.TEAM.DELETE(team.id) as ApiEndpoint, {
+      cache: "no-cache",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }).then(async (res) => {
+      if (!res.ok) {
+        switch (res.status) {
+          default:
+            toast({
+              title: "팀 삭제 실패",
+              description: "알 수 없는 이유",
+              variant: "destructive"
+            })
+        }
+      }
+      toast({
+        title: "팀 삭제 성공",
+        description: "성공적으로 팀을 삭제했습니다."
+      })
+      router.push(ROUTES.PERFORMANCE.TEAM.LIST(performanceId))
+    })
+  }
+
   return (
     <div className="relative h-fit w-full rounded-2xl bg-white px-[40px] py-[40px] text-lg font-semibold shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
       {/* 수정 및 삭제 버튼(데스크탑) */}
@@ -60,6 +97,43 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
           <h4 className="h-[34px] text-sm font-normal text-gray-500 md:my-2 md:text-2xl ">
             {team.songArtist} {team.isSelfMade && "(자작곡)"}
           </h4>
+        </div>
+        
+        {/* 팀 편집, 삭제 버튼 */}
+        {user && (user.is_admin || (user.id && +user.id === team.leader.id)) && (
+          <div className="flex items-center justify-center gap-x-5">
+            <Button asChild variant="outline" className="h-12 w-12 p-2 shadow">
+              <Link
+                href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+              >
+                <PenLine strokeWidth={1.25} />
+              </Link>
+            </Button>
+            <form action={onDeleteButtonClick}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="h-12 w-12 p-2 shadow"
+              >
+                <Trash2 strokeWidth={1.25} />
+              </Button>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* 팀장 */}
+      <div className="mb-8 flex items-center justify-start gap-x-4">
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
+        </Avatar>
+        <div>
+          <div className="text-primary">
+            {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
+            {team.leader.name}
+          </div>
+          {getRepresentativeRelativeTime(team.createdDatetime)}
         </div>
       </div>
 

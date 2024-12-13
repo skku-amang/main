@@ -57,6 +57,7 @@ const authOptions: NextAuthConfig = {
           image: user.image,
           email: user.email,
           position: user.position,
+          is_admin: user.is_admin,
           access: user.access,
           refresh: user.refresh
         }
