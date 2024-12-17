@@ -50,7 +50,7 @@ const ThirdPage = ({
     <Form {...form}>
       <form>
         <Description header="팀원 정보" className="mb-6">
-          <CircleAlert />
+          <CircleAlert className="h-2.5 w-2.5 md:h-4 md:w-4 text-gray-600" />
           이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 후 멤버를
           선택해주세요
           <br />
@@ -58,7 +58,7 @@ const ThirdPage = ({
         </Description>
 
         {/* 팀원 정보 입력 */}
-        <table className="table-auto border-separate border-spacing-5">
+        <table className="table-auto border-separate border-spacing-2 md:border-spacing-5">
           <tbody>
             {Object.values(form.getValues()).map((formValue) => {
               const { session, required, index } = formValue
@@ -66,7 +66,7 @@ const ThirdPage = ({
               if (!required) return
               return (
                 <tr key={`${session}-${index}`} className="my-3">
-                  <td className="w-32">
+                  <td className="md:w-32 text-xs md:text-base text-gray-900">
                     {session}
                     {index}
                   </td>

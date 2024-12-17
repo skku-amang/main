@@ -47,7 +47,7 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-[360px] justify-between",
+            "w-52 md:w-[360px] justify-between",
             hasError && "border-destructive"
           )}
         >

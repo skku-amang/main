@@ -52,9 +52,9 @@ const SecondPage = ({
               {Object.entries(memberSessionRequiredFormStructure).map(
                 ([label, fieldNames]) => (
                   <tr key={label}>
-                    <td className="w-10 md:w-52 font-normal text-xs md:text-base">{label}</td>
+                    <td className="md:w-52 font-normal text-xs md:text-base">{label}</td>
                     {fieldNames.map((fieldName) => (
-                      <td key={`${label}-${fieldName}`} className="p-4">
+                      <td key={`${label}-${fieldName}`} className="py-3 px-1 md:p-4">
                         <MemberSessionRequiredCheckbox
                           secondPageForm={form}
                           fieldName={fieldName}
