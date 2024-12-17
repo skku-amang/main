@@ -196,26 +196,28 @@ const TeamDetail = ({ params }: Props) => {
       </div>
 
       {/*수정 및 삭제 (모바일)*/}
-      <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-        <DeleteEditButton
-          performanceId={performanceId}
-          team={team}
-          accessToken={session.data?.access}
-        />
-      </div>
+      {session.data && (session.data.is_admin || (session.data.id && +session.data.id === team.leader.id)) && (
+        <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
+          <DeleteEditButton
+            performanceId={performanceId}
+            team={team}
+            accessToken={session.data?.access}
+          />
+        </div>
+      )}
 
       <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
-          <BasicInfo team={team} performanceId={performanceId} />
-          <div className="hidden w-full md:block">
+          <BasicInfo team={team} />
+          <div className="hidden w-full md:block overflow-clip">
             {team.posterImage && (
-            <Image
-              className="rounded-[20px]"
-              src={team.posterImage}
-              alt="poster"
-              fill
-            />)}
+              <Image
+                className="rounded-lg"
+                src={team.posterImage}
+                alt="poster"
+                fill
+              />)}
             <div className="md:hidden absolute bottom-[16px] right-[16px] flex h-11 w-11 animate-pulse items-center justify-center rounded-[10px] bg-gray-600/50">
               <Maximize2 className="text-white" />
             </div>

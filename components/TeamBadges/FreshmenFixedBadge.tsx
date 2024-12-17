@@ -15,7 +15,7 @@ const FreshmenFixedBadge = ({
     return (
       <Badge
         className={cn(
-          "h-4 text-[0.7rem] font-bold lg:h-5 p-2 bg-blue-100 text-primary hover:bg-blue-100",
+          "h-4 text-[0.7rem] font-bold lg:h-5 p-2 bg-blue-100 text-third hover:bg-blue-100",
           className
         )}
       >
@@ -29,11 +29,10 @@ const FreshmenFixedBadge = ({
     <Badge
       variant="outline"
       className={cn(
-        "text-md rounded-full border-none bg-blue-100 px-4 py-1 font-bold text-third",
+        "text-md rounded-full border-none bg-blue-100 px-4 py-1 font-bold text-primary",
         className
       )}
     >
-      <span className="me-2 text-[0.5rem]">●</span>
       신입고정
     </Badge>
   )

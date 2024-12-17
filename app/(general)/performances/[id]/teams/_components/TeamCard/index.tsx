@@ -1,6 +1,6 @@
 "use client"
 
-import { Image, PencilLine } from "lucide-react"
+import { Image, PencilLine, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 import { User } from "@/types/User"
+import TeamDeleteButton from "@/components/TeamDeleteButton"
 
 interface TeamCardProps {
   performanceId: number
@@ -117,7 +118,15 @@ const TeamCard = ({
               편집하기
             </Link>
           </Button>
-          <TeamCardDeleteButton teamId={id} />
+          <TeamDeleteButton teamId={id}>
+            <Button
+              className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
+              variant="destructive"
+            >
+              <Trash2 size={14} strokeWidth={2} className="font-bold" />
+              삭제하기
+            </Button>
+          </TeamDeleteButton>
         </div>
       )}
     </div>
