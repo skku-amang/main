@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, CircleAlert, Youtube } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -25,14 +26,13 @@ import { Textarea } from "@/components/ui/textarea"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
+import YoutubeVideo from "@/lib/youtube"
 import { Performance } from "@/types/Performance"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
 import basicInfoSchema, { songYoutubeVideoIdSchema } from "./schema"
 import YoutubeDialog from "./YoutubeDialog"
-import { zodResolver } from "@hookform/resolvers/zod"
-import YoutubeVideo from "@/lib/youtube"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
@@ -76,18 +76,8 @@ const FirstPage = ({
     }
   })
 
-  // const songYoutubeVideoId = youtubeForm.watch("songYoutubeVideoId");
-
-  // // songYoutubeVideoId 값이 변경될 때 에러 상태를 초기화
-  // useEffect(() => {
-  //   console.log(songYoutubeVideoId)
-  //   if (songYoutubeVideoId) {
-  //     youtubeForm.clearErrors("songYoutubeVideoId");
-  //   }
-  // }, [songYoutubeVideoId, youtubeForm]);
-
   function onInnerFormValid(formData: any) {
-    form.clearErrors("songYoutubeVideoId")
+      form.clearErrors("songYoutubeVideoId")
     form.setValue(
       "songYoutubeVideoId",
       formData.songYoutubeVideoId
@@ -301,53 +291,54 @@ const FirstPage = ({
           </div>
         </div>
 
-          <Form {...youtubeForm}>
-            <form onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
-              console.log(e)
-              )}>
-              <div className="flex items-center gap-x-2 justify-between">
-                {/* 입력 필드 */}
-                <Input
-                  placeholder="Enter URL" {...youtubeForm.register("songYoutubeVideoId")}
-                  className={form.formState.errors.songYoutubeVideoId && "border-destructive"}
-                  onChange={(e) => {
-                    youtubeForm.clearErrors("songYoutubeVideoId");
-                    youtubeForm.reset({
-                      ...youtubeForm.getValues(),
-                      songYoutubeVideoId: e.target.value,
-                    }, {
-                      keepErrors: true, // 기존 에러 상태를 유지합니다.
-                      keepDirty: true, // 기존 dirty 상태를 유지합니다.
-                      keepTouched: true, // 기존 touched 상태를 유지합니다.
-                      keepIsSubmitted: false, // 제출 상태를 초기화합니다.
-                      keepSubmitCount: false, // 제출 횟수를 초기화합니다.
-                    });
-                  }}
-                />
+        {/* TODO: 기존 값 그대로 사용하려고 할 때 에러 발생하는 버그 수정 필요 */}
+        <Form {...youtubeForm}>
+          <form onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
+            console.log("e")
+            )}>
+            <div className="flex items-center gap-x-2 justify-between">
+              {/* 입력 필드 */}
+              <Input
+                placeholder="Enter URL" {...youtubeForm.register("songYoutubeVideoId")}
+                className={form.formState.errors.songYoutubeVideoId && "border-destructive"}
+                onChange={(e) => {
+                  youtubeForm.clearErrors("songYoutubeVideoId");
+                  youtubeForm.reset({
+                    ...youtubeForm.getValues(),
+                    songYoutubeVideoId: e.target.value,
+                  }, {
+                    keepErrors: true, // 기존 에러 상태를 유지합니다.
+                    keepDirty: true, // 기존 dirty 상태를 유지합니다.
+                    keepTouched: true, // 기존 touched 상태를 유지합니다.
+                    keepIsSubmitted: false, // 제출 상태를 초기화합니다.
+                    keepSubmitCount: false, // 제출 횟수를 초기화합니다.
+                  });
+                }}
+              />
 
-                {/* 업로드 버튼 */}
-                {!youtubeForm.formState.isSubmitted && <Button
-                  type="submit"
-                  className={cn("bg-secondary", youtubeForm.formState.errors.songYoutubeVideoId && "bg-destructive")}
-                  disabled={!!youtubeForm.formState.errors.songYoutubeVideoId}
-                >
-                  {youtubeForm.formState.errors.songYoutubeVideoId ? "Failed" : youtubeForm.formState.isValid ? "Success" : "Upload"}
-                </Button>}
-                {youtubeForm.formState.isSubmitted && <div className="flex items-center gap-x-1 text-sm">
-                  <Check className="text-green-500 w-4 h-4" />
-                  Completed
-                  </div>}
+              {/* 업로드 버튼 */}
+              {!youtubeForm.formState.isSubmitted && <Button
+                type="submit"
+                className={cn("bg-secondary", youtubeForm.formState.errors.songYoutubeVideoId && "bg-destructive")}
+                disabled={!!youtubeForm.formState.errors.songYoutubeVideoId}
+              >
+                {youtubeForm.formState.errors.songYoutubeVideoId ? "Failed" : youtubeForm.formState.isValid ? "Success" : "Upload"}
+              </Button>}
+              {youtubeForm.formState.isSubmitted && <div className="flex items-center gap-x-1 text-sm">
+                <Check className="text-green-500 w-4 h-4" />
+                Completed
+                </div>}
+            </div>
+
+            {/* 에러 메시지 */}
+            {youtubeForm.formState.errors.songYoutubeVideoId && (
+              <div className="mt-1 text-xs text-destructive">
+                {youtubeForm.formState.errors.songYoutubeVideoId.message}
               </div>
-
-              {/* 에러 메시지 */}
-              {youtubeForm.formState.errors.songYoutubeVideoId && (
-                <div className="mt-1 text-xs text-destructive">
-                  {youtubeForm.formState.errors.songYoutubeVideoId.message}
-                </div>
-              )}
-          </form>
-        </Form>
-      </div>
+            )}
+        </form>
+      </Form>
+    </div>
 
       {/* TODO: 모바일 이미지 업로드 추가 */}
 

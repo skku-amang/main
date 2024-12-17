@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react"
+import { ArrowRight, ChevronLeft } from "lucide-react"
 import React from "react"
 import { GoDot, GoDotFill } from "react-icons/go"
 
@@ -6,28 +6,29 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const PaginatorButton = ({
-  disabled,
+  isFirst,
+  isLast,
   onClick,
   className,
   mode
 }: {
-  disabled: boolean
+  isFirst?: boolean
+  isLast?: boolean
   onClick?: () => void
   className?: string
   mode: "next" | "prev"
 }) => {
   return (
     <Button
-      className={cn(`h-8 md:h-12 rounded-none text-xs md:text-md p-2`, className)}
+      className={cn(`h-8 md:h-10 rounded-none text-xs md:text-md p-2 md:p-4 text-secondary disabled:text-gray-500 font-semibold`, mode === "next" ? "border-2 border-secondary" : "border-none", className)}
       variant="outline"
-      disabled={disabled}
+      disabled={isFirst && mode === "prev"}
       onClick={onClick}
       type="button"
     >
       {mode === "prev" && <ChevronLeft className="me-2 w-4 h-4 md:w-6 md:h-6 text-mainText" />}
-      {mode === "prev" && <span className="text-mainText">Back</span>}
-      {mode === "next" && <span className="text-secondary">Next</span>}
-      {mode === "next" && <ArrowRight className="ms-2 w-4 h-4 md:w-6 md:h-6 text-secondary" />}
+      {mode === "prev" ? "Back" : !isLast ? "Next" : "Complete"}
+      {mode === "next" && !isLast && <ArrowRight className="ms-2 w-4 h-4 md:w-6 md:h-6 text-secondary" />}
     </Button>
   )
 }
@@ -35,8 +36,6 @@ const PaginatorButton = ({
 interface PaginatorProps {
   onPrevious?: () => void
   onNext?: () => void
-  isPrevButtonDisabled?: boolean
-  isNextButtonDisabled?: boolean
   totalPage: number
   currentPage: number
 }
@@ -44,20 +43,14 @@ interface PaginatorProps {
 const Paginator = ({
   onPrevious,
   onNext,
-  isPrevButtonDisabled,
-  isNextButtonDisabled,
   totalPage,
   currentPage
 }: PaginatorProps) => {
-  isPrevButtonDisabled = currentPage === 1
-  isNextButtonDisabled = totalPage === currentPage
-
   return (
     <div className="mt-24 flex items-center justify-between">
       {/* 이전 버튼 */}
       <PaginatorButton
-        className="h-12 rounded-none text-gray-500 font-semibold disabled:border-none"
-        disabled={isPrevButtonDisabled}
+        isFirst={currentPage === 1}
         onClick={onPrevious}
         mode="prev"
         />
@@ -74,8 +67,7 @@ const Paginator = ({
 
       {/* 다음 버튼 */}
       <PaginatorButton
-        className="h-12 rounded-none border-2 border-secondary text-secondary font-semibold"
-        disabled={isNextButtonDisabled}
+        isLast={totalPage === currentPage}
         onClick={onNext}
         mode="next"
       />

@@ -83,12 +83,8 @@ const ThirdPage = ({
           </tbody>
         </table>
 
-        {/* 디바이더 */}
-        <hr className="my-14" />
-
         {/* 페이지 이동 */}
         <Paginator
-          nextButtonLabel="Complete"
           onPrevious={onPrevious}
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
