@@ -44,9 +44,9 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
     form.clearErrors("songYoutubeVideoId")
     form.setValue(
       "songYoutubeVideoId",
-      YoutubeVideo.getVideoId(formData.songYoutubeVideoId)
+      formData.songYoutubeVideoId
     )
-    setOpen(false)
+    !form.formState.errors.songYoutubeVideoId && setOpen(false)
   }
 
   return (
@@ -61,24 +61,25 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialog) => {
           }
           type="button"
           className={cn(
-            "bg-secondary text-white",
+            "border border-secondary text-secondary hover:text-white hover:bg-secondary",
             form.formState.errors.songYoutubeVideoId?.message &&
               "border-destructive bg-destructive"
           )}
           onClick={() => setOpen(true)}
         >
-          <div className="flex items-center justify-center gap-x-1">
+          <div className="flex items-center justify-center gap-x-2.5">
             <Youtube size={24} />
             Youtube Embed
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined}>
-        <DialogHeader>
-          <DialogTitle>Youtube Embed</DialogTitle>
-        </DialogHeader>
-        <div>
-          <p className="mb-2 text-sm">유튜브 링크를 업로드해주세요.</p>
+      <DialogContent aria-describedby={undefined} className="rounded-xl">
+        <div className="rounded-xl">
+          <DialogHeader className="mb-1">
+            <DialogTitle className="text-slate-900">Youtube Embed</DialogTitle>
+          </DialogHeader>
+
+          <p className="mb-4 text-sm text-zinc-500">유튜브 링크를 업로드하여 주세요.</p>
           <Form {...innerForm}>
             <form
               onSubmit={innerForm.handleSubmit(onInnerFormValid, (e) =>

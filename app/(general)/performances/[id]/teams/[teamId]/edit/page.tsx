@@ -47,22 +47,22 @@ const TeamEditPage = async ({ params }: TeamEditPageProps) => {
   const data = (await res.json()) as any
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
+    <div className="relative flex h-full w-full flex-col items-center justify-center px-6">
       {/* 헤더 */}
-      <div className="z-10 mt-20 flex w-2/3 items-center justify-between">
+      <div className="z-10 mt-10 md:mt-20 flex md:w-2/3 items-center justify-between">
         <Link
           href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}
-          className="mt-2 flex items-center gap-x-5 font-semibold text-white"
+          className="hidden mt-2 md:flex items-center gap-x-5 font-semibold text-white"
         >
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
         <OleoPageHeader title="Create New Team" />
-        <div className="h-10 w-10 " />
+        <div className="hidden md:block h-10 w-10 " />
       </div>
 
       {/* 양식 */}
-      <TeamForm initialData={data} className="z-10 w-2/3 bg-white" />
+      <TeamForm initialData={data} className="z-10 md:w-2/3 bg-white px-7 py-10 md:p-20" />
 
       <div className="absolute top-0 z-0 h-80 w-full bg-primary"></div>
     </div>

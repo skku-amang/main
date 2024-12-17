@@ -9,8 +9,8 @@ interface DescriptionProps {
 const Description = ({ header, children, className }: DescriptionProps) => {
   return (
     <div className={className}>
-      <h2 className="mb-1 text-lg font-extrabold">{header}</h2>
-      <div className="flex items-center gap-x-2 text-sm text-gray-400">
+      <h2 className="mb-2 text-md md:text-lg font-extrabold">{header}</h2>
+      <div className="flex items-center gap-x-2 text-xs text-gray-500">
         {children}
       </div>
     </div>
