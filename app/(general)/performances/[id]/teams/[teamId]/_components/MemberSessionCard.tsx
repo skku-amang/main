@@ -1,8 +1,8 @@
+import { Minus } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
@@ -19,6 +19,7 @@ interface MemberSessionCardProps {
   onUnapplySuccess: (team: Team) => void
 }
 
+// TODO: Table으로 변경
 const MemberSessionCard = ({
   teamId,
   session,
@@ -29,15 +30,11 @@ const MemberSessionCard = ({
   const authSession = useSession()
   const { toast } = useToast()
 
-  if (!authSession) {
-    return <div>로그인 필요</div>
-  }
-
   async function onUnapply() {
     const res = await fetchData(
       API_ENDPOINTS.TEAM.UNAPPLY(teamId) as ApiEndpoint,
       {
-        body: JSON.stringify({ session, index: sessionIndex }),
+        body: JSON.stringify({ session, index: sessionIndex - 1 }),
         cache: "no-store",
         headers: {
           Authorization: `Bearer ${authSession.data?.access}`,
@@ -55,7 +52,7 @@ const MemberSessionCard = ({
       return
     }
 
-    const data = await res.json() as Team
+    const data = (await res.json()) as Team
     toast({
       title: "탈퇴 완료",
       description: "성공적으로 팀에서 탈퇴되었습니다!"
@@ -64,42 +61,43 @@ const MemberSessionCard = ({
   }
 
   return (
-    <div>
-      {/* 세션 라벨 */}
-      <div className="flex select-none items-center justify-center">
-        <div className="rounded-t-md bg-slate-200 px-2 py-1 text-sm font-semibold">
-          {session}
-          {sessionIndex}
-        </div>
-        <div className="flex-auto" />
+    <div className="flex py-4">
+      <div className="hidden h-[48px] w-[160px] items-center pl-4 md:flex">
+        {session}
+        {sessionIndex}
       </div>
 
       {/* 유저 정보 */}
-      <div className="flex items-center justify-start gap-x-8 rounded-lg rounded-tl-none border border-slate-200 px-8 py-2">
+      <div className="relative flex h-[48px] w-[466px] items-center md:pl-4 ">
         {/* 아바타 */}
-        <Avatar>
+        <Avatar className="mr-[12px] md:mr-[24px]">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>{user.name?.substring(0, 1)}</AvatarFallback>
         </Avatar>
 
         {/* 설명 */}
         <div>
-          <div>
+          <div className="mb-[8px] block text-sm font-semibold md:hidden md:text-lg">
+            {session}
+            {sessionIndex}
+          </div>
+          <div className="text-sm font-normal leading-3 text-slate-700 md:text-xl md:font-medium md:leading-relaxed">
             {formatGenerationOrder(user.generation?.order)}기 {user.name}
           </div>
-          <div className="text-sm text-gray-400">#{user.nickname}</div>
-
-          {/* 탈퇴 버튼 */}
-          {user.id.toString() === authSession.data?.id && (
-            <Button
-              variant="destructive"
-              onClick={onUnapply}
-              className="h-6 px-2"
-            >
-              탈퇴
-            </Button>
-          )}
+          <div className="hidden text-sm text-gray-400 md:block">
+            #{user.nickname}
+          </div>
         </div>
+        
+        {/* 탈퇴 버튼 */}
+        {user.id.toString() === authSession.data?.id && (
+          <button
+            className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
+            onClick={onUnapply}
+          >
+            <Minus className="text-white" />
+          </button>
+        )}
       </div>
     </div>
   )

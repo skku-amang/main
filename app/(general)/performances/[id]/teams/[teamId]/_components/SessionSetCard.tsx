@@ -17,10 +17,12 @@ const SessionSetCard = ({
     <div
       className={cn(
         className,
-        "rounded-xl border-s-8 border-s-blue-900 bg-white px-16 py-6"
+        `rounded-xl border-s-8 border-s-blue-900 bg-white px-[40px] py-[40px] md:px-[68px] md:py-[56px]`
       )}
     >
-      <h5 className="mb-4 select-none text-xl font-semibold">{header}</h5>
+      <h5 className="select-none text-base font-bold leading-[18px] text-slate-700  md:text-2xl md:leading-normal">
+        {header}
+      </h5>
       {children}
     </div>
   )

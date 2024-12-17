@@ -57,7 +57,7 @@ const TeamEditPage = async ({ params }: TeamEditPageProps) => {
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
-        <OleoPageHeader title="Create Your Team" />
+        <OleoPageHeader title="Create New Team" />
         <div className="h-10 w-10 " />
       </div>
 
