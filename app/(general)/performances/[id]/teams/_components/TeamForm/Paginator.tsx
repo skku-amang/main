@@ -38,16 +38,18 @@ interface PaginatorProps {
   onNext?: () => void
   totalPage: number
   currentPage: number
+  className?: string
 }
 
 const Paginator = ({
   onPrevious,
   onNext,
   totalPage,
-  currentPage
+  currentPage,
+  className
 }: PaginatorProps) => {
   return (
-    <div className="mt-24 flex items-center justify-between">
+    <div className={cn("flex items-center justify-between", className)}>
       {/* 이전 버튼 */}
       <PaginatorButton
         isFirst={currentPage === 1}

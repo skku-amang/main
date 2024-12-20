@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, CircleAlert, Youtube } from "lucide-react"
+import { CircleAlert, Youtube } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import YoutubeSubmitButton from "@/app/(general)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
 import SimpleLabel from "@/components/Form/SimpleLabel"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
@@ -27,6 +27,7 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
+import YoutubePlayer from "@/lib/youtube/Player"
 import { Performance } from "@/types/Performance"
 
 import Description from "../Description"
@@ -282,7 +283,7 @@ const FirstPage = ({
       </Form>
           
       {/* 유튜브 링크 모바일: 블록 */}
-      <div className="md:hidden bg-slate-100 rounded-lg drop-shadow-search p-3 w-full mt-3 mb-4 space-y-2">
+      <div className="md:hidden bg-slate-100 rounded-lg drop-shadow-search p-3 w-full mt-3 space-y-2">
         <div className="flex items-center gap-x-2">
           <Youtube size={24} strokeWidth={0.85} />
           <div>
@@ -294,7 +295,7 @@ const FirstPage = ({
         {/* TODO: 기존 값 그대로 사용하려고 할 때 에러 발생하는 버그 수정 필요 */}
         <Form {...youtubeForm}>
           <form onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
-            console.log("e")
+            console.log(e)
             )}>
             <div className="flex items-center gap-x-2 justify-between">
               {/* 입력 필드 */}
@@ -317,18 +318,13 @@ const FirstPage = ({
               />
 
               {/* 업로드 버튼 */}
-              {!youtubeForm.formState.isSubmitted && <Button
-                type="submit"
-                className={cn("bg-secondary", youtubeForm.formState.errors.songYoutubeVideoId && "bg-destructive")}
-                disabled={!!youtubeForm.formState.errors.songYoutubeVideoId}
-              >
-                {youtubeForm.formState.errors.songYoutubeVideoId ? "Failed" : youtubeForm.formState.isValid ? "Success" : "Upload"}
-              </Button>}
-              {youtubeForm.formState.isSubmitted && <div className="flex items-center gap-x-1 text-sm">
-                <Check className="text-green-500 w-4 h-4" />
-                Completed
-                </div>}
+              <YoutubeSubmitButton
+                error={youtubeForm.formState.errors.songYoutubeVideoId}
+                isSubmitted={youtubeForm.formState.isSubmitted} />
             </div>
+
+            {/* 유튜브 플레이어 */}
+            {youtubeForm.getValues("songYoutubeVideoId") && <YoutubePlayer videoId={youtubeForm.getValues("songYoutubeVideoId")} className="w-full mt-3" />}
 
             {/* 에러 메시지 */}
             {youtubeForm.formState.errors.songYoutubeVideoId && (
@@ -348,6 +344,7 @@ const FirstPage = ({
         totalPage={3}
         currentPage={1}
         onPrevious={onPrevious}
+        className="mt-8 md:mt-24"
       />
     </div>
   )

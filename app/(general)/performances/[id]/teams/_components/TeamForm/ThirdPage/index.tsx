@@ -89,6 +89,7 @@ const ThirdPage = ({
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={3}
+          className="mt-8 md:mt-24"
         />
       </form>
     </Form>
