@@ -24,7 +24,7 @@ import NavLinkHeader from "./NavLinkHeader"
 const iconSize = 24
 const iconcolor = "text-gray-500"
 
-const SheetInnerContent = () => {
+const SheetInnerContent = ({ setIsOpen }: { setIsOpen: (state: boolean) => void}) => {
   const { data: session } = useSession()
 
   return (
@@ -69,24 +69,28 @@ const SheetInnerContent = () => {
             <NavLink
               href={ROUTES.NOTICE.LIST}
               icon={<Megaphone size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
             >
               공지사항
             </NavLink>
             <NavLink
               href={ROUTES.PERFORMANCE.LIST}
               icon={<Music4 size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
             >
               공연목록
             </NavLink>
             <NavLink
               href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
               icon={<FileText size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
             >
               세션지원
             </NavLink>
             <NavLink
               href={ROUTES.MEMBER.LIST}
               icon={<ImageIcon size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
             >
               멤버목록
             </NavLink>

@@ -7,15 +7,17 @@ interface SheetInnerContentNavLinkProps {
   rel?: string
   icon: React.ReactNode
   children: React.ReactNode
+  onClick?: () => void
 }
 
-const SheetInnerContentNavLink = ({ href, target, rel, icon, children }: SheetInnerContentNavLinkProps) => {
+const SheetInnerContentNavLink = ({ href, target, rel, icon, children, onClick }: SheetInnerContentNavLinkProps) => {
   return (
     <Link
       href={href}
       target={target}
       rel={rel}
       className="flex w-full items-center text-gray-500 gap-x-4"
+      onClick={() => {onClick && onClick()}}
     >
       {icon}
       <div className="text-lg font-medium">

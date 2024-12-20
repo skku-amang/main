@@ -136,6 +136,17 @@ class YoutubeVideo {
     }
   }
 
+  public static isUrlValid(url: string): boolean {
+    try {
+      return !!YoutubeVideo.getVideoId(url)
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return false
+      }
+      throw e
+    }
+  }
+
   public static getThumbnail(videoId: string) {
     return `https://img.youtube.com/vi/${videoId}/sddefault.jpg`
   }

@@ -42,19 +42,19 @@ const SecondPage = ({
         <div>
           {/* 설명 */}
           <Description header="세션 정보" className="mb-6">
-            <CircleAlert />
+          <CircleAlert className="h-2.5 w-2.5 md:h-4 md:w-4 text-gray-600" />
             곡에 필요한 모든 세션을 체크해주세요
           </Description>
 
           {/* 세션 체크박스 */}
-          <table className="table-auto">
-            <tbody>
+          <table className="md:table-auto">
+            <tbody className="text-gray-900">
               {Object.entries(memberSessionRequiredFormStructure).map(
                 ([label, fieldNames]) => (
-                  <tr key={label} className="font-semibold">
-                    <td className="w-52">{label}</td>
+                  <tr key={label}>
+                    <td className="md:w-52 font-normal text-xs md:text-base">{label}</td>
                     {fieldNames.map((fieldName) => (
-                      <td key={`${label}-${fieldName}`} className="p-4">
+                      <td key={`${label}-${fieldName}`} className="py-3 px-1 md:p-4">
                         <MemberSessionRequiredCheckbox
                           secondPageForm={form}
                           fieldName={fieldName}
@@ -75,6 +75,7 @@ const SecondPage = ({
           onNext={form.handleSubmit(onValid, onInvalid)}
           totalPage={3}
           currentPage={2}
+          className="mt-8 md:mt-24"
         />
       </form>
     </Form>

@@ -16,7 +16,7 @@ const SimpleLabel: React.FC<Prop> = ({
   required,
   htmlFor
 }) => (
-  <FormLabel className={cn("font-bold", className)} htmlFor={htmlFor}>
+  <FormLabel className={cn("text-slate-900 text-xs md:text-sm", className)} htmlFor={htmlFor}>
     {children} {required && <span className="text-destructive">*</span>}
   </FormLabel>
 )

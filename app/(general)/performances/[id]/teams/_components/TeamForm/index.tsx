@@ -273,7 +273,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   if (!session.data) router.push(ROUTES.HOME)
 
   return (
-    <div className={cn(`mb-20 rounded-2xl p-20 shadow-2xl ${className}`)}>
+    <div className={cn(`mb-20 rounded-2xl shadow-2xl`, className)}>
       {currentPage === 1 && (
         <FirstPage
           form={firstPageForm}

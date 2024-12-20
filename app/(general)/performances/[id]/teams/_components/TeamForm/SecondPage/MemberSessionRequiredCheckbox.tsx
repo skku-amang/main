@@ -26,9 +26,10 @@ const MemberSessionRequiredCheckbox = ({
 
   return (
     <div className="flex items-center gap-x-2">
+      {/* TODO: 내부 체크 SVG 크기 조정 */}
       <Checkbox
         id={requiredFieldName}
-        className="h-5 w-5"
+        className="h-3 w-3 md:h-5 md:w-5"
         onCheckedChange={(e) => {
           secondPageForm.setValue(requiredFieldName, !!e)
           secondPageForm.setValue(memberFieldName, null)
@@ -36,7 +37,7 @@ const MemberSessionRequiredCheckbox = ({
         }}
         checked={checked}
       />
-      <Label htmlFor={requiredFieldName} className="w-32 font-semibold">
+      <Label htmlFor={requiredFieldName} className="text-xs md:text-sm md:w-32">
         {label}
       </Label>
     </div>
