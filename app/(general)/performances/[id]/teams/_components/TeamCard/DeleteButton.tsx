@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
+import useTeamDelete from "@/hooks/Team/useTeamDelete"
 import { cn } from "@/lib/utils"
 
 interface TeamCardDeleteButtonProps {

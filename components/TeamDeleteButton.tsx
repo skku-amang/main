@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
+import useTeamDelete from "@/hooks/Team/useTeamDelete"
 
 interface TeamDeleteButtonProps {
   teamId: number

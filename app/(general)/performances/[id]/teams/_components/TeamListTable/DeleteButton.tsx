@@ -1,6 +1,6 @@
 import React from "react"
 
-import useTeamDelete from "@/hooks/useTeamDelete"
+import useTeamDelete from "@/hooks/Team/useTeamDelete"
 
 interface DeleteButtonProps {
   children: React.ReactNode
