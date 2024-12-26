@@ -32,7 +32,7 @@ const TeamCreatePage = async ({ params }: TeamCreatePageProps) => {
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
-        
+
         {/* 페이지 제목 */}
         <OleoPageHeader title="Create Your Team" />
 
@@ -40,7 +40,7 @@ const TeamCreatePage = async ({ params }: TeamCreatePageProps) => {
       </div>
 
       {/* 양식 */}
-      <TeamForm className="z-10 w-2/3 bg-white" />
+      <TeamForm className="z-10 bg-white px-7 py-10 md:w-2/3 md:p-20" />
 
       <div className="absolute top-0 z-0 h-80 w-full bg-primary"></div>
     </div>
