@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss"
-import { fontFamily } from "tailwindcss/defaultTheme"
 
 const config = {
   darkMode: ["class"],
@@ -81,7 +80,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out"
       },
       fontFamily: {
-        sans: ["Inter", ...fontFamily.sans]
+        sans: ["var(--font-inter)", "var(--font-noto_sans_kr)", "sans-serif"]
       },
       dropShadow: {
         search: "0 1px 2px rgba(64, 63, 84, 0.1)",

@@ -1,17 +1,23 @@
 import "@/app/globals.css"
 
 import { Metadata } from "next"
-import { Inter as FontSans } from "next/font/google"
+import { Inter, Noto_Sans_KR } from "next/font/google"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
 
-const fontSans = FontSans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans"
+  variable: "--font-inter"
 })
+
+const noto_sans_kr = Noto_Sans_KR({
+  subsets: ["latin"],
+  variable: "--font-noto-sans-kr"
+})
+
 export const metadata: Metadata = {
   title: "AMANG",
   description: "SKKU AMANG official homepage",
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <body className={cn(fontSans.className, "bg-neutral-50")}>
+        <body className={cn(inter.className, noto_sans_kr.className, "bg-neutral-50")}>
           {children}
           <Toaster />
         </body>
