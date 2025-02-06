@@ -27,7 +27,7 @@ const Header = ({
     <header
       className={cn(
         position,
-        "top-0 z-50 flex h-full w-full justify-center bg-primary"
+        "top-0 z-50 flex h-full w-full justify-center bg-neutral-50"
       )}
       style={{ height }}
     >
@@ -35,7 +35,7 @@ const Header = ({
       <nav className="visible relative flex h-full w-11/12 items-center justify-between md:hidden">
         <div className="f-full w-9 bg-none"></div>
         <Link href={ROUTES.HOME}>
-          <Image src="/Logo.png" alt="logo" width={50} height={50} />
+          <Image src="/Logo.svg" alt="logo" width={50} height={50} />
         </Link>
         <Sidebar />
       </nav>
@@ -45,7 +45,7 @@ const Header = ({
         <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
           {/* Logo */}
           <Link href={ROUTES.HOME}>
-            <Image src="/Logo.png" alt="logo" width={47} height={47} />
+            <Image src="/Logo.svg" alt="logo" width={100} height={100} />
           </Link>
 
           {/* MenuItems */}
