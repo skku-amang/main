@@ -16,13 +16,13 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        hostname: "amang.net",
+        hostname: "amang.skku.edu",
         port: "",
         pathname: "/media/**"
       },
       {
         protocol: "https",
-        hostname: "amang.net",
+        hostname: "amang.skku.edu",
         port: "",
         pathname: "/media/**"
       }
