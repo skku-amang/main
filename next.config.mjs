@@ -5,7 +5,7 @@ const nextConfig = {
       {
         // /api/auth를 제외한 모든 /api 요청을 리다이렉트
         source: '/api/:path((?!auth/).+)*',
-        destination: `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/:path*`,
+        destination: 'http://125.187.157.254/api/:path*',
       },
     ]
   },
