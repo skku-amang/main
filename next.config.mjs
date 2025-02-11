@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        // /api/auth를 제외한 모든 /api 요청을 리다이렉트
+        source: '/api/:path((?!auth/).+)*',
+        destination: 'http://125.187.157.254/api/:path*',
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {
