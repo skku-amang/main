@@ -1,17 +1,20 @@
 import "@/app/globals.css"
 
 import { Metadata } from "next"
-import { Inter as FontSans } from "next/font/google"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
+import localFont from "next/font/local"
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans"
+const pretendard = localFont({
+  src: '../public/fonts/PretendardVariable.woff2',
+  display: 'swap',
+  weight: '45 920', // weight 옵션을 지정하지 않으면 WebKit 기반의 브라우저에서 굵기가 잘못 렌더링 될 수 있으니 주의해 주세요.
+  variable: "--font-pretendard",
 })
+
 export const metadata: Metadata = {
   title: "AMANG",
   description: "SKKU AMANG official homepage",
@@ -34,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <SessionProvider>
-        <body className={cn(fontSans.className, "bg-neutral-50")}>
+        <body className={cn(pretendard.className, "bg-neutral-50")}>
           {children}
           <Toaster />
         </body>
