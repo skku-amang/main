@@ -89,7 +89,7 @@ const ApplyButton = ({
           fill={isLargeScreen}
         />
         {/* 세션명 */}
-        <div className="absolute right-[8px] z-10 text-center font-['Inter'] text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
+        <div className="absolute right-[8px] z-10 text-center text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
           {session}{memberSessionIndex}
         </div>
       </div>

@@ -521,7 +521,7 @@ export function TeamListDataTable<TValue>({
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                  <div className="font-['inter'] text-sm font-medium leading-tight">
+                  <div className="text-sm font-medium leading-tight">
                     Create
                   </div>
                 </div>

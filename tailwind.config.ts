@@ -81,7 +81,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out"
       },
       fontFamily: {
-        sans: ["Inter", ...fontFamily.sans]
+        sans: ['var(--font-pretendard)']
       },
       dropShadow: {
         search: "0 1px 2px rgba(64, 63, 84, 0.1)",
