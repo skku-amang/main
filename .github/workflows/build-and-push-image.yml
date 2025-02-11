@@ -10,8 +10,8 @@ permissions:
   packages: write
 
 jobs:
-  build-backend:
-    name: Build and Push Backend Image
+  build:
+    name: Build and Push Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
