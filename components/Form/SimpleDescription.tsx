@@ -5,7 +5,7 @@ import { FormDescription } from '../ui/form'
 const SimpleDescription = ({
   children
 }: {
-  children: React.AwaitedReactNode
+  children: React.ReactNode
 }) => {
   return (
     <>

@@ -9,12 +9,13 @@ import ROUTES from "@/constants/routes"
 import TeamForm from "../_components/TeamForm"
 
 interface TeamCreatePageProps {
-  params: {
+  params: Promise<{
     id: number
-  }
+  }>
 }
 
-const TeamCreatePage = async ({ params }: TeamCreatePageProps) => {
+const TeamCreatePage = async (props: TeamCreatePageProps) => {
+  const params = await props.params;
   const performanceId = params.id
 
   const session = await auth()

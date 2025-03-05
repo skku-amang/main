@@ -1,10 +1,11 @@
 interface PerformanceDetailProp {
-  params: {
+  params: Promise<{
     id: number
-  }
+  }>
 }
 
-const PerformanceEdit = ({ params }: PerformanceDetailProp) => {
+const PerformanceEdit = async (props: PerformanceDetailProp) => {
+  const params = await props.params;
   const { id } = params
 
   return (

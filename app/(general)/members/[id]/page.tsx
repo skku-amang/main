@@ -3,12 +3,13 @@ import React from "react"
 import DescribeToJSX from "@/components/DescribeToJSX"
 
 interface Props {
-  params: {
+  params: Promise<{
     id: number
-  }
+  }>
 }
 
-const MemberDetail = ({ params }: Props) => {
+const MemberDetail = async (props: Props) => {
+  const params = await props.params;
   const { id } = params
   const user = undefined // not implemented
 
