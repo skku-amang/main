@@ -9,12 +9,13 @@ import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 
 interface PerformanceDetailProp {
-  params: {
+  params: Promise<{
     id: number
-  }
+  }>
 }
 
-const PerformanceDetail = async ({ params }: PerformanceDetailProp) => {
+const PerformanceDetail = async (props: PerformanceDetailProp) => {
+  const params = await props.params;
   const { id } = params
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN)

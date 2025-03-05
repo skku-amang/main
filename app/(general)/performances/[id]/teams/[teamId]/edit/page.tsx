@@ -14,13 +14,14 @@ import fetchData from "@/lib/fetch"
 import TeamForm from "../../_components/TeamForm"
 
 interface TeamEditPageProps {
-  params: {
+  params: Promise<{
     id: number
     teamId: number
-  }
+  }>
 }
 
-const TeamEditPage = async ({ params }: TeamEditPageProps) => {
+const TeamEditPage = async (props: TeamEditPageProps) => {
+  const params = await props.params;
   const performanceId = params.id
   const id = params.teamId
 

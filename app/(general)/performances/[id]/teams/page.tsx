@@ -12,12 +12,13 @@ import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 
 interface TeamListProps {
-  params: {
+  params: Promise<{
     id: number
-  }
+  }>
 }
 
-const TeamList = async ({ params }: TeamListProps) => {
+const TeamList = async (props: TeamListProps) => {
+  const params = await props.params;
   const { id } = params
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN)

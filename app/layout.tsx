@@ -1,12 +1,12 @@
 import "@/app/globals.css"
 
 import { Metadata } from "next"
+import localFont from "next/font/local"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
-import localFont from "next/font/local"
 
 const pretendard = localFont({
   src: '../public/fonts/PretendardVariable.woff2',

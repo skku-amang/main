@@ -24,6 +24,7 @@ import NavLinkHeader from "./NavLinkHeader"
 const iconSize = 24
 const iconcolor = "text-gray-500"
 
+// eslint-disable-next-line no-unused-vars
 const SheetInnerContent = ({ setIsOpen }: { setIsOpen: (state: boolean) => void}) => {
   const { data: session } = useSession()
 

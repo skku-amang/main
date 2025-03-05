@@ -4,17 +4,16 @@ import { Image, PencilLine, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 
-import TeamCardDeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamCard/DeleteButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 import { User } from "@/types/User"
-import TeamDeleteButton from "@/components/TeamDeleteButton"
 
 interface TeamCardProps {
   performanceId: number

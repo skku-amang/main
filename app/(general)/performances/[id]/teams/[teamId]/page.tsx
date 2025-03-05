@@ -7,7 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import React, { useEffect, useState } from "react"
+import React, { use,useEffect, useState } from "react";
 import { RiArrowGoBackLine } from "react-icons/ri"
 
 import Loading from "@/app/_(errors)/Loading"
@@ -28,13 +28,14 @@ import YoutubePlayer from "@/lib/youtube/Player"
 import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
 
 interface Props {
-  params: {
+  params: Promise<{
     id: number
     teamId: number
-  }
+  }>
 }
 
-const TeamDetail = ({ params }: Props) => {
+const TeamDetail = (props: Props) => {
+  const params = use(props.params);
   const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
