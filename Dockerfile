@@ -26,8 +26,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_DEVELOPMENT_URL=http://localhost:8000
-ENV NEXT_PUBLIC_DEPLOY_URL=http://localhost:8000
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
@@ -40,7 +38,6 @@ RUN \
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=development
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
