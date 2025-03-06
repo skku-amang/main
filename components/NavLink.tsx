@@ -19,9 +19,7 @@ const NavLink = ({
   const parentPathname = pathname.split('/')[1] // 주소를 가져와서 어디 페이지인지 판별
   const hrefWithoutSlash = href.replaceAll('/', '') // 주소에서 /을 모두 제거
   const activeClass =
-    parentPathname === hrefWithoutSlash ? 'text-white' : 'text-gray-400' // 현재 있는 페이지의 버튼만 흰색
-  const hoverClass =
-    'hover:border-b-[0.2rem] hover:border-t-[0.2rem] hover:border-t-primary hover:border-b-white hover:text-white'
+    parentPathname === hrefWithoutSlash ? 'text-primary' : 'text-gray-600' // 현재 있는 페이지의 버튼만 흰색
 
   return (
     <Link
@@ -32,9 +30,8 @@ const NavLink = ({
         pointerEvents: active ? 'auto' : 'none'
       }}
       className={cn(
-        'flex flex-1 items-center px-3 font-extrabold',
-        activeClass,
-        hoverClass
+        'flex items-center font-semibold text-lg hover:text-primary',
+        activeClass
       )}
     >
       {children}

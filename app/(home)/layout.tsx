@@ -10,8 +10,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const headerHeight = '4rem'
-  const footerHeight = '5rem'
+  const headerHeight = '82px'
+  const footerHeight = '120px'
 
   return (
     <div className="h-screen">

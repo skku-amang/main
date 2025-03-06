@@ -1,4 +1,5 @@
 "use client"
+import { Knewave } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -9,25 +10,31 @@ import { cn } from "@/lib/utils"
 import NavLink from "../NavLink"
 import Profile from "./_component/Profile"
 
+const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
+
 const Header = ({
   position,
-  height
+  height = "82px",
+  mode = "light",
 }: {
   position: "sticky" | "fixed"
   height: string
+  mode?: "light" | "dark"
 }) => {
   const menuItems: { name: string; url: string; active: boolean }[] = [
-    // { name: "공지사항", url: ROUTES.NOTICE.LIST, active: false },
-    { name: "공연목록", url: ROUTES.PERFORMANCE.LIST, active: true },
-    { name: "세션지원", url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID), active: true },
-    // { name: "맴버목록", url: ROUTES.MEMBER.LIST, active: true }
+    { name: "소개", url: ROUTES.HOME, active: false },
+    { name: "신청", url: ROUTES.HOME, active: false },
+    { name: "모집", url: ROUTES.HOME, active: false },
+    { name: "예약", url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID), active: true },
+    { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true },
   ]
 
   return (
     <header
       className={cn(
         position,
-        "top-0 z-50 flex h-full w-full justify-center bg-primary"
+        "top-0 z-50 flex h-full w-full justify-center",
+        mode === "dark" ? "bg-primary" : "bg-white",
       )}
       style={{ height }}
     >
@@ -41,15 +48,15 @@ const Header = ({
       </nav>
 
       {/* Tablet & Desktop */}
-      <nav className="hidden h-full w-full items-center px-10 md:visible md:flex">
-        <div className="mx-auto flex h-full w-full items-center justify-between lg:w-[1280px]">
-          {/* Logo */}
-          <Link href={ROUTES.HOME}>
-            <Image src="/Logo.png" alt="logo" width={47} height={47} />
-          </Link>
+      <nav className="hidden h-full w-full items-center px-[87px] py-[21px] justify-between md:visible md:flex">
+        {/* Logo */}
+        <Link href={ROUTES.HOME} className={cn("text-primary text-[35px]", knewave.className)}>
+          Amang
+        </Link>
 
+        <div className="flex gap-x-[35px] items-center justify-end">
           {/* MenuItems */}
-          <div className="flex h-full justify-center md:gap-x-7 lg:gap-x-16 xl:gap-x-24">
+          <div className="flex h-full justify-center gap-x-9">
             {menuItems.map((menuItem) => (
               <NavLink
                 key={menuItem.name}

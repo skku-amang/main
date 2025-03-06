@@ -1,11 +1,13 @@
 "use client"
 
-import { LoaderCircle, LogOut, Moon, Settings, User, Users } from "lucide-react"
+import { LoaderCircle, LogOut, User, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import React from "react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Switch } from "@/components/ui/switch"
-
-import ROUTES from "../../../constants/routes"
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
+import ROUTES from "@/constants/routes"
+import { cn } from "@/lib/utils"
 
 interface MenuItemProps {
   icon: React.ReactNode
@@ -41,14 +41,11 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   )
 }
 
-const setDarkMode = (value: boolean) => {
-  if (value) {
-    return document.documentElement.classList.add("dark")
-  }
-  document.documentElement.classList.remove("dark")
+interface ProfileProps {
+  mode?: "light" | "dark"
 }
 
-function Profile() {
+const Profile = ({ mode }: ProfileProps) => {
   const { status, data: session } = useSession()
 
   if (!session) {
@@ -57,10 +54,9 @@ function Profile() {
         {status === "loading" ? (
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
-          <div className="flex justify-center gap-x-5 font-bold text-white">
-            <Link href={ROUTES.LOGIN}>로그인</Link>|
-            <Link href={ROUTES.SIGNUP}>회원가입</Link>
-          </div>
+          <Button className={cn("text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]")}>
+            <Link href={ROUTES.LOGIN}>Login</Link>
+          </Button>
         )}
       </>
     )
@@ -99,24 +95,6 @@ function Profile() {
         <MenuItem icon={<Users size={iconSize} />} href="#">
           참여 중인 팀
         </MenuItem>
-
-        <DropdownMenuSeparator />
-        <MenuItem icon={<Settings size={iconSize} />} href="#">
-          설정
-        </MenuItem>
-        <DropdownMenuItem
-          className="flex items-center justify-start gap-x-3 hover:cursor-pointer"
-          onSelect={(e) => e.preventDefault()}
-        >
-          <Moon size={iconSize} />
-          <Switch
-            onCheckedChange={(v) => {
-              localStorage.setItem("theme", v ? "dark" : "light")
-              setDarkMode(v)
-            }}
-          />
-          다크모드
-        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem

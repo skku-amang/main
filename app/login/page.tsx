@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Oleo_Script, Poppins } from "next/font/google"
+import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -21,7 +21,6 @@ import { cn } from "@/lib/utils"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
-const Poppin = Poppins({ subsets: ["latin"], weight: "400" })
 
 const Login = () => {
   const router = useRouter()
@@ -98,18 +97,13 @@ const Login = () => {
         </div>
         <div className="flex flex-col items-center justify-center lg:absolute lg:right-20 lg:top-[8.5rem] xl:right-32">
           <h3
-            className={cn(
-              Poppin.className,
-              "mb-2 text-2xl font-black text-slate-900"
-            )}
+            className="mb-2 text-2xl font-black text-slate-900"
+            
           >
             로그인
           </h3>
           <h5
-            className={cn(
-              Poppin.className,
-              "mb-8 text-sm font-black text-slate-500"
-            )}
+            className="mb-8 text-sm font-black text-slate-500"
           >
             계속하려면 로그인해주세요
           </h5>
@@ -150,13 +144,13 @@ const Login = () => {
             >
               {isSubmitting ? "Login on Progress..." : "로그인"}
             </Button>
-            <div className={cn(Poppin.className, "flex justify-center pt-4")}>
+            <div className="flex justify-center pt-4">
               <div className="pr-2 text-sm font-extrabold text-slate-900">
                 아직 계정이 없으신가요?
               </div>
               <Link
                 href={ROUTES.SIGNUP}
-                className={cn(Poppin.className, "text-sm text-blue-400")}
+                className="text-sm text-blue-40"
               >
                 회원가입
               </Link>
