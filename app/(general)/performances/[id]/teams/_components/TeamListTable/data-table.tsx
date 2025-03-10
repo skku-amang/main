@@ -48,7 +48,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  DrawerTrigger
 } from "./drawer"
 
 type State = {
@@ -466,14 +466,21 @@ export function TeamListDataTable<TValue>({
                 </MobileButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
-                <DrawerHeader className="py-0 px-7 flex items-center justify-between">
-                  <DrawerTitle className="text-left font-semibold text-md pt-5 pb-3">Property Filter</DrawerTitle>
-                  <DrawerClose><X className="text-slate-500 w-4 h-4" /></DrawerClose>
+                <DrawerHeader className="flex items-center justify-between px-7 py-0">
+                  <DrawerTitle className="text-md pb-3 pt-5 text-left font-semibold">
+                    Property Filter
+                  </DrawerTitle>
+                  <DrawerClose>
+                    <X className="h-4 w-4 text-slate-500" />
+                  </DrawerClose>
                 </DrawerHeader>
 
-                <Separator orientation="horizontal" className="w-full drop-shadow-table bg-slate-100" />
+                <Separator
+                  orientation="horizontal"
+                  className="w-full bg-slate-100 drop-shadow-table"
+                />
 
-                <div className="pt-4 px-7 space-y-7">
+                <div className="space-y-7 px-7 pt-4">
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
@@ -485,7 +492,6 @@ export function TeamListDataTable<TValue>({
                 </div>
               </DrawerContent>
             </Drawer>
-
 
             {/* 정렬 */}
             {/* TODO: 정렬 기능 구현 */}
@@ -514,7 +520,7 @@ export function TeamListDataTable<TValue>({
               href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}
               className="flex items-center gap-x-1"
             >
-              <div className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow w-full">
+              <div className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow">
                 <div className="relative h-4 w-4">
                   <div className="absolute left-0 top-0 h-4 w-4">
                     <Plus size={18} />
@@ -546,7 +552,9 @@ export function TeamListDataTable<TValue>({
                   isSelfMade={row.original.isSelfMade}
                   image={row.original.posterImage}
                   leader={row.original.leader}
-                  memberSessions={missingMemberSessions(row.original.memberSessions ?? [])}
+                  memberSessions={missingMemberSessions(
+                    row.original.memberSessions ?? []
+                  )}
                 />
               </div>
             ))

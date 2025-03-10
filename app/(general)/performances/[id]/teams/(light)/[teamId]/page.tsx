@@ -3,20 +3,20 @@
 import { Separator } from "@radix-ui/react-separator"
 import { StatusCodes } from "http-status-codes"
 import { ChevronRight, Maximize2 } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
-import React, { use,useEffect, useState } from "react";
+import { use, useEffect, useState } from "react"
 import { RiArrowGoBackLine } from "react-icons/ri"
 
+import ApplyButton from "@/app/(general)/performances/[id]/teams/(light)/[teamId]/_components/ApplyButton"
+import BasicInfo from "@/app/(general)/performances/[id]/teams/(light)/[teamId]/_components/BasicInfo"
+import DeleteEditButton from "@/app/(general)/performances/[id]/teams/(light)/[teamId]/_components/DeleteEditButton"
+import MemberSessionCard from "@/app/(general)/performances/[id]/teams/(light)/[teamId]/_components/MemberSessionCard"
+import SessionSetCard from "@/app/(general)/performances/[id]/teams/(light)/[teamId]/_components/SessionSetCard"
 import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import ApplyButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/ApplyButton"
-import BasicInfo from "@/app/(general)/performances/[id]/teams/[teamId]/_components/BasicInfo"
-import DeleteEditButton from "@/app/(general)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
-import MemberSessionCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
-import SessionSetCard from "@/app/(general)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import { useToast } from "@/components/hooks/use-toast"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -35,7 +35,7 @@ interface Props {
 }
 
 const TeamDetail = (props: Props) => {
-  const params = use(props.params);
+  const params = use(props.params)
   const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
@@ -197,29 +197,32 @@ const TeamDetail = (props: Props) => {
       </div>
 
       {/*수정 및 삭제 (모바일)*/}
-      {session.data && (session.data.is_admin || (session.data.id && +session.data.id === team.leader.id)) && (
-        <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-          <DeleteEditButton
-            performanceId={performanceId}
-            team={team}
-            accessToken={session.data?.access}
-          />
-        </div>
-      )}
+      {session.data &&
+        (session.data.is_admin ||
+          (session.data.id && +session.data.id === team.leader.id)) && (
+          <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
+            <DeleteEditButton
+              performanceId={performanceId}
+              team={team}
+              accessToken={session.data?.access}
+            />
+          </div>
+        )}
 
       <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
           <BasicInfo team={team} />
-          <div className="hidden w-full md:block overflow-clip">
+          <div className="hidden w-full overflow-clip md:block">
             {team.posterImage && (
               <Image
                 className="rounded-lg"
                 src={team.posterImage}
                 alt="poster"
                 fill
-              />)}
-            <div className="md:hidden absolute bottom-[16px] right-[16px] flex h-11 w-11 animate-pulse items-center justify-center rounded-[10px] bg-gray-600/50">
+              />
+            )}
+            <div className="absolute bottom-[16px] right-[16px] flex h-11 w-11 animate-pulse items-center justify-center rounded-[10px] bg-gray-600/50 md:hidden">
               <Maximize2 className="text-white" />
             </div>
           </div>

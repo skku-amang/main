@@ -11,7 +11,7 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 
-import TeamForm from "../../_components/TeamForm"
+import TeamForm from "../../../_components/TeamForm"
 
 interface TeamEditPageProps {
   params: Promise<{
@@ -21,7 +21,7 @@ interface TeamEditPageProps {
 }
 
 const TeamEditPage = async (props: TeamEditPageProps) => {
-  const params = await props.params;
+  const params = await props.params
   const performanceId = params.id
   const id = params.teamId
 
@@ -50,20 +50,23 @@ const TeamEditPage = async (props: TeamEditPageProps) => {
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center px-6">
       {/* 헤더 */}
-      <div className="z-10 mt-10 md:mt-20 flex md:w-2/3 items-center justify-between">
+      <div className="z-10 mt-10 flex items-center justify-between md:mt-20 md:w-2/3">
         <Link
           href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}
-          className="hidden mt-2 md:flex items-center gap-x-5 font-semibold text-white"
+          className="mt-2 hidden items-center gap-x-5 font-semibold text-white md:flex"
         >
           <RiArrowGoBackLine className="text-white" />
           뒤로가기
         </Link>
         <OleoPageHeader title="Create New Team" />
-        <div className="hidden md:block h-10 w-10 " />
+        <div className="hidden h-10 w-10 md:block " />
       </div>
 
       {/* 양식 */}
-      <TeamForm initialData={data} className="z-10 md:w-2/3 bg-white px-7 py-10 md:p-20" />
+      <TeamForm
+        initialData={data}
+        className="z-10 bg-white px-7 py-10 md:w-2/3 md:p-20"
+      />
 
       <div className="absolute top-0 z-0 h-80 w-full bg-primary"></div>
     </div>

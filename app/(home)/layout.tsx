@@ -15,7 +15,7 @@ export default function RootLayout({
 
   return (
     <div className="h-screen">
-      <Header position="fixed" height={headerHeight} />
+      <Header position="fixed" height={headerHeight} mode="transparent" />
 
       <div
         className="h-auto min-h-full"

@@ -1,9 +1,8 @@
 import Link from "next/link"
-import React from "react"
 import { CiCirclePlus } from "react-icons/ci"
 
-import Loading from "@/app/_(errors)/Loading"
 import PerformanceCard from "@/app/(general)/performances/_components/PerformanceCard"
+import Loading from "@/app/_(errors)/Loading"
 import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,7 +27,7 @@ const PerformanceList = async () => {
   const performances = (await res.json()) as ListResponse<Performance>
 
   return (
-    <div className="mb-10">
+    <div className="container">
       {/* 도구 모음 */}
       <div className="mb-3 flex justify-between">
         <div className="flex gap-x-3">
@@ -42,7 +41,7 @@ const PerformanceList = async () => {
           </Link>
         </Button>
       </div>
-      
+
       {/* 공연 카드 목록 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {performances.map((p) => (

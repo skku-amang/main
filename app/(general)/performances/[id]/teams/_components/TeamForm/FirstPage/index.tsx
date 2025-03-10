@@ -78,11 +78,8 @@ const FirstPage = ({
   })
 
   function onInnerFormValid(formData: any) {
-      form.clearErrors("songYoutubeVideoId")
-    form.setValue(
-      "songYoutubeVideoId",
-      formData.songYoutubeVideoId
-    )
+    form.clearErrors("songYoutubeVideoId")
+    form.setValue("songYoutubeVideoId", formData.songYoutubeVideoId)
   }
 
   return (
@@ -93,7 +90,7 @@ const FirstPage = ({
           <div>
             {/* 설명 */}
             <Description header="공연 및 곡 정보" className="mb-4 md:mb-6">
-              <CircleAlert className="h-2.5 w-2.5 md:h-4 md:w-4 text-gray-600" />
+              <CircleAlert className="h-2.5 w-2.5 text-gray-600 md:h-4 md:w-4" />
               <HoverCard>
                 <HoverCardTrigger>
                   입력 시 주의사항을 확인해주세요
@@ -111,7 +108,7 @@ const FirstPage = ({
               </HoverCard>
             </Description>
 
-            <div className="grid md:grid-cols-2 gap-x-14 gap-y-4 md:gap-y-6">
+            <div className="grid gap-x-14 gap-y-4 md:grid-cols-2 md:gap-y-6">
               {/* 공연 선택 */}
               <div className="space-y-2 md:space-y-1.5">
                 <SimpleLabel required={true} htmlFor="performanceIdInput">
@@ -128,7 +125,8 @@ const FirstPage = ({
                     id="performanceIdInput"
                     className={cn(
                       "mt-1 drop-shadow-search",
-                      form.formState.errors.performanceId && "border-destructive"
+                      form.formState.errors.performanceId &&
+                        "border-destructive"
                     )}
                   >
                     <SelectValue placeholder="공연 선택" />
@@ -157,10 +155,7 @@ const FirstPage = ({
 
               {/* 곡 입력 */}
               <div className="space-y-2 md:space-y-1.5">
-                <SimpleLabel
-                  required={true}
-                  htmlFor="songNameInput"
-                >
+                <SimpleLabel required={true} htmlFor="songNameInput">
                   곡명
                 </SimpleLabel>
                 <Input
@@ -183,9 +178,11 @@ const FirstPage = ({
                 <div className="flex items-center gap-x-2">
                   <Checkbox
                     id="isFreshmenFixedInput"
-                    onCheckedChange={(e) => form.setValue("isFreshmenFixed", !!e)}
+                    onCheckedChange={(e) =>
+                      form.setValue("isFreshmenFixed", !!e)
+                    }
                     checked={form.getValues("isFreshmenFixed")}
-                    className="border border-gray-400 w-4 h-4 rounded-md"
+                    className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
                     htmlFor="isFreshmenFixedInput"
@@ -198,10 +195,7 @@ const FirstPage = ({
 
               {/* 아티스트 입력 */}
               <div className="space-y-2 md:space-y-1.5">
-                <SimpleLabel
-                  required={true}
-                  htmlFor="songArtistInput"
-                >
+                <SimpleLabel required={true} htmlFor="songArtistInput">
                   아티스트명
                 </SimpleLabel>
                 <Input
@@ -226,11 +220,11 @@ const FirstPage = ({
                     id="isSelfMadeInput"
                     onCheckedChange={(e) => form.setValue("isSelfMade", !!e)}
                     checked={form.getValues("isSelfMade")}
-                    className="border border-gray-400 w-4 h-4 rounded-md"
+                    className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
                     htmlFor="isSelfMadeInput"
-                    className="text-xs md:text-sm text-neutral-500"
+                    className="text-xs text-neutral-500 md:text-sm"
                   >
                     자작곡입니다
                   </Label>
@@ -244,13 +238,10 @@ const FirstPage = ({
 
           {/* 게시글, 유튜브 링크 */}
           <div>
-            <Description
-              header="게시글 작성"
-              className="mb-4"
-            >
-              <div className="flex md:flex-row flex-col w-full items-start justify-between">
+            <Description header="게시글 작성" className="mb-4">
+              <div className="flex w-full flex-col items-start justify-between md:flex-row">
                 <div className="flex items-center justify-between gap-x-2">
-                  <CircleAlert className="h-2.5 w-2.5 md:h-4 md:w-4 text-gray-600" />
+                  <CircleAlert className="h-2.5 w-2.5 text-gray-600 md:h-4 md:w-4" />
                   자유롭게 팀을 홍보해주세요(유튜브 링크 첨부 필수)
                 </div>
 
@@ -263,7 +254,6 @@ const FirstPage = ({
                     </div>
                   )}
                 </div>
-
               </div>
             </Description>
             <Textarea
@@ -281,50 +271,67 @@ const FirstPage = ({
           </div>
         </form>
       </Form>
-          
+
       {/* 유튜브 링크 모바일: 블록 */}
-      <div className="md:hidden bg-slate-100 rounded-lg drop-shadow-search p-3 w-full mt-3 space-y-2">
+      <div className="mt-3 w-full space-y-2 rounded-lg bg-slate-100 p-3 drop-shadow-search md:hidden">
         <div className="flex items-center gap-x-2">
           <Youtube size={24} strokeWidth={0.85} />
           <div>
-            <div className="text-gray-600 text-md">Youtube Embed</div>
-            <div className="text-gray-400 text-xs">유튜브 링크를 첨부하여 주세요</div>
+            <div className="text-md text-gray-600">Youtube Embed</div>
+            <div className="text-xs text-gray-400">
+              유튜브 링크를 첨부하여 주세요
+            </div>
           </div>
         </div>
 
         {/* TODO: 기존 값 그대로 사용하려고 할 때 에러 발생하는 버그 수정 필요 */}
         <Form {...youtubeForm}>
-          <form onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
-            console.log(e)
-            )}>
-            <div className="flex items-center gap-x-2 justify-between">
+          <form
+            onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
+              console.log(e)
+            )}
+          >
+            <div className="flex items-center justify-between gap-x-2">
               {/* 입력 필드 */}
               <Input
-                placeholder="Enter URL" {...youtubeForm.register("songYoutubeVideoId")}
-                className={form.formState.errors.songYoutubeVideoId && "border-destructive"}
+                placeholder="Enter URL"
+                {...youtubeForm.register("songYoutubeVideoId")}
+                className={
+                  form.formState.errors.songYoutubeVideoId &&
+                  "border-destructive"
+                }
                 onChange={(e) => {
-                  youtubeForm.clearErrors("songYoutubeVideoId");
-                  youtubeForm.reset({
-                    ...youtubeForm.getValues(),
-                    songYoutubeVideoId: e.target.value,
-                  }, {
-                    keepErrors: true, // 기존 에러 상태를 유지합니다.
-                    keepDirty: true, // 기존 dirty 상태를 유지합니다.
-                    keepTouched: true, // 기존 touched 상태를 유지합니다.
-                    keepIsSubmitted: false, // 제출 상태를 초기화합니다.
-                    keepSubmitCount: false, // 제출 횟수를 초기화합니다.
-                  });
+                  youtubeForm.clearErrors("songYoutubeVideoId")
+                  youtubeForm.reset(
+                    {
+                      ...youtubeForm.getValues(),
+                      songYoutubeVideoId: e.target.value
+                    },
+                    {
+                      keepErrors: true, // 기존 에러 상태를 유지합니다.
+                      keepDirty: true, // 기존 dirty 상태를 유지합니다.
+                      keepTouched: true, // 기존 touched 상태를 유지합니다.
+                      keepIsSubmitted: false, // 제출 상태를 초기화합니다.
+                      keepSubmitCount: false // 제출 횟수를 초기화합니다.
+                    }
+                  )
                 }}
               />
 
               {/* 업로드 버튼 */}
               <YoutubeSubmitButton
                 error={youtubeForm.formState.errors.songYoutubeVideoId}
-                isSubmitted={youtubeForm.formState.isSubmitted} />
+                isSubmitted={youtubeForm.formState.isSubmitted}
+              />
             </div>
 
             {/* 유튜브 플레이어 */}
-            {youtubeForm.getValues("songYoutubeVideoId") && <YoutubePlayer videoId={youtubeForm.getValues("songYoutubeVideoId")} className="w-full mt-3" />}
+            {youtubeForm.getValues("songYoutubeVideoId") && (
+              <YoutubePlayer
+                videoId={youtubeForm.getValues("songYoutubeVideoId")}
+                className="mt-3 w-full"
+              />
+            )}
 
             {/* 에러 메시지 */}
             {youtubeForm.formState.errors.songYoutubeVideoId && (
@@ -332,9 +339,9 @@ const FirstPage = ({
                 {youtubeForm.formState.errors.songYoutubeVideoId.message}
               </div>
             )}
-        </form>
-      </Form>
-    </div>
+          </form>
+        </Form>
+      </div>
 
       {/* TODO: 모바일 이미지 업로드 추가 */}
 

@@ -6,7 +6,7 @@ import { auth } from "@/auth"
 import OleoPageHeader from "@/components/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
-import TeamForm from "../_components/TeamForm"
+import TeamForm from "../../_components/TeamForm"
 
 interface TeamCreatePageProps {
   params: Promise<{
@@ -15,16 +15,19 @@ interface TeamCreatePageProps {
 }
 
 const TeamCreatePage = async (props: TeamCreatePageProps) => {
-  const params = await props.params;
+  const params = await props.params
   const performanceId = params.id
 
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN)
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
+    <div className="flex h-full w-full flex-col items-center justify-center">
+      {/* 프라미어리 배경 */}
+      <div className="absolute top-0 z-0 h-[325px] w-full bg-primary"></div>
+
       {/* 헤더 */}
-      <div className="z-10 mt-20 flex w-2/3 items-center justify-between">
+      <div className="z-10 flex w-2/3 items-center justify-between">
         {/* 뒤로가기 버튼 */}
         <Link
           href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
@@ -42,8 +45,6 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
 
       {/* 양식 */}
       <TeamForm className="z-10 bg-white px-7 py-10 md:w-2/3 md:p-20" />
-
-      <div className="absolute top-0 z-0 h-80 w-full bg-primary"></div>
     </div>
   )
 }

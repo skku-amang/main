@@ -4,13 +4,13 @@ import { CellContext, ColumnDef } from "@tanstack/react-table"
 import {
   ArrowUpDown,
   EllipsisVertical,
+  Image,
   Paperclip,
   Pencil,
   Trash2
 } from "lucide-react"
-import { Image } from "lucide-react"
-import Link from "next/link"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
@@ -39,7 +39,7 @@ export type TeamColumn = {
   memberSessions?: MemberSession[]
   posterImage?: string
   songYoutubeVideoId?: string
-  isFreshmenFixed: boolean,
+  isFreshmenFixed: boolean
   isSelfMade: boolean
 }
 
@@ -64,7 +64,10 @@ const SortButton = ({
 const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
   const { data: user } = useSession()
 
-  if (user && (user.id && row.original.leader.id === +user.id || user.is_admin)) {
+  if (
+    user &&
+    ((user.id && row.original.leader.id === +user.id) || user.is_admin)
+  ) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -120,7 +123,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
         <div className="flex items-center gap-x-1">
           {row.original.songName}
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          {!row.original.posterImage && <span><Image className="w-3 h-3 font-normal text-neutral-500" /></span>}
+          {!row.original.posterImage && (
+            <span>
+              <Image className="h-3 w-3 font-normal text-neutral-500" />
+            </span>
+          )}
         </div>
 
         {/* 아티스트명 */}
@@ -142,9 +149,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="text-center">
         {row.original.leader.name}
         <br />
-        {row.original.isFreshmenFixed && (
-          <FreshmenFixedBadge size="small" />
-        )}
+        {row.original.isFreshmenFixed && <FreshmenFixedBadge size="small" />}
       </div>
     )
   },
