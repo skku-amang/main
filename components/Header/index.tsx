@@ -15,43 +15,6 @@ const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
 
 export type HeaderMode = "light" | "dark" | "transparent"
 
-export const headerColorClass = ({
-  mode,
-  isActive = true,
-  isCurrentPathname = false
-}: {
-  mode: HeaderMode
-  isActive?: boolean
-  isCurrentPathname?: boolean
-}) => {
-  if (!isActive) {
-    return "text-gray-600"
-  }
-
-  const defaultClass = "transition-colors duration-200"
-  let className = ""
-
-  switch (mode) {
-    case "light":
-      className = isCurrentPathname
-        ? "text-primary hover:text-primary"
-        : "text-gray-600 hover:text-primary"
-      break
-    case "dark":
-      className = isCurrentPathname
-        ? "text-white hover:text-primary"
-        : "text-gray-200 hover:text-white"
-      break
-    case "transparent":
-      className = isCurrentPathname
-        ? "text-gray-400 hover:text-primary"
-        : "text-gray-200 hover:text-white"
-      break
-  }
-
-  return `${defaultClass} ${className}`
-}
-
 const Header = ({
   position,
   height = "82px",
@@ -78,7 +41,11 @@ const Header = ({
       className={cn(
         position,
         "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
-        headerColorClass({ mode })
+        {
+          "bg-white": mode === "light",
+          "bg-primary": mode === "dark",
+          "bg-transparent": mode === "transparent"
+        }
       )}
       style={{ height }}
     >
@@ -96,11 +63,10 @@ const Header = ({
         {/* Logo */}
         <Link
           href={ROUTES.HOME}
-          className={cn(
-            "text-[35px]",
-            knewave.className,
-            headerColorClass({ mode })
-          )}
+          className={cn("text-[35px]", knewave.className, {
+            "text-white": mode === "transparent" || mode === "dark",
+            "text-primary": mode === "light"
+          })}
         >
           Amang
         </Link>

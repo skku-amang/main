@@ -1,18 +1,18 @@
 import "@/app/globals.css"
 
 import { Metadata } from "next"
-import localFont from "next/font/local"
 import { SessionProvider } from "next-auth/react"
+import localFont from "next/font/local"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
 
 const pretendard = localFont({
-  src: '../public/fonts/PretendardVariable.woff2',
-  display: 'swap',
-  weight: '45 920', // weight 옵션을 지정하지 않으면 WebKit 기반의 브라우저에서 굵기가 잘못 렌더링 될 수 있으니 주의해 주세요.
-  variable: "--font-pretendard",
+  src: "../public/fonts/PretendardVariable.woff2",
+  display: "swap",
+  weight: "45 920", // weight 옵션을 지정하지 않으면 WebKit 기반의 브라우저에서 굵기가 잘못 렌더링 될 수 있으니 주의해 주세요.
+  variable: "--font-pretendard"
 })
 
 export const metadata: Metadata = {

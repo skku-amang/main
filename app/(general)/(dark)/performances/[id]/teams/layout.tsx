@@ -6,7 +6,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <RootHeaderAndFooterWrapper headerMode="light">
+    <RootHeaderAndFooterWrapper headerMode="dark">
       {children}
     </RootHeaderAndFooterWrapper>
   )
