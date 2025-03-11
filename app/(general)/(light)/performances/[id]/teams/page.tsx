@@ -1,7 +1,8 @@
+import { Home } from "lucide-react"
 import { redirect } from "next/navigation"
 
 import { auth } from "@/auth"
-import PageHeader from "@/components/PageHeader"
+import DefaultPageHeader from "@/components/PageHeaders/Default"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -18,7 +19,7 @@ interface TeamListProps {
 }
 
 const TeamList = async (props: TeamListProps) => {
-  const params = await props.params;
+  const params = await props.params
   const { id } = params
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN)
@@ -56,11 +57,24 @@ const TeamList = async (props: TeamListProps) => {
   ).json()
 
   return (
-    <div className="container">
+    <div>
       {/* 팀 배너 */}
-      <div className="flex flex-col items-center justify-center">
-        <PageHeader>공연팀 목록</PageHeader>
-      </div>
+      <DefaultPageHeader
+        title="공연팀 목록"
+        routes={[
+          {
+            display: <Home />,
+            href: ROUTES.HOME
+          },
+          {
+            display: "모집"
+          },
+          {
+            display: "공연팀 목록",
+            href: ROUTES.PERFORMANCE.TEAM.LIST(id)
+          }
+        ]}
+      />
 
       {/* 팀 목록 */}
       <TeamListDataTable

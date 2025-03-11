@@ -32,8 +32,8 @@ const RootHeaderAndFooterWrapper = ({
   children,
   mainStyle,
   mainClassName = "container",
-  paddingTopPixel = 100,
-  paddingBottomPixel = 60,
+  paddingTopPixel = 0,
+  paddingBottomPixel = 0,
   useHeader = true,
   headerMode = useHeader ? "light" : undefined
 }: RootHeaderAndFooterWrapperProps) => {
