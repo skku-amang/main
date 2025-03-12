@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import YoutubeSubmitButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
+import YoutubeSubmitButton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"

@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes"
 import { redirect } from "next/navigation"
 
+import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import ErrorPage from "@/app/_(errors)/Error"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import { auth } from "@/auth"
@@ -9,7 +10,7 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 
-import TeamForm from "../../../../../../(light)/performances/[id]/teams/_components/TeamForm"
+import TeamForm from "../../_components/TeamForm"
 
 interface TeamEditPageProps {
   params: Promise<{
@@ -47,16 +48,13 @@ const TeamEditPage = async (props: TeamEditPageProps) => {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
-      {/* 프라미어리 배경 */}
-      <div className="absolute top-0 z-[-1] h-[325px] w-full bg-primary" />
+      <TeamFormBackground />
 
-      {/* 페이지 헤더 */}
       <OleoPageHeader
         title="Create Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}
       />
 
-      {/* 양식 */}
       <TeamForm
         initialData={data}
         className="w-full bg-white px-7 py-10 md:p-20"
