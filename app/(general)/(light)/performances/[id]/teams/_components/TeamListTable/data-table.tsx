@@ -297,14 +297,6 @@ export function TeamListDataTable<TValue>({
     <div>
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
-        {/* 연관된 공연 목록 */}
-        <div className="flex w-full items-center justify-center">
-          <RelatedPerformanceList
-            currentPerformanceId={performanceId}
-            relatedPerformances={relatedPerformances}
-          />
-        </div>
-
         {/* 헤더 */}
         <div className="flex items-center justify-between pt-10">
           {/* 검색 */}
@@ -407,9 +399,9 @@ export function TeamListDataTable<TValue>({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center"
+                    className="h-24 text-center font-semibold text-gray-400"
                   >
-                    No results.
+                    생성된 공연팀이 존재하지 않습니다
                   </TableCell>
                 </TableRow>
               )}
@@ -418,24 +410,26 @@ export function TeamListDataTable<TValue>({
         </div>
 
         {/* 페이지네이션 */}
-        <div className="flex items-center justify-center space-x-2 pb-6 pt-14">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+        {table.getRowModel().rows.length > 0 && (
+          <div className="flex items-center justify-center space-x-2 pb-6 pt-14">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* 모바일: 카드 보기 */}
@@ -560,7 +554,7 @@ export function TeamListDataTable<TValue>({
             ))
           ) : (
             <div className="flex flex-col items-center justify-center">
-              No results.
+              생성된 공연팀이 존재하지 않습니다
             </div>
           )}
         </div>

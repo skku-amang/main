@@ -5,10 +5,8 @@ import { StatusCodes } from "http-status-codes"
 import { ChevronRight, Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { use, useEffect, useState } from "react"
-import { RiArrowGoBackLine } from "react-icons/ri"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
@@ -161,30 +159,22 @@ const TeamDetail = (props: Props) => {
     <div className="container flex w-full flex-col items-center px-0 pt-16">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
-        className="absolute left-0 top-0 z-0 h-[283px]  w-full bg-slate-300 md:h-[25rem] min-[1440px]:w-full "
+        className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
       ></div>
 
       {/* 기울어진 배경 - 프라이머리 */}
       <div
-        className="absolute left-0 top-0 h-[283px] w-full bg-primary md:h-[28rem] min-[1440px]:w-full "
+        className="absolute left-0 top-0 h-[283px] w-full bg-primary md:h-[600px]"
         style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
       ></div>
 
-      {/* 뒤로가기 버튼 및 페이지 헤더 */}
-      <div className="relative flex w-full items-center justify-center px-12 md:w-[1300px]">
-        {/* 뒤로가기 버튼 */}
-        <Link
-          href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          className="absolute left-8 hidden  items-center gap-x-5 font-semibold text-white md:flex "
-        >
-          <RiArrowGoBackLine className="text-xl text-white" />
-          <div>돌아가기</div>
-        </Link>
-
-        {/* 페이지 제목 */}
-        <OleoPageHeader title="Join Your Team" className="mb-10" />
-      </div>
+      {/* 페이지 헤더 */}
+      <OleoPageHeader
+        title="Join Your Team"
+        goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
+        className="relative mb-10"
+      />
 
       {/* 유튜브 임베드 */}
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
