@@ -1,8 +1,6 @@
-
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -21,8 +19,11 @@ interface TeamDeleteButtonProps {
   children?: React.ReactNode
 }
 
-
-const TeamDeleteButton = ({ teamId, redirectUrl, children }: TeamDeleteButtonProps) => {
+const TeamDeleteButton = ({
+  teamId,
+  redirectUrl,
+  children
+}: TeamDeleteButtonProps) => {
   const { toast } = useToast()
   const router = useRouter()
 
@@ -42,15 +43,11 @@ const TeamDeleteButton = ({ teamId, redirectUrl, children }: TeamDeleteButtonPro
   }
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>
-        <>
-          {children}
-        </>
-      </DialogTrigger>
-      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl shadow p-4">
+      <DialogTrigger>{children}</DialogTrigger>
+      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow">
         {/* 삭제 아이콘 및 메시지 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch pt-5">
-          {/* 삭제 아이콘 */} 
+          {/* 삭제 아이콘 */}
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-[28px] border-8 border-red-50 bg-red-100 p-3">
             <div className="relative flex h-6 w-6 flex-col items-start justify-center">
               <Trash2 className="text-destructive" size={20} />
@@ -69,23 +66,27 @@ const TeamDeleteButton = ({ teamId, redirectUrl, children }: TeamDeleteButtonPro
             </DialogDescription>
           </div>
         </div>
-          
+
         {/* 확인, 취소 버튼 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch">
           <Button
             onClick={onDelete}
-            variant="destructive" className="font-semibold w-full inline-flex items-center justify-center gap-2 self-stretch rounded-lg px-[18px] py-2.5 shadow">
+            variant="destructive"
+            className="inline-flex w-full items-center justify-center gap-2 self-stretch rounded-lg px-[18px] py-2.5 font-semibold shadow"
+          >
             확인
           </Button>
           <Button
             onClick={() => setIsOpen(false)}
-            variant="outline" className="font-semibold w-full inline-flex items-center justify-center gap-2 self-stretch rounded-lg border border-gray-300 px-[18px] py-2.5 shadow text-gray-700">
+            variant="outline"
+            className="inline-flex w-full items-center justify-center gap-2 self-stretch rounded-lg border border-gray-300 px-[18px] py-2.5 font-semibold text-gray-700 shadow"
+          >
             취소
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-    )
-  }
+  )
+}
 
 export default TeamDeleteButton

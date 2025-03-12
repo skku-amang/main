@@ -161,13 +161,13 @@ const TeamDetail = (props: Props) => {
       <div
         className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
         style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
-      ></div>
+      />
 
       {/* 기울어진 배경 - 프라이머리 */}
       <div
         className="absolute left-0 top-0 h-[283px] w-full bg-primary md:h-[600px]"
         style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
-      ></div>
+      />
 
       {/* 페이지 헤더 */}
       <OleoPageHeader

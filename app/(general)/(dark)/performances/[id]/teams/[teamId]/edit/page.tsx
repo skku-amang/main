@@ -1,7 +1,5 @@
 import { StatusCodes } from "http-status-codes"
-import Link from "next/link"
 import { redirect } from "next/navigation"
-import { RiArrowGoBackLine } from "react-icons/ri"
 
 import ErrorPage from "@/app/_(errors)/Error"
 import NotFoundPage from "@/app/_(errors)/NotFound"
@@ -52,22 +50,11 @@ const TeamEditPage = async (props: TeamEditPageProps) => {
       {/* 프라미어리 배경 */}
       <div className="absolute top-0 z-[-1] h-[325px] w-full bg-primary" />
 
-      {/* 헤더 */}
-      <div className="flex w-full items-center justify-between">
-        {/* 뒤로가기 버튼 */}
-        <Link
-          href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          className="mt-2 flex items-center gap-x-5 font-semibold text-white"
-        >
-          <RiArrowGoBackLine className="text-white" />
-          뒤로가기
-        </Link>
-
-        {/* 페이지 제목 */}
-        <OleoPageHeader title="Create Your Team" />
-
-        <div />
-      </div>
+      {/* 페이지 헤더 */}
+      <OleoPageHeader
+        title="Create Your Team"
+        goBackHref={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}
+      />
 
       {/* 양식 */}
       <TeamForm
