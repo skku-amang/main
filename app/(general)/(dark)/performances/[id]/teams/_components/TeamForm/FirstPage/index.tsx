@@ -328,7 +328,7 @@ const FirstPage = ({
             {/* 유튜브 플레이어 */}
             {youtubeForm.getValues("songYoutubeVideoUrl") && (
               <YoutubePlayer
-                videoId={youtubeForm.getValues("songYoutubeVideoUrl")}
+                videoUrl={youtubeForm.getValues("songYoutubeVideoUrl")}
                 className="mt-3 w-full"
               />
             )}

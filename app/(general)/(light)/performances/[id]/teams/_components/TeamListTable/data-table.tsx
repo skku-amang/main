@@ -387,9 +387,10 @@ export function TeamListDataTable<TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] hover:drop-shadow-[0_4px_4px_rgb(0,0,0,0.25)]"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="bg-transparent">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

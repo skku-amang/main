@@ -4,16 +4,16 @@ import YoutubeVideo from "@/lib/youtube"
 
 interface YoutubePlayerProps
   extends React.IframeHTMLAttributes<HTMLIFrameElement> {
-  videoId: string
+  videoUrl: string
 }
 
 const YoutubePlayer: React.FC<YoutubePlayerProps> = ({
-  videoId,
+  videoUrl,
   ...iframeProps
 }) => {
   return (
     <iframe
-      src={`https://www.youtube.com/embed/${YoutubeVideo.getVideoId(videoId)}`}
+      src={`https://www.youtube.com/embed/${YoutubeVideo.getVideoId(videoUrl)}`}
       {...iframeProps}
     />
   )

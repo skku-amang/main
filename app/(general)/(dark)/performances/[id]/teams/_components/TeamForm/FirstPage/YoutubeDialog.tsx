@@ -15,7 +15,6 @@ import {
 import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
 
 import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
@@ -107,20 +106,15 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
               )}
             </form>
           </Form>
-          {innerForm.getValues("songYoutubeVideoUrl") &&
-            YoutubeVideo.getValidVideoIdOrNull(
-              innerForm.getValues("songYoutubeVideoUrl")
-            ) && (
-              <div className="aspect-video overflow-visible">
-                <YoutubePlayer
-                  videoId={YoutubeVideo.getVideoId(
-                    innerForm.getValues("songYoutubeVideoUrl")
-                  )}
-                  className="mt-4 h-full w-full"
-                  allowFullScreen
-                />
-              </div>
-            )}
+          {innerForm.getValues("songYoutubeVideoUrl") && (
+            <div className="aspect-video overflow-visible">
+              <YoutubePlayer
+                videoUrl={innerForm.getValues("songYoutubeVideoUrl")}
+                className="mt-4 h-full w-full"
+                allowFullScreen
+              />
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

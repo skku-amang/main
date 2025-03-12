@@ -180,7 +180,7 @@ const TeamDetail = (props: Props) => {
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
         {team.songYoutubeVideoUrl && (
           <YoutubePlayer
-            videoId={team.songYoutubeVideoUrl}
+            videoUrl={team.songYoutubeVideoUrl}
             className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
           />
         )}
