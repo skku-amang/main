@@ -38,7 +38,7 @@ export type TeamColumn = {
   leader: User
   memberSessions?: MemberSession[]
   posterImage?: string
-  songYoutubeVideoId?: string
+  songYoutubeVideoUrl?: string
   isFreshmenFixed: boolean
   isSelfMade: boolean
 }
@@ -193,13 +193,13 @@ export const columns: ColumnDef<TeamColumn>[] = [
     }
   },
   {
-    accessorKey: "songYoutubeVideoId",
+    accessorKey: "songYoutubeVideoUrl",
     header: () => (
       <div className="flex items-center justify-center">영상링크</div>
     ),
     cell: ({ row }) => {
       const youtubeLink = YoutubeVideo.getURL(
-        row.getValue("songYoutubeVideoId")
+        row.getValue("songYoutubeVideoUrl")
       )
       if (youtubeLink) {
         return (

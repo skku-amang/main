@@ -178,9 +178,9 @@ const TeamDetail = (props: Props) => {
 
       {/* 유튜브 임베드 */}
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
-        {team.songYoutubeVideoId && (
+        {team.songYoutubeVideoUrl && (
           <YoutubePlayer
-            videoId={team.songYoutubeVideoId}
+            videoId={team.songYoutubeVideoUrl}
             className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
           />
         )}

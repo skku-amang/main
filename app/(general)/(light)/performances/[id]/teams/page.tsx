@@ -42,7 +42,7 @@ const TeamList = async (props: TeamListProps) => {
     songArtist: team.songArtist,
     leader: team.leader,
     memberSessions: team.memberSessions,
-    songYoutubeVideoId: team.songYoutubeVideoId,
+    songYoutubeVideoUrl: team.songYoutubeVideoUrl,
     isFreshmenFixed: team.isFreshmenFixed,
     isSelfMade: team.isSelfMade
   }))

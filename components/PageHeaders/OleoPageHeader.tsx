@@ -16,6 +16,8 @@ const OleoPageHeader = ({
   goBackHref: string
 }) => {
   const words = title.split(" ")
+  const backButtonPaddingX = 27
+  const backButtonWidth = 91
 
   return (
     <div
@@ -27,7 +29,12 @@ const OleoPageHeader = ({
       {/* 뒤로가기 버튼 */}
       <Link
         href={goBackHref}
-        className="flex items-center gap-x-6 px-[27px] py-2 font-semibold text-white"
+        className={cn(
+          "flex items-center gap-x-6 px-[27px] py-2 font-semibold text-white",
+          {
+            width: backButtonWidth
+          }
+        )}
       >
         <RiArrowGoBackLine className="text-white" size={12} />
         뒤로가기
@@ -56,7 +63,9 @@ const OleoPageHeader = ({
           )
         })}
       </div>
-      <div />
+
+      {/* 중앙 정렬용 공간 */}
+      <div style={{ width: backButtonWidth + backButtonPaddingX * 2 }} />
     </div>
   )
 }

@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { StatusCodes } from "http-status-codes"
-import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -47,7 +47,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       songArtist: initialData?.songArtist,
       isSelfMade: initialData?.isSelfMade,
       description: initialData?.description,
-      songYoutubeVideoId: initialData?.songYoutubeVideoId
+      songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl
     }
   })
   function onFirstPageValid(formData: z.infer<typeof basicInfoSchema>) {
@@ -218,7 +218,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       songArtist: firstPageForm.getValues("songArtist"),
       memberSessions,
       description: firstPageForm.getValues("description"),
-      songYoutubeVideoId: firstPageForm.getValues("songYoutubeVideoId"),
+      songYoutubeVideoUrl: firstPageForm.getValues("songYoutubeVideoUrl"),
       posterImage: firstPageForm.getValues("posterImage"),
       isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed"),
       isSelfMade: firstPageForm.getValues("isSelfMade")
@@ -282,7 +282,13 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
           accessToken={session.data?.access}
           onPrevious={
             initialData
-              ? () => router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(initialData.performance.id, initialData.id))
+              ? () =>
+                  router.push(
+                    ROUTES.PERFORMANCE.TEAM.DETAIL(
+                      initialData.performance.id,
+                      initialData.id
+                    )
+                  )
               : undefined
           }
         />

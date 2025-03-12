@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
+import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -298,9 +299,9 @@ export function TeamListDataTable<TValue>({
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
         {/* 헤더 */}
-        <div className="flex items-center justify-between pt-10">
+        <div className="flex items-center justify-between py-[25px]">
           {/* 검색 */}
-          <Input
+          <Search
             placeholder="검색"
             value={
               (table.getColumn("songName")?.getFilterValue() as string) ?? ""
@@ -314,10 +315,13 @@ export function TeamListDataTable<TValue>({
           {/* 생성 및 필터 */}
           <div className="relative flex gap-3">
             {/* 생성 버튼 */}
-            <Button asChild className="h-8 rounded-md py-1">
+            <Button
+              asChild
+              className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
+            >
               <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
-                <CirclePlus size={22} />
-                &nbsp;Create
+                <CirclePlus size={24} className="me-[9px]" />
+                Create
               </Link>
             </Button>
 
@@ -326,13 +330,13 @@ export function TeamListDataTable<TValue>({
               <PopoverTrigger>
                 <Button
                   asChild
-                  className="h-8 rounded-md py-1"
+                  className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
                   onClick={() => setFilterOpen(true)}
                   variant={filterOpen ? "outline" : undefined}
                 >
                   <div>
-                    <Filter size={22} />
-                    &nbsp;Filter
+                    <Filter size={24} className="me-[9px]" />
+                    Filter
                   </div>
                 </Button>
               </PopoverTrigger>
@@ -355,59 +359,57 @@ export function TeamListDataTable<TValue>({
         </div>
 
         {/* 테이블 */}
-        <div>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead
-                        key={header.id}
-                        className="bg-zinc-700 font-bold text-white"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    )
-                  })}
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-none">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className="bg-zinc-700 py-0 font-bold text-white"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center font-semibold text-gray-400"
-                  >
-                    생성된 공연팀이 존재하지 않습니다
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center font-semibold text-gray-400"
+                >
+                  생성된 공연팀이 존재하지 않습니다
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
 
         {/* 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (

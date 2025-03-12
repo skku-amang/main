@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import YoutubeDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeDialog"
 import YoutubeSubmitButton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -32,8 +33,7 @@ import { Performance } from "@/types/Performance"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
-import basicInfoSchema, { songYoutubeVideoIdSchema } from "./schema"
-import YoutubeDialog from "./YoutubeDialog"
+import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
@@ -66,20 +66,20 @@ const FirstPage = ({
 
   // 유튜브 URL 로직
   const youtubeSchema = z.object({
-    songYoutubeVideoId: songYoutubeVideoIdSchema
+    songYoutubeVideoUrl: songYoutubeVideoUrlSchema
   })
   const youtubeForm = useForm<z.infer<typeof youtubeSchema>>({
     resolver: zodResolver(youtubeSchema),
     defaultValues: {
-      songYoutubeVideoId: YoutubeVideo.getURL(
-        form.getValues("songYoutubeVideoId") as string
+      songYoutubeVideoUrl: YoutubeVideo.getURL(
+        form.getValues("songYoutubeVideoUrl") as string
       )
     }
   })
 
   function onInnerFormValid(formData: any) {
-    form.clearErrors("songYoutubeVideoId")
-    form.setValue("songYoutubeVideoId", formData.songYoutubeVideoId)
+    form.clearErrors("songYoutubeVideoUrl")
+    form.setValue("songYoutubeVideoUrl", formData.songYoutubeVideoUrl)
   }
 
   return (
@@ -247,10 +247,10 @@ const FirstPage = ({
 
                 {/* 유튜브 링크 데스크톱: 다이얼로그 */}
                 <div className="hidden md:block">
-                  <YoutubeDialog form={form} fieldName="songYoutubeVideoId" />
-                  {form.formState.errors.songYoutubeVideoId && (
+                  <YoutubeDialog form={form} fieldName="songYoutubeVideoUrl" />
+                  {form.formState.errors.songYoutubeVideoUrl && (
                     <div className="mt-1 text-end text-xs text-destructive">
-                      {form.formState.errors.songYoutubeVideoId.message}
+                      {form.formState.errors.songYoutubeVideoUrl.message}
                     </div>
                   )}
                 </div>
@@ -295,17 +295,17 @@ const FirstPage = ({
               {/* 입력 필드 */}
               <Input
                 placeholder="Enter URL"
-                {...youtubeForm.register("songYoutubeVideoId")}
+                {...youtubeForm.register("songYoutubeVideoUrl")}
                 className={
-                  form.formState.errors.songYoutubeVideoId &&
+                  form.formState.errors.songYoutubeVideoUrl &&
                   "border-destructive"
                 }
                 onChange={(e) => {
-                  youtubeForm.clearErrors("songYoutubeVideoId")
+                  youtubeForm.clearErrors("songYoutubeVideoUrl")
                   youtubeForm.reset(
                     {
                       ...youtubeForm.getValues(),
-                      songYoutubeVideoId: e.target.value
+                      songYoutubeVideoUrl: e.target.value
                     },
                     {
                       keepErrors: true, // 기존 에러 상태를 유지합니다.
@@ -320,23 +320,23 @@ const FirstPage = ({
 
               {/* 업로드 버튼 */}
               <YoutubeSubmitButton
-                error={youtubeForm.formState.errors.songYoutubeVideoId}
+                error={youtubeForm.formState.errors.songYoutubeVideoUrl}
                 isSubmitted={youtubeForm.formState.isSubmitted}
               />
             </div>
 
             {/* 유튜브 플레이어 */}
-            {youtubeForm.getValues("songYoutubeVideoId") && (
+            {youtubeForm.getValues("songYoutubeVideoUrl") && (
               <YoutubePlayer
-                videoId={youtubeForm.getValues("songYoutubeVideoId")}
+                videoId={youtubeForm.getValues("songYoutubeVideoUrl")}
                 className="mt-3 w-full"
               />
             )}
 
             {/* 에러 메시지 */}
-            {youtubeForm.formState.errors.songYoutubeVideoId && (
+            {youtubeForm.formState.errors.songYoutubeVideoUrl && (
               <div className="mt-1 text-xs text-destructive">
-                {youtubeForm.formState.errors.songYoutubeVideoId.message}
+                {youtubeForm.formState.errors.songYoutubeVideoUrl.message}
               </div>
             )}
           </form>

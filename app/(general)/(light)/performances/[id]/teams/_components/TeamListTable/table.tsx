@@ -20,7 +20,7 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={ className } {...props} />
+  <thead ref={ref} className={className} {...props} />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -28,11 +28,7 @@ const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={className}
-    {...props}
-  />
+  <tbody ref={ref} className={className} {...props} />
 ))
 TableBody.displayName = "TableBody"
 
@@ -42,10 +38,7 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
-    className={cn(
-      "bg-muted/50 font-medium",
-      className
-    )}
+    className={cn("bg-muted/50 font-medium", className)}
     {...props}
   />
 ))
@@ -73,7 +66,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      "h-10 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}
@@ -116,5 +109,5 @@ export {
   TableFooter,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 }
