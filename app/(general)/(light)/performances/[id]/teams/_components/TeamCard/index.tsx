@@ -114,10 +114,10 @@ const TeamCard = ({
 
       {/* 액션: 편집, 삭제 */}
       {user && (user.is_admin || (user.id && +user?.id === leader.id)) && (
-        <div className="mt-3 flex items-center justify-between gap-x-4">
+        <div className="mt-3 grid grid-cols-2 gap-x-4">
           <Button
             asChild
-            className="flex h-9 flex-1 items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
+            className="flex h-9 w-full items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
             variant="outline"
           >
             <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
@@ -125,10 +125,10 @@ const TeamCard = ({
               편집하기
             </Link>
           </Button>
-          <TeamDeleteButton teamId={id}>
+          <TeamDeleteButton teamId={id} className="w-full">
             <Button
               asChild
-              className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
+              className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
               variant="destructive"
             >
               <div>

@@ -14,12 +14,14 @@ import {
 import useTeamDelete from "@/hooks/useTeamDelete"
 
 interface TeamDeleteButtonProps {
+  className?: string
   teamId: number
   redirectUrl?: string
   children?: React.ReactNode
 }
 
 const TeamDeleteButton = ({
+  className,
   teamId,
   redirectUrl,
   children
@@ -43,7 +45,7 @@ const TeamDeleteButton = ({
   }
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger className={className}>{children}</DialogTrigger>
       <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow">
         {/* 삭제 아이콘 및 메시지 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch pt-5">
