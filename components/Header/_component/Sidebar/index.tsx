@@ -10,11 +10,11 @@ import SheetInnerContent from "@/components/Header/_component/Sidebar/SheetInner
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
-  
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger>
-        <Menu className="h-9 w-9 text-white" />
+        <Menu className="h-6 w-6 text-white" />
       </SheetTrigger>
       <SheetContent>
         <SheetInnerContent setIsOpen={setIsOpen} />

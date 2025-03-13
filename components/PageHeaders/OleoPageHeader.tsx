@@ -22,7 +22,7 @@ const OleoPageHeader = ({
   return (
     <div
       className={cn(
-        "mb-[54px] mt-[100px] flex h-[70px] w-full items-center justify-between",
+        "my-2.5 flex h-[70px] w-full items-end justify-center md:mb-[54px] md:mt-[100px] md:items-center md:justify-between",
         className
       )}
     >
@@ -30,7 +30,7 @@ const OleoPageHeader = ({
       <Link
         href={goBackHref}
         className={cn(
-          "flex items-center gap-x-6 px-[27px] py-2 font-semibold text-white",
+          "hidden items-center gap-x-6 px-[27px] py-2 font-semibold text-white md:flex",
           {
             width: backButtonWidth
           }
@@ -40,7 +40,7 @@ const OleoPageHeader = ({
         뒤로가기
       </Link>
 
-      <div className="flex text-[100px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+      <div className="flex text-[40px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:text-[100px]">
         {words.map((word, i) => {
           const firstLetter = word.charAt(0)
           const rest = word.slice(1)
@@ -65,7 +65,10 @@ const OleoPageHeader = ({
       </div>
 
       {/* 중앙 정렬용 공간 */}
-      <div style={{ width: backButtonWidth + backButtonPaddingX * 2 }} />
+      <div
+        style={{ width: backButtonWidth + backButtonPaddingX * 2 }}
+        className="hidden md:block"
+      />
     </div>
   )
 }

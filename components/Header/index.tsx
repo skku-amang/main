@@ -4,6 +4,7 @@ import { Knewave } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 
+import MobileBackButton from "@/components/Header/_component/MobileBackButton"
 import Sidebar from "@/components/Header/_component/Sidebar"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { cn } from "@/lib/utils"
@@ -50,10 +51,10 @@ const Header = ({
       style={{ height }}
     >
       {/* Mobile */}
-      <nav className="visible relative flex h-full w-11/12 items-center justify-between md:hidden">
-        <div className="f-full w-9 bg-none"></div>
+      <nav className="visible relative flex h-full w-full items-center justify-between bg-primary px-10 py-2 md:hidden">
+        <MobileBackButton />
         <Link href={ROUTES.HOME}>
-          <Image src="/Logo.png" alt="logo" width={50} height={50} />
+          <Image src="/Logo.png" alt="logo" width={32} height={32} />
         </Link>
         <Sidebar />
       </nav>
