@@ -7,6 +7,7 @@ import {
   SheetTrigger
 } from "@/components/Header/_component/Sidebar/Sheet"
 import SheetInnerContent from "@/components/Header/_component/Sidebar/SheetInnerContent"
+import { SheetTitle } from "@/components/ui/sheet"
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -17,6 +18,7 @@ const Sidebar = () => {
         <Menu className="h-6 w-6 text-white" />
       </SheetTrigger>
       <SheetContent>
+        <SheetTitle className="hidden">메뉴</SheetTitle>
         <SheetInnerContent setIsOpen={setIsOpen} />
       </SheetContent>
     </Sheet>

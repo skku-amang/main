@@ -51,7 +51,16 @@ const Header = ({
       style={{ height }}
     >
       {/* Mobile */}
-      <nav className="visible relative flex h-full w-full items-center justify-between bg-primary px-10 py-2 md:hidden">
+      <nav
+        className={cn(
+          "visible relative flex h-full w-full items-center justify-between px-10 py-2 md:hidden",
+          {
+            "bg-white": mode === "light",
+            "bg-primary": mode === "dark",
+            "bg-transparent": mode === "transparent"
+          }
+        )}
+      >
         <MobileBackButton />
         <Link href={ROUTES.HOME}>
           <Image src="/Logo.png" alt="logo" width={32} height={32} />

@@ -1,10 +1,16 @@
 "use client"
 
 import { ArrowLeftIcon } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 const MobileBackButton = () => {
   const router = useRouter()
+  const pathname = usePathname()
+  const isHome = pathname === "/"
+
+  if (isHome) {
+    return <div className="w-6" />
+  }
 
   return (
     <button onClick={() => router.back()}>
