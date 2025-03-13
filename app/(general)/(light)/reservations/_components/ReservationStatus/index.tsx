@@ -6,7 +6,6 @@ export default function ReservationStatus() {
       <span className="mb-[18px] text-[22px] font-semibold text-zinc-700">
         나의 예약현황
       </span>
-
       <ReservationStatusCard />
       <ReservationStatusCard />
     </div>
