@@ -1,8 +1,8 @@
 "use client"
 
 import { Image, PencilLine, Trash2 } from "lucide-react"
-import Link from "next/link"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
@@ -49,10 +49,14 @@ const TeamCard = ({
           <div className="text-md flex items-start justify-between">
             {/* 곡명 */}
             <div className="flex items-center gap-x-2">
-              <h4 className="font-bold text-slate-700 self-stretch flex items-center gap-x-1">
+              <h4 className="flex items-center gap-x-1 self-stretch font-bold text-slate-700">
                 {songName}
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                {image && <span><Image className="w-3 h-3 font-normal text-neutral-500" /></span>}
+                {image && (
+                  <span>
+                    <Image className="h-3 w-3 font-normal text-neutral-500" />
+                  </span>
+                )}
               </h4>
             </div>
 
@@ -109,9 +113,13 @@ const TeamCard = ({
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      {user && (user.is_admin || user.id && +user?.id === leader.id) && (
+      {user && (user.is_admin || (user.id && +user?.id === leader.id)) && (
         <div className="mt-3 flex items-center justify-between gap-x-4">
-          <Button asChild className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm border-none" variant="outline">
+          <Button
+            asChild
+            className="flex h-9 flex-1 items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
+            variant="outline"
+          >
             <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
               <PencilLine size={14} strokeWidth={2} className="font-bold" />
               편집하기
@@ -119,11 +127,14 @@ const TeamCard = ({
           </Button>
           <TeamDeleteButton teamId={id}>
             <Button
+              asChild
               className="flex h-9 flex-1 items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
               variant="destructive"
             >
-              <Trash2 size={14} strokeWidth={2} className="font-bold" />
-              삭제하기
+              <div>
+                <Trash2 size={14} strokeWidth={2} className="font-bold" />
+                삭제하기
+              </div>
             </Button>
           </TeamDeleteButton>
         </div>

@@ -342,6 +342,7 @@ export function TeamListDataTable<TValue>({
                 </Button>
               </PopoverTrigger>
               <PopoverContent
+                align="end"
                 onInteractOutside={() => setFilterOpen(false)}
                 className="flex gap-6 px-9 py-6 md:h-[256px] md:w-[400px]"
               >
