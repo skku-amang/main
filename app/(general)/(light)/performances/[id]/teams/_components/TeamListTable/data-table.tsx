@@ -15,12 +15,12 @@ import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import Link from "next/link"
 import { useReducer, useState } from "react"
 
+import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
+import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
 import RelatedPerformanceList from "@/app/(general)/(light)/performances/[id]/teams/_components/RelatedPerformanceList"
-import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamCard"
 import TeamListTableFilter, {
   FilterValue
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/filter"
-import MobileButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/MobileButton"
 import {
   Table,
   TableBody,
@@ -41,6 +41,12 @@ import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger
+} from "../Mobile/SortSelect"
 import { TeamColumn } from "./columns"
 import {
   Drawer,
@@ -295,6 +301,18 @@ export function TeamListDataTable<TValue>({
     return new MemberSessionSet(memberSessions).getSessionsWithMissingMembers()
   }
 
+  const sortOptions: {
+    id: keyof TeamColumn
+    display: string
+    desc: boolean
+  }[] = [
+    { id: "songName", display: "곡명 오름차순", desc: false },
+    { id: "songArtist", display: "곡명 내림차순", desc: true }
+    // TODO: 최신순 추가
+    // { id: "createdDatetime", display: "최신순", desc: true },
+    // { id: "createdDatetime", display: "오래된순", desc: false },
+  ]
+
   return (
     <div className={className}>
       {/* 데스크톱: 테이블 보기 */}
@@ -458,11 +476,9 @@ export function TeamListDataTable<TValue>({
             {/* 필터 */}
             <Drawer>
               <DrawerTrigger>
-                <MobileButton asChild variant="outline">
-                  <div className="h-9 w-9 border border-gray-200 bg-slate-50 drop-shadow-search">
-                    <Filter className="text-gray-400" size={16} />
-                  </div>
-                </MobileButton>
+                <TeamHeaderButton asChild variant="outline">
+                  <Filter className="text-gray-400" size={16} />
+                </TeamHeaderButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
                 <DrawerHeader className="flex items-center justify-between px-7 py-0">
@@ -486,10 +502,12 @@ export function TeamListDataTable<TValue>({
                 />
 
                 <div className="space-y-7 px-7 pt-4">
+                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
                   />
+                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="모집상태"
                     filterValues={filterValues.모집상태}
@@ -500,15 +518,32 @@ export function TeamListDataTable<TValue>({
 
             {/* 정렬 */}
             {/* TODO: 정렬 기능 구현 */}
-            <MobileButton asChild variant="outline">
-              <div className="h-9 w-9 border border-gray-200 bg-slate-50 drop-shadow-search">
-                <ArrowDownUp
-                  strokeWidth={1.75}
-                  className="text-gray-400"
-                  size={16}
-                />
-              </div>
-            </MobileButton>
+            {/* Table과 완전 분리해서 정렬 로직 구성해야 함 */}
+            <Select
+              defaultValue={"null"}
+              // value={sorting[0].id ?? "null"}
+              // onValueChange={(value) => setSorting([value])}
+            >
+              <SelectTrigger>
+                <TeamHeaderButton asChild variant="outline">
+                  <ArrowDownUp
+                    strokeWidth={1.75}
+                    className="text-gray-400"
+                    size={16}
+                  />
+                </TeamHeaderButton>
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.display}
+                  </SelectItem>
+                ))}
+                <SelectItem value="null" onSelect={() => setSorting([])}>
+                  정렬해제
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 공연 선택 및 생성 버튼 */}
