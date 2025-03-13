@@ -63,7 +63,7 @@ const TeamList = async (props: TeamListProps) => {
         title="공연팀 목록"
         routes={[
           {
-            display: <Home />,
+            display: <Home className="h-4 w-4 md:h-5 md:w-5" />,
             href: ROUTES.HOME
           },
           {
@@ -78,6 +78,7 @@ const TeamList = async (props: TeamListProps) => {
 
       {/* 팀 목록 */}
       <TeamListDataTable
+        className="mb-4 mt-6 md:my-0"
         columns={columns}
         data={teams}
         relatedPerformances={relatedPerformances}

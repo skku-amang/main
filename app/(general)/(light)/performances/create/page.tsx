@@ -11,7 +11,12 @@ const PerformanceCreate = () => {
       <DefaultPageHeader
         title="공연 생성"
         routes={[
-          { display: <Home size={20} strokeWidth={1.67} />, href: ROUTES.HOME },
+          {
+            display: (
+              <Home className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.67} />
+            ),
+            href: ROUTES.HOME
+          },
           { display: "아카이브" },
           { display: "공연 생성", href: ROUTES.PERFORMANCE.LIST }
         ]}
