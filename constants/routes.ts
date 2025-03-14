@@ -36,18 +36,8 @@ const ROUTES = {
     INDEX: "/profile"
   },
   RESERVATION: {
-    CLUBROOM: {
-      CREATE: "/reservations/clubrooms/create",
-      LIST: "/reservations/clubrooms",
-      DETAIL: (id: number) => `/reservations/clubrooms/${id}`,
-      EDIT: (id: number) => `/reservations/clubrooms/${id}/edit`
-    },
-    EQUIPMENT: {
-      CREATE: "/reservations/equipments/create",
-      LIST: "/reservations/equipments",
-      DETAIL: (id: number) => `/reservations/equipments/${id}`,
-      EDIT: (id: number) => `/reservations/equipments/${id}/edit`
-    }
+    CLUBROOM: "/reservations/clubroom",
+    EQUIPMENT: "/reservations/equipment"
   }
 }
 

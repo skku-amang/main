@@ -1,9 +1,15 @@
+import { Home } from "lucide-react"
+
 import DefaultPageHeaderBreadCrumb from "@/components/PageHeaders/Default/BreadCrumb"
 import { cn } from "@/lib/utils"
 
 export type DefaultPageHeaderBreadCrumbRoute = {
   display: React.ReactNode
   href?: string
+}
+
+export const DefaultHomeIcon = () => {
+  return <Home size={20} strokeWidth={1.67} />
 }
 
 interface DefaultPageHeaderProps {

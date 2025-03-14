@@ -70,7 +70,6 @@ const NavLink = ({
   const pathname = usePathname()
   const { data } = useSession()
   const isAvailable = data?.is_admin || (!isAdminOnly && isActive)
-  console.log(data?.is_admin, isAvailable)
 
   if (isAdminOnly && !data?.is_admin) {
     return null

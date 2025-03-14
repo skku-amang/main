@@ -1,11 +1,12 @@
-import { Home } from "lucide-react"
 import Link from "next/link"
 import { CiCirclePlus } from "react-icons/ci"
 
-import Loading from "@/app/_(errors)/Loading"
 import PerformanceCard from "@/app/(general)/(light)/performances/_components/PerformanceCard"
+import Loading from "@/app/_(errors)/Loading"
 import { auth } from "@/auth"
-import DefaultPageHeader from "@/components/PageHeaders/Default"
+import DefaultPageHeader, {
+  DefaultHomeIcon
+} from "@/components/PageHeaders/Default"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
@@ -33,7 +34,7 @@ const PerformanceList = async () => {
       <DefaultPageHeader
         title="공연 목록"
         routes={[
-          { display: <Home size={20} strokeWidth={1.67} />, href: ROUTES.HOME },
+          { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "아카이브" },
           { display: "공연 목록", href: ROUTES.PERFORMANCE.LIST }
         ]}

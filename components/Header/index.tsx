@@ -41,13 +41,13 @@ const Header = ({
     },
     {
       name: "동방",
-      url: ROUTES.RESERVATION.CLUBROOM.LIST,
+      url: ROUTES.RESERVATION.CLUBROOM,
       active: true,
       experimental: true
     },
     {
       name: "장비",
-      url: ROUTES.RESERVATION.EQUIPMENT.LIST,
+      url: ROUTES.RESERVATION.EQUIPMENT,
       active: true,
       experimental: true
     },

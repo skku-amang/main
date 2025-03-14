@@ -1,8 +1,9 @@
-import { Home } from "lucide-react"
 import { redirect } from "next/navigation"
 
 import { auth } from "@/auth"
-import DefaultPageHeader from "@/components/PageHeaders/Default"
+import DefaultPageHeader, {
+  DefaultHomeIcon
+} from "@/components/PageHeaders/Default"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -63,7 +64,7 @@ const TeamList = async (props: TeamListProps) => {
         title="공연팀 목록"
         routes={[
           {
-            display: <Home />,
+            display: <DefaultHomeIcon />,
             href: ROUTES.HOME
           },
           {

@@ -1,9 +1,9 @@
-import { Home } from "lucide-react"
-
 import Calendar from "@/app/(general)/(light)/reservations/_components/Calender"
 import { AddScheduleButton } from "@/app/(general)/(light)/reservations/_components/Calender/AddScheduleButton"
 import ReservationStatus from "@/app/(general)/(light)/reservations/_components/ReservationStatus"
-import DefaultPageHeader from "@/components/PageHeaders/Default"
+import DefaultPageHeader, {
+  DefaultHomeIcon
+} from "@/components/PageHeaders/Default"
 import ROUTES from "@/constants/routes"
 
 const ReservationPage = () => {
@@ -12,7 +12,7 @@ const ReservationPage = () => {
       <DefaultPageHeader
         title="동아리방 예약"
         routes={[
-          { display: <Home />, href: ROUTES.HOME },
+          { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "예약" },
           { display: "동아리방 예약" }
         ]}

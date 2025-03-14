@@ -1,7 +1,7 @@
-import { Home } from "lucide-react"
-
 import ReservationStatus from "@/app/(general)/(light)/reservations/_components/ReservationStatus"
-import DefaultPageHeader from "@/components/PageHeaders/Default"
+import DefaultPageHeader, {
+  DefaultHomeIcon
+} from "@/components/PageHeaders/Default"
 import ROUTES from "@/constants/routes"
 
 const ReservationPage = () => {
@@ -11,7 +11,7 @@ const ReservationPage = () => {
         title="물품 대여"
         routes={[
           {
-            display: <Home />,
+            display: <DefaultHomeIcon />,
             href: ROUTES.HOME
           },
           {
