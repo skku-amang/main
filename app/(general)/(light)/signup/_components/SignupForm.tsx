@@ -1,7 +1,8 @@
 "use client"
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -24,10 +25,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
-import { password, signUpSchema as _signUpSchema } from "@/constants/zodSchema"
+import { signUpSchema as _signUpSchema, password } from "@/constants/zodSchema"
 import {
   DuplicatedCredentialsErrorCode,
   InvalidSignupCredentialsErrorCode
@@ -190,13 +191,19 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                   기수
                 </SimpleLabel>
               </div>
-              <Select value={field.value?.toString()} onValueChange={v => field.onChange(v)}>
+              <Select
+                value={field.value?.toString()}
+                onValueChange={(v) => field.onChange(v)}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
                   {generations.map((generation) => (
-                    <SelectItem key={generation.order} value={generation.id.toString()}>
+                    <SelectItem
+                      key={generation.order}
+                      value={generation.id.toString()}
+                    >
                       {formatGenerationOrder(generation.order)}기
                     </SelectItem>
                   ))}
@@ -206,7 +213,6 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
             </FormItem>
           )}
         />
-
 
         <FormField
           control={form.control}

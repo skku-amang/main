@@ -1,12 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { signIn } from "next-auth/react"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
-import React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -20,7 +19,6 @@ import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
-
 
 const Login = () => {
   const router = useRouter()
@@ -61,7 +59,7 @@ const Login = () => {
   }
 
   return (
-    <div className="mb-16 flex h-full w-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <div className="flex h-[653px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-white lg:relative lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
         <Image
           width="680"
@@ -96,15 +94,8 @@ const Login = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center lg:absolute lg:right-20 lg:top-[8.5rem] xl:right-32">
-          <h3
-            className="mb-2 text-2xl font-black text-slate-900"
-            
-          >
-            로그인
-          </h3>
-          <h5
-            className="mb-8 text-sm font-black text-slate-500"
-          >
+          <h3 className="mb-2 text-2xl font-black text-slate-900">로그인</h3>
+          <h5 className="mb-8 text-sm font-black text-slate-500">
             계속하려면 로그인해주세요
           </h5>
           {/* 일반 로그인 */}
@@ -148,10 +139,7 @@ const Login = () => {
               <div className="pr-2 text-sm font-extrabold text-slate-900">
                 아직 계정이 없으신가요?
               </div>
-              <Link
-                href={ROUTES.SIGNUP}
-                className="text-sm text-blue-40"
-              >
+              <Link href={ROUTES.SIGNUP} className="text-blue-40 text-sm">
                 회원가입
               </Link>
             </div>

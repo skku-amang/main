@@ -14,6 +14,12 @@ import Profile from "./_component/Profile"
 const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
 
 export type HeaderMode = "light" | "dark" | "transparent"
+type MenuItem = {
+  name: string
+  url: string
+  active: boolean
+  experimental?: boolean
+}
 
 const Header = ({
   position,
@@ -24,14 +30,26 @@ const Header = ({
   height: string
   mode?: HeaderMode
 }) => {
-  const menuItems: { name: string; url: string; active: boolean }[] = [
-    { name: "소개", url: ROUTES.HOME, active: false },
-    { name: "신청", url: ROUTES.HOME, active: false },
-    { name: "모집", url: ROUTES.HOME, active: false },
+  const menuItems: MenuItem[] = [
+    { name: "소개", url: ROUTES.HOME, active: false, experimental: true },
+    { name: "신청", url: ROUTES.HOME, active: false, experimental: true },
+    { name: "모집", url: ROUTES.HOME, active: false, experimental: true },
     {
       name: "예약",
       url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID),
       active: true
+    },
+    {
+      name: "동방",
+      url: ROUTES.RESERVATION.CLUBROOM.LIST,
+      active: true,
+      experimental: true
+    },
+    {
+      name: "장비",
+      url: ROUTES.RESERVATION.EQUIPMENT.LIST,
+      active: true,
+      experimental: true
     },
     { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true }
   ]
@@ -80,6 +98,7 @@ const Header = ({
                 href={menuItem.url}
                 isActive={menuItem.active}
                 mode={mode}
+                isAdminOnly={menuItem.experimental}
               >
                 {menuItem.name}
               </NavLink>

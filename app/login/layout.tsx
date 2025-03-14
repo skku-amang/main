@@ -6,7 +6,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <RootHeaderAndFooterWrapper headerMode="light">
+    <RootHeaderAndFooterWrapper
+      headerMode="light"
+      mainClassName="items-center flex"
+    >
       {children}
     </RootHeaderAndFooterWrapper>
   )
