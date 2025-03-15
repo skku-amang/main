@@ -34,7 +34,7 @@ const nextConfig = {
     return [
       {
         source: "/:path*",
-        destination: `${NEXT_PUBLIC_DEPLOY_URL}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL || process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/:path*`,
       },
     ];
   },
