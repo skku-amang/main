@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { StatusCodes } from "http-status-codes"
-import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
@@ -22,7 +22,7 @@ import { Performance } from "@/types/Performance"
 
 import PerformanceCard from "./PerformanceCard"
 
-const MAX_FILE_SIZE = 5000000 // 5MB
+const MAX_FILE_SIZE = 20000000 // 20MB
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -39,7 +39,7 @@ const formSchema = z.object({
   representativeImage: zfd
     .file()
     .refine((file) => file.size < MAX_FILE_SIZE, {
-      message: "File can't be bigger than 5MB."
+      message: "File can't be bigger than 20MB."
     })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
       message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace("image/", "")).join(", ")} 만 가능합니다.`
@@ -84,12 +84,15 @@ const PerformanceForm = () => {
       formDataToSend.append("endDatetime", formData.endDatetime.toISOString())
     }
 
-    const res = await fetchData(API_ENDPOINTS.PERFORMANCE.CREATE as ApiEndpoint, {
-      headers: {
-        Authorization: `Bearer ${session.data?.access}`
-      },
-      body: formDataToSend
-    })
+    const res = await fetchData(
+      API_ENDPOINTS.PERFORMANCE.CREATE as ApiEndpoint,
+      {
+        headers: {
+          Authorization: `Bearer ${session.data?.access}`
+        },
+        body: formDataToSend
+      }
+    )
 
     if (!res.ok) {
       const data = await res.json()
