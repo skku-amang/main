@@ -29,15 +29,7 @@ const nextConfig = {
     ],
     unoptimized: true
   },
-  output: "standalone",
-  async rewrites() {
-    return [
-      {
-        source: "/:path*",
-        destination: `${process.env.NEXT_PUBLIC_DEPLOY_URL || process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/:path*`,
-      },
-    ];
-  },
+  output: "standalone"
 };
 
 export default nextConfig;
