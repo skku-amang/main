@@ -7,8 +7,8 @@ import { auth } from "@/auth"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
@@ -41,11 +41,8 @@ const PerformanceList = async () => {
       />
 
       {/* 도구 모음 */}
-      <div className="mb-3 flex justify-between">
-        <div className="flex gap-x-3">
-          <Input className="w-72" />
-          <Button>검색</Button>
-        </div>
+      <div className="mb-3 flex justify-between gap-x-2">
+        <Search />
         <Button asChild className="flex items-center">
           <Link href={ROUTES.PERFORMANCE.CREATE}>
             <CiCirclePlus size={20} />
@@ -55,19 +52,18 @@ const PerformanceList = async () => {
       </div>
 
       {/* 공연 카드 목록 */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 xl:grid-cols-4">
         {performances.map((p) => (
-          <div key={p.id} className="flex w-full justify-center">
-            <PerformanceCard
-              id={p.id}
-              name={p.name}
-              representativeSrc={p.representativeImage}
-              location={p.location}
-              startDatetime={
-                p.startDatetime ? new Date(p.startDatetime) : undefined
-              }
-            />
-          </div>
+          <PerformanceCard
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            representativeSrc={p.representativeImage}
+            location={p.location}
+            startDatetime={
+              p.startDatetime ? new Date(p.startDatetime) : undefined
+            }
+          />
         ))}
       </div>
     </div>

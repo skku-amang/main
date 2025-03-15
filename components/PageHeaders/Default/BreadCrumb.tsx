@@ -16,7 +16,7 @@ const DefaultPageHeaderBreadCrumb = ({
   routes
 }: DefaultPageHeaderBreadCrumbProps) => {
   return (
-    <div className="flex items-center justify-center gap-x-1.5 font-medium text-slate-400">
+    <div className="flex items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
       {routes.map((route, index) => (
         <React.Fragment key={index}>
           {route.href ? (

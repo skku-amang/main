@@ -79,6 +79,7 @@ const TeamList = async (props: TeamListProps) => {
 
       {/* 팀 목록 */}
       <TeamListDataTable
+        className="mb-4 mt-6 md:my-0"
         columns={columns}
         data={teams}
         relatedPerformances={relatedPerformances}

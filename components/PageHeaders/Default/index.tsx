@@ -26,11 +26,11 @@ const DefaultPageHeader = ({
   return (
     <div
       className={cn(
-        "flex flex-col justify-center space-y-5 pb-[91px] pt-[135px] text-center",
+        "flex flex-col justify-center space-y-1 pb-2 pt-10 text-center md:space-y-5 md:pb-[91px] md:pt-[135px]",
         className
       )}
     >
-      <h1 className="text-5xl font-semibold">{title}</h1>
+      <h1 className="text-[22px] font-semibold md:text-5xl">{title}</h1>
       {routes.length > 0 && <DefaultPageHeaderBreadCrumb routes={routes} />}
     </div>
   )

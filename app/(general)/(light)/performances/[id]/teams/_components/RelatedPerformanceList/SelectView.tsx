@@ -28,19 +28,19 @@ const SelectView = ({
   const router = useRouter()
 
   return (
-    <Select value={currentPerformanceId.toString()} onValueChange={(performanceId) => router.push(ROUTES.PERFORMANCE.TEAM.LIST(+performanceId))}>
-      <SelectTrigger className="font-semibold text-gray-400">
+    <Select
+      value={currentPerformanceId.toString()}
+      onValueChange={(performanceId) =>
+        router.push(ROUTES.PERFORMANCE.TEAM.LIST(+performanceId))
+      }
+    >
+      <SelectTrigger className="flex-row-reverse gap-x-2 text-gray-500">
         <SelectValue placeholder={currentPerformance?.name} />
       </SelectTrigger>
       <SelectContent>
         {performanceOptions.map((p) => (
-          <SelectItem
-            key={p.id}
-            value={p.id.toString()}
-          >
-          <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>
-            {p.name}
-          </Link>
+          <SelectItem key={p.id} value={p.id.toString()}>
+            <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>{p.name}</Link>
           </SelectItem>
         ))}
       </SelectContent>

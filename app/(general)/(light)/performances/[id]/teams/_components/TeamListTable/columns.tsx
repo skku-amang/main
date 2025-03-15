@@ -73,14 +73,17 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex w-full items-center justify-center p-0"
+            className="flex w-full items-center justify-center p-0 "
           >
             <span className="sr-only">Open menu</span>
             <EllipsisVertical className="h-5 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="rounded-none text-sm">
-          <DropdownMenuItem className="p-0">
+        <DropdownMenuContent
+          align="end"
+          className="rounded-lg border border-slate-100 p-[5px] text-sm drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
+        >
+          <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
             <Link
               href={ROUTES.PERFORMANCE.TEAM.EDIT(
                 row.original.performanceId,
@@ -92,7 +95,7 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
               편집하기
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
+          <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
             <DeleteButton
               className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
               teamId={row.original.id}
@@ -122,9 +125,9 @@ export const columns: ColumnDef<TeamColumn>[] = [
         {/* 곡명 */}
         <div className="flex items-center gap-x-1">
           {row.original.songName}
-          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           {!row.original.posterImage && (
             <span>
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3 font-normal text-neutral-500" />
             </span>
           )}

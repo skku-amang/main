@@ -15,12 +15,12 @@ import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import Link from "next/link"
 import { useReducer, useState } from "react"
 
+import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
+import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
 import RelatedPerformanceList from "@/app/(general)/(light)/performances/[id]/teams/_components/RelatedPerformanceList"
-import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamCard"
 import TeamListTableFilter, {
   FilterValue
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/filter"
-import MobileButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/MobileButton"
 import {
   Table,
   TableBody,
@@ -31,7 +31,6 @@ import {
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
@@ -42,6 +41,12 @@ import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger
+} from "../Mobile/SortSelect"
 import { TeamColumn } from "./columns"
 import {
   Drawer,
@@ -148,6 +153,7 @@ const reducer = (state: State, action: Action) => {
 }
 
 interface DataTableProps<TValue> {
+  className?: string
   columns: ColumnDef<TeamColumn, TValue>[]
   data: TeamColumn[]
   relatedPerformances: Performance[]
@@ -155,6 +161,7 @@ interface DataTableProps<TValue> {
 }
 
 export function TeamListDataTable<TValue>({
+  className,
   columns,
   data,
   relatedPerformances,
@@ -294,8 +301,20 @@ export function TeamListDataTable<TValue>({
     return new MemberSessionSet(memberSessions).getSessionsWithMissingMembers()
   }
 
+  const sortOptions: {
+    id: keyof TeamColumn
+    display: string
+    desc: boolean
+  }[] = [
+    { id: "songName", display: "곡명 오름차순", desc: false },
+    { id: "songArtist", display: "곡명 내림차순", desc: true }
+    // TODO: 최신순 추가
+    // { id: "createdDatetime", display: "최신순", desc: true },
+    // { id: "createdDatetime", display: "오래된순", desc: false },
+  ]
+
   return (
-    <div>
+    <div className={className}>
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
         {/* 헤더 */}
@@ -313,7 +332,7 @@ export function TeamListDataTable<TValue>({
           />
 
           {/* 생성 및 필터 */}
-          <div className="relative flex gap-3">
+          <div className="flex gap-4">
             {/* 생성 버튼 */}
             <Button
               asChild
@@ -341,14 +360,15 @@ export function TeamListDataTable<TValue>({
                 </Button>
               </PopoverTrigger>
               <PopoverContent
+                align="end"
                 onInteractOutside={() => setFilterOpen(false)}
-                className="flex gap-8 p-8"
+                className="flex gap-6 px-9 py-6 md:h-[256px] md:w-[400px]"
               >
                 <TeamListTableFilter
                   header="필요세션"
                   filterValues={filterValues.필요세션}
                 />
-                <Separator orientation="vertical" className="h-64" />
+                <Separator orientation="vertical" className="h-[216px]" />
                 <TeamListTableFilter
                   header="모집상태"
                   filterValues={filterValues.모집상태}
@@ -387,7 +407,7 @@ export function TeamListDataTable<TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] hover:drop-shadow-[0_4px_4px_rgb(0,0,0,0.25)]"
+                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] transition-all duration-300 hover:drop-shadow-[0_4px_4px_rgb(0,0,0,0.25)]"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="bg-transparent">
@@ -442,7 +462,7 @@ export function TeamListDataTable<TValue>({
           {/* 검색, 필터, 정렬 */}
           <div className="flex items-center justify-center gap-x-3">
             {/* 검색 */}
-            <Input
+            <Search
               placeholder="검색"
               value={
                 (table.getColumn("songName")?.getFilterValue() as string) ?? ""
@@ -456,19 +476,23 @@ export function TeamListDataTable<TValue>({
             {/* 필터 */}
             <Drawer>
               <DrawerTrigger>
-                <MobileButton asChild variant="outline">
-                  <div className="h-9 w-9 drop-shadow-search">
-                    <Filter className="text-gray-400" size={16} />
-                  </div>
-                </MobileButton>
+                <TeamHeaderButton asChild variant="outline">
+                  <Filter className="text-gray-400" size={16} />
+                </TeamHeaderButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
                 <DrawerHeader className="flex items-center justify-between px-7 py-0">
-                  <DrawerTitle className="text-md pb-3 pt-5 text-left font-semibold">
-                    Property Filter
+                  <DrawerTitle className="mb-3 mt-5 flex h-5 items-baseline gap-x-[15px] ">
+                    <div className="h-full text-left text-[14px] font-semibold">
+                      Property Filter
+                    </div>
+                    {/* TODO: 초기화 기능 추가 */}
+                    <button className="h-full text-[10px] font-normal text-third">
+                      초기화
+                    </button>
                   </DrawerTitle>
                   <DrawerClose>
-                    <X className="h-4 w-4 text-slate-500" />
+                    <X className="h-3 w-3 text-slate-500" strokeWidth={2} />
                   </DrawerClose>
                 </DrawerHeader>
 
@@ -478,10 +502,12 @@ export function TeamListDataTable<TValue>({
                 />
 
                 <div className="space-y-7 px-7 pt-4">
+                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
                   />
+                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="모집상태"
                     filterValues={filterValues.모집상태}
@@ -492,15 +518,32 @@ export function TeamListDataTable<TValue>({
 
             {/* 정렬 */}
             {/* TODO: 정렬 기능 구현 */}
-            <MobileButton asChild variant="outline">
-              <div className="h-9 w-9 drop-shadow-search">
-                <ArrowDownUp
-                  strokeWidth={1.75}
-                  className="text-gray-400"
-                  size={16}
-                />
-              </div>
-            </MobileButton>
+            {/* Table과 완전 분리해서 정렬 로직 구성해야 함 */}
+            <Select
+              defaultValue={"null"}
+              // value={sorting[0].id ?? "null"}
+              // onValueChange={(value) => setSorting([value])}
+            >
+              <SelectTrigger>
+                <TeamHeaderButton asChild variant="outline">
+                  <ArrowDownUp
+                    strokeWidth={1.75}
+                    className="text-gray-400"
+                    size={16}
+                  />
+                </TeamHeaderButton>
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.display}
+                  </SelectItem>
+                ))}
+                <SelectItem value="null" onSelect={() => setSorting([])}>
+                  정렬해제
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 공연 선택 및 생성 버튼 */}
