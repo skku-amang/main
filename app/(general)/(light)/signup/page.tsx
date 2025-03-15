@@ -23,7 +23,7 @@ const Signup = async () => {
             backgroundPosition: "top",
             backgroundSize: "cover"
           }}
-        ></div>
+        />
         <SignupForm sessions={sessions} generations={generations} />
       </div>
     </div>

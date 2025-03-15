@@ -1,5 +1,6 @@
 "use client"
 
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
@@ -36,8 +37,8 @@ const headerColorClass = ({
       break
     case "transparent":
       className = isCurrentPathname
-        ? "text-gray-400 hover:text-primary"
-        : "text-gray-200 hover:text-white"
+        ? "text-gray-200 hover:text-white"
+        : "text-gray-400 hover:text-white"
       break
   }
 
@@ -51,30 +52,40 @@ const isCurrentPathname = (pathname: string, href: string) => {
   return pathnameWithoutSlash === hrefWithoutSlash
 }
 
-const NavLink = ({
-  href,
-  children,
-  isActive,
-  mode
-}: {
+interface NavLinkProps {
   href: string
   children: React.ReactNode
   isActive: boolean
   mode: HeaderMode
-}) => {
+  isAdminOnly?: boolean
+}
+
+const NavLink = ({
+  href,
+  children,
+  isActive,
+  mode,
+  isAdminOnly = false
+}: NavLinkProps) => {
   const pathname = usePathname()
+  const { data } = useSession()
+  const isAvailable = data?.is_admin || (!isAdminOnly && isActive)
+
+  if (isAdminOnly && !data?.is_admin) {
+    return null
+  }
 
   return (
     <Link
       href={href}
-      aria-disabled={!isActive}
-      tabIndex={isActive ? undefined : -1}
+      aria-disabled={!isAvailable}
+      tabIndex={isAvailable ? undefined : -1}
       className={cn(
         "flex items-center text-lg font-semibold",
-        !isActive && "pointer-events-none",
+        !isAvailable && "pointer-events-none",
         headerColorClass({
           mode,
-          isActive,
+          isActive: isAvailable,
           isCurrentPathname: isCurrentPathname(pathname, href)
         })
       )}

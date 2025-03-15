@@ -18,10 +18,13 @@ const ROUTES = {
     LIST: "/performances",
     DETAIL: (id: number) => `/performances/${id}`,
     TEAM: {
-      CREATE: (performanceId: number) => `/performances/${performanceId}/teams/create`,
+      CREATE: (performanceId: number) =>
+        `/performances/${performanceId}/teams/create`,
       LIST: (id: number) => `/performances/${id}/teams`,
-      DETAIL: (performanceId: number, teamId: number) => `/performances/${performanceId}/teams/${teamId}`,
-      EDIT: (performanceId: number, teamId: number) => `/performances/${performanceId}/teams/${teamId}/edit`
+      DETAIL: (performanceId: number, teamId: number) =>
+        `/performances/${performanceId}/teams/${teamId}`,
+      EDIT: (performanceId: number, teamId: number) =>
+        `/performances/${performanceId}/teams/${teamId}/edit`
     },
     EDIT: (id: number) => `/performances/${id}/edit`
   },
@@ -31,6 +34,10 @@ const ROUTES = {
   },
   PROFILE: {
     INDEX: "/profile"
+  },
+  RESERVATION: {
+    CLUBROOM: "/reservations/clubroom",
+    EQUIPMENT: "/reservations/equipment"
   }
 }
 
