@@ -1,0 +1,103 @@
+:root {
+  --fc-border-color: #F3F4F6;
+  --fc-button-active-bg-color: white;
+  --fc-button-active-border-color: white;
+  --fc-button-hover-bg-color: transparent;
+  --fc-button-hover-border: 0px;
+}
+
+.fc .fc-button,
+.fc .fc-button-group {
+  background-color: #F4F4F5;
+  color: #A1A1AA;
+  border: 0px;
+}
+
+.fc .fc-button-primary:hover,
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  color: black;
+}
+
+.fc .fc-prev-button,
+.fc .fc-next-button {
+  background-color: #FAFAFA;
+}
+
+.fc .fc-col-header-cell-cushion {
+  padding: 5px 0;
+  font-size: 12px;
+  height: 42px;
+}
+
+.fc .fc-daygrid-day-number,
+.fc .fc-scrollgrid-shrink-cushion {
+  font-size: 12px;
+}
+
+.fc .fc-daygrid-day-frame {
+  height: 126px;
+  width: 140px;
+  background-color: white;
+}
+
+.fc .fc-daygrid-day-top {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+
+.fc .fc-toolbar-title {
+  color: var(--Gray-700, #374151);
+  font-family: Pretendard;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  width: 165px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+}
+
+.fc .fc-toolbar-chunk {
+  padding-right: 110px;
+  display: flex;
+}
+
+.fc .fc-event-main,
+.fc .fc-event-title {
+  color: black;
+  font-size: 12px;
+  font-weight: 400;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus, .fc .fc-button-primary:not(:disabled):active:focus {
+    box-shadow: rgb(64 137 209 / 0%) 0px 0px 0px 0.2rem;
+}
+
+.fc .fc-event-time {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.fc .fc-daygrid-event {
+  padding-left: 5px;
+}
+
+.fc .fc-event {
+  border: none;
+}
+
+.fc .fc-daygrid-event-dot {
+  display: none;
+}
+
+.fc .fc-timegrid-axis {
+  background-color: white;
+}
+
+.fc .fc--button {
+  visibility: hidden;
+}
