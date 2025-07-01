@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { Generation, Session } from "shared-types"
 import { z } from "zod"
 
 import SimpleLabel from "@/components/Form/SimpleLabel"
@@ -34,8 +35,6 @@ import {
   InvalidSignupCredentialsErrorCode
 } from "@/lib/auth/errors"
 import { formatGenerationOrder } from "@/lib/utils"
-import { Generation } from "@/types/Generation"
-import { Session } from "@/types/Session"
 
 const signUpSchema = _signUpSchema
   .merge(z.object({ confirmPassword: password }))

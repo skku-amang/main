@@ -1,14 +1,8 @@
-import { SessionName } from "@/types/Session"
+import { SessionName } from "shared-types"
 
 type SessionImageType = {
-  UNPRESSED: Record<
-    SessionName,
-    string
-  >
-  PRESSED: Record<
-    SessionName,
-    string
-  >
+  UNPRESSED: Record<SessionName, string>
+  PRESSED: Record<SessionName, string>
 }
 
 const SESSIONIMAGE: SessionImageType = {
