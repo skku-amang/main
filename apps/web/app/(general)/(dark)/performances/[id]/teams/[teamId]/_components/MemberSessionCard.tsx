@@ -5,17 +5,15 @@ import { useToast } from "@/components/hooks/use-toast"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName } from "@/types/Session"
-import { Team } from "@/types/Team"
-import { User } from "@/types/User"
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
+import { SessionName, Team, User } from "shared-types"
 
 interface MemberSessionCardProps {
   teamId: number
   session: SessionName
   sessionIndex: number
   user: User
-  // eslint-disable-next-line no-unused-vars
+
   onUnapplySuccess: (team: Team) => void
 }
 

@@ -5,10 +5,9 @@ import { ArrowUpDown } from "lucide-react"
 import React from "react"
 
 import { formatGenerationOrder } from "@/lib/utils"
-import { Session } from "@/types/Session"
-import { User } from "@/types/User"
 import { Badge } from "@repo/ui/badge"
 import { Button } from "@repo/ui/button"
+import { Session, User } from "shared-types"
 
 const SortButton = ({
   column,

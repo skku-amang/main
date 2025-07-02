@@ -5,8 +5,8 @@ import {
   formatGenerationOrder,
   getRepresentativeRelativeTime
 } from "@/lib/utils"
-import { MemberSessionSet, Team } from "@/types/Team"
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
+import { MemberSessionSet, Team } from "shared-types"
 
 interface BasicInfoProps {
   team: Team

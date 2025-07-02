@@ -20,8 +20,6 @@ import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
-import { MemberSession, MemberSessionSet } from "@/types/Team"
-import { User } from "@/types/User"
 import { Button } from "@repo/ui/button"
 import {
   DropdownMenu,
@@ -29,6 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@repo/ui/dropdown-menu"
+import { MemberSession, MemberSessionSet, User } from "shared-types"
 
 export type TeamColumn = {
   performanceId: number

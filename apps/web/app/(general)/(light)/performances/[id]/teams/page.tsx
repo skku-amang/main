@@ -8,7 +8,7 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
-import { Team } from "@/types/Team"
+import { Team } from "shared-types"
 
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"

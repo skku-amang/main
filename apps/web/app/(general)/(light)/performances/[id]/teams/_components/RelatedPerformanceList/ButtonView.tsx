@@ -2,8 +2,8 @@ import Link from "next/link"
 
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
-import { Performance } from "@/types/Performance"
 import { Button } from "@repo/ui/button"
+import { Performance } from "shared-types"
 
 interface SelectViewProps {
   currentPerformanceId: number

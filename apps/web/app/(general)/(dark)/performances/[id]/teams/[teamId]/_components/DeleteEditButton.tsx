@@ -5,8 +5,8 @@ import Link from "next/link"
 
 import TeamDeleteButton from "@/components/TeamDeleteButton"
 import ROUTES from "@/constants/routes"
-import { Team } from "@/types/Team"
 import { Button } from "@repo/ui/button"
+import { Team } from "shared-types"
 
 interface DeleteEditButtonProps {
   performanceId: number

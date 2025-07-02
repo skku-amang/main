@@ -16,9 +16,9 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
-import { Performance } from "@/types/Performance"
 import { Button } from "@repo/ui/button"
 import { Form } from "@repo/ui/form"
+import { Performance } from "shared-types"
 
 import PerformanceCard from "./PerformanceCard"
 

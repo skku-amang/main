@@ -10,10 +10,9 @@ import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import TeamDeleteButton from "@/components/TeamDeleteButton"
 import ROUTES from "@/constants/routes"
-import { MemberSession } from "@/types/Team"
-import { User } from "@/types/User"
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
 import { Button } from "@repo/ui/button"
+import { MemberSession, User } from "shared-types"
 
 interface TeamCardProps {
   performanceId: number

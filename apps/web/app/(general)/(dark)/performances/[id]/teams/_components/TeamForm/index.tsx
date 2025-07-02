@@ -15,7 +15,7 @@ import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { cn } from "@/lib/utils"
-import { Team } from "@/types/Team"
+import { Team } from "shared-types"
 
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"

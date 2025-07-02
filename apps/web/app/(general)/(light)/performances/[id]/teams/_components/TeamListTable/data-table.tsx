@@ -31,11 +31,10 @@ import {
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
 import Search from "@/components/Search"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
-import { Performance } from "@/types/Performance"
-import { MemberSession, MemberSessionSet } from "@/types/Team"
 import { Button } from "@repo/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover"
 import { Separator } from "@repo/ui/separator"
+import { MemberSession, MemberSessionSet, Performance } from "shared-types"
 
 import {
   Select,

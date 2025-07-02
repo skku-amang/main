@@ -1,6 +1,6 @@
 "use client"
 
-import { Separator } from "@radix-ui/react-separator"
+import { Separator } from "@repo/ui/separator"
 import { StatusCodes } from "http-status-codes"
 import { ChevronRight, Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
@@ -22,8 +22,8 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
 import { Button } from "@repo/ui/button"
+import { MemberSessionSet, SessionOrder, Team } from "shared-types"
 
 interface Props {
   params: Promise<{
