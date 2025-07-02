@@ -4,18 +4,18 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import YoutubePlayer from "@/lib/youtube/Player"
+import { Button } from "@repo/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog"
-import { Form } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import YoutubePlayer from "@/lib/youtube/Player"
+} from "@repo/ui/dialog"
+import { Form } from "@repo/ui/form"
+import { Input } from "@repo/ui/input"
 
 import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
 

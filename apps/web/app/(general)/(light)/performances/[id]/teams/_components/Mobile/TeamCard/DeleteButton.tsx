@@ -3,16 +3,16 @@
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 
-import { Button } from "@/components/ui/button"
+import useTeamDelete from "@/hooks/useTeamDelete"
+import { cn } from "@/lib/utils"
+import { Button } from "@repo/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
-import { cn } from "@/lib/utils"
+} from "@repo/ui/dialog"
 
 interface TeamCardDeleteButtonProps {
   teamId: number
@@ -47,10 +47,10 @@ const TeamCardDeleteButton = ({
           삭제하기
         </Button>
       </DialogTrigger>
-      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl shadow p-4">
+      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow">
         {/* 삭제 아이콘 및 메시지 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch pt-5">
-          {/* 삭제 아이콘 */} 
+          {/* 삭제 아이콘 */}
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-[28px] border-8 border-red-50 bg-red-100 p-3">
             <div className="relative flex h-6 w-6 flex-col items-start justify-center">
               <Trash2 className="text-destructive" size={20} />
@@ -69,15 +69,20 @@ const TeamCardDeleteButton = ({
             </DialogDescription>
           </div>
         </div>
-          
+
         {/* 확인, 취소 버튼 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch">
           <Button
             onClick={onDelete}
-            variant="destructive" className="font-semibold w-full inline-flex items-center justify-center gap-2 self-stretch rounded-lg px-[18px] py-2.5 shadow">
+            variant="destructive"
+            className="inline-flex w-full items-center justify-center gap-2 self-stretch rounded-lg px-[18px] py-2.5 font-semibold shadow"
+          >
             확인
           </Button>
-          <Button variant="outline" className="font-semibold w-full inline-flex items-center justify-center gap-2 self-stretch rounded-lg border border-gray-300 px-[18px] py-2.5 shadow text-gray-700">
+          <Button
+            variant="outline"
+            className="inline-flex w-full items-center justify-center gap-2 self-stretch rounded-lg border border-gray-300 px-[18px] py-2.5 font-semibold text-gray-700 shadow"
+          >
             취소
           </Button>
         </div>

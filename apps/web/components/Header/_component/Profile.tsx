@@ -1,13 +1,15 @@
 "use client"
 
 import { LoaderCircle, LogOut, User, Users } from "lucide-react"
+import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
 import React from "react"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import ROUTES from "@/constants/routes"
+import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
+import { Button } from "@repo/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +17,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
+} from "@repo/ui/dropdown-menu"
 
 interface MenuItemProps {
   icon: React.ReactNode
@@ -54,7 +54,11 @@ const Profile = ({ mode }: ProfileProps) => {
         {status === "loading" ? (
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
-          <Button className={cn("text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]")}>
+          <Button
+            className={cn(
+              "rounded-full bg-blue-500 px-[37px] py-[10.5px] text-lg font-semibold text-white"
+            )}
+          >
             <Link href={ROUTES.LOGIN}>Login</Link>
           </Button>
         )}
@@ -86,10 +90,7 @@ const Profile = ({ mode }: ProfileProps) => {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
-        <MenuItem
-          icon={<User size={iconSize} />}
-          href={ROUTES.PROFILE.INDEX}
-        >
+        <MenuItem icon={<User size={iconSize} />} href={ROUTES.PROFILE.INDEX}>
           내 프로필
         </MenuItem>
         <MenuItem icon={<Users size={iconSize} />} href="#">

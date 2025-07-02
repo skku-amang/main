@@ -2,8 +2,8 @@ import { useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import z from "zod"
 
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { Checkbox } from "@repo/ui/checkbox"
+import { Label } from "@repo/ui/label"
 
 import { memberSessionRequiredBaseSchema } from "./schema"
 
@@ -37,7 +37,7 @@ const MemberSessionRequiredCheckbox = ({
         }}
         checked={checked}
       />
-      <Label htmlFor={requiredFieldName} className="text-xs md:text-sm md:w-32">
+      <Label htmlFor={requiredFieldName} className="text-xs md:w-32 md:text-sm">
         {label}
       </Label>
     </div>

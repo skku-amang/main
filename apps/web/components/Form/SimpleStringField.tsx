@@ -1,5 +1,10 @@
-import { FormControl, FormField, FormItem, FormMessage } from "../ui/form"
-import { Input } from "../ui/input"
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage
+} from "../../../../packages/ui/src/form"
+import { Input } from "../../../../packages/ui/src/input"
 import SimpleDescription from "./SimpleDescription"
 import SimpleLabel from "./SimpleLabel"
 

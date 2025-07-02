@@ -1,7 +1,7 @@
 import React from "react"
 
+import { FormLabel } from "../../../../packages/ui/src/form"
 import { cn } from "../../lib/utils"
-import { FormLabel } from "../ui/form"
 
 interface Prop {
   children: React.ReactNode
@@ -16,7 +16,10 @@ const SimpleLabel: React.FC<Prop> = ({
   required,
   htmlFor
 }) => (
-  <FormLabel className={cn("text-slate-900 text-xs md:text-sm", className)} htmlFor={htmlFor}>
+  <FormLabel
+    className={cn("text-xs text-slate-900 md:text-sm", className)}
+    htmlFor={htmlFor}
+  >
     {children} {required && <span className="text-destructive">*</span>}
   </FormLabel>
 )

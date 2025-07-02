@@ -1,10 +1,5 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { FormControl, FormField, FormItem, FormMessage } from "@repo/ui/form"
+import { Input } from "@repo/ui/input"
 
 import SimpleDescription from "./SimpleDescription"
 import SimpleLabel from "./SimpleLabel"

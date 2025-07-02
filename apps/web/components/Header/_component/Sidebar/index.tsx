@@ -7,7 +7,7 @@ import {
   SheetTrigger
 } from "@/components/Header/_component/Sidebar/Sheet"
 import SheetInnerContent from "@/components/Header/_component/Sidebar/SheetInnerContent"
-import { SheetTitle } from "@/components/ui/sheet"
+import { SheetTitle } from "@repo/ui/sheet"
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)

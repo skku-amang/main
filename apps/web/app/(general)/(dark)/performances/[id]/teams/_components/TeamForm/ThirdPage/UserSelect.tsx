@@ -1,8 +1,10 @@
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { User } from "@/types/User"
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
+import { Button } from "@repo/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -10,14 +12,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { User } from "@/types/User"
+} from "@repo/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover"
 
 interface UserSelectProps {
   users: User[]
@@ -47,7 +43,7 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-52 md:w-[360px] justify-between",
+            "w-52 justify-between md:w-[360px]",
             hasError && "border-destructive"
           )}
         >

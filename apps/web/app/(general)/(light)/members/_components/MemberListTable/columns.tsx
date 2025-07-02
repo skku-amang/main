@@ -4,11 +4,11 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import React from "react"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { formatGenerationOrder } from "@/lib/utils"
 import { Session } from "@/types/Session"
 import { User } from "@/types/User"
+import { Badge } from "@repo/ui/badge"
+import { Button } from "@repo/ui/button"
 
 const SortButton = ({
   column,

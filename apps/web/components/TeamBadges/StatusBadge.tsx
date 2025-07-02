@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { Badge } from "@repo/ui/badge"
 
 interface StatusBadgeProps {
   status: "Inactive" | "Active"
@@ -14,7 +14,7 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
         status === "Inactive"
           ? "bg-red-100 text-destructive"
           : "bg-green-100 text-green-600",
-        "text-md rounded-full border-none px-4 py-0.5 lg:py-1 font-semibold",
+        "text-md rounded-full border-none px-4 py-0.5 font-semibold lg:py-1",
         className
       )}
     >

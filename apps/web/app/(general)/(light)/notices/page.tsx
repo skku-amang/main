@@ -1,7 +1,7 @@
-import Link from 'next/link'
+import Link from "next/link"
 
-import { Button } from '@/components/ui/button'
-import ROUTES from '@/constants/routes'
+import ROUTES from "@/constants/routes"
+import { Button } from "@repo/ui/button"
 
 const NoticeList = () => {
   return (

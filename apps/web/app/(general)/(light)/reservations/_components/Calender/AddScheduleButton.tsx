@@ -1,12 +1,12 @@
 import { PlusCircle } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog"
+} from "@repo/ui/dialog"
 
 export function AddScheduleButton({ className }: { className?: string }) {
   return (

@@ -1,7 +1,7 @@
 import { Check } from "lucide-react"
 import { FieldError } from "react-hook-form"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 
 interface YoutubeSubmitButtonProps {
   error?: FieldError
@@ -14,11 +14,7 @@ const YoutubeSubmitButton = ({
 }: YoutubeSubmitButtonProps) => {
   if (error) {
     // Error
-    return (
-      <div className="text-sm rounded text-destructive">
-        Failed
-      </div>
-    )
+    return <div className="rounded text-sm text-destructive">Failed</div>
   } else if (isSubmitted) {
     // Success
     return (

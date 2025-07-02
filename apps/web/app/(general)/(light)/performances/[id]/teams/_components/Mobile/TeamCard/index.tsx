@@ -9,11 +9,11 @@ import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import TeamDeleteButton from "@/components/TeamDeleteButton"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { MemberSession } from "@/types/Team"
 import { User } from "@/types/User"
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
+import { Button } from "@repo/ui/button"
 
 interface TeamCardProps {
   performanceId: number
