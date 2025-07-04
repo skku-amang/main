@@ -31,5 +31,5 @@ jobs:
       - name: Run Tests
         run: pnpm turbo test
 
-      # - name: Run Build
-      #   run: pnpm turbo build
+      - name: Run Build
+        run: pnpm turbo build
