@@ -5,7 +5,8 @@ import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
-import { signInSchema, signUpSchema } from "@/constants/zodSchema"
+import { signInSchema } from "@/constants/zodSchema"
+import { signUpSchema } from "@/constants/zodSchema"
 import {
   DuplicatedCredentialsError,
   InternalServerError,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/auth/errors"
 import { isAccessTokenExpired } from "@/lib/auth/utils"
 import fetchData from "@/lib/fetch"
-import { AuthData } from "shared-types"
+import { AuthData } from "@/types/auth"
 
 const authOptions: NextAuthConfig = {
   providers: [
@@ -120,7 +121,7 @@ async function _signIn(
   // 요청 전송
   const apiEndpoint =
     type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
-
+  
   const res = await fetchData(apiEndpoint as ApiEndpoint, {
     body: JSON.stringify(body),
     cache: "no-store",

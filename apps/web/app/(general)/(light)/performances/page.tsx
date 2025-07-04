@@ -12,8 +12,8 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
+import { Performance } from "@/types/Performance"
 import { Button } from "@repo/ui/button"
-import { Performance } from "shared-types"
 
 const PerformanceList = async () => {
   const session = await auth()

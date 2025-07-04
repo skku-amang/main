@@ -1,10 +1,20 @@
-import type { AuthData } from "shared-types"
+export type AuthData = {
+  id: string | undefined
+  name: string
+  nickname: string
+  image?: string | null
+  email: string
+  position: string
+  is_admin: boolean
+  access: string
+  refresh: string
+}
 
-declare module "next-auth" {
+export declare module "next-auth" {
   interface User extends AuthData {}
   interface Session extends AuthData {}
 }
 
-declare module "@auth/core/jwt" {
+export declare module "@auth/core/jwt" {
   interface JWT extends AuthData {}
 }

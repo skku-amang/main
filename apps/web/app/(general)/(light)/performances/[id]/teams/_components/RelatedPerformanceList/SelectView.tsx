@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import ROUTES from "@/constants/routes"
+import { Performance } from "@/types/Performance"
 import {
   Select,
   SelectContent,
@@ -11,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@repo/ui/select"
-import { Performance } from "shared-types"
 
 interface SelectViewProps {
   currentPerformanceId: number
