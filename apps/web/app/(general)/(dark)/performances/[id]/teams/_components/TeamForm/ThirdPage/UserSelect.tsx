@@ -17,7 +17,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { User } from "@/types/User"
+import { User } from "shared-types"
 
 interface UserSelectProps {
   users: User[]
@@ -47,7 +47,7 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-52 md:w-[360px] justify-between",
+            "w-52 justify-between md:w-[360px]",
             hasError && "border-destructive"
           )}
         >

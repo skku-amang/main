@@ -6,9 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName } from "@/types/Session"
-import { Team } from "@/types/Team"
-import { User } from "@/types/User"
+import { SessionName, Team, User } from "shared-types"
 
 interface MemberSessionCardProps {
   teamId: number
@@ -88,7 +86,7 @@ const MemberSessionCard = ({
             #{user.nickname}
           </div>
         </div>
-        
+
         {/* 탈퇴 버튼 */}
         {user.id.toString() === authSession.data?.id && (
           <button

@@ -5,8 +5,7 @@ import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
-import { signInSchema } from "@/constants/zodSchema"
-import { signUpSchema } from "@/constants/zodSchema"
+import { signInSchema, signUpSchema } from "@/constants/zodSchema"
 import {
   DuplicatedCredentialsError,
   InternalServerError,
@@ -121,7 +120,7 @@ async function _signIn(
   // 요청 전송
   const apiEndpoint =
     type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
-  
+
   const res = await fetchData(apiEndpoint as ApiEndpoint, {
     body: JSON.stringify(body),
     cache: "no-store",

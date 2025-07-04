@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import {
   ColumnDef,
@@ -10,14 +10,14 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable
-} from '@tanstack/react-table'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { TbFilter } from 'react-icons/tb'
+} from "@tanstack/react-table"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { TbFilter } from "react-icons/tb"
 
-import FilterSection, { FilterLabel } from '@/components/Filter'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import FilterSection, { FilterLabel } from "@/components/Filter"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -25,9 +25,9 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
-import ROUTES from '@/constants/routes'
-import { User } from '@/types/User'
+} from "@/components/ui/table"
+import ROUTES from "@/constants/routes"
+import { User } from "shared-types"
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<User, TValue>[]
@@ -35,12 +35,12 @@ interface DataTableProps<TValue> {
 }
 
 const ExampleFilterArray: FilterLabel[] = [
-  { id: 1, label: '모두' },
-  { id: 2, label: '보컬 1' },
-  { id: 3, label: '기타' },
-  { id: 4, label: '신디' },
-  { id: 5, label: '베이스' },
-  { id: 6, label: '드럼' }
+  { id: 1, label: "모두" },
+  { id: 2, label: "보컬 1" },
+  { id: 3, label: "기타" },
+  { id: 4, label: "신디" },
+  { id: 5, label: "베이스" },
+  { id: 6, label: "드럼" }
 ]
 
 export function MemberListDataTable<TValue>({
@@ -74,9 +74,9 @@ export function MemberListDataTable<TValue>({
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="검색"
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -88,10 +88,7 @@ export function MemberListDataTable<TValue>({
           </Button>
           {filter && (
             <div className="absolute right-0 top-11 z-50 flex h-[21rem] w-[15rem] rounded-sm bg-white shadow-xl">
-              <FilterSection
-                header="세션"
-                filterObject={ExampleFilterArray}
-              />
+              <FilterSection header="세션" filterObject={ExampleFilterArray} />
             </div>
           )}
         </div>
@@ -124,12 +121,10 @@ export function MemberListDataTable<TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                   className="hover:cursor-pointer"
                   onClick={() =>
-                    router.push(
-                      ROUTES.MEMBER.DETAIL(row.original.id)
-                    )
+                    router.push(ROUTES.MEMBER.DETAIL(row.original.id))
                   }
                 >
                   {row.getVisibleCells().map((cell) => (

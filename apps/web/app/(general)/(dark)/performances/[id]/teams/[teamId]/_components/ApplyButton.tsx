@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 
 import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
-import { SessionName } from "@/types/Session"
+import { SessionName } from "shared-types"
 
 interface ApplyButtonProps {
   session: SessionName
@@ -49,7 +49,10 @@ const ApplyButton = ({
   }, [])
 
   return (
-    <button className="relative h-full w-full" onClick={() => toggleSelectedSessionWithIndex(memberSessionWithIndex)}>
+    <button
+      className="relative h-full w-full"
+      onClick={() => toggleSelectedSessionWithIndex(memberSessionWithIndex)}
+    >
       <div
         className={cn(
           "relative flex h-[100px] w-full items-center overflow-hidden rounded bg-slate-50 max-[470px]:h-[60px] md:h-[160px] md:w-[250px] md:overflow-visible",
@@ -90,7 +93,8 @@ const ApplyButton = ({
         />
         {/* 세션명 */}
         <div className="absolute right-[8px] z-10 text-center text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
-          {session}{memberSessionIndex}
+          {session}
+          {memberSessionIndex}
         </div>
       </div>
       <div

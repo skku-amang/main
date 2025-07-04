@@ -23,7 +23,7 @@ import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
+import { MemberSessionSet, SessionOrder, Team } from "shared-types"
 
 interface Props {
   params: Promise<{

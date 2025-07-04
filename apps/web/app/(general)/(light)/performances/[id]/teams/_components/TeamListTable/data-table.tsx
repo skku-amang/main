@@ -38,8 +38,7 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
-import { Performance } from "@/types/Performance"
-import { MemberSession, MemberSessionSet } from "@/types/Team"
+import { MemberSession, MemberSessionSet, Performance } from "shared-types"
 
 import {
   Select,
