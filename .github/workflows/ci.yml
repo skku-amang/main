@@ -25,11 +25,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate Prisma Client
+        run: pnpm turbo db:generate
+
       - name: Run Lint
         run: pnpm turbo lint
 
       - name: Run Tests
         run: pnpm turbo test
 
-      # - name: Run Build
-      #   run: pnpm turbo build
+      - name: Run Build
+        run: pnpm turbo build
