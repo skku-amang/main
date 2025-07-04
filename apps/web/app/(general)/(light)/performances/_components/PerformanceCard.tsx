@@ -4,8 +4,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { IoLocationSharp } from "react-icons/io5"
 
-import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
 import {
   Card,
   CardContent,
@@ -13,7 +11,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from "@repo/ui/card"
+} from "@/components/ui/card"
+import ROUTES from "@/constants/routes"
+import { cn } from "@/lib/utils"
 
 interface PerformanceCardProp {
   id?: number

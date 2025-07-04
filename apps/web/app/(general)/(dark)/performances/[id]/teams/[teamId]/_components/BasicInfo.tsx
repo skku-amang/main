@@ -1,12 +1,12 @@
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   formatGenerationOrder,
   getRepresentativeRelativeTime
 } from "@/lib/utils"
 import { MemberSessionSet, Team } from "@/types/Team"
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar"
 
 interface BasicInfoProps {
   team: Team

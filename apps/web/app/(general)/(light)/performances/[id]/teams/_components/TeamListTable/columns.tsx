@@ -18,17 +18,17 @@ import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
-import ROUTES from "@/constants/routes"
-import YoutubeVideo from "@/lib/youtube"
-import { MemberSession, MemberSessionSet } from "@/types/Team"
-import { User } from "@/types/User"
-import { Button } from "@repo/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from "@repo/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
+import ROUTES from "@/constants/routes"
+import YoutubeVideo from "@/lib/youtube"
+import { MemberSession, MemberSessionSet } from "@/types/Team"
+import { User } from "@/types/User"
 
 export type TeamColumn = {
   performanceId: number

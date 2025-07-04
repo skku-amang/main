@@ -1,5 +1,5 @@
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Badge } from "@repo/ui/badge"
 
 interface FreshmenFixedBadgeProps {
   className?: string
@@ -7,18 +7,21 @@ interface FreshmenFixedBadgeProps {
   size: "small" | "large"
 }
 
-const BasicTeamBadge = ({ className, content }: FreshmenFixedBadgeProps) => {
-  return (
-    <Badge
-      className={cn(
-        className,
-        "lg:text-md h-5 bg-blue-100 p-2 text-[10px] text-third hover:bg-blue-100 lg:h-10 lg:rounded-full lg:px-4 lg:py-1"
-      )}
-    >
-      <span className="me-2 hidden font-extrabold lg:block">●</span>
-      {content}
-    </Badge>
-  )
+const BasicTeamBadge = ({
+  className,
+  content
+}: FreshmenFixedBadgeProps) => {
+    return (
+      <Badge
+        className={cn(
+          className,
+          "h-5 bg-blue-100 text-third text-[10px] hover:bg-blue-100 p-2 lg:h-10 lg:text-md lg:rounded-full lg:px-4 lg:py-1"
+        )}
+      >
+        <span className="hidden lg:block me-2 font-extrabold">●</span>
+        {content}
+      </Badge>
+    )
 }
 
 export default BasicTeamBadge

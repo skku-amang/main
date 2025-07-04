@@ -8,12 +8,12 @@ import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import Search from "@/components/Search"
+import { Button } from "@/components/ui/button"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { Performance } from "@/types/Performance"
-import { Button } from "@repo/ui/button"
 
 const PerformanceList = async () => {
   const session = await auth()

@@ -33,6 +33,6 @@
     "../../packages/shared-types/src/Performance.ts",
     "../../packages/shared-types/src/Notice.ts",
     "../../packages/shared-types/src/Generation.ts"
-, "../../packages/ui/src/button.tsx", "../../packages/ui/src/calendar.tsx", "../../packages/ui/src/card.tsx", "../../packages/ui/src/checkbox.tsx", "../../packages/ui/src/command.tsx", "../../packages/ui/src/avatar.tsx", "../../packages/ui/src/badge.tsx", "../../packages/ui/src/datetimePicker.tsx", "../../packages/ui/src/dialog.tsx", "../../packages/ui/src/dropdown-menu.tsx", "../../packages/ui/src/form.tsx", "../../packages/ui/src/hover-card.tsx", "../../packages/ui/src/input.tsx", "../../packages/ui/src/label.tsx", "../../packages/ui/src/pagination.tsx", "../../packages/ui/src/popover.tsx", "../../packages/ui/src/select.tsx", "../../packages/ui/src/separator.tsx", "../../packages/ui/src/sheet.tsx", "../../packages/ui/src/switch.tsx", "../../packages/ui/src/table.tsx", "../../packages/ui/src/textarea.tsx", "../../packages/ui/src/toast.tsx", "../../packages/ui/src/toaster.tsx"  ],
+  ],
   "exclude": ["node_modules"]
 }

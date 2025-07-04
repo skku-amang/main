@@ -1,5 +1,5 @@
+import { Button, ButtonProps } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Button, ButtonProps } from "@repo/ui/button"
 
 const TeamHeaderButton = (props: ButtonProps) => {
   const { children, className } = props

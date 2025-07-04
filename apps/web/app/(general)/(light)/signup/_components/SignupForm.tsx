@@ -10,15 +10,8 @@ import { z } from "zod"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
-import ROUTES from "@/constants/routes"
-import { signUpSchema as _signUpSchema, password } from "@/constants/zodSchema"
-import {
-  DuplicatedCredentialsErrorCode,
-  InvalidSignupCredentialsErrorCode
-} from "@/lib/auth/errors"
-import { formatGenerationOrder } from "@/lib/utils"
-import { Button } from "@repo/ui/button"
-import { Checkbox } from "@repo/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -27,14 +20,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from "@repo/ui/form"
+} from "@/components/ui/form"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@repo/ui/select"
+} from "@/components/ui/select"
+import ROUTES from "@/constants/routes"
+import { signUpSchema as _signUpSchema, password } from "@/constants/zodSchema"
+import {
+  DuplicatedCredentialsErrorCode,
+  InvalidSignupCredentialsErrorCode
+} from "@/lib/auth/errors"
+import { formatGenerationOrder } from "@/lib/utils"
 
 const signUpSchema = _signUpSchema
   .merge(z.object({ confirmPassword: password }))

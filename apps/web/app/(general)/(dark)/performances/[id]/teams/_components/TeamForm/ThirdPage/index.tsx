@@ -5,10 +5,10 @@ import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { Form } from "@/components/ui/form"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { User } from "@/types/User"
-import { Form } from "@repo/ui/form"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
@@ -50,7 +50,7 @@ const ThirdPage = ({
     <Form {...form}>
       <form>
         <Description header="팀원 정보" className="mb-6">
-          <CircleAlert className="h-2.5 w-2.5 text-gray-600 md:h-4 md:w-4" />
+          <CircleAlert className="h-2.5 w-2.5 md:h-4 md:w-4 text-gray-600" />
           이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 후 멤버를
           선택해주세요
           <br />
@@ -66,7 +66,7 @@ const ThirdPage = ({
               if (!required) return
               return (
                 <tr key={`${session}-${index}`} className="my-3">
-                  <td className="text-xs text-gray-900 md:w-32 md:text-base">
+                  <td className="md:w-32 text-xs md:text-base text-gray-900">
                     {session}
                     {index}
                   </td>

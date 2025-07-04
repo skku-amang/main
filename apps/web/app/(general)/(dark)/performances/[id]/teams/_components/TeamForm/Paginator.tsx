@@ -1,8 +1,9 @@
 import { ArrowRight, ChevronLeft } from "lucide-react"
+import React from "react"
 import { GoDot, GoDotFill } from "react-icons/go"
 
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Button } from "@repo/ui/button"
 
 const PaginatorButton = ({
   isFirst,
@@ -19,23 +20,15 @@ const PaginatorButton = ({
 }) => {
   return (
     <Button
-      className={cn(
-        `md:text-md h-8 rounded-none p-4 text-xs font-semibold text-secondary disabled:text-gray-500 md:h-10`,
-        mode === "next" ? "border-2 border-secondary" : "border-none",
-        className
-      )}
+      className={cn(`h-8 md:h-10 rounded-none text-xs md:text-md p-4 text-secondary disabled:text-gray-500 font-semibold`, mode === "next" ? "border-2 border-secondary" : "border-none", className)}
       variant="outline"
       disabled={isFirst && mode === "prev"}
       onClick={onClick}
       type="button"
     >
-      {mode === "prev" && (
-        <ChevronLeft className="me-2 h-4 w-4 text-mainText md:h-6 md:w-6" />
-      )}
+      {mode === "prev" && <ChevronLeft className="me-2 w-4 h-4 md:w-6 md:h-6 text-mainText" />}
       {mode === "prev" ? "Back" : !isLast ? "Next" : "Complete"}
-      {mode === "next" && !isLast && (
-        <ArrowRight className="ms-2 h-4 w-4 text-secondary md:h-6 md:w-6" />
-      )}
+      {mode === "next" && !isLast && <ArrowRight className="ms-2 w-4 h-4 md:w-6 md:h-6 text-secondary" />}
     </Button>
   )
 }
@@ -62,22 +55,14 @@ const Paginator = ({
         isFirst={currentPage === 1}
         onClick={onPrevious}
         mode="prev"
-      />
+        />
 
       <div className="flex items-center gap-x-1 md:gap-x-3">
         {Array.from({ length: totalPage }).map((_, index) =>
           currentPage === index + 1 ? (
-            <GoDotFill
-              key={index}
-              size={28}
-              className="h-4 w-4 text-primary md:h-7 md:w-7"
-            />
+            <GoDotFill key={index} size={28} className="text-primary w-4 h-4 md:w-7 md:h-7" />
           ) : (
-            <GoDot
-              key={index}
-              size={28}
-              className="h-4 w-4 text-gray-500 md:h-7 md:w-7"
-            />
+            <GoDot key={index} size={28} className="text-gray-500 w-4 h-4 md:w-7 md:h-7" />
           )
         )}
       </div>

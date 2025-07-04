@@ -3,15 +3,15 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-import ROUTES from "@/constants/routes"
-import { Performance } from "@/types/Performance"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@repo/ui/select"
+} from "@/components/ui/select"
+import ROUTES from "@/constants/routes"
+import { Performance } from "@/types/Performance"
 
 interface SelectViewProps {
   currentPerformanceId: number

@@ -1,19 +1,16 @@
 import Link from "next/link"
 
+import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 import { Performance } from "@/types/Performance"
-import { Button } from "@repo/ui/button"
 
 interface SelectViewProps {
   currentPerformanceId: number
   performanceOptions: Performance[]
 }
 
-const ButtonView = ({
-  currentPerformanceId,
-  performanceOptions
-}: SelectViewProps) => {
+const ButtonView = ({ currentPerformanceId, performanceOptions }: SelectViewProps) => {
   return (
     <div>
       <p className="mb-8 text-center font-bold">Performances</p>

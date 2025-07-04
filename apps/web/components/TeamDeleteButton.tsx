@@ -3,15 +3,15 @@ import { useRouter } from "next/navigation"
 import React, { useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
-import useTeamDelete from "@/hooks/useTeamDelete"
-import { Button } from "@repo/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
   DialogTrigger
-} from "@repo/ui/dialog"
+} from "@/components/ui/dialog"
+import useTeamDelete from "@/hooks/useTeamDelete"
 
 interface TeamDeleteButtonProps {
   className?: string

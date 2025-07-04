@@ -5,8 +5,8 @@ import { SessionProvider } from "next-auth/react"
 import localFont from "next/font/local"
 import React from "react"
 
+import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
-import { Toaster } from "@repo/ui/toaster"
 
 const pretendard = localFont({
   src: "../public/fonts/PretendardVariable.woff2",

@@ -1,5 +1,5 @@
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Badge } from "@repo/ui/badge"
 
 interface SessionBadgeProps {
   session: string
@@ -10,7 +10,7 @@ const SessionBadge = ({ session, className }: SessionBadgeProps) => {
   return (
     <Badge
       className={cn(
-        "h-5 select-none text-nowrap rounded bg-slate-200 px-2 text-xs font-normal text-neutral-600 hover:bg-slate-200",
+        "h-5 rounded bg-slate-200 hover:bg-slate-200 text-xs font-normal text-neutral-600 text-nowrap px-2 select-none",
         className
       )}
     >

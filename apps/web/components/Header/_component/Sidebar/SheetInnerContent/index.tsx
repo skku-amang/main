@@ -10,13 +10,13 @@ import {
   Music4,
   Youtube
 } from "lucide-react"
-import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
+import { signOut, useSession } from "next-auth/react"
 import { FaCircle } from "react-icons/fa"
 
+import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import SOCIAL from "@/constants/social"
-import { Separator } from "@repo/ui/separator"
 
 import NavLink from "./NavLink"
 import NavLinkHeader from "./NavLinkHeader"
@@ -25,11 +25,7 @@ const iconSize = 24
 const iconcolor = "text-gray-500"
 
 // eslint-disable-next-line no-unused-vars
-const SheetInnerContent = ({
-  setIsOpen
-}: {
-  setIsOpen: (state: boolean) => void
-}) => {
+const SheetInnerContent = ({ setIsOpen }: { setIsOpen: (state: boolean) => void}) => {
   const { data: session } = useSession()
 
   return (

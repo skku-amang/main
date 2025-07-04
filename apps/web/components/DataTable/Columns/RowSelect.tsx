@@ -1,15 +1,12 @@
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from '@tanstack/react-table'
 
-import { Checkbox } from "@repo/ui/checkbox"
+import { Checkbox } from '@/components/ui/checkbox'
 
 const rowSelect: ColumnDef<unknown> = {
-  id: "select",
+  id: 'select',
   header: ({ table }) => (
     <Checkbox
-      checked={
-        table.getIsAllPageRowsSelected() ||
-        (table.getIsSomePageRowsSelected() && "indeterminate")
-      }
+      checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
       aria-label="Select all"
     />

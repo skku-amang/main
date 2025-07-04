@@ -1,12 +1,7 @@
-import { DatePicker } from "../../../../packages/ui/src/datetimePicker"
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage
-} from "../../../../packages/ui/src/form"
-import SimpleDescription from "./SimpleDescription"
-import SimpleLabel from "./SimpleLabel"
+import { DatePicker } from '../ui/datetimePicker'
+import { FormControl, FormField, FormItem, FormMessage } from '../ui/form'
+import SimpleDescription from './SimpleDescription'
+import SimpleLabel from './SimpleLabel'
 
 interface Prop {
   form: any

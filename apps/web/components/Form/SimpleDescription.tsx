@@ -1,8 +1,12 @@
-import React from "react"
+import React from 'react'
 
-import { FormDescription } from "../../../../packages/ui/src/form"
+import { FormDescription } from '../ui/form'
 
-const SimpleDescription = ({ children }: { children: React.ReactNode }) => {
+const SimpleDescription = ({
+  children
+}: {
+  children: React.ReactNode
+}) => {
   return (
     <>
       {children && (

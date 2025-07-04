@@ -1,5 +1,5 @@
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Badge } from "@repo/ui/badge"
 
 interface FreshmenFixedBadgeProps {
   className?: string
@@ -15,7 +15,7 @@ const FreshmenFixedBadge = ({
     return (
       <Badge
         className={cn(
-          "h-4 bg-blue-100 p-2 text-[0.7rem] font-bold text-third hover:bg-blue-100 lg:h-5",
+          "h-4 text-[0.7rem] font-bold lg:h-5 p-2 bg-blue-100 text-third hover:bg-blue-100",
           className
         )}
       >

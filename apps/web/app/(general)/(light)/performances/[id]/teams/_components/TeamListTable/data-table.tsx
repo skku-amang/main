@@ -30,12 +30,16 @@ import {
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
 import Search from "@/components/Search"
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { Performance } from "@/types/Performance"
 import { MemberSession, MemberSessionSet } from "@/types/Team"
-import { Button } from "@repo/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover"
-import { Separator } from "@repo/ui/separator"
 
 import {
   Select,

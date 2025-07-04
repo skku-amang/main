@@ -18,12 +18,12 @@ import NotFoundPage from "@/app/_(errors)/NotFound"
 import { useToast } from "@/components/hooks/use-toast"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import { Button } from "@/components/ui/button"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import YoutubePlayer from "@/lib/youtube/Player"
 import { MemberSessionSet, SessionOrder, Team } from "@/types/Team"
-import { Button } from "@repo/ui/button"
 
 interface Props {
   params: Promise<{

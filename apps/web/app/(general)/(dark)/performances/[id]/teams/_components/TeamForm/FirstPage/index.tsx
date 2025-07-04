@@ -7,29 +7,29 @@ import { z } from "zod"
 import YoutubeDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeDialog"
 import YoutubeSubmitButton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
 import SimpleLabel from "@/components/Form/SimpleLabel"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
-import { cn } from "@/lib/utils"
-import YoutubeVideo from "@/lib/youtube"
-import YoutubePlayer from "@/lib/youtube/Player"
-import { Performance } from "@/types/Performance"
-import { Checkbox } from "@repo/ui/checkbox"
-import { Form } from "@repo/ui/form"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Form } from "@/components/ui/form"
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger
-} from "@repo/ui/hover-card"
-import { Input } from "@repo/ui/input"
-import { Label } from "@repo/ui/label"
+} from "@/components/ui/hover-card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@repo/ui/select"
-import { Textarea } from "@repo/ui/textarea"
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import API_ENDPOINTS from "@/constants/apiEndpoints"
+import fetchData from "@/lib/fetch"
+import { cn } from "@/lib/utils"
+import YoutubeVideo from "@/lib/youtube"
+import YoutubePlayer from "@/lib/youtube/Player"
+import { Performance } from "@/types/Performance"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
