@@ -11,6 +11,11 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "test": {
+      "dependsOn": ["^test"],
+      "persistent": true,
+      "env": ["NODE_ENV"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
