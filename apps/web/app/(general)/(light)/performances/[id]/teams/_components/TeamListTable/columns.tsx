@@ -126,7 +126,6 @@ export const columns: ColumnDef<TeamColumn>[] = [
           {row.original.songName}
           {!row.original.posterImage && (
             <span>
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3 font-normal text-neutral-500" />
             </span>
           )}

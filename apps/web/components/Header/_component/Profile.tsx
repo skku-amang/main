@@ -1,9 +1,9 @@
 "use client"
 
 import { LoaderCircle, LogOut, User, Users } from "lucide-react"
+import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
 import React from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -41,11 +41,7 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   )
 }
 
-interface ProfileProps {
-  mode?: "light" | "dark"
-}
-
-const Profile = ({ mode }: ProfileProps) => {
+const Profile = () => {
   const { status, data: session } = useSession()
 
   if (!session) {

@@ -50,7 +50,6 @@ const TeamCard = ({
             <div className="flex items-center gap-x-2">
               <h4 className="flex items-center gap-x-1 self-stretch font-bold text-slate-700">
                 {songName}
-                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 {image && (
                   <span>
                     <Image className="h-3 w-3 font-normal text-neutral-500" />
