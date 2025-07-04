@@ -39,12 +39,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared-types
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.29.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.7(@swc/cli@0.6.0(@swc/core@1.12.9)(chokidar@4.0.3))(@swc/core@1.12.9)(@types/node@22.15.3)
@@ -54,6 +48,12 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3)
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@swc/cli':
         specifier: ^0.6.0
         version: 0.6.0(@swc/core@1.12.9)(chokidar@4.0.3)
@@ -67,29 +67,17 @@ importers:
         specifier: ^29.5.14
         version: 29.5.14
       '@types/node':
-        specifier: ^22.10.7
+        specifier: ^22.15.3
         version: 22.15.3
       '@types/supertest':
         specifier: ^6.0.2
         version: 6.0.3
       eslint:
-        specifier: ^9.18.0
+        specifier: ^9.29.0
         version: 9.29.0(jiti@1.21.7)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.1(eslint@9.29.0(jiti@1.21.7))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.1(@types/eslint@9.6.1)(eslint-config-prettier@10.1.1(eslint@9.29.0(jiti@1.21.7)))(eslint@9.29.0(jiti@1.21.7))(prettier@3.6.0)
-      globals:
-        specifier: ^16.0.0
-        version: 16.2.0
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.15.3)(ts-node@10.9.2(@swc/core@1.12.9)(@types/node@22.15.3)(typescript@5.8.2))
-      prettier:
-        specifier: ^3.4.2
-        version: 3.6.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -109,11 +97,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 5.8.2
         version: 5.8.2
-      typescript-eslint:
-        specifier: ^8.20.0
-        version: 8.34.0(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.2)
 
   apps/web:
     dependencies:
@@ -247,6 +232,12 @@ importers:
         specifier: ^2.0.2
         version: 2.0.7(zod@3.25.67)
     devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^20
         version: 20.19.2
@@ -1250,10 +1241,6 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
-
-  '@pkgr/core@0.2.7':
-    resolution: {integrity: sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg==}
-    engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
   '@radix-ui/number@1.1.1':
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
@@ -2971,20 +2958,6 @@ packages:
     resolution: {integrity: sha512-2tktqUAT+Q3hCAU0iSf4xAN1k9zOpjK5WO8104mB0rT/dGhOa09582HN5HlbxNbPRZ0THV7nLGvzugcNOSjzfA==}
     engines: {node: '>=6'}
 
-  eslint-plugin-prettier@5.5.1:
-    resolution: {integrity: sha512-dobTkHT6XaEVOo8IO90Q4DOSxnm3Y151QxPJlM/vKC0bVy+d6cVWQZLlFiuZPP0wS6vZwSKeJgKkcS+KfMBlRw==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      '@types/eslint': '>=8.0.0'
-      eslint: '>=8.0.0'
-      eslint-config-prettier: '>= 7.0.0 <10.0.0 || >=10.1.0'
-      prettier: '>=3.0.0'
-    peerDependenciesMeta:
-      '@types/eslint':
-        optional: true
-      eslint-config-prettier:
-        optional: true
-
   eslint-plugin-react-hooks@5.2.0:
     resolution: {integrity: sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==}
     engines: {node: '>=10'}
@@ -3121,9 +3094,6 @@ packages:
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
-
-  fast-diff@1.3.0:
-    resolution: {integrity: sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==}
 
   fast-fifo@1.3.2:
     resolution: {integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==}
@@ -4665,10 +4635,6 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-linter-helpers@1.0.0:
-    resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
-    engines: {node: '>=6.0.0'}
-
   prettier@3.6.0:
     resolution: {integrity: sha512-ujSB9uXHJKzM/2GBuE0hBOUgC77CN3Bnpqa+g80bkv3T3A93wL/xlzDATHhnhkzifz/UE2SNOvmbTz5hSkDlHw==}
     engines: {node: '>=14'}
@@ -5284,10 +5250,6 @@ packages:
   symbol-observable@4.0.0:
     resolution: {integrity: sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ==}
     engines: {node: '>=0.10'}
-
-  synckit@0.11.8:
-    resolution: {integrity: sha512-+XZ+r1XGIJGeQk3VvXhT6xx/VpbHsRzsTkGgF6E5RX9TTXD0118l87puaEBZ566FhqblC6U0d4XnubznJDm30A==}
-    engines: {node: ^14.18.0 || >=16.0.0}
 
   tailwind-merge@2.6.0:
     resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
@@ -6886,8 +6848,6 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
-
-  '@pkgr/core@0.2.7': {}
 
   '@radix-ui/number@1.1.1': {}
 
@@ -8830,16 +8790,6 @@ snapshots:
 
   eslint-plugin-only-warn@1.1.0: {}
 
-  eslint-plugin-prettier@5.5.1(@types/eslint@9.6.1)(eslint-config-prettier@10.1.1(eslint@9.29.0(jiti@1.21.7)))(eslint@9.29.0(jiti@1.21.7))(prettier@3.6.0):
-    dependencies:
-      eslint: 9.29.0(jiti@1.21.7)
-      prettier: 3.6.0
-      prettier-linter-helpers: 1.0.0
-      synckit: 0.11.8
-    optionalDependencies:
-      '@types/eslint': 9.6.1
-      eslint-config-prettier: 10.1.1(eslint@9.29.0(jiti@1.21.7))
-
   eslint-plugin-react-hooks@5.2.0(eslint@9.29.0(jiti@1.21.7)):
     dependencies:
       eslint: 9.29.0(jiti@1.21.7)
@@ -9050,8 +9000,6 @@ snapshots:
   extsprintf@1.3.0: {}
 
   fast-deep-equal@3.1.3: {}
-
-  fast-diff@1.3.0: {}
 
   fast-fifo@1.3.2: {}
 
@@ -10827,10 +10775,6 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-linter-helpers@1.0.0:
-    dependencies:
-      fast-diff: 1.3.0
-
   prettier@3.6.0: {}
 
   pretty-format@29.7.0:
@@ -11575,10 +11519,6 @@ snapshots:
       upper-case: 1.1.3
 
   symbol-observable@4.0.0: {}
-
-  synckit@0.11.8:
-    dependencies:
-      '@pkgr/core': 0.2.7
 
   tailwind-merge@2.6.0: {}
 
