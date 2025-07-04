@@ -41,7 +41,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger
-} from "@repo/ui/SortSelect"
+} from "../Mobile/SortSelect"
 import { TeamColumn } from "./columns"
 import {
   Drawer,
