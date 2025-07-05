@@ -6,6 +6,7 @@ module.exports = {
     "plugin:react-hooks/recommended",
     "plugin:@next/next/recommended",
     "plugin:@next/next/core-web-vitals",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
     "prettier"
   ],
   parser: "@typescript-eslint/parser",
@@ -36,7 +37,10 @@ module.exports = {
     "no-undef": "off", // TypeScript가 처리
     "react/no-unknown-property": ["error", {
       "ignore": ["cmdk-input-wrapper"]
-    }]
+    }],
+    "@tanstack/query/exhaustive-deps": "error",
+    "@tanstack/query/stable-query-client": "error",
+    "@tanstack/query/no-rest-destructuring": "warn"
   },
   env: {
     browser: true,

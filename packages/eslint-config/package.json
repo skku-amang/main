@@ -10,6 +10,7 @@
   "devDependencies": {
     "@eslint/js": "^8.57.1",
     "@next/eslint-plugin-next": "^14.2.30",
+    "@tanstack/eslint-plugin-query": "^5.81.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.1",
