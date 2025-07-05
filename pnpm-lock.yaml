@@ -355,6 +355,10 @@ importers:
         version: 8.35.1(eslint@8.57.1)(typescript@5.8.3)
 
   packages/shared-types:
+    dependencies:
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
       typescript:
         specifier: ^5.8.2
