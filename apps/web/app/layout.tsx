@@ -7,9 +7,6 @@ import React from "react"
 import Providers from "@/app/providers"
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
-import {
-  QueryClient
-} from '@tanstack/react-query'
 
 const pretendard = localFont({
   src: "../public/fonts/PretendardVariable.woff2",
@@ -38,16 +35,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const queryClient = new QueryClient()
-
   return (
     <html lang="ko">
-      <Providers>
-          <body className={cn(pretendard.className, "bg-neutral-50")}>
+      <body className={cn(pretendard.className, "bg-neutral-50")}>
+        <Providers>
             {children}
             <Toaster />
-          </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }
