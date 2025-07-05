@@ -73,5 +73,6 @@
   "overrides": {
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4"
-  }
+  },
+  "prettier": "@repo/eslint-config/prettier.config"
 }

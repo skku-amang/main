@@ -12,17 +12,17 @@ export function cn(...inputs: ClassValue[]) {
  * @example formatGenerationOrder(1.0) // "1"
  */
 export function formatGenerationOrder(order: number): string {
-  return order % 1 === 0 ? `${Math.floor(order)}` : `${order}`;
+  return order % 1 === 0 ? `${Math.floor(order)}` : `${order}`
 }
 
 /**
-  * `date`와 현재 시간의 차이를 계산하여, 대표적인 상대 시간을 반환합니다.
-  * @param date - 대상 날짜
-  * @returns 대표적인 상대 시간
-  * @example getRepresentativeRelativeTime(new Date()) // "방금"
-*/
+ * `date`와 현재 시간의 차이를 계산하여, 대표적인 상대 시간을 반환합니다.
+ * @param date - 대상 날짜
+ * @returns 대표적인 상대 시간
+ * @example getRepresentativeRelativeTime(new Date()) // "방금"
+ */
 export function getRepresentativeRelativeTime(date: Date | string) {
-  if (typeof date === 'string') {
+  if (typeof date === "string") {
     date = new Date(date)
   }
 

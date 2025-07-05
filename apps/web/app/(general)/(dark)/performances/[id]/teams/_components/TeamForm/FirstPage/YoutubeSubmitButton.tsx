@@ -14,11 +14,7 @@ const YoutubeSubmitButton = ({
 }: YoutubeSubmitButtonProps) => {
   if (error) {
     // Error
-    return (
-      <div className="text-sm rounded text-destructive">
-        Failed
-      </div>
-    )
+    return <div className="text-sm rounded text-destructive">Failed</div>
   } else if (isSubmitted) {
     // Success
     return (

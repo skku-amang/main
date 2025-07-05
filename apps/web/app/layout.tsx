@@ -23,7 +23,6 @@ export const metadata: Metadata = {
   }
 }
 
-
 /**
  * Root layout 입니다.
  * Session, metadata, font 등 전역적인 설정을 적용합니다.
@@ -39,8 +38,8 @@ export default function RootLayout({
     <html lang="ko">
       <body className={cn(pretendard.className, "bg-neutral-50")}>
         <Providers>
-            {children}
-            <Toaster />
+          {children}
+          <Toaster />
         </Providers>
       </body>
     </html>

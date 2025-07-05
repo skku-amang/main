@@ -21,7 +21,8 @@ module.exports = {
     "@typescript-eslint",
     "react",
     "react-hooks",
-    "@next/next"
+    "@next/next",
+    "prettier"
   ],
   settings: {
     react: {
@@ -40,7 +41,8 @@ module.exports = {
     }],
     "@tanstack/query/exhaustive-deps": "error",
     "@tanstack/query/stable-query-client": "error",
-    "@tanstack/query/no-rest-destructuring": "warn"
+    "@tanstack/query/no-rest-destructuring": "warn",
+    "prettier/prettier": "error"
   },
   env: {
     browser: true,

@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react"
 
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
 export type FilterLabel = {
   id: number
@@ -20,7 +20,7 @@ export const FilterHeader = ({
   className?: string
 }) => {
   return (
-    <div className={cn('text-lg font-semibold text-blue-950', className)}>
+    <div className={cn("text-lg font-semibold text-blue-950", className)}>
       {children}
     </div>
   )
