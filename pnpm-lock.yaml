@@ -186,6 +186,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.20.1
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      api-client:
+        specifier: workspace:*
+        version: link:../../packages/api-client
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -286,6 +289,22 @@ importers:
       typescript:
         specifier: ^5.6.2
         version: 5.8.2
+
+  packages/api-client:
+    dependencies:
+      http-problem-details:
+        specifier: ^0.1.7
+        version: 0.1.7
+      http-status-codes:
+        specifier: ^2.3.0
+        version: 2.3.0
+      shared-types:
+        specifier: workspace:*
+        version: link:../shared-types
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.10
+        version: 24.0.10
 
   packages/database:
     dependencies:
@@ -2052,6 +2071,9 @@ packages:
   '@types/node@22.15.3':
     resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
 
+  '@types/node@24.0.10':
+    resolution: {integrity: sha512-ENHwaH+JIRTDIEEbDK6QSQntAYGtbvdDXnMXnZaZ6k13Du1dPMmprkEHIL7ok2Wl2aZevetwTAb5S+7yIF+enA==}
+
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
 
@@ -3717,6 +3739,9 @@ packages:
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
+
+  http-problem-details@0.1.7:
+    resolution: {integrity: sha512-+ccES43ePQOnZDIkEuo4gNyT0R/Gkulk79oZ3a9FuQQFZYPcUx0OPBe5ztmehe6t79WN/me7APHX3yD6Ha5CHA==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -5918,6 +5943,9 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
+  undici-types@7.8.0:
+    resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
+
   universalify@0.2.0:
     resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
     engines: {node: '>= 4.0.0'}
@@ -8031,6 +8059,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@24.0.10':
+    dependencies:
+      undici-types: 7.8.0
+
   '@types/qs@6.14.0': {}
 
   '@types/range-parser@1.2.7': {}
@@ -10101,6 +10133,8 @@ snapshots:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
+
+  http-problem-details@0.1.7: {}
 
   http-proxy-agent@7.0.2:
     dependencies:
@@ -12581,6 +12615,8 @@ snapshots:
       through: 2.3.8
 
   undici-types@6.21.0: {}
+
+  undici-types@7.8.0: {}
 
   universalify@0.2.0: {}
 
