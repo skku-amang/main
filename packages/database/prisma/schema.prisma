@@ -7,3 +7,22 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password        String
+  name            String
+  nickname        String    @unique
+  bio             String?
+  image           String?
+  isActive        Boolean   @default(true) 
+  isAdmin         Boolean   @default(false) 
+  isSuperuser     Boolean   @default(false) 
+  isStaff         Boolean   @default(false) 
+  hashedRefreshToken    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("users")
+}
