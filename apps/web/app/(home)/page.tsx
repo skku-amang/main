@@ -1,7 +1,6 @@
-import { Ma_Shan_Zheng } from "next/font/google"
-import { Island_Moments } from "next/font/google"
+import { Island_Moments, Ma_Shan_Zheng } from "next/font/google"
 
-import { cn } from "../../lib/utils"
+import { cn } from "@/lib/utils"
 
 const MaShanZheng = Ma_Shan_Zheng({ subsets: ["latin"], weight: "400" })
 const IslandMoments = Island_Moments({ subsets: ["latin"], weight: "400" })

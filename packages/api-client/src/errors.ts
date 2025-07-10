@@ -1,87 +1,63 @@
-import { ProblemDocument } from "http-problem-details";
-import { StatusCodes } from "http-status-codes";
-import { Failure, Success } from "./api-result";
+export abstract class ApiError extends Error {
+  abstract readonly type: string;
+  abstract readonly status: number;
+  abstract readonly title: string;
 
-// 기본 에러 인터페이스
-export interface ApiError {
-  toProblemDocument(): ProblemDocument;
-}
-
-// 400 Bad Request 에러
-export class ValidationError implements ApiError {
-  constructor(public message: string) {}
-
-  toProblemDocument(): ProblemDocument {
-    return {
-      type: "/errors/validation-error",
-      title: "Validation Error",
-      status: StatusCodes.BAD_REQUEST,
-      detail: this.message,
-    };
+  constructor(
+    message: string,
+    public readonly detail?: string
+  ) {
+    super(message);
+    this.name = this.constructor.name;
   }
 }
 
-// 401 Unauthorized 에러
-export class AuthError implements ApiError {
-  message = "인증이 필요합니다.";
+export class NotFoundError extends ApiError {
+  readonly type = "/errors/not-found";
+  readonly status = 404;
+  readonly title = "Not Found";
 
-  toProblemDocument(): ProblemDocument {
-    return {
-      type: "/errors/authentication-error",
-      title: "Authentication Error",
-      status: StatusCodes.UNAUTHORIZED,
-      detail: this.message,
-    };
+  constructor(detail?: string) {
+    super("요청하신 리소스를 찾을 수 없습니다", detail);
   }
 }
 
-// 404 Not Found 에러
-export class NotFoundError implements ApiError {
-  message = "리소스를 찾을 수 없습니다.";
+export class InternalServerError extends ApiError {
+  readonly type = "/errors/internal-server-error";
+  readonly status = 500;
+  readonly title = "Internal Server Error";
 
-  toProblemDocument(): ProblemDocument {
-    return {
-      type: "/errors/not-found",
-      title: "Resource Not Found",
-      status: StatusCodes.NOT_FOUND,
-      detail: this.message,
-    };
+  constructor(detail?: string) {
+    super("서버에서 오류가 발생했습니다", detail);
   }
 }
 
-// 예측하지 못한 서버 에러
-export class InternalServerError implements ApiError {
-  message = "알 수 없는 서버 에러가 발생했습니다.";
+export class ValidationError extends ApiError {
+  readonly type = "/errors/validation-error";
+  readonly status = 400;
+  readonly title = "Validation Error";
 
-  toProblemDocument(): ProblemDocument {
-    return {
-      type: "/errors/internal-server-error",
-      title: "Internal Server Error",
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      detail: this.message,
-    };
+  constructor(detail?: string) {
+    super("입력값이 올바르지 않습니다", detail);
   }
 }
 
-/** 모든 예측 가능한 에러들의 유니온 타입 */
-export type GeneralApiError =
-  | ValidationError
-  | AuthError
-  | NotFoundError
-  | InternalServerError;
+export class AuthError extends ApiError {
+  readonly type = "/errors/authentication-error";
+  readonly status = 401;
+  readonly title = "Authentication Error";
 
-export function createFailure(error: ApiError): Failure {
-  return {
-    isSuccess: false,
-    isFailure: true,
-    error: error.toProblemDocument(),
-  };
+  constructor(detail?: string) {
+    super("인증이 필요합니다", detail);
+  }
 }
 
-export function createSuccess<T>(data: T): Success<T> {
-  return {
-    isSuccess: true,
-    isFailure: false,
-    data,
-  };
+export class ConflictError extends ApiError {
+  readonly type = "/errors/conflict";
+  readonly status = 409;
+  readonly title = "Conflict";
+
+  constructor(detail?: string) {
+    super("이미 존재하는 데이터입니다", detail);
+  }
 }
