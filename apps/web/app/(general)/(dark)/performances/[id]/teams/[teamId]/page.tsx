@@ -39,7 +39,7 @@ const TeamDetail = (props: TeamDetailProps) => {
   const performanceId = props.params.id
   const id = props.params.teamId
 
-  const { data: team, isLoading, isError, isSuccess } = useTeam(id)
+  const { data: team, isLoading, isError } = useTeam(id)
 
   const [selectedSessionsWithIndex, setSelectedSessionsWithIndex] = useState<
     string[]
