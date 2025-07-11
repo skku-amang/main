@@ -4,6 +4,7 @@ import {
   ApiError,
   AuthError,
   ConflictError,
+  ForbiddenError,
   InternalServerError,
   NotFoundError,
   ValidationError,
@@ -86,9 +87,87 @@ export default class ApiClient {
     }
   }
 
+  /**
+   * 공연 생성
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async createPerformance() {
+    return this._request<Performance, ValidationError | InternalServerError>(
+      `/api/performances`,
+      "POST"
+    );
+  }
+
+  /**
+   * 공연 정보 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
   public async getPerformanceById(id: number) {
     return this._request<Performance, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
+      "GET"
+    );
+  }
+
+  /**
+   * 공연 목록 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getPerformances() {
+    return this._request<Performance[], InternalServerError>(
+      `/api/performances`,
+      "GET"
+    );
+  }
+
+  /**
+   * 공연 수정
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async updatePerformance(id: number) {
+    return this._request<
+      Performance,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/performances/${id}`, "PUT");
+  }
+
+  /**
+   * 공연 삭제
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async deletePerformance(id: number) {
+    return this._request<null, NotFoundError | InternalServerError>(
+      `/api/performances/${id}`,
+      "DELETE"
+    );
+  }
+
+  /**
+   * 팀 생성
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async createTeam(performanceId: number, teamData: Partial<Team>) {
+    return this._request<
+      Team,
+      ValidationError | NotFoundError | InternalServerError
+    >(`/api/performances/${performanceId}/teams`, "POST", teamData);
+  }
+
+  /**
+   * 공연에 속한 팀 목록 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getTeamsByPerformance(performanceId: number) {
+    return this._request<Team[], NotFoundError | InternalServerError>(
+      `/api/performances/${performanceId}/teams`,
       "GET"
     );
   }
@@ -103,5 +182,57 @@ export default class ApiClient {
       `/api/teams/${id}`,
       "GET"
     );
+  }
+
+  /**
+   * 팀 수정
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async updateTeam(id: number, teamData: Partial<Team>) {
+    return this._request<
+      Team,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/teams/${id}`, "PUT", teamData);
+  }
+
+  /**
+   * 팀 삭제
+   * @throws {ForbiddenError} 팀 삭제 권한이 없는 경우
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async deleteTeam(id: number) {
+    return this._request<
+      null,
+      ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/teams/${id}`, "DELETE");
+  }
+
+  /**
+   * 팀에 지원
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ConflictError} 이미 지원한 팀인 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async applyToTeam(teamId: number): Promise<Team> {
+    return this._request<
+      Team,
+      NotFoundError | ValidationError | ConflictError | InternalServerError
+    >(`/api/teams/${teamId}/apply`, "POST");
+  }
+
+  /**
+   * 팀 지원 취소
+   * @throws {ValidationError} 지원하지 않은 팀인 경우
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async cancelTeamApplication(teamId: number): Promise<Team> {
+    return this._request<
+      Team,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/teams/${teamId}/cancel`, "POST");
   }
 }

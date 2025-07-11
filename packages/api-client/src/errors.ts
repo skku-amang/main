@@ -52,6 +52,16 @@ export class AuthError extends ApiError {
   }
 }
 
+export class ForbiddenError extends ApiError {
+  readonly type = "/errors/forbidden";
+  readonly status = 403;
+  readonly title = "Forbidden";
+
+  constructor(detail?: string) {
+    super("접근 권한이 없습니다", detail);
+  }
+}
+
 export class ConflictError extends ApiError {
   readonly type = "/errors/conflict";
   readonly status = 409;
