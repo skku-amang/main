@@ -6,7 +6,7 @@ import { ChevronRight, Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { use, useState } from "react"
+import { useState } from "react"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
@@ -20,36 +20,26 @@ import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { useApiClient } from "@/lib/providers/api-client-provider"
+import { useTeam } from "@/hooks/api/useTeam"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { useQuery } from "@tanstack/react-query"
 import { MemberSessionSet, SessionOrder, Team } from "shared-types"
 
-interface Props {
-  params: Promise<{
+interface TeamDetailProps {
+  params: {
     id: number
     teamId: number
-  }>
+  }
 }
 
-const TeamDetail = (props: Props) => {
-  const params = use(props.params)
+const TeamDetail = (props: TeamDetailProps) => {
   const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
 
-  const apiClient = useApiClient()
-  const {
-    data: team,
-    isLoading,
-    isError
-  } = useQuery({
-    queryKey: ["team", params.teamId],
-    queryFn: () => apiClient.getTeamById(params.teamId)
-  })
+  const performanceId = props.params.id
+  const id = props.params.teamId
 
-  const performanceId = params.id
-  const id = params.teamId
+  const { data: team, isLoading, isError, isSuccess } = useTeam(id)
 
   const [selectedSessionsWithIndex, setSelectedSessionsWithIndex] = useState<
     string[]
@@ -133,7 +123,7 @@ const TeamDetail = (props: Props) => {
     return <Loading />
   } else if (isError) {
     return <div>Error</div>
-  } else if (isSuccess && !team) {
+  } else if (!team) {
     return <NotFoundPage />
   }
 
