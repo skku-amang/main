@@ -16,13 +16,28 @@ model User {
   nickname        String    @unique
   bio             String?
   image           String?
-  isActive        Boolean   @default(true) 
   isAdmin         Boolean   @default(false) 
-  isSuperuser     Boolean   @default(false) 
-  isStaff         Boolean   @default(false) 
   hashedRefreshToken    String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
+  generationId   Int
+  generation     Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
+
+  ledGeneration        Generation? @relation("GenerationLeader")
   @@map("users")
+}
+
+model Generation {
+  id              Int       @id @default(autoincrement())
+  order           Decimal   @db.Decimal(3, 1) @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  leader    User?     @relation("GenerationLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+  leaderId  Int?      @unique
+
+  users         User[]
+
+  @@map("generations")
 }
