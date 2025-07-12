@@ -6,4 +6,7 @@ export * from "./Team";
 export * from "./User";
 export * from "./user/create-user.dto";
 export * from "./user/login-user.dto";
+export * from "./auth/jwt.types";
 export * from "./constants/regex";
+export * from "./generation/create-generation.dto";
+export * from "./generation/update-generation.dto";
