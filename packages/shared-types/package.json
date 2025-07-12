@@ -19,6 +19,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@nestjs/mapped-types": "^2.1.0",
     "class-validator": "^0.14.2"
   }
 }
