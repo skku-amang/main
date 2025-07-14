@@ -1,5 +1,5 @@
 import { Performance, Team } from "shared-types";
-import { ApiResult } from "./api-result";
+import { ApiResult } from "./src/api-result";
 import {
   ApiError,
   AuthError,
@@ -8,7 +8,7 @@ import {
   InternalServerError,
   NotFoundError,
   ValidationError,
-} from "./errors";
+} from "./src/errors";
 
 /**
  * 서버에서 plain object로 전달되는 에러를
@@ -236,3 +236,6 @@ export default class ApiClient {
     >(`/api/teams/${teamId}/cancel`, "POST");
   }
 }
+
+export * from "./src/api-result";
+export * from "./src/errors";
