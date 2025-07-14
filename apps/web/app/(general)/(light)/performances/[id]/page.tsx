@@ -15,7 +15,7 @@ interface PerformanceDetailProp {
 }
 
 const PerformanceDetail = async (props: PerformanceDetailProp) => {
-  const params = await props.params;
+  const params = await props.params
   const { id } = params
   const session = await auth()
   if (!session) redirect(ROUTES.LOGIN)

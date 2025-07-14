@@ -7,10 +7,10 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
+    "build": "next build",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/database": "workspace:*",
     "@faker-js/faker": "^8.4.1",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
@@ -30,7 +30,11 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-switch": "^1.1.3",
     "@radix-ui/react-toast": "^1.2.6",
+    "@repo/database": "workspace:*",
+    "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-query-devtools": "^5.81.5",
     "@tanstack/react-table": "^8.20.1",
+    "@repo/api-client": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -70,5 +74,6 @@
   "overrides": {
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4"
-  }
+  },
+  "prettier": "@repo/eslint-config/prettier.config"
 }

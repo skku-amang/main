@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import Image from 'next/image'
-import React from 'react'
-import { useState } from 'react'
+import Image from "next/image"
+import React from "react"
+import { useState } from "react"
 
-import { cn } from '../lib/utils'
+import { cn } from "../lib/utils"
 
 function ImageLoader({
   src,
@@ -27,7 +27,7 @@ function ImageLoader({
 
   return (
     <div
-      className={cn(className, 'relative w-full')}
+      className={cn(className, "relative w-full")}
       style={{ height: parentHeight }}
     >
       <Image
@@ -36,9 +36,9 @@ function ImageLoader({
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         style={{
-          objectFit: 'cover',
+          objectFit: "cover",
           opacity: isImageLoaded ? 1 : 0.8,
-          transition: 'opacity 1s ease-in-out'
+          transition: "opacity 1s ease-in-out"
         }}
         onLoad={handleImageLoad}
       />

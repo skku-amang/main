@@ -1,11 +1,11 @@
 import "@/app/globals.css"
 
 import { Metadata } from "next"
-import { SessionProvider } from "next-auth/react"
 import localFont from "next/font/local"
 import React from "react"
 
 import { Toaster } from "@/components/ui/toaster"
+import Providers from "@/lib/providers"
 import { cn } from "@/lib/utils"
 
 const pretendard = localFont({
@@ -36,12 +36,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <SessionProvider>
-        <body className={cn(pretendard.className, "bg-neutral-50")}>
+      <body className={cn(pretendard.className, "bg-neutral-50")}>
+        <Providers>
           {children}
           <Toaster />
-        </body>
-      </SessionProvider>
+        </Providers>
+      </body>
     </html>
   )
 }

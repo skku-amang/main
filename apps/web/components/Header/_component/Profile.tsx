@@ -50,7 +50,11 @@ const Profile = () => {
         {status === "loading" ? (
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
-          <Button className={cn("text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]")}>
+          <Button
+            className={cn(
+              "text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]"
+            )}
+          >
             <Link href={ROUTES.LOGIN}>Login</Link>
           </Button>
         )}
@@ -82,10 +86,7 @@ const Profile = () => {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
-        <MenuItem
-          icon={<User size={iconSize} />}
-          href={ROUTES.PROFILE.INDEX}
-        >
+        <MenuItem icon={<User size={iconSize} />} href={ROUTES.PROFILE.INDEX}>
           내 프로필
         </MenuItem>
         <MenuItem icon={<Users size={iconSize} />} href="#">

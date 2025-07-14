@@ -6,7 +6,7 @@ import { ChevronRight, Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { use, useEffect, useState } from "react"
+import { useState } from "react"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
@@ -19,27 +19,27 @@ import { useToast } from "@/components/hooks/use-toast"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import { Button } from "@/components/ui/button"
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import fetchData from "@/lib/fetch"
+import { useTeam } from "@/hooks/api/useTeam"
 import YoutubePlayer from "@/lib/youtube/Player"
 import { MemberSessionSet, SessionOrder, Team } from "shared-types"
 
-interface Props {
-  params: Promise<{
+interface TeamDetailProps {
+  params: {
     id: number
     teamId: number
-  }>
+  }
 }
 
-const TeamDetail = (props: Props) => {
-  const params = use(props.params)
+const TeamDetail = (props: TeamDetailProps) => {
   const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
 
-  const performanceId = params.id
-  const id = params.teamId
+  const performanceId = props.params.id
+  const id = props.params.teamId
+
+  const { data: team, isLoading, isError } = useTeam(id)
 
   const [selectedSessionsWithIndex, setSelectedSessionsWithIndex] = useState<
     string[]
@@ -117,35 +117,13 @@ const TeamDetail = (props: Props) => {
     setTeam(data)
   }
 
-  const [team, setTeam] = useState<Team | null>()
-  useEffect(() => {
-    if (session.data?.access) {
-      fetchData(API_ENDPOINTS.TEAM.RETRIEVE(id) as ApiEndpoint, {
-        cache: "no-cache",
-        headers: {
-          Authorization: `Bearer ${session.data?.access}`
-        }
-      }).then(async (res) => {
-        if (!res.ok) {
-          switch (res.status) {
-            case StatusCodes.NOT_FOUND:
-              setTeam(null)
-              break
-            default:
-              router.push(ROUTES.HOME)
-          }
-        } else {
-          setTeam(await res.json())
-        }
-      })
-    }
-  }, [id, session.data?.access, router])
-
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
-  if (team === undefined) {
+  if (isLoading) {
     return <Loading />
-  } else if (team === null) {
+  } else if (isError) {
+    return <div>Error</div>
+  } else if (!team) {
     return <NotFoundPage />
   }
 

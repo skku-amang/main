@@ -9,7 +9,7 @@ interface Props {
 }
 
 const MemberDetail = async (props: Props) => {
-  const params = await props.params;
+  const params = await props.params
   const { id } = params
   const user = undefined // not implemented
 

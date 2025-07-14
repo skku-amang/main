@@ -7,7 +7,10 @@ interface SheetInnerContentNavLinkHeaderProps {
   className?: string
 }
 
-const SheetInnerContentNavLinkHeader = ({ children, className }: SheetInnerContentNavLinkHeaderProps) => {
+const SheetInnerContentNavLinkHeader = ({
+  children,
+  className
+}: SheetInnerContentNavLinkHeaderProps) => {
   return (
     <div className={cn("w-full text-gray-500 text-sm", className)}>
       {children}

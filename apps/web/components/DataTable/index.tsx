@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import {
   ColumnDef,
@@ -10,11 +10,11 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable
-} from '@tanstack/react-table'
-import React from 'react'
+} from "@tanstack/react-table"
+import React from "react"
 
-import { DataTablePagination } from '@/components/DataTable/Pagination'
-import { DataTableViewOptions } from '@/components/DataTable/ViewOptions'
+import { DataTablePagination } from "@/components/DataTable/Pagination"
+import { DataTableViewOptions } from "@/components/DataTable/ViewOptions"
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/ui/table'
+} from "@/components/ui/table"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
+                data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
