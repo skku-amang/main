@@ -1,7 +1,6 @@
 import {
-  basicGeneration,
-  generationWithMinimalUsers,
   generationWithBasicUsers,
+  generationWithPublicUsers,
 } from './../prisma/selectors/generation.selector';
 import {
   ConflictException,
@@ -11,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@repo/database';
 import { CreateGenerationDto, UpdateGenerationDto } from 'shared-types';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class GenerationService {
@@ -47,7 +46,7 @@ export class GenerationService {
 
   async findAll() {
     const generations = await this.prisma.generation.findMany({
-      select: generationWithMinimalUsers,
+      select: generationWithBasicUsers,
       orderBy: {
         order: 'desc',
       },
@@ -59,7 +58,7 @@ export class GenerationService {
   async findOne(id: number) {
     const generation = await this.prisma.generation.findUnique({
       where: { id },
-      select: generationWithBasicUsers,
+      select: generationWithPublicUsers,
     });
     if (!generation) {
       throw new NotFoundException(
