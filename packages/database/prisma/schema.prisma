@@ -24,7 +24,7 @@ model User {
   generationId   Int
   generation     Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
 
-  ledGeneration        Generation? @relation("GenerationLeader")
+  ledGeneration        Generation? @relation("generationLeader")
   @@map("users")
 }
 
@@ -34,7 +34,7 @@ model Generation {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  leader    User?     @relation("GenerationLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+  leader    User?     @relation("generationLeader", fields: [leaderId], references: [id], onDelete: SetNull)
   leaderId  Int?      @unique
 
   users         User[]
