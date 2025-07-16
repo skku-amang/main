@@ -34,7 +34,7 @@ export class AuthController {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { refreshToken: refreshToken, ...response } = result;
+    const { refreshToken, ...response } = result;
     return response;
   }
 
@@ -56,7 +56,7 @@ export class AuthController {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { refreshToken: refreshToken, ...response } = result;
+    const { refreshToken, ...response } = result;
     return response;
   }
 
