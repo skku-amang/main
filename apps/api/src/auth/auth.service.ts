@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { LoginUserDto, CreateUserDto, JwtPayload } from 'shared-types';
 @Injectable()
 export class AuthService {
@@ -44,6 +44,7 @@ export class AuthService {
     );
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, hashedRefreshToken, ...userResponse } = user;
     return { ...tokens, user: userResponse };
   }
