@@ -7,7 +7,6 @@ import {
   UseGuards,
   Req,
   Res,
-  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AccessTokenGuard } from './guards/access-token.guard';
@@ -31,6 +30,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
     });
 
     const { refreshToken, ...response } = result;
@@ -50,6 +50,7 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        path: '/',
       });
     }
 
@@ -57,18 +58,18 @@ export class AuthController {
     return response;
   }
 
-  @UseGuards(AccessTokenGuard)
   @Post('logout')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { sub: userId } = req.user as { sub: number };
     await this.authService.logout(userId);
-    res.clearCookie('refresh_token');
+    res.clearCookie('refresh_token', { path: '/' });
     return { message: '성공적으로 로그아웃되었습니다.' };
   }
 
-  @UseGuards(RefreshTokenGuard)
   @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   async refreshTokens(
     @Req() req: Request,
@@ -84,6 +85,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
     });
 
     return {

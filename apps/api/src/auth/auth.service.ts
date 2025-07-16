@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -7,9 +6,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
-import { LoginUserDto, CreateUserDto } from 'shared-types';
+import { LoginUserDto, CreateUserDto, JwtPayload } from 'shared-types';
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,7 +18,12 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
-    const tokens = await this.getTokens(user.id, user.email, user.name);
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.name,
+      user.isAdmin,
+    );
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
     return { ...tokens, user };
   }
@@ -33,7 +36,12 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.getTokens(user.id, user.email, user.name);
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.name,
+      user.isAdmin,
+    );
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 
     const { password, hashedRefreshToken, ...userResponse } = user;
@@ -44,22 +52,27 @@ export class AuthService {
     return this.usersService.updateRefreshToken(userId, null);
   }
 
-  private async getTokens(userId: number, email: string, name: string) {
+  private async getTokens(
+    userId: number,
+    email: string,
+    name: string,
+    isAdmin: boolean,
+  ) {
+    const jwtPayload: JwtPayload = {
+      sub: userId,
+      email,
+      name,
+      isAdmin,
+    };
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        { sub: userId, email, name },
-        {
-          secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-          expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
-        },
-      ),
-      this.jwtService.signAsync(
-        { sub: userId, email, name },
-        {
-          secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-          expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
-        },
-      ),
+      this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
+      }),
+      this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
+      }),
     ]);
 
     return { accessToken, refreshToken };
@@ -79,7 +92,12 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    const tokens = await this.getTokens(user.id, user.email, user.name);
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.name,
+      user.isAdmin,
+    );
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
   }
