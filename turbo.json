@@ -12,7 +12,7 @@
       "dependsOn": ["^lint"]
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^build"],
       "persistent": true,
       "env": ["NODE_ENV"]
     },
