@@ -7,8 +7,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker-build:
+  build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app:
+          - name: web
+            dockerfile: apps/web/Dockerfile
+          - name: api
+            dockerfile: apps/api/Dockerfile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,22 +30,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push web image
+      - name: Build and push ${{ matrix.app.name }} image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: apps/web/Dockerfile
+          file: ${{ matrix.app.dockerfile }}
           push: true
           tags: |
-            ghcr.io/skku-amang/amang-web:${{ github.sha }}
-            ghcr.io/skku-amang/amang-web:latest
-
-      - name: Build and push api image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/api/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/skku-amang/amang-api:${{ github.sha }}
-            ghcr.io/skku-amang/amang-api:latest
+            ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
+            ghcr.io/skku-amang/amang-${{ matrix.app.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
