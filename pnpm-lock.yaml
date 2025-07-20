@@ -207,9 +207,6 @@ importers:
       '@repo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@repo/database':
-        specifier: workspace:*
-        version: link:../../packages/database
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@18.3.1)
