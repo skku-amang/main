@@ -1,0 +1,34 @@
+replicaCount: 1
+
+image:
+  repository: amang-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: amang-api.json-server.win
+      paths:
+        - path: /
+          pathType: Prefix
+
+env:
+  NODE_ENV: production
+  ACCESS_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
+  REFRESH_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?schema=public # TODO: Update with actual database URL
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi

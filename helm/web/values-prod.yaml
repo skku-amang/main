@@ -1,0 +1,17 @@
+replicaCount: 1
+
+ingress:
+  hosts:
+    - host: amang.json-server.win
+      paths:
+        - path: /
+          pathType: Prefix
+
+env:
+  NODE_ENV: production
+  NEXT_PUBLIC_API_URL: "https://amang-api.json-server.win"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
