@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: amang-api
+  repository: ghcr.io/skku-amang/amang-api
   pullPolicy: IfNotPresent
   tag: "latest"
 
