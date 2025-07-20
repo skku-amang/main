@@ -1,0 +1,10 @@
+apiVersion: v2
+name: db
+description: Amang PostgreSQL Database
+type: application
+version: 0.1.0
+appVersion: "15.0"
+dependencies:
+  - name: postgresql
+    version: "13.2.24"
+    repository: https://charts.bitnami.com/bitnami

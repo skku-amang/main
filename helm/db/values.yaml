@@ -1,0 +1,29 @@
+postgresql:
+  auth:
+    enablePostgresUser: true
+    postgresPassword: "postgres"
+    database: "amang"
+    username: "amang"
+    password: "amang123"
+
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: "standard"
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+
+  service:
+    ports:
+      postgresql: 5432
+    type: ClusterIP
+
+  metrics:
+    enabled: false
