@@ -10,6 +10,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false # 하나 실패해도 다른 것들 계속 실행
       matrix:
         app:
           - name: web
