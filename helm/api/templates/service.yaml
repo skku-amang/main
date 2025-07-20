@@ -5,9 +5,9 @@ metadata:
   labels:
     app: amang-api
 spec:
-  type: { { .Values.service.type } }
+  type: {{ .Values.service.type }}
   ports:
-    - port: { { .Values.service.port } }
+    - port: {{ .Values.service.port }}
       targetPort: 8000
       protocol: TCP
       name: http
