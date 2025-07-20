@@ -23,7 +23,7 @@ env:
   NODE_ENV: production
   ACCESS_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
   REFRESH_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
-  DATABASE_URL: "postgresql://amang:amang123@postgresql.amang-db.svc.cluster.local:5432/amang?schema=public"
+  DATABASE_URL: "postgresql://amang:amang123@postgresql.amang-db-postgresql.svc.cluster.local:5432/amang?schema=public"
 
 resources:
   limits:
