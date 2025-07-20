@@ -1,0 +1,19 @@
+replicaCount: 1
+
+ingress:
+  hosts:
+    - host: amang-api-staging.json-server.win
+      paths:
+        - path: /
+          pathType: Prefix
+
+env:
+  NODE_ENV: development
+  ACCESS_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
+  REFRESH_TOKEN_SECRET: aasfeawfawjfiawefiawenifn23r4239rj23
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?schema=public # TODO: Update with actual database URL
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
