@@ -46,7 +46,7 @@ export default class ApiClient {
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
       throw new Error(
-        "ApiClient has not been initialized. Call ApiClient.initialize(config) first.",
+        "ApiClient has not been initialized. Call ApiClient.initialize(config) first."
       );
     }
     return ApiClient.instance;
@@ -58,7 +58,7 @@ export default class ApiClient {
   private async _request<T, E = ApiError>(
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "DELETE",
-    body?: any,
+    body?: any
   ): Promise<T> {
     const options: RequestInit = {
       method,
@@ -81,7 +81,7 @@ export default class ApiClient {
         return data.data;
       }
       throw createErrorFromProblemDocument(data.error);
-    } catch (error) {
+    } catch {
       // 네트워크 에러만 클라이언트에서 처리
       throw new InternalServerError();
     }
@@ -95,7 +95,7 @@ export default class ApiClient {
   public async createPerformance() {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
-      "POST",
+      "POST"
     );
   }
 
@@ -107,7 +107,7 @@ export default class ApiClient {
   public async getPerformanceById(id: number) {
     return this._request<Performance, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
-      "GET",
+      "GET"
     );
   }
 
@@ -118,7 +118,7 @@ export default class ApiClient {
   public async getPerformances() {
     return this._request<Performance[], InternalServerError>(
       `/api/performances`,
-      "GET",
+      "GET"
     );
   }
 
@@ -143,7 +143,7 @@ export default class ApiClient {
   public async deletePerformance(id: number) {
     return this._request<null, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
-      "DELETE",
+      "DELETE"
     );
   }
 
@@ -168,7 +168,7 @@ export default class ApiClient {
   public async getTeamsByPerformance(performanceId: number) {
     return this._request<Team[], NotFoundError | InternalServerError>(
       `/api/performances/${performanceId}/teams`,
-      "GET",
+      "GET"
     );
   }
 
@@ -180,7 +180,7 @@ export default class ApiClient {
   public async getTeamById(id: number) {
     return this._request<Team, NotFoundError | InternalServerError>(
       `/api/teams/${id}`,
-      "GET",
+      "GET"
     );
   }
 

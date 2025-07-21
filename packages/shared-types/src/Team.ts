@@ -87,7 +87,7 @@ export class MemberSessionSet {
   getRequiredSessionsWithMissingUserCount(
     includeFullSessions = false,
   ): Map<SessionName, number> {
-    let requiredSessionsWithMissingUserCount: Map<SessionName, number> =
+    const requiredSessionsWithMissingUserCount: Map<SessionName, number> =
       new Map();
     Array.from(this.memberSessions).map((ms) => {
       const requiredMemberCount =
