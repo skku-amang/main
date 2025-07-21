@@ -2,6 +2,7 @@
   "name": "@repo/eslint-config",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "exports": {
     "./base": "./base.js",
     "./next-js": "./next.js",
@@ -14,7 +15,6 @@
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.5.1",
@@ -22,7 +22,6 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-turbo": "^2.5.4",
     "globals": "^16.3.0",
-    "prettier": "^3.6.0",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1"
