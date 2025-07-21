@@ -10,7 +10,7 @@
     "db:deploy": "turbo run db:deploy"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^8.57.1",
     "prettier": "^3.6.0",
     "turbo": "^2.5.4",
     "typescript": "5.8.2"

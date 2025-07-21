@@ -1,13 +1,13 @@
-import { Prisma } from '@repo/database';
-import { basicUser, publicUser } from './user.selector';
+import { Prisma } from "@repo/database"
+import { basicUser, publicUser } from "./user.selector"
 
 /**
  * 기수의 최소 정보를 선택합니다. (id, order)
  */
 export const basicGeneration = {
   id: true,
-  order: true,
-} satisfies Prisma.GenerationSelect;
+  order: true
+} satisfies Prisma.GenerationSelect
 
 /**
  * 기수 정보와 함께 소속된 유저들의 최소 정보(basicUser)를 선택합니다.
@@ -16,12 +16,12 @@ export const basicGeneration = {
 export const generationWithBasicUsers = {
   ...basicGeneration,
   users: {
-    select: basicUser,
+    select: basicUser
   },
   leader: {
-    select: basicUser,
-  },
-} satisfies Prisma.GenerationSelect;
+    select: basicUser
+  }
+} satisfies Prisma.GenerationSelect
 
 /**
  * 기수 정보와 함께 소속된 유저들의 공개 정보(publicUser)를 선택합니다.
@@ -30,9 +30,9 @@ export const generationWithBasicUsers = {
 export const generationWithPublicUsers = {
   ...basicGeneration,
   users: {
-    select: publicUser,
+    select: publicUser
   },
   leader: {
-    select: publicUser,
-  },
-} satisfies Prisma.GenerationSelect;
+    select: publicUser
+  }
+} satisfies Prisma.GenerationSelect

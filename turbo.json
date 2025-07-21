@@ -8,6 +8,9 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": ["PORT", "NODE_ENV", "DATABASE_URL"]
     },
+    "format": {
+      "dependsOn": ["^format"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

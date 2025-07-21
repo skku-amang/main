@@ -1,5 +1,5 @@
 :root {
-  --fc-border-color: #F3F4F6;
+  --fc-border-color: #f3f4f6;
   --fc-button-active-bg-color: white;
   --fc-button-active-border-color: white;
   --fc-button-hover-bg-color: transparent;
@@ -8,8 +8,8 @@
 
 .fc .fc-button,
 .fc .fc-button-group {
-  background-color: #F4F4F5;
-  color: #A1A1AA;
+  background-color: #f4f4f5;
+  color: #a1a1aa;
   border: 0px;
 }
 
@@ -21,7 +21,7 @@
 
 .fc .fc-prev-button,
 .fc .fc-next-button {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 
 .fc .fc-col-header-cell-cushion {
@@ -73,8 +73,9 @@
   font-size: 12px;
   font-weight: 400;
 }
-.fc .fc-button-primary:not(:disabled).fc-button-active:focus, .fc .fc-button-primary:not(:disabled):active:focus {
-    box-shadow: rgb(64 137 209 / 0%) 0px 0px 0px 0.2rem;
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus,
+.fc .fc-button-primary:not(:disabled):active:focus {
+  box-shadow: rgb(64 137 209 / 0%) 0px 0px 0px 0.2rem;
 }
 
 .fc .fc-event-time {

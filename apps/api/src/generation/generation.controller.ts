@@ -6,15 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
-} from '@nestjs/common';
-import { GenerationService } from './generation.service';
-import { CreateGenerationDto, UpdateGenerationDto } from 'shared-types';
-import { AccessTokenGuard } from '../auth/guards/access-token.guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
-import { Public } from '../auth/decorators/public.decorator';
+  UseGuards
+} from "@nestjs/common"
+import { GenerationService } from "./generation.service"
+import { CreateGenerationDto, UpdateGenerationDto } from "shared-types"
+import { AccessTokenGuard } from "../auth/guards/access-token.guard"
+import { AdminGuard } from "../auth/guards/admin.guard"
+import { Public } from "../auth/decorators/public.decorator"
 
-@Controller('generation')
+@Controller("generation")
 @UseGuards(AccessTokenGuard)
 export class GenerationController {
   constructor(private readonly generationService: GenerationService) {}
@@ -22,33 +22,33 @@ export class GenerationController {
   @Post()
   @UseGuards(AdminGuard)
   create(@Body() createGenerationDto: CreateGenerationDto) {
-    return this.generationService.create(createGenerationDto);
+    return this.generationService.create(createGenerationDto)
   }
 
   @Get()
   @Public()
   findAll() {
-    return this.generationService.findAll();
+    return this.generationService.findAll()
   }
 
-  @Get(':id')
+  @Get(":id")
   @Public()
-  findOne(@Param('id') id: number) {
-    return this.generationService.findOne(id);
+  findOne(@Param("id") id: number) {
+    return this.generationService.findOne(id)
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @UseGuards(AdminGuard)
   update(
-    @Param('id') id: number,
-    @Body() updateGenerationDto: UpdateGenerationDto,
+    @Param("id") id: number,
+    @Body() updateGenerationDto: UpdateGenerationDto
   ) {
-    return this.generationService.update(id, updateGenerationDto);
+    return this.generationService.update(id, updateGenerationDto)
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @UseGuards(AdminGuard)
-  remove(@Param('id') id: number) {
-    return this.generationService.remove(id);
+  remove(@Param("id") id: number) {
+    return this.generationService.remove(id)
   }
 }
