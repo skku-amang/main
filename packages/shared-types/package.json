@@ -13,8 +13,8 @@
   "scripts": {
     "build": "tsup ./src/index.ts",
     "dev": "tsup --watch",
-    "format": "prettier --write \"{src}/**/*.{ts,tsx}\"",
-    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
