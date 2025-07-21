@@ -12,7 +12,7 @@ spec:
       - name: migration-runner
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
-        command: ["pnpm", "run", "--filter", "database", "db:migrate:deploy"]
+        command: ["pnpm", "run", "--filter", "@repo/database", "db:migrate:deploy"]
         env:
           {{- range $key, $value := .Values.env }}
           - name: {{ $key }}
