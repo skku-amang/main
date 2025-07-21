@@ -1,8 +1,9 @@
 # 레포지토리 소개
+
 아망 홈페이지 프로젝트를 위한 프론트엔드 서버입니다.
 
-
 # 레포지토리 구조
+
 ```
 frontend
 ├── .vscode             # vscode 설정: 코드 스타일, 디버깅 스크립트 등
@@ -45,28 +46,31 @@ frontend
 └── tsconfig.json       # TypeScript 설정 파일
 ```
 
-
-
 # 레포지토리 세팅
+
 ## 준비물
+
 - git: https://git-scm.com/downloads
 - node.js >= 20.18.0: https://nodejs.org/en/download/package-manager
 
-
 ## 사용법
+
 ### 1. 이 레포지토리를 클론합니다.
+
 ```bash
 git clone https://github.com/skku-amang/frontend
 ```
 
-
 ### 2. 필요한 라이브러리를 설치합니다.
+
 ```bash
 npm install
 ```
 
 ### 3. 디버그 서버 실행
+
 ```bash
 npm start
 ```
+
 또는 `F5`~~딸깍~~를 눌러 vscode 세팅을 이용하여 디버그 서버를 실행할 수 있습니다.

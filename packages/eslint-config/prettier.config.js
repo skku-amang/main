@@ -1,4 +1,4 @@
-module.exports = {
+const prettierConfig = {
   semi: false,
   trailingComma: "none",
   singleQuote: false,
@@ -9,3 +9,5 @@ module.exports = {
   arrowParens: "always",
   endOfLine: "lf"
 }
+
+export default prettierConfig

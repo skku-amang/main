@@ -8,7 +8,9 @@
   },
   "scripts": {
     "dev": "tsup ./index.ts --watch",
-    "build": "tsup ./index.ts"
+    "build": "tsup ./index.ts",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "lint": "eslint \"**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
     "http-problem-details": "^0.1.7",
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
-    "tsup": "^8.5.0"
+    "tsup": "^8.5.0",
+    "@repo/eslint-config": "workspace:*"
   }
 }

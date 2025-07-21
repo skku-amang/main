@@ -1,4 +1,6 @@
 {
+  "eslint.enable": true,
+  "eslint.useFlatConfig": true,
   "eslint.workingDirectories": [
     {
       "mode": "auto"

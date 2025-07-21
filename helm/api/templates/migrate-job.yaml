@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: amang-api-migrate-
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: migration-runner
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        command: ["pnpm", "--filter", "@repo/database", "db:deploy"]
+        env:
+          {{- range $key, $value := .Values.env }}
+          - name: {{ $key }}
+            valueFrom:
+              configMapKeyRef:
+                name: amang-api-config
+                key: {{ $key }}
+          {{- end }}
+      restartPolicy: Never
+  backoffLimit: 2

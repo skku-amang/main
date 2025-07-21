@@ -66,7 +66,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
 
   // Second Page
   function constructDefaultValues(initialData?: Team) {
-    let defaultValues: {
+    const defaultValues: {
       [key: string]: z.infer<ReturnType<typeof memberSessionRequiredField>>
     } = {
       보컬1: {
@@ -164,7 +164,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         const fieldName = `${ms.session}${index + 1}` as keyof z.infer<
           typeof memberSessionRequiredBaseSchema
         >
-        let fieldKey = defaultValues[fieldName]
+        const fieldKey = defaultValues[fieldName]
         if (!fieldKey) return
         fieldKey.required = true
         if (member) {
@@ -200,7 +200,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   async function onThirdPageValid(
     secondPageFormData: z.infer<typeof memberSessionRequiredBaseSchema>
   ) {
-    let memberSessionData: { [key: string]: (number | null)[] } = {}
+    const memberSessionData: { [key: string]: (number | null)[] } = {}
     Object.values(secondPageFormData).map((ms) => {
       if (!ms.required) return
       if (!(ms.session in memberSessionData)) {
@@ -212,7 +212,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       ([session, membersId]) => ({ session, membersId })
     )
 
-    let allFormData = {
+    const allFormData = {
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       songArtist: firstPageForm.getValues("songArtist"),
