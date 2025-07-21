@@ -4,7 +4,7 @@ metadata:
   generateName: amang-api-migrate-
   annotations:
     argocd.argoproj.io/hook: PreSync
-    # argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
