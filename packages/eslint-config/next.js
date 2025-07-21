@@ -36,9 +36,12 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": "error",
     "no-unused-vars": "off", // TypeScript가 처리
     "no-undef": "off", // TypeScript가 처리
-    "react/no-unknown-property": ["error", {
-      "ignore": ["cmdk-input-wrapper"]
-    }],
+    "react/no-unknown-property": [
+      "error",
+      {
+        ignore: ["cmdk-input-wrapper"]
+      }
+    ],
     "@tanstack/query/exhaustive-deps": "error",
     "@tanstack/query/stable-query-client": "error",
     "@tanstack/query/no-rest-destructuring": "warn",
@@ -49,4 +52,4 @@ module.exports = {
     es2022: true,
     node: true
   }
-};
+}
