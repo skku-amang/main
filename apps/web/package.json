@@ -7,8 +7,7 @@
     "dev": "next dev",
     "start": "next start",
     "format": "prettier --check \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
-    "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix",
-    "check-types": "tsc --noEmit"
+    "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
