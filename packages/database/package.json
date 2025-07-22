@@ -15,8 +15,8 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "format": "prettier --check \"**/*.ts\"",
-    "lint": "eslint \"**/*.ts\" --fix",
+    "format": "prettier --check \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
     "db:deploy": "prisma migrate deploy"

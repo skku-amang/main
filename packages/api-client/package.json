@@ -15,8 +15,8 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "format": "prettier --check \"**/*.{ts,tsx}\"",
-    "lint": "eslint \"**/*.{ts,tsx}\" --fix"
+    "format": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
     "http-problem-details": "^0.1.7",
