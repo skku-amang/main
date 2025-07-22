@@ -6,7 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  ParseIntPipe
 } from "@nestjs/common"
 import { GenerationService } from "./generation.service"
 import { CreateGenerationDto, UpdateGenerationDto } from "shared-types"
@@ -33,14 +34,14 @@ export class GenerationController {
 
   @Get(":id")
   @Public()
-  findOne(@Param("id") id: number) {
+  findOne(@Param("id", ParseIntPipe) id: number) {
     return this.generationService.findOne(id)
   }
 
   @Patch(":id")
   @UseGuards(AdminGuard)
   update(
-    @Param("id") id: number,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateGenerationDto: UpdateGenerationDto
   ) {
     return this.generationService.update(id, updateGenerationDto)
@@ -48,7 +49,7 @@ export class GenerationController {
 
   @Delete(":id")
   @UseGuards(AdminGuard)
-  remove(@Param("id") id: number) {
+  remove(@Param("id", ParseIntPipe) id: number) {
     return this.generationService.remove(id)
   }
 }
