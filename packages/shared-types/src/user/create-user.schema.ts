@@ -24,11 +24,11 @@ export const CreateUserSchema = z
   .strict();
 
 /**
- * @description 기수 생성 DTO 클래스 (백엔드용)
+ * @description 사용자 생성 DTO 클래스 (백엔드용)
  */
 export class CreateUserDto extends createZodDto(CreateUserSchema) {}
 
 /**
- * @description 기수 생성 타입 (프론트엔드용)
+ * @description 사용자 생성 타입 (프론트엔드용)
  */
 export type CreateUser = z.infer<typeof CreateUserSchema>;
