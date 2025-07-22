@@ -332,12 +332,12 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^24.0.10
         version: 24.0.15
-      tsup:
-        specifier: ^8.5.0
-        version: 8.5.0(@swc/core@1.13.1)(jiti@2.4.2)(postcss@8.5.6)(typescript@5.8.3)(yaml@2.8.0)
 
   packages/database:
     dependencies:

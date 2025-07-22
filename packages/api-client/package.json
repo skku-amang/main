@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js",
-    "./errors": "./dist/errors.js"
+    ".": "./dist/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
   },
   "scripts": {
-    "dev": "tsup ./index.ts --watch",
-    "build": "tsup ./index.ts",
+    "build": "tsc",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "lint": "eslint \"**/*.{ts,tsx}\" --fix"
   },
@@ -19,7 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
-    "tsup": "^8.5.0",
-    "@repo/eslint-config": "workspace:*"
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
   }
 }

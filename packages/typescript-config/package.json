@@ -9,6 +9,6 @@
   "exports": {
     "./base": "./base.json",
     "./nextjs": "./nextjs.json",
-    "./react": "./react-library.json"
+    "./react-library": "./react-library.json"
   }
 }
