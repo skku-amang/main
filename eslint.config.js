@@ -22,7 +22,7 @@ export default [
       "apps/api/**/*.{js,ts}",
       "packages/api-client/**/*.{js,ts}",
       "packages/database/**/*.{js,ts}",
-      "packages/shared-types/**/*.{js,ts}",
+      "packages/@repo/shared-types/**/*.{js,ts}",
     ],
   })),
 

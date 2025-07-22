@@ -6,7 +6,7 @@ import {
   formatGenerationOrder,
   getRepresentativeRelativeTime
 } from "@/lib/utils"
-import { MemberSessionSet, Team } from "shared-types"
+import { MemberSessionSet, Team } from "@repo/shared-types"
 
 interface BasicInfoProps {
   team: Team

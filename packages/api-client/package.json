@@ -21,7 +21,7 @@
   "dependencies": {
     "http-problem-details": "^0.1.7",
     "http-status-codes": "^2.3.0",
-    "shared-types": "workspace:*"
+    "@repo/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",

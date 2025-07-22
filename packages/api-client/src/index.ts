@@ -1,4 +1,4 @@
-import { Performance, Team } from "shared-types";
+import { Performance, Team } from "@repo/shared-types";
 import { ApiResult } from "./api-result";
 import {
   ApiError,

@@ -3,10 +3,10 @@ import {
   Injectable,
   InternalServerErrorException
 } from "@nestjs/common"
-import { CreateUserDto } from "shared-types"
-import { PrismaService } from "../prisma/prisma.service"
-import * as bcrypt from "bcrypt"
 import { Prisma } from "@repo/database"
+import { CreateUserDto } from "@repo/shared-types"
+import * as bcrypt from "bcrypt"
+import { PrismaService } from "../prisma/prisma.service"
 
 @Injectable()
 export class UsersService {

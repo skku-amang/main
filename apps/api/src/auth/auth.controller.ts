@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
   HttpCode,
   HttpStatus,
-  UseGuards,
+  Post,
   Req,
-  Res
+  Res,
+  UseGuards
 } from "@nestjs/common"
+import { CreateUserDto, LoginUserDto } from "@repo/shared-types"
+import { Request, Response } from "express"
 import { AuthService } from "./auth.service"
 import { AccessTokenGuard } from "./guards/access-token.guard"
 import { RefreshTokenGuard } from "./guards/refresh-token.guard"
-import { Request, Response } from "express"
-import { LoginUserDto, CreateUserDto } from "shared-types"
 
 @Controller("auth")
 export class AuthController {

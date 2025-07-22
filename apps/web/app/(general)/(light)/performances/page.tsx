@@ -13,7 +13,7 @@ import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
 import fetchData from "@/lib/fetch"
 import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
-import { Performance } from "shared-types"
+import { Performance } from "@repo/shared-types"
 
 const PerformanceList = async () => {
   const session = await auth()

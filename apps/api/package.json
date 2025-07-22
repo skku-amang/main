@@ -36,7 +36,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "shared-types": "workspace:*"
+    "@repo/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",

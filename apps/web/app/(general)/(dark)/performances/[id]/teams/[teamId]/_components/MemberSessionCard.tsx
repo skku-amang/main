@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName, Team, User } from "shared-types"
+import { SessionName, Team, User } from "@repo/shared-types"
 
 interface MemberSessionCardProps {
   teamId: number

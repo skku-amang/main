@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 
 import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
-import { SessionName } from "shared-types"
+import { SessionName } from "@repo/shared-types"
 
 interface ApplyButtonProps {
   session: SessionName

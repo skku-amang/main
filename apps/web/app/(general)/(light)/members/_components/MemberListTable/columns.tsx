@@ -7,7 +7,7 @@ import React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatGenerationOrder } from "@/lib/utils"
-import { Session, User } from "shared-types"
+import { Session, User } from "@repo/shared-types"
 
 const SortButton = ({
   column,

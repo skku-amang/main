@@ -53,6 +53,9 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -80,9 +83,6 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
-      shared-types:
-        specifier: workspace:*
-        version: link:../../packages/shared-types
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.0
@@ -213,6 +213,9 @@ importers:
       '@repo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@repo/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.83.0(react@18.3.1)
@@ -273,9 +276,6 @@ importers:
       shadcn:
         specifier: ^2.0.1
         version: 2.9.2(@types/node@20.19.9)(typescript@5.8.3)
-      shared-types:
-        specifier: workspace:*
-        version: link:../../packages/shared-types
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.6.0
@@ -322,15 +322,15 @@ importers:
 
   packages/api-client:
     dependencies:
+      '@repo/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
       http-problem-details:
         specifier: ^0.1.7
         version: 0.1.7
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
-      shared-types:
-        specifier: workspace:*
-        version: link:../shared-types
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

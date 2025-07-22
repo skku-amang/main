@@ -1,7 +1,7 @@
 import { DEFAULT_REACT_QUERY_STALE_TIME } from "@/constants/api"
 import { useApiClient } from "@/lib/providers/api-client-provider"
+import { Team } from "@repo/shared-types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Team } from "shared-types"
 
 export function useCreateTeam() {
   const apiClient = useApiClient()
