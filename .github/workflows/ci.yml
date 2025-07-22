@@ -31,6 +31,12 @@ jobs:
       - name: Run Lint
         run: pnpm turbo lint
 
+      - name: Run Format
+        run: pnpm turbo format
+
+      - name: Run Type Check
+        run: pnpm turbo check-types
+
       - name: Run Tests
         run: pnpm turbo test
 
