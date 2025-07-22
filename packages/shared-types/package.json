@@ -2,28 +2,27 @@
   "name": "shared-types",
   "version": "0.0.1",
   "private": true,
-  "main": "./dist/index.ts",
-  "types": "./dist/index.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+    ".": "./dist/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
     }
   },
   "scripts": {
-    "build": "tsup ./src/index.ts",
-    "dev": "tsup --watch",
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
+  "dependencies": {
+    "@nestjs/mapped-types": "^2.1.0"
+  },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@repo/eslint-config": "workspace:*",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.2"
-  },
-  "dependencies": {
-    "@nestjs/mapped-types": "^2.1.0",
-    "class-validator": "^0.14.2"
+    "@repo/eslint-config": "workspace:*"
   }
 }
