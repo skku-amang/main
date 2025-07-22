@@ -7,6 +7,8 @@
     "access": "public"
   },
   "exports": {
-    "./base": "./base.json"
+    "./base": "./base.json",
+    "./nextjs": "./nextjs.json",
+    "./react": "./react-library.json"
   }
 }
