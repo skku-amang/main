@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "format": "prettier --write \"**/*.ts\"",
+    "format": "prettier --check \"**/*.ts\"",
     "lint": "eslint \"**/*.ts\" --fix",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",

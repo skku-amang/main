@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
     "lint": "eslint \"**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {

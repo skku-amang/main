@@ -6,7 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev",
     "start": "next start",
-    "format": "prettier --write \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
+    "format": "prettier --check \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
     "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix",
     "check-types": "tsc --noEmit"
   },

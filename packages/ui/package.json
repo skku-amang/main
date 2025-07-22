@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --check \"src/**/*.{ts,tsx}\"",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "generate:component": "turbo gen react-component"
   },
