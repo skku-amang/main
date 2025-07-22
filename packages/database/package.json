@@ -13,7 +13,8 @@
     }
   },
   "scripts": {
-    "build": "tsup ./index.ts",
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint \"**/*.ts\" --fix",
     "db:generate": "prisma generate",
@@ -24,8 +25,9 @@
     "@prisma/client": "^6.11.1"
   },
   "devDependencies": {
-    "prisma": "^6.11.1",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.1.0",
+    "prisma": "^6.11.1"
   }
 }
