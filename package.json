@@ -7,10 +7,13 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "db:deploy": "turbo run db:deploy"
+    "db:deploy": "turbo run db:deploy",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "eslint": "^8.57.1",
+    "eslint": "^8.57.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.6.0",
     "turbo": "^2.5.4",
     "typescript": "5.8.2"
@@ -18,5 +21,9 @@
   "packageManager": "pnpm@10.13.1",
   "engines": {
     "node": ">=18"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
   }
 }
