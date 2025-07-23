@@ -1,5 +1,5 @@
-import { Performance, Team } from "@repo/shared-types";
-import { ApiResult } from "./api-result";
+import { Performance, Team } from "@repo/shared-types"
+import { ApiResult } from "./api-result"
 import {
   ApiError,
   AuthError,
@@ -7,34 +7,34 @@ import {
   ForbiddenError,
   InternalServerError,
   NotFoundError,
-  ValidationError,
-} from "./errors";
+  ValidationError
+} from "./errors"
 
 /**
  * 서버에서 plain object로 전달되는 에러를
  * 자바스크립트의 에러 형식으로 변환합니다.
  */
-function createErrorFromProblemDocument(problemDoc: any): ApiError {
-  const detail = problemDoc.detail;
+function createErrorFromProblemDocument(problemDoc: ApiError): ApiError {
+  const detail = problemDoc.detail
 
   switch (problemDoc.type) {
     case "/errors/not-found":
-      return new NotFoundError(detail);
+      return new NotFoundError(detail)
     case "/errors/internal-server-error":
-      return new InternalServerError(detail);
+      return new InternalServerError(detail)
     case "/errors/validation-error":
-      return new ValidationError(detail);
+      return new ValidationError(detail)
     case "/errors/authentication-error":
-      return new AuthError(detail);
+      return new AuthError(detail)
     case "/errors/conflict":
-      return new ConflictError(detail);
+      return new ConflictError(detail)
     default:
-      return new InternalServerError(detail);
+      return new InternalServerError(detail)
   }
 }
 
 export default class ApiClient {
-  private static instance: ApiClient | null = null;
+  private static instance: ApiClient | null = null
 
   constructor(private baseUrl: string) {}
 
@@ -46,10 +46,10 @@ export default class ApiClient {
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
       throw new Error(
-        "ApiClient has not been initialized. Call ApiClient.initialize(config) first.",
-      );
+        "ApiClient has not been initialized. Call ApiClient.initialize(config) first."
+      )
     }
-    return ApiClient.instance;
+    return ApiClient.instance
   }
 
   /**
@@ -58,32 +58,33 @@ export default class ApiClient {
   private async _request<T, E = ApiError>(
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "DELETE",
-    body?: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    body?: any
   ): Promise<T> {
     const options: RequestInit = {
       method,
-      headers: {},
-    };
+      headers: {}
+    }
 
     if (
       body &&
       (method === "POST" || method === "PUT" || method === "DELETE")
     ) {
-      options.headers = { "Content-Type": "application/json" };
-      options.body = JSON.stringify(body);
+      options.headers = { "Content-Type": "application/json" }
+      options.body = JSON.stringify(body)
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, options);
-      const data = (await response.json()) as ApiResult<T, E>;
+      const response = await fetch(`${this.baseUrl}${endpoint}`, options)
+      const data = (await response.json()) as ApiResult<T, E>
 
       if (data.isSuccess) {
-        return data.data;
+        return data.data
       }
-      throw createErrorFromProblemDocument(data.error);
+      throw createErrorFromProblemDocument(data.error as ApiError)
     } catch {
       // 네트워크 에러만 클라이언트에서 처리
-      throw new InternalServerError();
+      throw new InternalServerError()
     }
   }
 
@@ -95,8 +96,8 @@ export default class ApiClient {
   public async createPerformance() {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
-      "POST",
-    );
+      "POST"
+    )
   }
 
   /**
@@ -107,8 +108,8 @@ export default class ApiClient {
   public async getPerformanceById(id: number) {
     return this._request<Performance, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
-      "GET",
-    );
+      "GET"
+    )
   }
 
   /**
@@ -118,8 +119,8 @@ export default class ApiClient {
   public async getPerformances() {
     return this._request<Performance[], InternalServerError>(
       `/api/performances`,
-      "GET",
-    );
+      "GET"
+    )
   }
 
   /**
@@ -132,7 +133,7 @@ export default class ApiClient {
     return this._request<
       Performance,
       NotFoundError | ValidationError | InternalServerError
-    >(`/api/performances/${id}`, "PUT");
+    >(`/api/performances/${id}`, "PUT")
   }
 
   /**
@@ -143,8 +144,8 @@ export default class ApiClient {
   public async deletePerformance(id: number) {
     return this._request<null, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
-      "DELETE",
-    );
+      "DELETE"
+    )
   }
 
   /**
@@ -157,7 +158,7 @@ export default class ApiClient {
     return this._request<
       Team,
       ValidationError | NotFoundError | InternalServerError
-    >(`/api/performances/${performanceId}/teams`, "POST", teamData);
+    >(`/api/performances/${performanceId}/teams`, "POST", teamData)
   }
 
   /**
@@ -168,8 +169,8 @@ export default class ApiClient {
   public async getTeamsByPerformance(performanceId: number) {
     return this._request<Team[], NotFoundError | InternalServerError>(
       `/api/performances/${performanceId}/teams`,
-      "GET",
-    );
+      "GET"
+    )
   }
 
   /**
@@ -180,8 +181,8 @@ export default class ApiClient {
   public async getTeamById(id: number) {
     return this._request<Team, NotFoundError | InternalServerError>(
       `/api/teams/${id}`,
-      "GET",
-    );
+      "GET"
+    )
   }
 
   /**
@@ -194,7 +195,7 @@ export default class ApiClient {
     return this._request<
       Team,
       NotFoundError | ValidationError | InternalServerError
-    >(`/api/teams/${id}`, "PUT", teamData);
+    >(`/api/teams/${id}`, "PUT", teamData)
   }
 
   /**
@@ -207,7 +208,7 @@ export default class ApiClient {
     return this._request<
       null,
       ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/teams/${id}`, "DELETE");
+    >(`/api/teams/${id}`, "DELETE")
   }
 
   /**
@@ -220,7 +221,7 @@ export default class ApiClient {
     return this._request<
       Team,
       NotFoundError | ValidationError | ConflictError | InternalServerError
-    >(`/api/teams/${teamId}/apply`, "POST");
+    >(`/api/teams/${teamId}/apply`, "POST")
   }
 
   /**
@@ -233,9 +234,9 @@ export default class ApiClient {
     return this._request<
       Team,
       NotFoundError | ValidationError | InternalServerError
-    >(`/api/teams/${teamId}/cancel`, "POST");
+    >(`/api/teams/${teamId}/cancel`, "POST")
   }
 }
 
-export * from "./api-result";
-export * from "./errors";
+export * from "./api-result"
+export * from "./errors"
