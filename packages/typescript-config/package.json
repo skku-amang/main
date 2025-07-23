@@ -6,5 +6,6 @@
     "./base": "./base.json",
     "./nextjs": "./nextjs.json",
     "./react-library": "./react-library.json"
-  }
+  },
+  "prettier": "@repo/eslint-config/prettier.config"
 }
