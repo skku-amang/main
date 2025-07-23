@@ -1,25 +1,32 @@
 {
   "name": "@repo/api-client",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js",
-    "./errors": "./dist/errors.js"
+    ".": "./dist/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
   },
   "scripts": {
-    "dev": "tsup ./index.ts --watch",
-    "build": "tsup ./index.ts",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "lint": "eslint \"**/*.{ts,tsx}\" --fix"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit",
+    "format": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
     "http-problem-details": "^0.1.7",
     "http-status-codes": "^2.3.0",
-    "shared-types": "workspace:*"
+    "@repo/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
-    "tsup": "^8.5.0",
-    "@repo/eslint-config": "workspace:*"
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
   }
 }

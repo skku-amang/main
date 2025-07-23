@@ -5,21 +5,30 @@
   "exports": {
     ".": "./dist/index.js"
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
   "scripts": {
-    "build": "tsup ./index.ts",
-    "dev": "tsup ./index.ts --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit",
+    "format": "prettier --check \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy": "prisma migrate deploy",
-    "format": "prettier --write \"**/*.ts\"",
-    "lint": "eslint \"**/*.ts\" --fix"
-  },
-  "devDependencies": {
-    "prisma": "^6.11.1",
-    "tsup": "^8.5.0",
-    "@repo/eslint-config": "workspace:*"
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.1.0",
+    "prisma": "^6.11.1"
   }
 }

@@ -1,10 +1,10 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
-  ForbiddenException
+  ForbiddenException,
+  Injectable
 } from "@nestjs/common"
-import { JwtPayload } from "shared-types"
+import { JwtPayload } from "@repo/shared-types"
 
 @Injectable()
 export class AdminGuard implements CanActivate {

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
-import { MemberSession, MemberSessionSet, User } from "shared-types"
+import { MemberSession, MemberSessionSet, User } from "@repo/shared-types"
 
 export type TeamColumn = {
   performanceId: number

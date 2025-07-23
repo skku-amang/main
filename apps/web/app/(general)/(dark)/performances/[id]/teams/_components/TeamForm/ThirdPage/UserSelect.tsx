@@ -17,7 +17,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { User } from "shared-types"
+import { User } from "@repo/shared-types"
 
 interface UserSelectProps {
   users: User[]

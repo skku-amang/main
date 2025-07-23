@@ -11,7 +11,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
-import { Performance } from "shared-types"
+import { Performance } from "@repo/shared-types"
 
 interface SelectViewProps {
   currentPerformanceId: number

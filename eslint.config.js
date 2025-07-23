@@ -22,7 +22,7 @@ export default [
       "apps/api/**/*.{js,ts}",
       "packages/api-client/**/*.{js,ts}",
       "packages/database/**/*.{js,ts}",
-      "packages/shared-types/**/*.{js,ts}",
+      "packages/@repo/shared-types/**/*.{js,ts}",
     ],
   })),
 
@@ -34,6 +34,6 @@ export default [
 
   // 무시할 파일/폴더
   {
-    ignores: ["**/dist/**", ".turbo/", "node_modules/"],
+    ignores: ["**/dist/**", ".turbo/", "node_modules/", "**/generated/**"],
   },
 ];

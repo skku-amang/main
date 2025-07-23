@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
-import { Performance } from "shared-types"
+import { Performance } from "@repo/shared-types"
 
 interface SelectViewProps {
   currentPerformanceId: number

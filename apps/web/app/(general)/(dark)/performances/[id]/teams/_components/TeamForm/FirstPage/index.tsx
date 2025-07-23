@@ -29,7 +29,7 @@ import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { Performance } from "shared-types"
+import { Performance } from "@repo/shared-types"
 
 import Description from "../Description"
 import Paginator from "../Paginator"

@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { useTeam } from "@/hooks/api/useTeam"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { MemberSessionSet, SessionOrder, Team } from "shared-types"
+import { MemberSessionSet, SessionOrder, Team } from "@repo/shared-types"
 
 interface TeamDetailProps {
   params: {

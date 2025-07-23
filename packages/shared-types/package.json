@@ -1,29 +1,30 @@
 {
-  "name": "shared-types",
+  "name": "@repo/shared-types",
   "version": "0.0.1",
   "private": true,
-  "main": "./dist/index.ts",
-  "types": "./dist/index.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+    ".": "./dist/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
     }
   },
   "scripts": {
-    "build": "tsup ./src/index.ts",
-    "dev": "tsup --watch",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit",
+    "format": "prettier --check \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.2"
   },
   "dependencies": {
     "nestjs-zod": "^4.3.1",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
   }
 }

@@ -1,16 +1,16 @@
 import {
-  generationWithBasicUsers,
-  generationWithPublicUsers
-} from "./../prisma/selectors/generation.selector"
-import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException
 } from "@nestjs/common"
 import { Prisma } from "@repo/database"
-import { CreateGenerationDto, UpdateGenerationDto } from "shared-types"
+import { CreateGenerationDto, UpdateGenerationDto } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
+import {
+  generationWithBasicUsers,
+  generationWithPublicUsers
+} from "./../prisma/selectors/generation.selector"
 
 @Injectable()
 export class GenerationService {

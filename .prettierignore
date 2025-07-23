@@ -1,2 +1,6 @@
 helm/*/templates/**/*.yaml
 helm/*/templates/**/*.yml
+dist/
+.turbo/
+node_modules/
+generated/

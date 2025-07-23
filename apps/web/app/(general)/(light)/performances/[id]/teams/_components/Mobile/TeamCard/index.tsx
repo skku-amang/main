@@ -12,7 +12,7 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { MemberSession, User } from "shared-types"
+import { MemberSession, User } from "@repo/shared-types"
 
 interface TeamCardProps {
   performanceId: number

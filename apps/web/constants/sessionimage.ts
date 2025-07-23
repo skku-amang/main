@@ -1,4 +1,4 @@
-import { SessionName } from "shared-types"
+import { SessionName } from "@repo/shared-types"
 
 type SessionImageType = {
   UNPRESSED: Record<SessionName, string>

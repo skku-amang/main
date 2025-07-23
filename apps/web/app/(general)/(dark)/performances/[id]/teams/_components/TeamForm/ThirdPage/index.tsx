@@ -8,7 +8,7 @@ import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import API_ENDPOINTS from "@/constants/apiEndpoints"
 import fetchData from "@/lib/fetch"
-import { User } from "shared-types"
+import { User } from "@repo/shared-types"
 
 import Description from "../Description"
 import Paginator from "../Paginator"
