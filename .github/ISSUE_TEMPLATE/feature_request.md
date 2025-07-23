@@ -2,7 +2,7 @@
 name: "\U0001F4A1 Feature Request"
 about: 새로운 기능에 대한 아이디어를 제안해주세요.
 title: "[FEAT] "
-labels: "feature"
+labels: "✨ 기능"
 assignees: ""
 ---
 
