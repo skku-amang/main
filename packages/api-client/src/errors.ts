@@ -48,7 +48,7 @@ export class AuthError extends ApiError {
   readonly title = "Authentication Error"
 
   constructor(detail?: string) {
-    super("인증이 필요합니다", detail)
+    super("유효한 인증 정보가 필요합니다.", detail)
   }
 }
 
