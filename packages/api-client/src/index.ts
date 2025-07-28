@@ -1,4 +1,12 @@
-import { Performance, Team } from "@repo/shared-types"
+import {
+  CreateUser,
+  Generation,
+  LoginUser,
+  Performance,
+  Session,
+  Team,
+  User
+} from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
   ApiError,
@@ -57,7 +65,7 @@ export default class ApiClient {
    */
   private async _request<T, E = ApiError>(
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any
   ): Promise<T> {
@@ -68,7 +76,10 @@ export default class ApiClient {
 
     if (
       body &&
-      (method === "POST" || method === "PUT" || method === "DELETE")
+      (method === "POST" ||
+        method === "PUT" ||
+        method === "PATCH" ||
+        method === "DELETE")
     ) {
       options.headers = { "Content-Type": "application/json" }
       options.body = JSON.stringify(body)
@@ -93,10 +104,11 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createPerformance() {
+  public async createPerformance(performanceData: Partial<Performance>) {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
-      "POST"
+      "POST",
+      performanceData
     )
   }
 
@@ -235,6 +247,209 @@ export default class ApiClient {
       Team,
       NotFoundError | ValidationError | InternalServerError
     >(`/api/teams/${teamId}/cancel`, "POST")
+  }
+
+  /**
+   * 기수 생성
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async createGeneration(generationData: Partial<Generation>) {
+    return this._request<Generation, ValidationError | InternalServerError>(
+      `/api/generations`,
+      "POST",
+      generationData
+    )
+  }
+
+  /**
+   * 기수 정보 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getGenerationById(id: number) {
+    return this._request<Generation, NotFoundError | InternalServerError>(
+      `/api/generations/${id}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 기수 목록 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getGenerations() {
+    return this._request<Generation[], InternalServerError>(
+      `/api/generations`,
+      "GET"
+    )
+  }
+
+  /**
+   * 기수 수정
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async updateGeneration(id: number) {
+    return this._request<
+      Generation,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/generations/${id}`, "PUT")
+  }
+
+  /**
+   * 기수 삭제
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async deleteGeneration(id: number) {
+    return this._request<null, NotFoundError | InternalServerError>(
+      `/api/generations/${id}`,
+      "DELETE"
+    )
+  }
+
+  /**
+   * 세션 생성
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async createSession(sessionData: Partial<Session>) {
+    return this._request<Session, ValidationError | InternalServerError>(
+      `/api/sessions`,
+      "POST",
+      sessionData
+    )
+  }
+
+  /**
+   * 세션 정보 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getSessionById(id: number) {
+    return this._request<Session, NotFoundError | InternalServerError>(
+      `/api/sessions/${id}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 세션 목록 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getSessions() {
+    return this._request<Session[], InternalServerError>(`/api/sessions`, "GET")
+  }
+
+  /**
+   * 세션 수정
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async updateSession(id: number) {
+    return this._request<
+      Session,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/sessions/${id}`, "PUT")
+  }
+
+  /**
+   * 세션 삭제
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async deleteSession(id: number) {
+    return this._request<null, NotFoundError | InternalServerError>(
+      `/api/sessions/${id}`,
+      "DELETE"
+    )
+  }
+
+  /**
+   * 유저 생성
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async createUser(userData: Partial<User>) {
+    return this._request<User, ValidationError | InternalServerError>(
+      `/api/users`,
+      "POST",
+      userData
+    )
+  }
+
+  /**
+   * 유저 정보 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getUserById(id: number) {
+    return this._request<User, NotFoundError | InternalServerError>(
+      `/api/users/${id}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 유저 목록 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getUsers() {
+    return this._request<User[], InternalServerError>(`/api/users`, "GET")
+  }
+
+  /**
+   * 유저 수정
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async updateUser(id: number) {
+    return this._request<
+      User,
+      NotFoundError | ValidationError | InternalServerError
+    >(`/api/users/${id}`, "PUT")
+  }
+
+  /**
+   * 유저 삭제
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async deleteUser(id: number) {
+    return this._request<null, NotFoundError | InternalServerError>(
+      `/api/users/${id}`,
+      "DELETE"
+    )
+  }
+
+  /**
+   * 회원가입
+   * @throws {ValidationError}
+   * @throws {ConflictError}
+   * @throws {InternalServerError}
+   */
+  public async register(userData: CreateUser) {
+    return this._request<
+      User,
+      ValidationError | ConflictError | InternalServerError
+    >("/api/register", "POST", userData)
+  }
+
+  /**
+   * 로그인
+   * @throws {AuthError}
+   * @throws {InternalServerError}
+   */
+  public async login(loginUser: LoginUser) {
+    return this._request<User, AuthError | InternalServerError>(
+      "/api/login",
+      "POST",
+      loginUser
+    )
   }
 }
 
