@@ -8,6 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SessionName {
+  VOCAL   // 보컬
+  GUITAR  // 기타
+  BASS    // 베이스
+  SYNTH   // 신디
+  DRUM    // 드럼
+  STRINGS // 현악기
+  WINDS   // 관악기
+}
+
+
 model User {
   id              Int       @id @default(autoincrement())
   email           String    @unique
@@ -21,10 +32,14 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  generationId   Int
-  generation     Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
+  generationId    Int
+  generation      Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
 
-  ledGeneration        Generation? @relation("generationLeader")
+  ledGeneration   Generation? @relation("generationLeader")
+
+  sessions        Session[]
+  ledSession      Session?  @relation("sessionLeader")
+
   @@map("users")
 }
 
@@ -34,10 +49,24 @@ model Generation {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  leader    User?     @relation("generationLeader", fields: [leaderId], references: [id], onDelete: SetNull)
-  leaderId  Int?      @unique
+  leader          User?     @relation("generationLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+  leaderId        Int?      @unique
 
-  users         User[]
+  users           User[]
 
   @@map("generations")
+}
+
+model Session {
+  id              Int       @id @default(autoincrement())
+  name            SessionName @unique
+  icon            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  leader          User?     @relation("sessionLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+  leaderId        Int?      @unique
+
+  users           User[]
+  @@map("sessions")
 }

@@ -6,6 +6,7 @@ import { PrismaModule } from "./prisma/prisma.module"
 import { UsersModule } from "./users/users.module"
 import { AuthModule } from "./auth/auth.module"
 import { GenerationModule } from "./generation/generation.module"
+import { SessionModule } from "./session/session.module"
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { GenerationModule } from "./generation/generation.module"
     PrismaModule,
     UsersModule,
     AuthModule,
-    GenerationModule
+    GenerationModule,
+    SessionModule
   ],
   controllers: [AppController],
   providers: [AppService]
