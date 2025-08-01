@@ -71,9 +71,30 @@ export class GenerationService {
   async update(id: number, updateGenerationDto: UpdateGenerationDto) {
     await this.findOne(id) // Ensure the generation exists before updating
     try {
+      // DTO에서 관계성 필드와 관련 없는 필드 분리
+      const { leaderId, users, ...scalarData } = updateGenerationDto
+      const updatePayload: Prisma.GenerationUpdateInput = {
+        ...scalarData
+      }
+
+      if (leaderId !== undefined) {
+        // leaderId가 존재하는 경우 관계성 필드 업데이트
+        updatePayload.leader =
+          leaderId === null
+            ? { disconnect: true }
+            : { connect: { id: leaderId } }
+      }
+
+      if (users !== undefined) {
+        // users가 존재하는 경우 관계성 필드 업데이트
+        updatePayload.users = {
+          set: users.map((userId) => ({ id: userId }))
+        }
+      }
+
       await this.prisma.generation.update({
         where: { id },
-        data: updateGenerationDto
+        data: updatePayload
       })
       return this.findOne(id)
     } catch (error) {
@@ -90,6 +111,12 @@ export class GenerationService {
               `해당 유저(ID: ${updateGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
             )
           }
+        }
+        if (error.code === "P2025") {
+          // P2025: An operation failed because it depends on one or more records that were required but not found.
+          throw new NotFoundException(
+            "리더 ID 혹은 사용자 ID가 유효하지 않습니다."
+          )
         }
         // RFC 7807 적용 시, throw error; 로 변경 필요
         throw new InternalServerErrorException(
