@@ -27,23 +27,25 @@ import {
 function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
   const { detail, instance, type } = problemDoc
 
-  switch (problemDoc.type) {
+  switch (type) {
     case "/errors/validation-error":
-      return new ValidationError(detail)
+      return new ValidationError(detail, instance)
     case "/errors/authentication-error":
-      return new AuthError(detail)
+      return new AuthError(detail, instance)
     case "/errors/forbidden":
-      return new ForbiddenError(detail)
+      return new ForbiddenError(detail, instance)
     case "/errors/not-found":
-      return new NotFoundError(detail)
+      return new NotFoundError(detail, instance)
     case "/errors/conflict":
-      return new ConflictError(detail)
+      return new ConflictError(detail, instance)
     case "/errors/unprocessable-entity":
-      return new UnprocessableEntityError(detail)
+      return new UnprocessableEntityError(detail, instance)
     case "/errors/internal-server-error":
-      return new InternalServerError(detail)
+      return new InternalServerError(detail, instance)
     default:
-      return new InternalServerError(detail)
+      // API 서버에서 알 수 없는 에러가 전달될 경우
+      // detail과 instance가 없을 수 있습니다.
+      return new InternalServerError()
   }
 }
 
