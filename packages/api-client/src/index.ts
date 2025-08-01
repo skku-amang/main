@@ -53,7 +53,9 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
     case "/errors/internal-server-error":
       return new InternalServerError(detail, instance)
     default:
-      return new InternalServerError(detail, instance)
+      // API 서버에서 알 수 없는 에러가 전달될 경우
+      // detail과 instance가 없을 수 있습니다.
+      return new InternalServerError()
   }
 }
 
