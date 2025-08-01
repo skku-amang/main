@@ -415,9 +415,6 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@repo/database':
-        specifier: workspace:*
-        version: link:../database
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
