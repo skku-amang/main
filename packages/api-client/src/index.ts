@@ -27,16 +27,20 @@ function createErrorFromProblemDocument(problemDoc: ApiError): ApiError {
   const detail = problemDoc.detail
 
   switch (problemDoc.type) {
-    case "/errors/not-found":
-      return new NotFoundError(detail)
-    case "/errors/internal-server-error":
-      return new InternalServerError(detail)
     case "/errors/validation-error":
       return new ValidationError(detail)
     case "/errors/authentication-error":
       return new AuthError(detail)
+    case "/errors/forbidden":
+      return new ForbiddenError(detail)
+    case "/errors/not-found":
+      return new NotFoundError(detail)
     case "/errors/conflict":
       return new ConflictError(detail)
+    case "/errors/unprocessable-entity":
+      return new UnprocessableEntityError(detail)
+    case "/errors/internal-server-error":
+      return new InternalServerError(detail)
     default:
       return new InternalServerError(detail)
   }
