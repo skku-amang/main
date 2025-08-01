@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { createZodDto } from "nestjs-zod";
-import { CreateSessionSchema } from "./create-session.schema";
+import { z } from "zod"
+import { createZodDto } from "nestjs-zod"
+import { CreateSessionSchema } from "./create-session.schema"
 
 /**
  * @description 세션 업데이트 Zod 스키마
@@ -12,9 +12,9 @@ export const UpdateSessionSchema = CreateSessionSchema.partial()
     /**
      * @description 세션에 속한 사용자들의 ID 배열
      */
-    users: z.array(z.number().int()).optional(),
+    users: z.array(z.number().int()).optional()
   })
-  .strict();
+  .strict()
 
 /**
  * @description 세션 업데이트 DTO 클래스 (백엔드용)
@@ -24,4 +24,4 @@ export class UpdateSessionDto extends createZodDto(UpdateSessionSchema) {}
 /**
  * @description 세션 업데이트 타입 (프론트엔드용)
  */
-export type UpdateSession = z.infer<typeof UpdateSessionSchema>;
+export type UpdateSession = z.infer<typeof UpdateSessionSchema>

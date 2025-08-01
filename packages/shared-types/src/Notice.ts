@@ -1,10 +1,10 @@
-import { User } from "./User";
+import { User } from "./User"
 
 export type Notice = {
-  id: number;
-  title: string;
-  content: string;
-  author: User;
-  createdDatetime: Date;
-  editedDatetime: Date;
-};
+  id: number
+  title: string
+  content: string
+  author: User
+  createdDatetime: Date
+  editedDatetime: Date
+}

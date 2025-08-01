@@ -30,5 +30,6 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.1.0",
     "prisma": "^6.11.1"
-  }
+  },
+  "prettier": "@repo/eslint-config/prettier.config"
 }

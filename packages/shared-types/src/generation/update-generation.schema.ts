@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { createZodDto } from "nestjs-zod";
-import { CreateGenerationSchema } from "./create-generation.schema";
+import { createZodDto } from "nestjs-zod"
+import { z } from "zod"
+import { CreateGenerationSchema } from "./create-generation.schema"
 
 /**
  * @description 기수 업데이트 Zod 스키마
@@ -11,9 +11,9 @@ export const UpdateGenerationSchema = CreateGenerationSchema.partial()
     /**
      * @description 기수에 속한 사용자들의 ID 배열
      */
-    users: z.array(z.number().int()).optional(),
+    users: z.array(z.number().int()).optional()
   })
-  .strict();
+  .strict()
 
 /**
  * @description 기수 업데이트 DTO 클래스 (백엔드용)
@@ -23,4 +23,4 @@ export class UpdateGenerationDto extends createZodDto(UpdateGenerationSchema) {}
 /**
  * @description 기수 업데이트 타입 (프론트엔드용)
  */
-export type UpdateGeneration = z.infer<typeof UpdateGenerationSchema>;
+export type UpdateGeneration = z.infer<typeof UpdateGenerationSchema>

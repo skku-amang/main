@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { User } from "./User";
+import { User } from "./User"
 
 export type SessionName =
   | "보컬"
@@ -8,11 +8,11 @@ export type SessionName =
   | "신디"
   | "드럼"
   | "현악기"
-  | "관악기";
+  | "관악기"
 
 export type Session = {
-  id: number;
-  name: SessionName;
-  leader?: User; // 세션장
-  icon?: string;
-};
+  id: number
+  name: SessionName
+  leader?: User // 세션장
+  icon?: string
+}
