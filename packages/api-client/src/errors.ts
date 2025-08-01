@@ -75,6 +75,10 @@ export class ForbiddenError extends ApiError {
   }
 }
 
+/**
+ * 요청이 서버의 현재 상태와 충돌하는 경우 발생하는 오류입니다.
+ * @example 중복된 데이터 생성 시
+ */
 export class ConflictError extends ApiError {
   readonly type = "/errors/conflict"
   readonly status = 409
@@ -82,5 +86,20 @@ export class ConflictError extends ApiError {
 
   constructor(detail?: string, instance?: string) {
     super("이미 존재하는 데이터입니다", detail, instance)
+  }
+}
+
+/**
+ * 요청 내용 자체에 문제가 있는 경우 발생하는 오류입니다.
+ * JSON 문법은 올바르지만, 요청된 엔티티가 유효하지 않거나 처리할 수 없는 경우에 사용됩니다.
+ * @example 유효하지 않은 외래 키 참조
+ */
+export class UnprocessableEntityError extends ApiError {
+  readonly type = "/errors/unprocessable-entity"
+  readonly status = 422
+  readonly title = "Unprocessable Entity"
+
+  constructor(detail?: string, instance?: string) {
+    super("처리할 수 없는 엔티티입니다", detail, instance)
   }
 }
