@@ -15,6 +15,7 @@ import {
   ForbiddenError,
   InternalServerError,
   NotFoundError,
+  UnprocessableEntityError,
   ValidationError
 } from "./errors"
 
@@ -104,7 +105,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createPerformance(performanceData: Partial<Performance>) {
+  public async createPerformance(performanceData: Performance) {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
       "POST",
@@ -141,35 +142,46 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updatePerformance(id: number) {
+  public async updatePerformance(
+    id: number,
+    performanceData: Partial<Performance>
+  ) {
     return this._request<
       Performance,
       NotFoundError | ValidationError | InternalServerError
-    >(`/api/performances/${id}`, "PUT")
+    >(`/api/performances/${id}`, "PATCH", performanceData)
   }
 
   /**
    * 공연 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 공연 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async deletePerformance(id: number) {
-    return this._request<null, NotFoundError | InternalServerError>(
-      `/api/performances/${id}`,
-      "DELETE"
-    )
+    return this._request<
+      null,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/performances/${id}`, "DELETE")
   }
 
   /**
    * 팀 생성
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 팀 생성 권한이 없는 경우
    * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createTeam(performanceId: number, teamData: Partial<Team>) {
+  public async createTeam(performanceId: number, teamData: Team) {
     return this._request<
       Team,
-      ValidationError | NotFoundError | InternalServerError
+      | ValidationError
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | InternalServerError
     >(`/api/performances/${performanceId}/teams`, "POST", teamData)
   }
 
@@ -199,6 +211,8 @@ export default class ApiClient {
 
   /**
    * 팀 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 팀 수정 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
@@ -206,12 +220,17 @@ export default class ApiClient {
   public async updateTeam(id: number, teamData: Partial<Team>) {
     return this._request<
       Team,
-      NotFoundError | ValidationError | InternalServerError
-    >(`/api/teams/${id}`, "PUT", teamData)
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | InternalServerError
+    >(`/api/teams/${id}`, "PATCH", teamData)
   }
 
   /**
    * 팀 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ForbiddenError} 팀 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
@@ -219,47 +238,61 @@ export default class ApiClient {
   public async deleteTeam(id: number) {
     return this._request<
       null,
-      ForbiddenError | NotFoundError | InternalServerError
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/api/teams/${id}`, "DELETE")
   }
 
   /**
    * 팀에 지원
+   * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {ConflictError} 이미 지원한 팀인 경우
+   * @throws {ConflictError} 이미 지원했거나 소속된 팀인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async applyToTeam(teamId: number): Promise<Team> {
+  public async applyToTeam(
+    teamId: number,
+    teamApplicationData: {
+      // TODO: Team API 도입시 타입 정의
+      sessionId: number
+    }
+  ) {
     return this._request<
       Team,
-      NotFoundError | ValidationError | ConflictError | InternalServerError
-    >(`/api/teams/${teamId}/apply`, "POST")
+      | AuthError
+      | NotFoundError
+      | ValidationError
+      | ConflictError
+      | InternalServerError
+    >(`/api/teams/${teamId}/apply`, "POST", teamApplicationData)
   }
 
   /**
    * 팀 지원 취소
-   * @throws {ValidationError} 지원하지 않은 팀인 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {UnprocessableEntityError} 지원하지 않은 팀인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async cancelTeamApplication(teamId: number): Promise<Team> {
+  // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
+  public async cancelTeamApplication(teamId: number) {
     return this._request<
       Team,
-      NotFoundError | ValidationError | InternalServerError
+      AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
     >(`/api/teams/${teamId}/cancel`, "POST")
   }
 
   /**
    * 기수 생성
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 기수 생성 권한이 없는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createGeneration(generationData: Partial<Generation>) {
-    return this._request<Generation, ValidationError | InternalServerError>(
-      `/api/generations`,
-      "POST",
-      generationData
-    )
+  public async createGeneration(generationData: Generation) {
+    return this._request<
+      Generation,
+      AuthError | ForbiddenError | ValidationError | InternalServerError
+    >(`/api/generations`, "POST", generationData)
   }
 
   /**
@@ -287,40 +320,52 @@ export default class ApiClient {
 
   /**
    * 기수 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 기수 수정 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateGeneration(id: number) {
+  public async updateGeneration(
+    id: number,
+    generationData: Partial<Generation>
+  ) {
     return this._request<
       Generation,
-      NotFoundError | ValidationError | InternalServerError
-    >(`/api/generations/${id}`, "PUT")
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | InternalServerError
+    >(`/api/generations/${id}`, "PATCH", generationData)
   }
 
   /**
    * 기수 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 기수 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async deleteGeneration(id: number) {
-    return this._request<null, NotFoundError | InternalServerError>(
-      `/api/generations/${id}`,
-      "DELETE"
-    )
+    return this._request<
+      null,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/generations/${id}`, "DELETE")
   }
 
   /**
    * 세션 생성
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 세션 생성 권한이 없는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createSession(sessionData: Partial<Session>) {
-    return this._request<Session, ValidationError | InternalServerError>(
-      `/api/sessions`,
-      "POST",
-      sessionData
-    )
+  public async createSession(sessionData: Session) {
+    return this._request<
+      Session,
+      AuthError | ForbiddenError | ValidationError | InternalServerError
+    >(`/api/sessions`, "POST", sessionData)
   }
 
   /**
@@ -345,97 +390,130 @@ export default class ApiClient {
 
   /**
    * 세션 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 세션 수정 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateSession(id: number) {
+  public async updateSession(id: number, sessionData: Partial<Session>) {
     return this._request<
       Session,
-      NotFoundError | ValidationError | InternalServerError
-    >(`/api/sessions/${id}`, "PUT")
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | InternalServerError
+    >(`/api/sessions/${id}`, "PATCH", sessionData)
   }
 
   /**
    * 세션 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 세션 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async deleteSession(id: number) {
-    return this._request<null, NotFoundError | InternalServerError>(
-      `/api/sessions/${id}`,
-      "DELETE"
-    )
+    return this._request<
+      null,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/sessions/${id}`, "DELETE")
   }
 
   /**
    * 유저 생성
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 유저 생성 권한이 없는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ConflictError} 이미 존재하는 유저인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createUser(userData: Partial<User>) {
-    return this._request<User, ValidationError | InternalServerError>(
-      `/api/users`,
-      "POST",
-      userData
-    )
+  public async createUser(userData: CreateUser) {
+    return this._request<
+      User,
+      | AuthError
+      | ForbiddenError
+      | ValidationError
+      | ConflictError
+      | InternalServerError
+    >(`/api/users`, "POST", userData)
   }
 
   /**
    * 유저 정보 조회
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async getUserById(id: number) {
-    return this._request<User, NotFoundError | InternalServerError>(
-      `/api/users/${id}`,
-      "GET"
-    )
+    return this._request<
+      User,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/users/${id}`, "GET")
   }
 
   /**
    * 유저 목록 조회
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async getUsers() {
-    return this._request<User[], InternalServerError>(`/api/users`, "GET")
+    return this._request<
+      User[],
+      AuthError | ForbiddenError | InternalServerError
+    >(`/api/users`, "GET")
   }
 
   /**
    * 유저 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateUser(id: number) {
+  public async updateUser(id: number, userData: Partial<User>) {
     return this._request<
       User,
-      NotFoundError | ValidationError | InternalServerError
-    >(`/api/users/${id}`, "PUT")
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | InternalServerError
+    >(`/api/users/${id}`, "PATCH", userData)
   }
 
   /**
    * 유저 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 유저 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async deleteUser(id: number) {
-    return this._request<null, NotFoundError | InternalServerError>(
-      `/api/users/${id}`,
-      "DELETE"
-    )
+    return this._request<
+      null,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/api/users/${id}`, "DELETE")
   }
 
   /**
    * 회원가입
    * @throws {ValidationError}
    * @throws {ConflictError}
+   * @throws {UnprocessableEntityError} 존재하지 않는 기수인 경우
    * @throws {InternalServerError}
    */
   public async register(userData: CreateUser) {
     return this._request<
       User,
-      ValidationError | ConflictError | InternalServerError
+      | ValidationError
+      | ConflictError
+      | UnprocessableEntityError
+      | InternalServerError
     >("/api/register", "POST", userData)
   }
 
