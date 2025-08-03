@@ -1,9 +1,13 @@
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import dayjs from "dayjs"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ROUTES from "@/constants/routes"
 import MyReservationField from "../_components/MyReservationField"
+import WeekColumn from "../_components/WeekCalendarField/WeekColumn"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import AddScheduleButton from "../_components/WeekCalendarField/AddScheduleButton"
 
 const ReservationPage = () => {
   return (
@@ -26,7 +30,7 @@ const ReservationPage = () => {
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>
             </TabsList>
-            <TabsContent value="week">
+            <TabsContent className="relative" value="week">
               <div className="w-full mt-7 flex bg-white">
                 <div className="w-7 flex flex-col">
                   {Array.from({ length: 16 }).map((_, i) => {
@@ -44,21 +48,18 @@ const ReservationPage = () => {
                     )
                   })}
                 </div>
-
-                <div className="flex-1 flex flex-col">
-                  <div className="w-[14.28%] border-x-[1.5px] border-gray-100">
-                    <div className="w-full bg-gray-50 h-[42px] border-t-[1.5px] border-gray-100 text-xs text-black font-medium flex justify-center items-center">
-                      Sun 6
-                    </div>
-                    {Array.from({ length: 15 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
-                      ></div>
-                    ))}
-                  </div>
+                <div className="flex-1 flex">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <WeekColumn key={i} />
+                  ))}
                 </div>
               </div>
+              <div className="absolute flex gap-5 items-center text-gray-700 font-semibold text-xl right-1/2 translate-x-1/2 -top-[62px]">
+                <ChevronLeft />
+                Jan 06-12, 2025
+                <ChevronRight />
+              </div>
+              <AddScheduleButton className="absolute -top-[62px] right-0" />
             </TabsContent>
             <TabsContent value="month">Change your password here.</TabsContent>
           </Tabs>
