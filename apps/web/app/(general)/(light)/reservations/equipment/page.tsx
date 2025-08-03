@@ -1,4 +1,3 @@
-import ReservationStatus from "@/app/(general)/(light)/reservations/_components/ReservationStatus"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
@@ -22,8 +21,6 @@ const ReservationPage = () => {
           }
         ]}
       />
-
-      <ReservationStatus />
     </div>
   )
 }
