@@ -1,6 +1,11 @@
 import { DEFAULT_REACT_QUERY_STALE_TIME } from "@/constants/api"
 import { useApiClient } from "@/lib/providers/api-client-provider"
-import { Team } from "@repo/shared-types"
+import {
+  CreateTeam,
+  Team,
+  TeamApplication,
+  UpdateTeam
+} from "@repo/shared-types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useCreateTeam() {
@@ -8,8 +13,13 @@ export function useCreateTeam() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (performanceId: number, teamData: CreateTeamDTO) =>
-      apiClient.createTeam(performanceId, teamData),
+    mutationFn: ({
+      performanceId,
+      teamData
+    }: {
+      performanceId: number
+      teamData: CreateTeam
+    }) => apiClient.createTeam(performanceId, teamData),
     onSuccess: (newTeam: Team) => {
       queryClient.invalidateQueries({ queryKey: ["teams"] })
       queryClient.setQueryData(["team", newTeam.id], newTeam)
@@ -49,7 +59,7 @@ export function useUpdateTeam(teamId: number) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (updateData: UpdateTeamDTO) =>
+    mutationFn: (updateData: UpdateTeam) =>
       apiClient.updateTeam(teamId, updateData),
     onSuccess: (updatedTeam: Team) => {
       queryClient.setQueryData(["team", teamId], updatedTeam)
@@ -76,7 +86,7 @@ export function useTeamApplication(teamId: number) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (applicationData: TeamApplicationDTO) =>
+    mutationFn: (applicationData: TeamApplication) =>
       apiClient.applyToTeam(teamId, applicationData),
     onSuccess: (updatedTeam: Team) => {
       queryClient.setQueryData(["team", teamId], updatedTeam)

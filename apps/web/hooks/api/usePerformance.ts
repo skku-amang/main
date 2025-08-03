@@ -1,6 +1,10 @@
 import { DEFAULT_REACT_QUERY_STALE_TIME } from "@/constants/api"
 import { useApiClient } from "@/lib/providers/api-client-provider"
-import { Performance } from "@repo/shared-types"
+import {
+  CreatePerformance,
+  Performance,
+  UpdatePerformance
+} from "@repo/shared-types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useCreatePerformance() {
@@ -8,7 +12,7 @@ export function useCreatePerformance() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (performanceData: CreatePerformanceDTO) =>
+    mutationFn: (performanceData: CreatePerformance) =>
       apiClient.createPerformance(performanceData),
     onSuccess: (newPerformance: Performance) => {
       queryClient.invalidateQueries({ queryKey: ["performances"] })
@@ -47,7 +51,7 @@ export function useUpdatePerformance(performanceId: number) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (updateData: UpdatePerformanceDTO) =>
+    mutationFn: (updateData: UpdatePerformance) =>
       apiClient.updatePerformance(performanceId, updateData),
     onSuccess: (updatedPerformance: Performance) => {
       queryClient.setQueryData(
