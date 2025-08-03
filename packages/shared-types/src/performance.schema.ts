@@ -12,5 +12,7 @@ export const CreatePerformanceSchema = z.object({
   endAt: z.string().datetime("종료 날짜는 유효한 날짜여야 합니다."),
   status: z.enum(["예정", "진행중", "종료"]) // TODO: prisma enum으로 변경
 })
+export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
 
 export const UpdatePerformanceSchema = CreatePerformanceSchema.partial()
+export type UpdatePerformance = z.infer<typeof UpdatePerformanceSchema>

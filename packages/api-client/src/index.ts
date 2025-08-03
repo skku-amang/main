@@ -1,10 +1,20 @@
 import {
+  CreateGeneration,
+  CreatePerformance,
+  CreateSession,
+  CreateTeam,
   CreateUser,
   Generation,
   LoginUser,
   Performance,
   Session,
   Team,
+  TeamApplication,
+  UpdateGeneration,
+  UpdatePerformance,
+  UpdateSession,
+  UpdateTeam,
+  UpdateUser,
   User
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
@@ -109,7 +119,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createPerformance(performanceData: Performance) {
+  public async createPerformance(performanceData: CreatePerformance) {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
       "POST",
@@ -148,7 +158,7 @@ export default class ApiClient {
    */
   public async updatePerformance(
     id: number,
-    performanceData: Partial<Performance>
+    performanceData: UpdatePerformance
   ) {
     return this._request<
       Performance,
@@ -178,7 +188,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createTeam(performanceId: number, teamData: Team) {
+  public async createTeam(performanceId: number, teamData: CreateTeam) {
     return this._request<
       Team,
       | ValidationError
@@ -221,7 +231,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateTeam(id: number, teamData: Partial<Team>) {
+  public async updateTeam(id: number, teamData: UpdateTeam) {
     return this._request<
       Team,
       | AuthError
@@ -255,10 +265,7 @@ export default class ApiClient {
    */
   public async applyToTeam(
     teamId: number,
-    teamApplicationData: {
-      // TODO: Team API 도입시 타입 정의
-      sessionId: number
-    }
+    teamApplicationData: TeamApplication
   ) {
     return this._request<
       Team,
@@ -278,11 +285,14 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
-  public async cancelTeamApplication(teamId: number) {
+  public async unapplyFromTeam(
+    teamId: number,
+    teamApplicationData: TeamApplication
+  ) {
     return this._request<
       Team,
       AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
-    >(`/api/teams/${teamId}/cancel`, "POST")
+    >(`/api/teams/${teamId}/cancel`, "POST", teamApplicationData)
   }
 
   /**
@@ -292,7 +302,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createGeneration(generationData: Generation) {
+  public async createGeneration(generationData: CreateGeneration) {
     return this._request<
       Generation,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -330,10 +340,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateGeneration(
-    id: number,
-    generationData: Partial<Generation>
-  ) {
+  public async updateGeneration(id: number, generationData: UpdateGeneration) {
     return this._request<
       Generation,
       | AuthError
@@ -365,7 +372,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createSession(sessionData: Session) {
+  public async createSession(sessionData: CreateSession) {
     return this._request<
       Session,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -400,7 +407,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateSession(id: number, sessionData: Partial<Session>) {
+  public async updateSession(id: number, sessionData: UpdateSession) {
     return this._request<
       Session,
       | AuthError
@@ -479,7 +486,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateUser(id: number, userData: Partial<User>) {
+  public async updateUser(id: number, userData: UpdateUser) {
     return this._request<
       User,
       | AuthError
