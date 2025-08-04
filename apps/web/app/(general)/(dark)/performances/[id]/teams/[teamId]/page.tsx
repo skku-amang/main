@@ -1,28 +1,23 @@
 "use client"
 
 import { Separator } from "@radix-ui/react-separator"
-import { StatusCodes } from "http-status-codes"
-import { ChevronRight, Maximize2 } from "lucide-react"
+import { Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 
-import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
-import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
-import { useToast } from "@/components/hooks/use-toast"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
-import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { useTeam } from "@/hooks/api/useTeam"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { MemberSessionSet, SessionOrder, Team } from "@repo/shared-types"
+import { MemberSessionSet, SessionOrder } from "@repo/shared-types"
+import useTeamApplication from "./_hooks/useTeamApplication"
 
 interface TeamDetailProps {
   params: {
@@ -34,88 +29,13 @@ interface TeamDetailProps {
 const TeamDetail = (props: TeamDetailProps) => {
   const session = useSession()
   const router = useRouter()
-  const { toast } = useToast()
 
   const performanceId = props.params.id
   const id = props.params.teamId
 
   const { data: team, isLoading, isError } = useTeam(id)
-
-  const [selectedSessionsWithIndex, setSelectedSessionsWithIndex] = useState<
-    string[]
-  >([])
-  function toggleSelectedSessionWithIndex(sessionWithIndex: string) {
-    setSelectedSessionsWithIndex((prev) => {
-      if (prev.includes(sessionWithIndex)) {
-        return prev.filter(
-          (selectedSessionWithIndex) =>
-            selectedSessionWithIndex !== sessionWithIndex
-        )
-      } else {
-        return [...prev, sessionWithIndex]
-      }
-    })
-  }
-
-  async function onApply() {
-    if (selectedSessionsWithIndex.length === 0) {
-      toast({
-        title: "세션 지원 실패",
-        description: "적어도 하나의 세션을 선택해야 합니다",
-        variant: "destructive"
-      })
-      return
-    }
-
-    const res = await fetchData(API_ENDPOINTS.TEAM.APPLY(id) as ApiEndpoint, {
-      body: JSON.stringify({
-        applications: selectedSessionsWithIndex.map(
-          (selectedSessionWithIndex) => {
-            const [session, index] = selectedSessionWithIndex.split("__")
-            return { session, index: +index - 1 }
-          }
-        )
-      }),
-      cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${session.data?.access}`,
-        "Content-Type": "application/json"
-      }
-    })
-
-    if (!res.ok) {
-      switch (res.status) {
-        case StatusCodes.BAD_REQUEST:
-          toast({
-            title: "세션 지원 실패",
-            description: (await res.json())?.detail || "알 수 없는 에러 발생",
-            variant: "destructive"
-          })
-          break
-        case StatusCodes.CONFLICT:
-          toast({
-            title: "세션 지원 실패",
-            description: "이미 등록된 세션입니다.",
-            variant: "destructive"
-          })
-          break
-        default:
-          toast({
-            title: "세션 지원 실패",
-            description: "알 수 없는 에러 발생",
-            variant: "destructive"
-          })
-      }
-      return
-    }
-
-    const data = (await res.json()) as Team
-    toast({
-      title: "지원 완료",
-      description: "성공적으로 팀에 등록되었습니다!"
-    })
-    setTeam(data)
-  }
+  const { selectedSession, setSelectedSession, onApply } =
+    useTeamApplication(id)
 
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
@@ -243,27 +163,6 @@ const TeamDetail = (props: TeamDetailProps) => {
                 </div>
               </div>
               <Separator className="hidden h-[1.5px] w-full bg-slate-200 md:block" />
-              {memberSessionsWithAtleastOneMember.map((ms) =>
-                ms.members.map((member, index) => {
-                  if (member) {
-                    return (
-                      <div
-                        key={`${ms.session}-${index}`}
-                        className="flex flex-col"
-                      >
-                        <MemberSessionCard
-                          teamId={team.id}
-                          session={ms.session}
-                          sessionIndex={index + 1}
-                          user={member}
-                          onUnapplySuccess={setTeam}
-                        />
-                        <Separator className="h-[1.5px] w-full bg-slate-200" />
-                      </div>
-                    )
-                  }
-                })
-              )}
             </div>
           </SessionSetCard>
 
@@ -282,61 +181,6 @@ const TeamDetail = (props: TeamDetailProps) => {
                 수 있습니다
               </li>
             </ul>
-
-            {memberSessionsWithMissingMembers.length > 0 ? (
-              <div>
-                <div className="grid grid-cols-2 gap-x-[26px] gap-y-[26px]">
-                  {memberSessionsWithMissingMembers.map((ms) =>
-                    ms.members.map(
-                      (member, index) =>
-                        member === null && (
-                          <ApplyButton
-                            key={`${ms.session}-${index}`}
-                            session={ms.session}
-                            memberSessionIndex={index + 1}
-                            selectedSessionsWithIndex={
-                              selectedSessionsWithIndex
-                            }
-                            toggleSelectedSessionWithIndex={
-                              toggleSelectedSessionWithIndex
-                            }
-                          />
-                        )
-                    )
-                  )}
-                </div>
-
-                <Separator className="mt-6 hidden h-[1.5px] bg-slate-200 md:block" />
-
-                {/* 지원 버튼 - 데스크톱 */}
-                <div className="mt-6 hidden h-10 justify-end md:flex">
-                  <Button
-                    variant="outline"
-                    className="w-30 flex h-10 items-center justify-center gap-2 rounded-md border-2 border-primary shadow"
-                    onClick={onApply}
-                    disabled={selectedSessionsWithIndex.length === 0}
-                  >
-                    <div className="flex justify-center text-base font-bold leading-normal text-primary">
-                      지원하기
-                    </div>
-                    <ChevronRight className="h-6 w-6 text-primary" />
-                  </Button>
-                </div>
-
-                {/* 지원 버튼 - 모바일 */}
-                <Button
-                  className="mt-6 flex h-10 w-full items-center justify-center rounded-full text-sm text-white shadow md:hidden"
-                  onClick={onApply}
-                  disabled={selectedSessionsWithIndex.length === 0}
-                >
-                  지원하기
-                </Button>
-              </div>
-            ) : (
-              <div className="col-span-2 mb-5 mt-10 flex h-6 justify-center text-lg font-medium leading-normal text-gray-500">
-                참여가능한 세션이 없습니다
-              </div>
-            )}
           </SessionSetCard>
         </div>
       </div>

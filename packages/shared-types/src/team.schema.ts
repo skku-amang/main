@@ -1,19 +1,12 @@
-import { SessionName } from "@repo/database"
 import z from "zod"
-
-// TODO: 세션명 제대로 List로 나오는지 확인 필요
-const sessionNames = Object.values(SessionName) as [
-  SessionName,
-  ...SessionName[]
-]
 
 /**
  * 각 팀에 소속된 멤버의 세션(with 몇 번째 인지도) 정보
- * 예: { userId: 1, session: "기타", index: 2 } => 유저 ID 1은 기타2 세션
+ * 예: { userId: 1, sessionId: 2, index: 2 } => 유저 ID 1은 세션 ID 2(기타)의 2번째 인덱스
  */
 export const MemberSessionIndexSchema = z.object({
   userId: z.number().int("유저 ID는 정수여야 합니다.").positive(),
-  session: z.enum(sessionNames),
+  sessionId: z.number().int("세션 ID는 정수여야 합니다.").positive(),
   index: z.number().int("인덱스는 정수여야 합니다.").positive()
 })
 
