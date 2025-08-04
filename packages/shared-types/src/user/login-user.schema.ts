@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { createZodDto } from "nestjs-zod"
 
 /**
  * @description 로그인에 사용될 Zod 스키마
@@ -16,11 +15,6 @@ export const LoginUserSchema = z
     password: z.string().min(1, { message: "비밀번호는 비워둘 수 없습니다." })
   })
   .strict()
-
-/**
- * @description 로그인에 사용될 DTO 클래스 (백엔드용)
- */
-export class LoginUserDto extends createZodDto(LoginUserSchema) {}
 
 /**
  * @description 로그인에 사용될 순수 데이터 타입 (프론트엔드용)

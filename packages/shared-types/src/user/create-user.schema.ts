@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { createZodDto } from "nestjs-zod"
 import { PASSWORD_REGEX } from "../constants/regex"
 
 /**
@@ -22,11 +21,6 @@ export const CreateUserSchema = z
       .int("기수 ID는 정수여야 합니다.")
   })
   .strict()
-
-/**
- * @description 사용자 생성 DTO 클래스 (백엔드용)
- */
-export class CreateUserDto extends createZodDto(CreateUserSchema) {}
 
 /**
  * @description 사용자 생성 타입 (프론트엔드용)

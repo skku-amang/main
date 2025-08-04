@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { createZodDto } from "nestjs-zod"
 
 /**
  * @description 기수 생성 Zod 스키마
@@ -17,11 +16,6 @@ export const CreateGenerationSchema = z
       .optional()
   })
   .strict()
-
-/**
- * @description 기수 생성 DTO 클래스 (백엔드용)
- */
-export class CreateGenerationDto extends createZodDto(CreateGenerationSchema) {}
 
 /**
  * @description 기수 생성 타입 (프론트엔드용)
