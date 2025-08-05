@@ -34,8 +34,7 @@ const TeamDetail = (props: TeamDetailProps) => {
   const id = props.params.teamId
 
   const { data: team, isLoading, isError } = useTeam(id)
-  const { selectedSession, setSelectedSession, onApply } =
-    useTeamApplication(id)
+  const { selectedSessions } = useTeamApplication(id)
 
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 

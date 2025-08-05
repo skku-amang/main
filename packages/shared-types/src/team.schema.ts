@@ -39,7 +39,9 @@ export type UpdateTeam = z.infer<typeof UpdateTeamSchema>
  * - `userId`는 토큰을 통해 가져오므로 클라이언트에서 입력하지 않음
  * - apply, unapply 구분은 API 경로를 통해 처리하므로 필요 없음(예: `POST /api/teams/:teamId/unapply`)
  */
-export const TeamApplicationSchema = MemberSessionIndexSchema.omit({
-  userId: true
-})
+export const TeamApplicationSchema = z.array(
+  MemberSessionIndexSchema.omit({
+    userId: true
+  })
+)
 export type TeamApplication = z.infer<typeof TeamApplicationSchema>

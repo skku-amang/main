@@ -10,41 +10,54 @@ type SelectedSessionWithIndex = {
 const useTeamApplication = (teamId: number) => {
   const { toast } = useToast()
   const teamApplication = useTeamApplicationOriginal(teamId)
-  const [selectedSession, setSelectedSession] =
-    useState<SelectedSessionWithIndex | null>(null)
+  const [selectedSessions, setSelectedSessions] = useState<
+    SelectedSessionWithIndex[]
+  >([])
 
-  const onApply = async () => {
-    if (!selectedSession) {
-      toast({
-        title: "세션 선택 오류",
-        description: "세션을 선택해주세요.",
-        variant: "destructive"
-      })
-      return
-    }
+  const isSelected = (sessionId: number, index: number) => {
+    return selectedSessions.some(
+      (s) => s.sessionId === sessionId && s.index === index
+    )
+  }
 
-    const { sessionId, index } = selectedSession
-
-    const result = await teamApplication.mutateAsync({
-      sessionId,
-      index
+  const onAppendSession = (sessionId: number, index: number) => {
+    setSelectedSessions((prev) => {
+      if (isSelected(sessionId, index)) {
+        toast({
+          title: "이미 선택된 세션입니다.",
+          description: "다른 세션을 선택해주세요.",
+          variant: "destructive"
+        })
+        return prev
+      }
+      return [...prev, { sessionId, index }]
     })
+  }
 
-    // TODO: useMutation에서 실패 처리 아키텍처 추가
-    if (!result) {
-      toast({
-        title: "신청 실패",
-        description: "알 수 없는 오류가 발생했습니다.",
-        variant: "destructive"
-      })
-    }
-    return result
+  const onRemoveSession = (sessionId: number, index: number) => {
+    setSelectedSessions((prev) => {
+      if (!isSelected(sessionId, index)) {
+        toast({
+          title: "선택되지 않은 세션입니다.",
+          description: "다른 세션을 선택해주세요.",
+          variant: "destructive"
+        })
+        return prev
+      }
+      return prev.filter((s) => s.sessionId !== sessionId || s.index !== index)
+    })
+  }
+
+  const onSubmit = async () => {
+    teamApplication.mutateAsync(selectedSessions)
   }
 
   return {
-    selectedSession,
-    setSelectedSession,
-    onApply
+    selectedSessions,
+    setSelectedSessions,
+    onAppendSession,
+    onRemoveSession,
+    onSubmit
   }
 }
 
