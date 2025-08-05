@@ -1,9 +1,9 @@
+import { Injectable } from "@nestjs/common"
 import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException
-} from "@nestjs/common"
+  NotFoundError,
+  ConflictError,
+  UnprocessableEntityError
+} from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import { CreateGenerationDto, UpdateGenerationDto } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
@@ -23,24 +23,29 @@ export class GenerationService {
       return this.findOne(generation.id)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2002") {
-          const target = (error.meta?.target as string[]) || []
-          if (target.includes("order")) {
-            throw new ConflictException(
-              `해당 기수(${createGenerationDto.order})는 이미 존재합니다.`
+        switch (error.code) {
+          case "P2002":
+            // P2002: Unique constraint failed
+            const target = (error.meta?.target as string[]) || []
+            if (target.includes("order")) {
+              throw new ConflictError(
+                `해당 기수(${createGenerationDto.order})는 이미 존재합니다.`
+              )
+            }
+            if (target.includes("leaderId")) {
+              throw new ConflictError(
+                `해당 유저(ID: ${createGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
+              )
+            }
+            break
+          case "P2025":
+            // P2025: An operation failed because it depends on one or more records that were required but not found.
+            throw new UnprocessableEntityError(
+              "존재하지 않는 리더 ID 혹은 사용자 ID가 포함되어 있습니다."
             )
-          }
-          if (target.includes("leaderId")) {
-            throw new ConflictException(
-              `해당 유저(ID: ${createGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
-            )
-          }
         }
-        // RFC 7807 적용 시, throw error; 로 변경 필요
-        throw new InternalServerErrorException(
-          "기수 생성 중 서버 오류가 발생했습니다."
-        )
       }
+      throw error
     }
   }
 
@@ -61,9 +66,7 @@ export class GenerationService {
       select: generationWithPublicUsers
     })
     if (!generation) {
-      throw new NotFoundException(
-        `ID ${id}에 해당하는 기수를 찾을 수 없습니다.`
-      )
+      throw new NotFoundError(`ID ${id}에 해당하는 기수를 찾을 수 없습니다.`)
     }
     return generation
   }
@@ -99,29 +102,28 @@ export class GenerationService {
       return this.findOne(id)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2002") {
-          const target = (error.meta?.target as string[]) || []
-          if (target.includes("order")) {
-            throw new ConflictException(
-              `해당 기수(${updateGenerationDto.order})는 이미 존재합니다.`
+        switch (error.code) {
+          case "P2002":
+            // P2002: Unique constraint failed
+            const target = (error.meta?.target as string[]) || []
+            if (target.includes("order")) {
+              throw new ConflictError(
+                `해당 기수(${updateGenerationDto.order})는 이미 존재합니다.`
+              )
+            }
+            if (target.includes("leaderId")) {
+              throw new ConflictError(
+                `해당 유저(ID: ${updateGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
+              )
+            }
+            break
+          case "P2025":
+            // P2025: An operation failed because it depends on one or more records that were required but not found.
+            throw new UnprocessableEntityError(
+              "존재하지 않는 리더 ID 혹은 사용자 ID가 포함되어 있습니다."
             )
-          }
-          if (target.includes("leaderId")) {
-            throw new ConflictException(
-              `해당 유저(ID: ${updateGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
-            )
-          }
         }
-        if (error.code === "P2025") {
-          // P2025: An operation failed because it depends on one or more records that were required but not found.
-          throw new NotFoundException(
-            "리더 ID 혹은 사용자 ID가 유효하지 않습니다."
-          )
-        }
-        // RFC 7807 적용 시, throw error; 로 변경 필요
-        throw new InternalServerErrorException(
-          "기수 업데이트 중 서버 오류가 발생했습니다."
-        )
+        throw error
       }
     }
   }
@@ -135,15 +137,12 @@ export class GenerationService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2003") {
-          throw new ConflictException(
+          throw new ConflictError(
             "해당 기수에 소속된 유저가 있어 삭제할 수 없습니다."
           )
         }
       }
-      // RFC 7807 적용 시, throw error; 로 변경 필요
-      throw new InternalServerErrorException(
-        "기수 삭제 중 서버 오류가 발생했습니다."
-      )
+      throw error
     }
   }
 }
