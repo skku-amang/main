@@ -26,13 +26,12 @@ const MemberSessionCard = ({
 }: MemberSessionCardProps) => {
   const authSession = useSession()
 
-  const {
-    selectedSessions,
-    setSelectedSessions,
-    onAppendSession,
-    onRemoveSession,
-    onSubmit
-  } = useTeamApplication(teamId)
+  const { onRemoveSession, onSubmit } = useTeamApplication(teamId)
+
+  function handleUnapply() {
+    onRemoveSession(sessionId, sessionIndex)
+    onSubmit()
+  }
 
   return (
     <div className="flex py-4">
@@ -68,9 +67,7 @@ const MemberSessionCard = ({
         {user.id.toString() === authSession.data?.id && (
           <button
             className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
-            onClick={() => {
-              onRemoveSession(sessionId, sessionIndex)
-            }}
+            onClick={handleUnapply}
           >
             <Minus className="text-white" />
           </button>
