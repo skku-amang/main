@@ -4,7 +4,7 @@ import { PrismaService } from "../prisma/prisma.service"
 import {
   NotFoundError,
   ConflictError,
-  InternalServerError
+  UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
@@ -40,11 +40,10 @@ export class SessionService {
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
-            throw new NotFoundError("리더 ID가 유효하지 않습니다.")
+            throw new UnprocessableEntityError("리더 ID가 유효하지 않습니다.")
         }
       }
-      // RFC 7807 적용 시, throw error; 로 변경 필요
-      throw new InternalServerError("세션 생성 중 서버 오류가 발생했습니다.")
+      throw error
     }
   }
 
@@ -116,28 +115,24 @@ export class SessionService {
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
-            throw new NotFoundError(
+            throw new UnprocessableEntityError(
               "리더 ID 혹은 사용자 ID가 유효하지 않습니다."
             )
         }
       }
-      // RFC 7807 적용 시, throw error; 로 변경 필요
-      throw new InternalServerError(
-        "세션 업데이트 중 서버 오류가 발생했습니다."
-      )
+      throw error
     }
   }
 
   async remove(id: number) {
+    const sesssion = await this.findOne(id) // 존재 여부 확인
     try {
-      const sesssion = await this.findOne(id) // 존재 여부 확인
       await this.prisma.session.delete({
         where: { id }
       })
       return sesssion
     } catch (error) {
-      if (error instanceof NotFoundError) throw error // 이미 존재하지 않는 세션에 대한 삭제 요청
-      throw new InternalServerError("세션 삭제 중 서버 오류가 발생했습니다.")
+      throw error
     }
   }
 }
