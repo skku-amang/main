@@ -1,8 +1,5 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException
-} from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
+import { ForbiddenError, AuthError } from "@repo/api-client"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { CreateUserDto, JwtPayload, LoginUserDto } from "@repo/shared-types"
@@ -31,9 +28,7 @@ export class AuthService {
   async login(loginDto: LoginUserDto) {
     const user = await this.usersService.findOneByEmail(loginDto.email)
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-      throw new UnauthorizedException(
-        "이메일 또는 비밀번호가 올바르지 않습니다."
-      )
+      throw new AuthError("이메일 또는 비밀번호가 올바르지 않습니다.")
     }
 
     const tokens = await this.getTokens(
@@ -82,7 +77,7 @@ export class AuthService {
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
-      throw new ForbiddenException("Access Denied")
+      throw new ForbiddenError("Access Denied")
     }
 
     const refreshTokenMatches = await bcrypt.compare(
@@ -90,7 +85,7 @@ export class AuthService {
       user.hashedRefreshToken
     )
     if (!refreshTokenMatches) {
-      throw new ForbiddenException("Access Denied")
+      throw new ForbiddenError("Access Denied")
     }
 
     const tokens = await this.getTokens(
