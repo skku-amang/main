@@ -1,8 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException
-} from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
+import { ConflictError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import { CreateUserDto } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
@@ -33,12 +30,11 @@ export class UsersService {
       ) {
         const target = (error.meta?.target as string[]) || []
         if (target.includes("email"))
-          throw new ConflictException("이미 사용중인 이메일입니다.")
+          throw new ConflictError("이미 사용중인 이메일입니다.")
         if (target.includes("nickname"))
-          throw new ConflictException("이미 사용중인 닉네임입니다.")
+          throw new ConflictError("이미 사용중인 닉네임입니다.")
       }
-      // RFC 7807 적용 시, throw error; 로 변경 필요
-      throw new InternalServerErrorException()
+      throw error
     }
   }
 
