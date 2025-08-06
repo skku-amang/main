@@ -125,12 +125,12 @@ export class SessionService {
   }
 
   async remove(id: number) {
-    const sesssion = await this.findOne(id) // 존재 여부 확인
+    const session = await this.findOne(id) // 존재 여부 확인
     try {
       await this.prisma.session.delete({
         where: { id }
       })
-      return sesssion
+      return session
     } catch (error) {
       throw error
     }
