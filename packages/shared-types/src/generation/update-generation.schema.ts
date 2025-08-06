@@ -1,4 +1,3 @@
-import { createZodDto } from "nestjs-zod"
 import { z } from "zod"
 import { CreateGenerationSchema } from "./create-generation.schema"
 
@@ -14,11 +13,6 @@ export const UpdateGenerationSchema = CreateGenerationSchema.partial()
     users: z.array(z.number().int()).optional()
   })
   .strict()
-
-/**
- * @description 기수 업데이트 DTO 클래스 (백엔드용)
- */
-export class UpdateGenerationDto extends createZodDto(UpdateGenerationSchema) {}
 
 /**
  * @description 기수 업데이트 타입 (프론트엔드용)

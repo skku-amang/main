@@ -29,7 +29,10 @@ const DeleteEditButton = ({ team, className }: DeleteEditButtonProps) => {
       </Button>
 
       {/* 삭제 버튼 */}
-      <TeamDeleteButton teamId={team.id}>
+      <TeamDeleteButton
+        teamId={team.id}
+        redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(team.performance.id)}
+      >
         <div className="rounded-md border p-2 shadow transition-colors hover:bg-accent">
           <Trash2 strokeWidth={1} size={20} className="text-gray-600" />
         </div>

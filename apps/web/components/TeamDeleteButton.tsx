@@ -11,12 +11,12 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
+import { useDeleteTeam } from "@/hooks/api/useTeam"
 
 interface TeamDeleteButtonProps {
   className?: string
   teamId: number
-  redirectUrl?: string
+  redirectUrl: string
   children?: React.ReactNode
 }
 
@@ -30,13 +30,13 @@ const TeamDeleteButton = ({
   const router = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
-  const { deleteTeam } = useTeamDelete()
+  const deleteTeam = useDeleteTeam()
 
   const onDelete = async () => {
-    const res = await deleteTeam(teamId)
+    const res = await deleteTeam.mutateAsync(teamId)
     if (res) {
       setIsOpen(false)
-      redirectUrl && router.push(redirectUrl)
+      router.push(redirectUrl)
       toast({
         title: "팀 삭제 성공",
         description: "팀이 삭제되었습니다."

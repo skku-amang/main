@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { createZodDto } from "nestjs-zod"
 import { CreateSessionSchema } from "./create-session.schema"
 
 /**
@@ -15,11 +14,6 @@ export const UpdateSessionSchema = CreateSessionSchema.partial()
     users: z.array(z.number().int()).optional()
   })
   .strict()
-
-/**
- * @description 세션 업데이트 DTO 클래스 (백엔드용)
- */
-export class UpdateSessionDto extends createZodDto(UpdateSessionSchema) {}
 
 /**
  * @description 세션 업데이트 타입 (프론트엔드용)

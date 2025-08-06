@@ -1,6 +1,5 @@
-import { z } from "zod"
-import { createZodDto } from "nestjs-zod"
 import { SessionName } from "@repo/database"
+import { z } from "zod"
 
 /**
  * @description 세션 생성 Zod 스키마
@@ -25,11 +24,6 @@ export const CreateSessionSchema = z
       .optional()
   })
   .strict()
-
-/**
- * @description 세션 생성 DTO 클래스 (백엔드용)
- */
-export class CreateSessionDto extends createZodDto(CreateSessionSchema) {}
 
 /**
  * @description 세션 생성 타입 (프론트엔드용)

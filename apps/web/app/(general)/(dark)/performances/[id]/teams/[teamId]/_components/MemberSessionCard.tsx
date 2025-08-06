@@ -1,16 +1,15 @@
 import { Minus } from "lucide-react"
 import { useSession } from "next-auth/react"
 
-import { useToast } from "@/components/hooks/use-toast"
+import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
 import { formatGenerationOrder } from "@/lib/utils"
 import { SessionName, Team, User } from "@repo/shared-types"
 
 interface MemberSessionCardProps {
   teamId: number
-  session: SessionName
+  sessionId: number
+  sessionName: SessionName
   sessionIndex: number
   user: User
   // eslint-disable-next-line no-unused-vars
@@ -20,48 +19,24 @@ interface MemberSessionCardProps {
 // TODO: Table으로 변경
 const MemberSessionCard = ({
   teamId,
-  session,
+  sessionId,
+  sessionName,
   sessionIndex,
-  user,
-  onUnapplySuccess
+  user
 }: MemberSessionCardProps) => {
   const authSession = useSession()
-  const { toast } = useToast()
 
-  async function onUnapply() {
-    const res = await fetchData(
-      API_ENDPOINTS.TEAM.UNAPPLY(teamId) as ApiEndpoint,
-      {
-        body: JSON.stringify({ session, index: sessionIndex - 1 }),
-        cache: "no-store",
-        headers: {
-          Authorization: `Bearer ${authSession.data?.access}`,
-          "Content-Type": "application/json"
-        }
-      }
-    )
+  const { onRemoveSession, onSubmit } = useTeamApplication(teamId)
 
-    if (!res.ok) {
-      toast({
-        title: "탈퇴 실패",
-        description: (await res.json())?.detail || "알 수 없는 에러 발생",
-        variant: "destructive"
-      })
-      return
-    }
-
-    const data = (await res.json()) as Team
-    toast({
-      title: "탈퇴 완료",
-      description: "성공적으로 팀에서 탈퇴되었습니다!"
-    })
-    onUnapplySuccess(data)
+  function handleUnapply() {
+    onRemoveSession(sessionId, sessionIndex)
+    onSubmit()
   }
 
   return (
     <div className="flex py-4">
       <div className="hidden h-[48px] w-[160px] items-center pl-4 md:flex">
-        {session}
+        {sessionName}
         {sessionIndex}
       </div>
 
@@ -76,11 +51,12 @@ const MemberSessionCard = ({
         {/* 설명 */}
         <div>
           <div className="mb-[8px] block text-sm font-semibold md:hidden md:text-lg">
-            {session}
+            {sessionName}
             {sessionIndex}
           </div>
           <div className="text-sm font-normal leading-3 text-slate-700 md:text-xl md:font-medium md:leading-relaxed">
-            {formatGenerationOrder(user.generation?.order)}기 {user.name}
+            {/* TODO: Prisma 타입에서 외래 키인 `generation` 타입 추론 가능하게 설정 */}
+            {formatGenerationOrder(user.generationId)}기 {user.name}
           </div>
           <div className="hidden text-sm text-gray-400 md:block">
             #{user.nickname}
@@ -91,7 +67,7 @@ const MemberSessionCard = ({
         {user.id.toString() === authSession.data?.id && (
           <button
             className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
-            onClick={onUnapply}
+            onClick={handleUnapply}
           >
             <Minus className="text-white" />
           </button>
