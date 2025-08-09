@@ -6,7 +6,7 @@ import {
   HttpException
 } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
-import { Failure } from "@repo/api-client"
+import { Failure, InternalServerError } from "@repo/api-client"
 
 @Catch()
 export class AllErrorFilter implements ExceptionFilter {
@@ -29,16 +29,19 @@ export class AllErrorFilter implements ExceptionFilter {
     const detail =
       exception instanceof HttpException
         ? (exception.getResponse() as any)?.message || exception.message
-        : "서버에서 처리되지 않은 오류가 발생했습니다."
+        : (exception as any)?.message ||
+          "서버에서 처리되지 않은 오류가 발생했습니다."
+
+    const internalServerError = new InternalServerError()
 
     const responseBody = {
       isSuccess: false,
       isFailure: true,
       error: {
-        type: "/errors/internal-server-error",
+        type: internalServerError.type,
         status: httpStatus,
-        title: "Internal Server Error",
-        detail: detail,
+        title: internalServerError.title,
+        detail,
         instance: request.url
       }
     } satisfies Failure
