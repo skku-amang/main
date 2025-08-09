@@ -9,7 +9,8 @@ import {
   Post,
   UseGuards
 } from "@nestjs/common"
-import { CreateGenerationDto, UpdateGenerationDto } from "@repo/shared-types"
+import { CreateGenerationDto } from "./dto/create-generation.dto"
+import { UpdateGenerationDto } from "./dto/update-generation.dto"
 import { Public } from "../auth/decorators/public.decorator"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
