@@ -110,7 +110,7 @@ export default class ApiClient {
       if (data.isSuccess) {
         return data.data
       }
-      throw createErrorFromProblemDocument(data.error as ApiError)
+      throw createErrorFromProblemDocument(data.error satisfies ProblemDocument)
     } catch {
       // 네트워크 에러만 클라이언트에서 처리
       throw new InternalServerError()
