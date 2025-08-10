@@ -1,3 +1,15 @@
+/**
+ * RFC 7807 표준을 따르는 에러 데이터 객체 타입
+ * JSON으로 직렬화되어 클라이언트에 전달되는 실제 데이터의 형태입니다.
+ */
+export type ProblemDocument = {
+  type: string
+  title: string
+  status: number
+  detail?: string
+  instance?: string
+}
+
 export abstract class ApiError extends Error {
   abstract readonly type: string
   abstract readonly status: number
@@ -5,7 +17,8 @@ export abstract class ApiError extends Error {
 
   constructor(
     message: string,
-    public readonly detail?: string
+    public readonly detail?: string,
+    public readonly instance?: string
   ) {
     super(message)
     this.name = this.constructor.name
@@ -17,8 +30,8 @@ export class NotFoundError extends ApiError {
   readonly status = 404
   readonly title = "Not Found"
 
-  constructor(detail?: string) {
-    super("요청하신 리소스를 찾을 수 없습니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("요청하신 리소스를 찾을 수 없습니다", detail, instance)
   }
 }
 
@@ -27,8 +40,8 @@ export class InternalServerError extends ApiError {
   readonly status = 500
   readonly title = "Internal Server Error"
 
-  constructor(detail?: string) {
-    super("서버에서 오류가 발생했습니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("서버에서 오류가 발생했습니다", detail, instance)
   }
 }
 
@@ -37,8 +50,8 @@ export class ValidationError extends ApiError {
   readonly status = 400
   readonly title = "Validation Error"
 
-  constructor(detail?: string) {
-    super("입력값이 올바르지 않습니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("입력값이 올바르지 않습니다", detail, instance)
   }
 }
 
@@ -47,8 +60,8 @@ export class AuthError extends ApiError {
   readonly status = 401
   readonly title = "Authentication Error"
 
-  constructor(detail?: string) {
-    super("유효한 인증 정보가 필요합니다.", detail)
+  constructor(detail?: string, instance?: string) {
+    super("유효한 인증 정보가 필요합니다.", detail, instance)
   }
 }
 
@@ -57,8 +70,8 @@ export class ForbiddenError extends ApiError {
   readonly status = 403
   readonly title = "Forbidden"
 
-  constructor(detail?: string) {
-    super("접근 권한이 없습니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("접근 권한이 없습니다", detail, instance)
   }
 }
 
@@ -71,8 +84,8 @@ export class ConflictError extends ApiError {
   readonly status = 409
   readonly title = "Conflict"
 
-  constructor(detail?: string) {
-    super("이미 존재하는 데이터입니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("이미 존재하는 데이터입니다", detail, instance)
   }
 }
 
@@ -86,7 +99,7 @@ export class UnprocessableEntityError extends ApiError {
   readonly status = 422
   readonly title = "Unprocessable Entity"
 
-  constructor(detail?: string) {
-    super("처리할 수 없는 엔티티입니다", detail)
+  constructor(detail?: string, instance?: string) {
+    super("처리할 수 없는 엔티티입니다", detail, instance)
   }
 }

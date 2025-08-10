@@ -1,9 +1,5 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable
-} from "@nestjs/common"
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common"
+import { ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 
 @Injectable()
@@ -16,6 +12,6 @@ export class AdminGuard implements CanActivate {
       return true
     }
 
-    throw new ForbiddenException("관리자 권한이 필요합니다.")
+    throw new ForbiddenError("관리자 권한이 필요합니다.")
   }
 }

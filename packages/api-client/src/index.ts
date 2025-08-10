@@ -19,6 +19,7 @@ import {
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
+  ProblemDocument,
   ApiError,
   AuthError,
   ConflictError,
@@ -33,26 +34,28 @@ import {
  * 서버에서 plain object로 전달되는 에러를
  * 자바스크립트의 에러 형식으로 변환합니다.
  */
-function createErrorFromProblemDocument(problemDoc: ApiError): ApiError {
-  const detail = problemDoc.detail
+function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
+  const { detail, instance, type } = problemDoc
 
-  switch (problemDoc.type) {
+  switch (type) {
     case "/errors/validation-error":
-      return new ValidationError(detail)
+      return new ValidationError(detail, instance)
     case "/errors/authentication-error":
-      return new AuthError(detail)
+      return new AuthError(detail, instance)
     case "/errors/forbidden":
-      return new ForbiddenError(detail)
+      return new ForbiddenError(detail, instance)
     case "/errors/not-found":
-      return new NotFoundError(detail)
+      return new NotFoundError(detail, instance)
     case "/errors/conflict":
-      return new ConflictError(detail)
+      return new ConflictError(detail, instance)
     case "/errors/unprocessable-entity":
-      return new UnprocessableEntityError(detail)
+      return new UnprocessableEntityError(detail, instance)
     case "/errors/internal-server-error":
-      return new InternalServerError(detail)
+      return new InternalServerError(detail, instance)
     default:
-      return new InternalServerError(detail)
+      // API 서버에서 알 수 없는 에러가 전달될 경우
+      // detail과 instance가 없을 수 있습니다.
+      return new InternalServerError()
   }
 }
 
@@ -78,7 +81,7 @@ export default class ApiClient {
   /**
    * 내부 API 요청 헬퍼 메소드
    */
-  private async _request<T, E = ApiError>(
+  private async _request<T, E>(
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,12 +105,12 @@ export default class ApiClient {
 
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, options)
-      const data = (await response.json()) as ApiResult<T, E>
+      const data = (await response.json()) as ApiResult<T>
 
       if (data.isSuccess) {
         return data.data
       }
-      throw createErrorFromProblemDocument(data.error as ApiError)
+      throw createErrorFromProblemDocument(data.error satisfies ProblemDocument)
     } catch {
       // 네트워크 에러만 클라이언트에서 처리
       throw new InternalServerError()
@@ -269,11 +272,7 @@ export default class ApiClient {
   ) {
     return this._request<
       Team,
-      | AuthError
-      | NotFoundError
-      | ValidationError
-      | ConflictError
-      | InternalServerError
+      AuthError | NotFoundError | ConflictError | InternalServerError
     >(`/api/teams/${teamId}/apply`, "POST", teamApplicationData)
   }
 
