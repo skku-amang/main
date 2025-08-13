@@ -37,7 +37,7 @@ export default function MonthCalendarField({
         {WeekLabelList.map((label) => (
           <div
             key={label}
-            className="flex-1 flex justify-center h-10 bg-gray-100 text-black text-[13px] font-medium items-center"
+            className="flex-1 flex justify-center h-10 border-t border-x border-gray-100 bg-gray-50 text-black text-[13px] font-medium items-center"
           >
             {label}
           </div>
