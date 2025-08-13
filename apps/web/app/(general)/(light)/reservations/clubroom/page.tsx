@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ROUTES from "@/constants/routes"
 import MyReservationField from "../_components/MyReservationField"
-import AddScheduleButton from "../_components/WeekCalendarField/AddScheduleButton"
+import AddScheduleButton from "../_components/AddScheduleButton"
 import WeekCalendarField from "../_components/WeekCalendarField"
 import { useEffect, useState } from "react"
 import isoWeek from "dayjs/plugin/isoWeek"
@@ -65,7 +65,7 @@ const ReservationPage = () => {
               <AddScheduleButton className="absolute -top-[62px] right-0" />
             </TabsContent>
             <TabsContent value="month" className="relative">
-              <MonthCalendarField />
+              <MonthCalendarField currentMonday={currentMonday} />
               <WeekLabel
                 weekLabel={weekLabel}
                 setCalendarViewMonth={setCalendarViewMonth}
