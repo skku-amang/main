@@ -3,8 +3,11 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
-import { Dayjs } from "dayjs"
+import dayjs, { Dayjs } from "dayjs"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import isoWeek from "dayjs/plugin/isoWeek"
+
+dayjs.extend(isoWeek)
 
 interface SmallCalendarProp {
   setCalendarViewMonth: React.Dispatch<React.SetStateAction<Dayjs>>
@@ -12,9 +15,11 @@ interface SmallCalendarProp {
   daysInCalendar: Dayjs[]
   setCurrentMonday: React.Dispatch<React.SetStateAction<Dayjs>>
   calendarViewMonth: Dayjs
+  currentMonday: Dayjs
 }
 
 export default function SmallCalendar({
+  currentMonday,
   setCalendarViewMonth,
   monthLabel,
   daysInCalendar,
@@ -22,8 +27,9 @@ export default function SmallCalendar({
   calendarViewMonth
 }: SmallCalendarProp) {
   const dayList = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+  console.log(currentMonday)
   return (
-    <DropdownMenuContent className="mt-3 border-zinc-200 shadow-sm border-[1.5px] w-[300px]">
+    <DropdownMenuContent className="mt-3 border-zinc-200 shadow-sm border-[1.5px] w-[278px]">
       <DropdownMenuLabel>
         <div className="w-full items-center text-zinc-950 font-medium text-sm flex justify-between">
           {/* 왼쪽 화살표: 전달로 이동 */}
@@ -59,13 +65,16 @@ export default function SmallCalendar({
           ))}
           {daysInCalendar.map((date, i) => {
             const isCurrentMonth = date.month() === calendarViewMonth.month()
+            const isToday = date.isSame(dayjs(), "day")
+            const isViewedWeek = date.isSame(currentMonday, "isoWeek")
             return (
               <div
                 key={i}
                 onClick={() => setCurrentMonday(date.startOf("isoWeek"))}
                 className={`h-9 text-sm flex justify-center items-center rounded-sm cursor-pointer duration-150 transition-colors
-    ${isCurrentMonth ? "text-zinc-950" : "text-zinc-300"}
-    hover:bg-sky-50`}
+                ${isCurrentMonth ? "text-zinc-950" : "text-zinc-300"} 
+                ${isViewedWeek && !isToday ? "bg-sky-50 rounded-none" : ""} ${isToday ? "bg-third rounded-lg text-zinc-50 hover:bg-third" : ""}
+              hover:bg-sky-50`}
               >
                 {date.date()}
               </div>

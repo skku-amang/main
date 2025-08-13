@@ -6,16 +6,11 @@ import dayjs from "dayjs"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ROUTES from "@/constants/routes"
 import MyReservationField from "../_components/MyReservationField"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import AddScheduleButton from "../_components/WeekCalendarField/AddScheduleButton"
 import WeekCalendarField from "../_components/WeekCalendarField"
 import { useEffect, useState } from "react"
 import isoWeek from "dayjs/plugin/isoWeek"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import SmallCalendar from "../_components/SmallCalendar"
+import WeekLabel from "../_components/WeekLable"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
@@ -56,30 +51,15 @@ const ReservationPage = () => {
             </TabsList>
             <TabsContent className="relative" value="week">
               <WeekCalendarField currentMonday={currentMonday} />
-              <div className="absolute flex gap-5 items-center text-gray-700 font-semibold text-xl right-1/2 translate-x-1/2 -top-[62px]">
-                <ChevronLeft
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentMonday((prev) => prev.subtract(1, "week"))
-                  }
-                />
-                <DropdownMenu>
-                  <DropdownMenuTrigger>{weekLabel}</DropdownMenuTrigger>
-                  <SmallCalendar
-                    setCalendarViewMonth={setCalendarViewMonth}
-                    setCurrentMonday={setCurrentMonday}
-                    calendarViewMonth={calendarViewMonth}
-                    monthLabel={monthLabel}
-                    daysInCalendar={daysInCalendar}
-                  />
-                </DropdownMenu>
-                <ChevronRight
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setCurrentMonday((prev) => prev.add(1, "week"))
-                  }
-                />
-              </div>
+              <WeekLabel
+                weekLabel={weekLabel}
+                setCalendarViewMonth={setCalendarViewMonth}
+                setCurrentMonday={setCurrentMonday}
+                currentMonday={currentMonday}
+                calendarViewMonth={calendarViewMonth}
+                monthLabel={monthLabel}
+                daysInCalendar={daysInCalendar}
+              />
               <AddScheduleButton className="absolute -top-[62px] right-0" />
             </TabsContent>
             <TabsContent value="month">Change your password here.</TabsContent>
