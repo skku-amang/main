@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import isoWeek from "dayjs/plugin/isoWeek"
 import WeekLabel from "../_components/WeekLable"
 import MonthCalendarField from "../_components/MonthCalendarField"
+import MobileCalendar from "../_components/MobileField/MobileCalendar"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
@@ -40,7 +41,8 @@ const ReservationPage = () => {
           { display: "동아리방 예약" }
         ]}
       />
-      <div className="w-full min-h-[739px] flex gap-5">
+      {/* PC 페이지 */}
+      <div className={`w-full min-h-[739px] hidden md:flex gap-5`}>
         <div className="w-1/4">
           <MyReservationField />
         </div>
@@ -50,6 +52,7 @@ const ReservationPage = () => {
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>
             </TabsList>
+            {/* 주간 캘린더 */}
             <TabsContent className="relative" value="week">
               <WeekCalendarField currentMonday={currentMonday} />
               <WeekLabel
@@ -64,6 +67,7 @@ const ReservationPage = () => {
               />
               <AddScheduleButton className="absolute -top-[62px] right-0" />
             </TabsContent>
+            {/* 월간 캘린더 */}
             <TabsContent value="month" className="relative">
               <MonthCalendarField currentMonday={currentMonday} />
               <WeekLabel
@@ -80,6 +84,10 @@ const ReservationPage = () => {
             </TabsContent>
           </Tabs>
         </div>
+      </div>
+      {/* 모바일 페이지 */}
+      <div className="max-w-[500px] mx-auto pt-6">
+        <MobileCalendar />
       </div>
     </div>
   )
