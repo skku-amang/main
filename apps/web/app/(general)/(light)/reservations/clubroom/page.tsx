@@ -11,6 +11,7 @@ import WeekCalendarField from "../_components/WeekCalendarField"
 import { useEffect, useState } from "react"
 import isoWeek from "dayjs/plugin/isoWeek"
 import WeekLabel from "../_components/WeekLable"
+import MonthCalendarField from "../_components/MonthCalendarField"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
@@ -59,10 +60,24 @@ const ReservationPage = () => {
                 calendarViewMonth={calendarViewMonth}
                 monthLabel={monthLabel}
                 daysInCalendar={daysInCalendar}
+                mode="week"
               />
               <AddScheduleButton className="absolute -top-[62px] right-0" />
             </TabsContent>
-            <TabsContent value="month">Change your password here.</TabsContent>
+            <TabsContent value="month" className="relative">
+              <MonthCalendarField />
+              <WeekLabel
+                weekLabel={weekLabel}
+                setCalendarViewMonth={setCalendarViewMonth}
+                setCurrentMonday={setCurrentMonday}
+                currentMonday={currentMonday}
+                calendarViewMonth={calendarViewMonth}
+                monthLabel={monthLabel}
+                daysInCalendar={daysInCalendar}
+                mode="month"
+              />
+              <AddScheduleButton className="absolute -top-[62px] right-0" />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
