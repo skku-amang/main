@@ -33,23 +33,27 @@ export default function WeekLabel({
         className="cursor-pointer"
         onClick={() =>
           setCurrentMonday((prev) =>
-            mode === "week" ? prev.subtract(1, "week") : prev.add(1, "month")
+            mode === "week"
+              ? prev.subtract(1, "week")
+              : prev.subtract(1, "month")
           )
         }
-      />
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          {mode === "week" ? weekLabel : monthLabel}
-        </DropdownMenuTrigger>
-        <SmallCalendar
-          setCalendarViewMonth={setCalendarViewMonth}
-          setCurrentMonday={setCurrentMonday}
-          currentMonday={currentMonday}
-          calendarViewMonth={calendarViewMonth}
-          monthLabel={monthLabel}
-          daysInCalendar={daysInCalendar}
-        />
-      </DropdownMenu>
+      />{" "}
+      {mode === "week" ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger>{weekLabel}</DropdownMenuTrigger>
+          <SmallCalendar
+            setCalendarViewMonth={setCalendarViewMonth}
+            setCurrentMonday={setCurrentMonday}
+            currentMonday={currentMonday}
+            calendarViewMonth={calendarViewMonth}
+            monthLabel={monthLabel}
+            daysInCalendar={daysInCalendar}
+          />
+        </DropdownMenu>
+      ) : (
+        <span>{monthLabel}</span>
+      )}
       <ChevronRight
         className="cursor-pointer"
         onClick={() =>
