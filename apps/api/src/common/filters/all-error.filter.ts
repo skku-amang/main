@@ -19,7 +19,7 @@ export class AllErrorFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>()
 
     // 별도의 Logger를 사용하여 에러 로그를 남기도록 수정할 예정입니다.
-    console.error("Unhandled Error:", exception)
+    console.error("Unhandled Error:", JSON.stringify(exception, null, 2))
 
     const httpStatus =
       exception instanceof HttpException
