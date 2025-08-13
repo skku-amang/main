@@ -1,4 +1,4 @@
-import { ProblemDocument } from "./errors"
+import { ProblemDocument, ValidationProblemDocument } from "./errors"
 
 export type Success<T> = {
   isSuccess: true
@@ -8,7 +8,7 @@ export type Success<T> = {
 export type Failure = {
   isSuccess: false
   isFailure: true
-  error: ProblemDocument
+  error: ProblemDocument | ValidationProblemDocument
 }
 
 export type ApiResult<T> = Success<T> | Failure
