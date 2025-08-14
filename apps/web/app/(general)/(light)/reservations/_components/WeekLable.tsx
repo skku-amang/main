@@ -15,6 +15,7 @@ interface WeekLabelProps {
   monthLabel: string
   daysInCalendar: Dayjs[]
   mode: string
+  className?: string
 }
 
 export default function WeekLabel({
@@ -25,10 +26,13 @@ export default function WeekLabel({
   calendarViewMonth,
   monthLabel,
   daysInCalendar,
-  mode
+  mode,
+  className
 }: WeekLabelProps) {
   return (
-    <div className="absolute flex gap-5 items-center text-gray-700 font-semibold text-xl right-1/2 translate-x-1/2 -top-[62px]">
+    <div
+      className={`absolute flex gap-5 items-center text-gray-700 font-semibold text-xl right-1/2 translate-x-1/2 -top-[62px] ${className}`}
+    >
       <ChevronLeft
         className="cursor-pointer"
         onClick={() =>
@@ -38,7 +42,7 @@ export default function WeekLabel({
               : prev.subtract(1, "month")
           )
         }
-      />{" "}
+      />
       {mode === "week" ? (
         <DropdownMenu>
           <DropdownMenuTrigger>{weekLabel}</DropdownMenuTrigger>
@@ -52,7 +56,7 @@ export default function WeekLabel({
           />
         </DropdownMenu>
       ) : (
-        <span>{monthLabel}</span>
+        <span className="text-nowrap">{monthLabel}</span>
       )}
       <ChevronRight
         className="cursor-pointer"

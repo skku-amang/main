@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 import isoWeek from "dayjs/plugin/isoWeek"
 import WeekLabel from "../_components/WeekLable"
 import MonthCalendarField from "../_components/MonthCalendarField"
-import MobileCalendar from "../_components/MobileField/MobileCalendar"
+import MobileCalendarField from "../_components/MobileCalendarField"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
@@ -86,8 +86,19 @@ const ReservationPage = () => {
         </div>
       </div>
       {/* 모바일 페이지 */}
-      <div className="max-w-[500px] md:hidden mx-auto pt-6">
-        <MobileCalendar />
+      <div className="max-w-[400px] relative md:hidden mx-auto pt-6">
+        <MobileCalendarField currentMonday={currentMonday} />
+        <WeekLabel
+          weekLabel={weekLabel}
+          setCalendarViewMonth={setCalendarViewMonth}
+          setCurrentMonday={setCurrentMonday}
+          currentMonday={currentMonday}
+          calendarViewMonth={calendarViewMonth}
+          monthLabel={monthLabel}
+          daysInCalendar={daysInCalendar}
+          mode="month"
+          className="top-12 flex justify-between w-full px-5"
+        />
       </div>
     </div>
   )

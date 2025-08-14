@@ -27,7 +27,6 @@ export default function SmallCalendar({
   calendarViewMonth
 }: SmallCalendarProp) {
   const dayList = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-  console.log(currentMonday)
   return (
     <DropdownMenuContent className="mt-3 border-zinc-200 shadow-sm border-[1.5px] w-[278px]">
       <DropdownMenuLabel>
