@@ -10,6 +10,16 @@ export type ProblemDocument = {
   instance?: string
 }
 
+export type InvalidParam = {
+  path: string
+  code: string
+  message: string
+}
+
+export type ValidationProblemDocument = ProblemDocument & {
+  "invalid-params": InvalidParam[]
+}
+
 export abstract class ApiError extends Error {
   abstract readonly type: string
   abstract readonly status: number
@@ -49,9 +59,15 @@ export class ValidationError extends ApiError {
   readonly type = "/errors/validation-error"
   readonly status = 400
   readonly title = "Validation Error"
+  public readonly invalidParams: InvalidParam[]
 
-  constructor(detail?: string, instance?: string) {
+  constructor(
+    detail?: string,
+    instance?: string,
+    invalidParams: InvalidParam[] = []
+  ) {
     super("입력값이 올바르지 않습니다", detail, instance)
+    this.invalidParams = invalidParams
   }
 }
 

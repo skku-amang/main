@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { PassportStrategy } from "@nestjs/passport"
+import { AuthError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import { Request } from "express"
 import { ExtractJwt, Strategy } from "passport-jwt"
@@ -23,7 +24,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   validate(req: Request, payload: JwtPayload) {
     const refreshToken = req.cookies["refresh_token"]
     if (!refreshToken) {
-      throw new Error("Refresh token is malformed.")
+      throw new AuthError("Refresh token is malformed.")
     }
 
     // req.user에 아래 객체가 주입됩니다.

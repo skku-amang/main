@@ -27,19 +27,24 @@ import {
   InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  ValidationProblemDocument
 } from "./errors"
 
 /**
  * 서버에서 plain object로 전달되는 에러를
  * 자바스크립트의 에러 형식으로 변환합니다.
  */
-function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
+function createErrorFromProblemDocument(
+  problemDoc: ProblemDocument | ValidationProblemDocument
+): ApiError {
   const { detail, instance, type } = problemDoc
 
   switch (type) {
     case "/errors/validation-error":
-      return new ValidationError(detail, instance)
+      const invalidParams =
+        "invalid-params" in problemDoc ? problemDoc["invalid-params"] : []
+      return new ValidationError(detail, instance, invalidParams)
     case "/errors/authentication-error":
       return new AuthError(detail, instance)
     case "/errors/forbidden":

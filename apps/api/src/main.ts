@@ -5,6 +5,7 @@ import { ZodValidationPipe } from "nestjs-zod"
 import { AppModule } from "./app.module"
 import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { AllErrorFilter } from "./common/filters/all-error.filter"
+import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
 
 async function bootstrap() {
@@ -14,6 +15,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe())
   app.useGlobalFilters(
     new AllErrorFilter(httpAdapterHost),
+    new ZodValidationErrorFilter(httpAdapterHost),
     new ApiErrorFilter(httpAdapterHost)
   )
   app.useGlobalInterceptors(new ApiResultInterceptor())
