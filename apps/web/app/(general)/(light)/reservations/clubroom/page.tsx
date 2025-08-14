@@ -86,7 +86,7 @@ const ReservationPage = () => {
         </div>
       </div>
       {/* 모바일 페이지 */}
-      <div className="max-w-[500px] mx-auto pt-6">
+      <div className="max-w-[500px] md:hidden mx-auto pt-6">
         <MobileCalendar />
       </div>
     </div>
