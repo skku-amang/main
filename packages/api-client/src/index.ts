@@ -19,13 +19,13 @@ import {
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
-  ProblemDocument,
   ApiError,
   AuthError,
   ConflictError,
   ForbiddenError,
   InternalServerError,
   NotFoundError,
+  ProblemDocument,
   UnprocessableEntityError,
   ValidationError
 } from "./errors"
@@ -59,6 +59,12 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
   }
 }
 
+// Promise에 에러 타입을 주입하기 위한 트릭
+// 실제 런타임 동작은 Promise<T>와 동일하지만, 타입 시스템은 TError를 알 수 있게 됩니다.
+export type PromiseWithError<T, TError> = Promise<T> & {
+  __errorType?: TError
+}
+
 export default class ApiClient {
   private static instance: ApiClient | null = null
 
@@ -81,12 +87,12 @@ export default class ApiClient {
   /**
    * 내부 API 요청 헬퍼 메소드
    */
-  private async _request<T, E>(
+  private _request<T, E extends ProblemDocument>(
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any
-  ): Promise<T> {
+  ): PromiseWithError<T, E> {
     const options: RequestInit = {
       method,
       headers: {}
@@ -103,18 +109,21 @@ export default class ApiClient {
       options.body = JSON.stringify(body)
     }
 
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, options)
-      const data = (await response.json()) as ApiResult<T>
+    const promise = fetch(`${this.baseUrl}${endpoint}`, options)
+      .then(async (response) => {
+        const data = (await response.json()) as ApiResult<T>
+        if (data.isSuccess) {
+          return data.data
+        }
+        throw createErrorFromProblemDocument(data.error as ApiError)
+      })
+      .catch(() => {
+        // fetch 실패(네트워크 에러 등) 시
+        throw new InternalServerError()
+      })
 
-      if (data.isSuccess) {
-        return data.data
-      }
-      throw createErrorFromProblemDocument(data.error satisfies ProblemDocument)
-    } catch {
-      // 네트워크 에러만 클라이언트에서 처리
-      throw new InternalServerError()
-    }
+    // 타입스크립트가 타입을 올바르게 추론하도록 명시적 캐스팅
+    return promise as PromiseWithError<T, E>
   }
 
   /**
@@ -122,7 +131,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createPerformance(performanceData: CreatePerformance) {
+  public createPerformance(performanceData: CreatePerformance) {
     return this._request<Performance, ValidationError | InternalServerError>(
       `/api/performances`,
       "POST",
@@ -135,7 +144,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getPerformanceById(id: number) {
+  public getPerformanceById(id: number) {
     return this._request<Performance, NotFoundError | InternalServerError>(
       `/api/performances/${id}`,
       "GET"
@@ -146,7 +155,7 @@ export default class ApiClient {
    * 공연 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getPerformances() {
+  public getPerformances() {
     return this._request<Performance[], InternalServerError>(
       `/api/performances`,
       "GET"
@@ -159,10 +168,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updatePerformance(
-    id: number,
-    performanceData: UpdatePerformance
-  ) {
+  public updatePerformance(id: number, performanceData: UpdatePerformance) {
     return this._request<
       Performance,
       NotFoundError | ValidationError | InternalServerError
@@ -176,7 +182,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async deletePerformance(id: number) {
+  public deletePerformance(id: number) {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -191,7 +197,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createTeam(performanceId: number, teamData: CreateTeam) {
+  public createTeam(performanceId: number, teamData: CreateTeam) {
     return this._request<
       Team,
       | ValidationError
@@ -207,7 +213,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getTeamsByPerformance(performanceId: number) {
+  public getTeamsByPerformance(performanceId: number) {
     return this._request<Team[], NotFoundError | InternalServerError>(
       `/api/performances/${performanceId}/teams`,
       "GET"
@@ -219,7 +225,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 팀이 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getTeamById(id: number) {
+  public getTeamById(id: number) {
     return this._request<Team, NotFoundError | InternalServerError>(
       `/api/teams/${id}`,
       "GET"
@@ -234,7 +240,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateTeam(id: number, teamData: UpdateTeam) {
+  public updateTeam(id: number, teamData: UpdateTeam) {
     return this._request<
       Team,
       | AuthError
@@ -252,7 +258,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async deleteTeam(id: number) {
+  public deleteTeam(id: number) {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -266,10 +272,7 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 지원했거나 소속된 팀인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async applyToTeam(
-    teamId: number,
-    teamApplicationData: TeamApplication
-  ) {
+  public applyToTeam(teamId: number, teamApplicationData: TeamApplication) {
     return this._request<
       Team,
       AuthError | NotFoundError | ConflictError | InternalServerError
@@ -284,10 +287,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
-  public async unapplyFromTeam(
-    teamId: number,
-    teamApplicationData: TeamApplication
-  ) {
+  public unapplyFromTeam(teamId: number, teamApplicationData: TeamApplication) {
     return this._request<
       Team,
       AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
@@ -301,7 +301,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createGeneration(generationData: CreateGeneration) {
+  public createGeneration(generationData: CreateGeneration) {
     return this._request<
       Generation,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -313,7 +313,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getGenerationById(id: number) {
+  public getGenerationById(id: number) {
     return this._request<Generation, NotFoundError | InternalServerError>(
       `/api/generations/${id}`,
       "GET"
@@ -324,7 +324,7 @@ export default class ApiClient {
    * 기수 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getGenerations() {
+  public getGenerations() {
     return this._request<Generation[], InternalServerError>(
       `/api/generations`,
       "GET"
@@ -339,7 +339,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateGeneration(id: number, generationData: UpdateGeneration) {
+  public updateGeneration(id: number, generationData: UpdateGeneration) {
     return this._request<
       Generation,
       | AuthError
@@ -357,7 +357,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async deleteGeneration(id: number) {
+  public deleteGeneration(id: number) {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -371,7 +371,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createSession(sessionData: CreateSession) {
+  public createSession(sessionData: CreateSession) {
     return this._request<
       Session,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -383,7 +383,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getSessionById(id: number) {
+  public getSessionById(id: number) {
     return this._request<Session, NotFoundError | InternalServerError>(
       `/api/sessions/${id}`,
       "GET"
@@ -394,7 +394,7 @@ export default class ApiClient {
    * 세션 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getSessions() {
+  public getSessions() {
     return this._request<Session[], InternalServerError>(`/api/sessions`, "GET")
   }
 
@@ -406,7 +406,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateSession(id: number, sessionData: UpdateSession) {
+  public updateSession(id: number, sessionData: UpdateSession) {
     return this._request<
       Session,
       | AuthError
@@ -424,7 +424,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async deleteSession(id: number) {
+  public deleteSession(id: number) {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -439,7 +439,7 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 존재하는 유저인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async createUser(userData: CreateUser) {
+  public createUser(userData: CreateUser) {
     return this._request<
       User,
       | AuthError
@@ -457,7 +457,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getUserById(id: number) {
+  public getUserById(id: number) {
     return this._request<
       User,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -470,7 +470,7 @@ export default class ApiClient {
    * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async getUsers() {
+  public getUsers() {
     return this._request<
       User[],
       AuthError | ForbiddenError | InternalServerError
@@ -485,7 +485,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async updateUser(id: number, userData: UpdateUser) {
+  public updateUser(id: number, userData: UpdateUser) {
     return this._request<
       User,
       | AuthError
@@ -503,7 +503,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public async deleteUser(id: number) {
+  public deleteUser(id: number) {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
@@ -517,7 +517,7 @@ export default class ApiClient {
    * @throws {UnprocessableEntityError} 존재하지 않는 기수인 경우
    * @throws {InternalServerError}
    */
-  public async register(userData: CreateUser) {
+  public register(userData: CreateUser) {
     return this._request<
       User,
       | ValidationError
@@ -532,7 +532,7 @@ export default class ApiClient {
    * @throws {AuthError}
    * @throws {InternalServerError}
    */
-  public async login(loginUser: LoginUser) {
+  public login(loginUser: LoginUser) {
     return this._request<User, AuthError | InternalServerError>(
       "/api/login",
       "POST",
