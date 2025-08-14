@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { ConflictError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import { CreateUserDto } from "@repo/shared-types"
+import { CreateUserDto } from "./dto/create-user.dto"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 

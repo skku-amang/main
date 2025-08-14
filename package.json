@@ -25,5 +25,8 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
     "*.{js,jsx,ts,tsx,json,css,md}": "prettier --check"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
   }
 }

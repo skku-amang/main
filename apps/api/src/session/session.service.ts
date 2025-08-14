@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common"
-import { CreateSessionDto, UpdateSessionDto } from "@repo/shared-types"
+import { CreateSessionDto } from "./dto/create-session.dto"
+import { UpdateSessionDto } from "./dto/update-session.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import {
   NotFoundError,

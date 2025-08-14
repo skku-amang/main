@@ -5,7 +5,8 @@ import {
   UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import { CreateGenerationDto, UpdateGenerationDto } from "@repo/shared-types"
+import { CreateGenerationDto } from "./dto/create-generation.dto"
+import { UpdateGenerationDto } from "./dto/update-generation.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import {
   generationWithBasicUsers,
