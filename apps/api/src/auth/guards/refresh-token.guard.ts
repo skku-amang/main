@@ -1,10 +1,10 @@
-import { ExecutionContext, Injectable } from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
 import { AuthGuard } from "@nestjs/passport"
 import { AuthError } from "@repo/api-client"
 
 @Injectable()
 export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
-  handleRequest<TUser = any>(err: any, user: any, info: any): TUser {
+  handleRequest(err: any, user: any, info: any) {
     if (info) {
       switch (info.name) {
         case "TokenExpiredError":
