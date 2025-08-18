@@ -85,7 +85,7 @@ const TeamDetail = (props: TeamDetailProps) => {
 
       {/*수정 및 삭제 (모바일)*/}
       {session.data &&
-        (session.data.is_admin ||
+        (session.data.isAdmin ||
           (session.data.id && +session.data.id === team.leader.id)) && (
           <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
             <DeleteEditButton

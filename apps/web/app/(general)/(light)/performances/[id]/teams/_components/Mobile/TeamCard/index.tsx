@@ -111,7 +111,7 @@ const TeamCard = ({
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      {user && (user.is_admin || (user.id && +user?.id === leader.id)) && (
+      {user && (user.isAdmin || (user.id && +user?.id === leader.id)) && (
         <div className="mt-3 grid grid-cols-2 gap-x-4">
           <Button
             asChild

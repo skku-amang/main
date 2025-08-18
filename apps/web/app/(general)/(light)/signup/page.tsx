@@ -1,17 +1,16 @@
+"use client"
+
 import SignupForm from "@/app/(general)/(light)/signup/_components/SignupForm"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
+import { useGenerations } from "@/hooks/api/useGeneration"
+import { useSessions } from "@/hooks/api/useSession"
 
-const Signup = async () => {
-  const sessionRes = await fetchData(API_ENDPOINTS.SESSION.LIST, {
-    cache: "no-cache"
-  })
-  const sessions = await sessionRes.json()
+const Signup = () => {
+  const { data: sessions } = useSessions()
+  const { data: generations } = useGenerations()
 
-  const generationRes = await fetchData(API_ENDPOINTS.GENERATION.LIST, {
-    cache: "no-cache"
-  })
-  const generations = await generationRes.json()
+  if (!sessions || !generations) {
+    return
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center lg:py-20">

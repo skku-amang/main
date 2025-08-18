@@ -65,7 +65,7 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
 
   if (
     user &&
-    ((user.id && row.original.leader.id === +user.id) || user.is_admin)
+    ((user.id && row.original.leader.id === +user.id) || user.isAdmin)
   ) {
     return (
       <DropdownMenu>

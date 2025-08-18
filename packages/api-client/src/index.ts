@@ -91,11 +91,12 @@ export default class ApiClient {
     endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body?: any
+    body?: any,
+    headers?: Record<string, string>
   ): PromiseWithError<T, E> {
     const options: RequestInit = {
       method,
-      headers: {}
+      headers
     }
 
     if (
@@ -517,14 +518,14 @@ export default class ApiClient {
    * @throws {UnprocessableEntityError} 존재하지 않는 기수인 경우
    * @throws {InternalServerError}
    */
-  public register(userData: CreateUser) {
+  public signup(userData: CreateUser) {
     return this._request<
       User,
       | ValidationError
       | ConflictError
       | UnprocessableEntityError
       | InternalServerError
-    >("/api/register", "POST", userData)
+    >("/api/auth/signup", "POST", userData)
   }
 
   /**
@@ -534,10 +535,22 @@ export default class ApiClient {
    */
   public login(loginUser: LoginUser) {
     return this._request<User, AuthError | InternalServerError>(
-      "/api/login",
+      "/api/auth/login",
       "POST",
       loginUser
     )
+  }
+
+  /**
+   * 토큰 갱신
+   */
+  public refreshToken(userId: string, refreshToken: string) {
+    return this._request<
+      {
+        accessToken: string
+      },
+      AuthError | InternalServerError
+    >("/api/auth/refresh", "POST", { refresh_token: refreshToken }, { userId })
   }
 }
 

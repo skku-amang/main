@@ -1,20 +1,12 @@
-import { StatusCodes } from "http-status-codes"
 import NextAuth, { NextAuthConfig, User } from "next-auth"
 import { JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
-import { z } from "zod"
 
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import { signInSchema, signUpSchema } from "@/constants/zodSchema"
-import {
-  DuplicatedCredentialsError,
-  InternalServerError,
-  InvalidSigninError,
-  InvalidSignupCredentialsError
-} from "@/lib/auth/errors"
 import { isAccessTokenExpired } from "@/lib/auth/utils"
-import fetchData from "@/lib/fetch"
-import { AuthData } from "@/types/auth"
+import { apiClient } from "@/lib/providers/api-client-provider"
+import { AuthError, ValidationError } from "@repo/api-client"
+import { CreateUser, LoginUser } from "@repo/shared-types"
 
 const authOptions: NextAuthConfig = {
   providers: [
@@ -56,7 +48,7 @@ const authOptions: NextAuthConfig = {
           image: user.image,
           email: user.email,
           position: user.position,
-          is_admin: user.is_admin,
+          is_admin: user.isAdmin,
           access: user.access,
           refresh: user.refresh
         }
@@ -88,69 +80,42 @@ export const {
 } = NextAuth(authOptions)
 
 async function refreshAccessToken(prevToken: JWT) {
-  const res = await fetchData(API_ENDPOINTS.AUTH.REFRESH as ApiEndpoint, {
-    body: JSON.stringify({ refresh: prevToken.refresh }),
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-
-  if (!res.ok) {
-    switch (res.status) {
-      // Refresh Token 만료
-      case StatusCodes.UNAUTHORIZED:
-        return null
-      default:
-        throw new InternalServerError()
-    }
-  }
-
-  const data = await res.json()
+  const res = apiClient.refreshToken(
+    prevToken.userId as string,
+    prevToken.refresh as string
+  )
   return {
     ...prevToken,
-    access: data.access
+    access: (await res).accessToken
   }
 }
 
 async function _signIn(
   type: "signup" | "login",
-  body: z.infer<typeof signUpSchema> | z.infer<typeof signInSchema>
+  body: LoginUser | CreateUser
 ): Promise<User> {
-  // 요청 전송
-  const apiEndpoint =
-    type === "signup" ? API_ENDPOINTS.AUTH.REGISTER : API_ENDPOINTS.AUTH.LOGIN
-
-  const res = await fetchData(apiEndpoint as ApiEndpoint, {
-    body: JSON.stringify(body),
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json"
+  let result: User
+  if (type === "signup") {
+    try {
+      result = await apiClient.signup(body as CreateUser)
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        // TODO: 에러 처리
+        console.error("Validation error:", error)
+      }
+      throw error
     }
-  })
-
-  // 에러 처리
-  if (!res.ok) {
-    if (type === "signup") {
-      switch (res.status) {
-        case StatusCodes.BAD_REQUEST:
-          throw new InvalidSignupCredentialsError()
-        case StatusCodes.CONFLICT:
-          throw new DuplicatedCredentialsError()
-        default:
-          throw new InternalServerError()
+  } else {
+    try {
+      result = await apiClient.login(body)
+    } catch (error) {
+      if (error instanceof AuthError) {
+        // TODO: 에러 처리
+        console.error("Authentication error:", error)
       }
-    } else {
-      switch (res.status) {
-        case StatusCodes.UNAUTHORIZED:
-          throw new InvalidSigninError()
-        default:
-          throw new InternalServerError()
-      }
+      throw error
     }
   }
 
-  // 결과 반환
-  const data = await res.json()
-  return { ...data } as AuthData
+  return result
 }

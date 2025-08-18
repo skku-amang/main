@@ -46,55 +46,29 @@ export function createQueryHook<
  * 커스텀 뮤테이션 훅을 생성합니다.
  * 일반 useMutation과는 다르게 반환되는 데이터 타입, 에러 타입을 자동으로 추론합니다.
  * @template TApiFn ApiClient 메서드 타입 (예: apiClient.createTeam)
- * @template TArgs 생성될 커스텀 훅이 받을 인자들의 배열 타입 (예: [teamData: CreateTeam])
- * @param apiFn
- * @param getMutationKey
- * @returns
+ * @param apiFn API 클라이언트 메서드
  */
 export function createMutationHook<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TApiFn extends (...args: any[]) => any,
-  TArgs extends unknown[]
->(apiFn: TApiFn, getMutationKey: (...args: TArgs) => QueryKey) {
-  // TData와 TError를 자동으로 추론합니다.
+  TApiFn extends (...args: any[]) => any
+>(apiFn: TApiFn) {
+  // TData, TError, 그리고 mutationFn이 받을 변수 타입(TVariables)을 추론합니다.
   type TData = ApiSuccessType<TApiFn>
   type TError = ApiErrorType<TApiFn>
+  type TVariables = Parameters<TApiFn>[0] // apiFn의 첫 번째 파라미터 타입을 변수 타입으로 지정
 
   // 실제 사용될 커스텀 훅 함수를 반환합니다.
+  // 이 훅은 useMutation의 options 객체만 인자로 받습니다.
   return (
-    options?: Omit<
-      UseMutationOptions<TData, TError>,
-      "mutationKey" | "mutationFn"
-    >,
-    ...args: TArgs
+    options?: Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn">
   ) => {
     const apiClient = useApiClient()
 
-    return useMutation<TData, TError>({
-      mutationKey: getMutationKey(...args),
-      // apiFn을 apiClient 인스턴스에 바인딩하여 호출합니다.
-      mutationFn: () => apiFn.bind(apiClient)(...args) as ReturnType<TApiFn>,
+    return useMutation<TData, TError, TVariables>({
+      // mutationFn은 mutate 함수에서 전달받은 variables를 사용합니다.
+      mutationFn: (variables: TVariables) =>
+        apiFn.bind(apiClient)(variables) as ReturnType<TApiFn>,
       ...options
     })
   }
 }
-
-/**
- * 공연 정보 조회를 위한 커스텀 훅 (팩토리로 생성됨)
- * @param performanceId 조회할 공연의 ID
- * @param enabled 쿼리 활성화 여부
- */
-export const usePerformance = createQueryHook(
-  // 1. 사용할 ApiClient 메서드 전달
-  useApiClient.prototype.getPerformanceById,
-  // 2. 인자(args)를 받아 쿼리 키를 생성하는 함수 전달
-  (performanceId: number) => ["performance", performanceId]
-)
-
-/**
- * 모든 공연 목록 조회를 위한 커스텀 훅 (팩토리로 생성됨)
- */
-export const usePerformances = createQueryHook(
-  useApiClient.prototype.getPerformances,
-  () => ["performances"]
-)
