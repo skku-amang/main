@@ -20,13 +20,12 @@
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
-    "zod": "^3.25.76",
     "@repo/database": "workspace:*"
   },
   "devDependencies": {
+    "@repo/database": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@repo/database": "workspace:*"
+    "@repo/typescript-config": "workspace:*"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }

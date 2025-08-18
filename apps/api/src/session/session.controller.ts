@@ -10,7 +10,8 @@ import {
   UseGuards
 } from "@nestjs/common"
 import { SessionService } from "./session.service"
-import { CreateSessionDto, UpdateSessionDto } from "@repo/shared-types"
+import { CreateSessionDto } from "./dto/create-session.dto"
+import { UpdateSessionDto } from "./dto/update-session.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { Public } from "../auth/decorators/public.decorator"

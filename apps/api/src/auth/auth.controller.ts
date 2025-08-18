@@ -8,7 +8,8 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common"
-import { CreateUserDto, LoginUserDto } from "@repo/shared-types"
+import { CreateUserDto } from "../users/dto/create-user.dto"
+import { LoginUserDto } from "../users/dto/login-user.dto"
 import { Request, Response } from "express"
 import { AuthService } from "./auth.service"
 import { AccessTokenGuard } from "./guards/access-token.guard"
