@@ -34,11 +34,13 @@ model User {
 
   generationId    Int
   generation      Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
-
   ledGeneration   Generation? @relation("generationLeader")
 
   sessions        Session[]
   ledSession      Session?  @relation("sessionLeader")
+  
+  teamMemberships      TeamMember[]
+  ledTeam              Team[]       @relation("teamLeader")
 
   @@map("users")
 }
@@ -68,5 +70,66 @@ model Session {
   leaderId        Int?      @unique
 
   users           User[]
+  teamSessions         TeamSession[]
+
   @@map("sessions")
+}
+
+model Team {
+  id                    Int          @id @default(autoincrement())
+
+  name                  String       // 팀 이름
+  description           String?      // 팀 설명
+  posterImage           String?      // 포스터 이미지 URL
+  songName              String       // 곡 제목
+  songArtist            String       // 곡 아티스트
+  isFreshmenFixed       Boolean      @default(false) // 신입생 고정 여부
+  isSelfMade            Boolean      @default(false) // 자작곡 여부
+  songYoutubeVideoUrl   String?     // 유튜브 영상 URL
+
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  leaderId              Int
+  leader                User        @relation("teamLeader", fields: [leaderId], references: [id], onDelete: Restrict)
+
+  teamSessions          TeamSession[] // 팀에 필요한 세션 목록
+
+  @@map("teams")
+}
+
+model TeamSession {
+  id                   Int          @id @default(autoincrement())
+
+  capacity             Int          // 필요한 인원 수
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  teamId               Int
+  team                 Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  sessionId            Int
+  session              Session      @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+
+  members              TeamMember[] // 이 세션에 배정된 멤버들
+
+  @@unique([teamId, sessionId])
+  @@map("team_sessions")
+}
+
+model TeamMember {
+  id                   Int          @id @default(autoincrement())
+  index                Int          // 세션 내 순서
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  teamSessionId        Int
+  teamSession          TeamSession  @relation(fields: [teamSessionId], references: [id], onDelete: Cascade)
+
+  userId               Int
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamSessionId, userId])
+  @@unique([teamSessionId, index])
+  @@map("team_members")
 }
