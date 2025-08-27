@@ -20,16 +20,20 @@
     "lint": "eslint \"src/**/*.ts\" --fix",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.1"
+    "@prisma/client": "^6.11.1",
+    "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^24.1.0",
-    "prisma": "^6.11.1"
+    "prisma": "^6.11.1",
+    "ts-node": "^10.9.2"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }
