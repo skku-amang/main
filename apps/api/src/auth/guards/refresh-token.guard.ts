@@ -6,7 +6,7 @@ import { JwtPayload } from "@repo/shared-types"
 
 @Injectable()
 export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
-  handleRequest<TUser = JwtPayload>(
+  handleRequest<TUser = JwtPayload & { refreshToken: string }>(
     err: any,
     user: any,
     info: any,
