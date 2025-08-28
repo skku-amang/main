@@ -4,6 +4,7 @@ import { AuthGuard } from "@nestjs/passport"
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
 import { AuthError } from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
+import { JwtPayload } from "@repo/shared-types"
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {
@@ -27,7 +28,13 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     return super.canActivate(context)
   }
 
-  handleRequest(err: any, user: any, info: any) {
+  handleRequest<TUser = JwtPayload>(
+    err: any,
+    user: any,
+    info: any,
+    context: ExecutionContext,
+    status?: any
+  ): TUser {
     if (info) {
       if (info instanceof TokenExpiredError) {
         throw new AuthError("액세스 토큰이 만료되었습니다.")
