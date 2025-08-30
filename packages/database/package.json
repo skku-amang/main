@@ -5,15 +5,9 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*"
-      ]
-    }
-  },
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.ts\"",

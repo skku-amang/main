@@ -1,9 +1,10 @@
 {
   "extends": "@repo/typescript-config/base",
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "dist",
+    "rootDir": "src",
     "declaration": true
   },
-  "include": ["src", "prisma"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
