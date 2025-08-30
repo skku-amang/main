@@ -32,11 +32,15 @@
       "cache": false
     },
     "db:migrate": {
-      "cache": false,
-      "persistent": true
+      "cache": false
     },
     "db:deploy": {
       "cache": false
+    },
+    "db:seed": {
+      "cache": false,
+      "dependsOn": ["^db:generate", "^db:migrate"],
+      "env": ["DATABASE_URL", "SEED_DEFAULT_PASSWORD"]
     }
   },
   "globalEnv": ["NODE_ENV", "PORT", "DATABASE_URL"]
