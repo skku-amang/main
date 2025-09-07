@@ -20,27 +20,27 @@ enum SessionName {
 
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
-  password        String
-  name            String
-  nickname        String    @unique
-  bio             String?
-  image           String?
-  isAdmin         Boolean   @default(false) 
+  id                    Int       @id @default(autoincrement())
+  email                 String    @unique
+  password              String
+  name                  String
+  nickname              String    @unique
+  bio                   String?
+  image                 String?
+  isAdmin               Boolean   @default(false) 
   hashedRefreshToken    String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  generationId    Int
-  generation      Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
-  ledGeneration   Generation? @relation("generationLeader")
+  generationId          Int
+  generation            Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
+  ledGeneration     Generation? @relation("generationLeader")
 
-  sessions        Session[]
-  ledSession      Session?  @relation("sessionLeader")
-  
-  teamMemberships      TeamMember[]
-  ledTeam              Team[]       @relation("teamLeader")
+  sessions              Session[]
+  ledSession        Session?    @relation("sessionLeader")
+
+  teamMemberships       TeamMember[]
+  ledTeam          Team[]      @relation("teamLeader")
 
   @@map("users")
 }
