@@ -3,6 +3,8 @@ import { Reflector } from "@nestjs/core"
 import { AuthGuard } from "@nestjs/passport"
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
 import { AuthError } from "@repo/api-client"
+import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
+import { JwtPayload } from "@repo/shared-types"
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {
@@ -26,18 +28,23 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     return super.canActivate(context)
   }
 
-  handleRequest(err: any, user: any, info: any) {
+  handleRequest<TUser = JwtPayload>(
+    err: any,
+    user: any,
+    info: any,
+    context: ExecutionContext,
+    status?: any
+  ): TUser {
     if (info) {
-      switch (info.name) {
-        case "TokenExpiredError":
-          throw new AuthError("액세스 토큰이 만료되었습니다.")
-        case "JsonWebTokenError":
-          throw new AuthError("유효하지 않은 형식의 액세스 토큰입니다.")
-        default:
-          throw new AuthError(
-            "액세스 토큰 인증 중 알 수 없는 오류가 발생했습니다."
-          )
+      if (info instanceof TokenExpiredError) {
+        throw new AuthError("액세스 토큰이 만료되었습니다.")
       }
+
+      if (info instanceof JsonWebTokenError) {
+        throw new AuthError("유효하지 않은 형식의 액세스 토큰입니다.")
+      }
+
+      throw new AuthError("액세스 토큰 인증 중 알 수 없는 오류가 발생했습니다.")
     }
 
     // `validate` 함수에서 발생한 에러를 상위로 전파합니다.
