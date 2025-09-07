@@ -34,13 +34,13 @@ model User {
 
   generationId          Int
   generation            Generation @relation(fields: [generationId], references: [id], onDelete: Restrict)
-  ledGeneration     Generation? @relation("generationLeader")
+  leadingGeneration     Generation? @relation("generationLeader")
 
   sessions              Session[]
-  ledSession        Session?    @relation("sessionLeader")
+  leadingSession        Session?    @relation("sessionLeader")
 
   teamMemberships       TeamMember[]
-  ledTeam          Team[]      @relation("teamLeader")
+  leadingTeams          Team[]      @relation("teamLeader")
 
   @@map("users")
 }
