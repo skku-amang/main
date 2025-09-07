@@ -16,21 +16,33 @@ import MobileCalendarField from "../_components/MobileCalendarField"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
+  // 현재 날짜 기준 "월요일"을 반환하는 함수
   const getMonday = (date = dayjs()) => date.startOf("isoWeek")
+
+  // 현재 보고 있는 주의 시작일(월요일)
   const [currentMonday, setCurrentMonday] = useState(getMonday())
+
+  // 현재 보고 있는 달 (Month View에서 사용됨)
   const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
 
+  // currentMonday가 바뀔 때, month view도 동기화
   useEffect(() => {
     setCalendarViewMonth(currentMonday)
   }, [currentMonday])
 
+  // 주간 캘린더 상단에 표시될 라벨 (예: "Sep 02–08, 2025")
   const weekLabel = `${currentMonday.format("MMM DD")}–${currentMonday.add(6, "day").format("DD, YYYY")}`
+
+  // 월간 캘린더 상단에 표시될 라벨 (예: "September 2025")
+  const monthLabel = calendarViewMonth.format("MMMM YYYY")
+
+  // 월간 달력에 표시될 시작 날짜 (해당 달의 시작일 포함 주의 월요일)
   const calendarStart = calendarViewMonth.startOf("month").startOf("isoWeek")
+
+  // 월간 달력에 채워질 날짜 배열 (6주 × 7일 = 42칸)
   const daysInCalendar = Array.from({ length: 42 }, (_, i) =>
     calendarStart.add(i, "day")
   )
-  const monthLabel = calendarViewMonth.format("MMMM YYYY")
-
   return (
     <div>
       <DefaultPageHeader
