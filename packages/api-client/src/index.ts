@@ -27,7 +27,16 @@ import {
   InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  DuplicateApplicationError,
+  PositionOccupiedError,
+  SessionNotFoundError,
+  NoApplicationFoundError,
+  InvalidMemberIndexError,
+  DuplicateMemberIndexError,
+  DuplicateSessionUserError,
+  DuplicateTeamSessionError,
+  ReferencedEntityNotFoundError
 } from "./errors"
 
 /**
@@ -52,6 +61,24 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new UnprocessableEntityError(detail, instance)
     case "/errors/internal-server-error":
       return new InternalServerError(detail, instance)
+    case "/errors/team/duplicate-application":
+      return new DuplicateApplicationError(detail, instance)
+    case "/errors/team/position-occupied":
+      return new PositionOccupiedError(detail, instance)
+    case "/errors/team/session-not-found":
+      return new SessionNotFoundError(detail, instance)
+    case "/errors/team/no-application-found":
+      return new NoApplicationFoundError(detail, instance)
+    case "/errors/team/invalid-member-index":
+      return new InvalidMemberIndexError(detail, instance)
+    case "/errors/team/duplicate-member-index":
+      return new DuplicateMemberIndexError(detail, instance)
+    case "/errors/team/duplicate-session-user":
+      return new DuplicateSessionUserError(detail, instance)
+    case "/errors/team/duplicate-team-session":
+      return new DuplicateTeamSessionError(detail, instance)
+    case "/errors/team/referenced-entity-not-found":
+      return new ReferencedEntityNotFoundError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
@@ -185,19 +212,26 @@ export default class ApiClient {
 
   /**
    * 팀 생성
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 팀 생성 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
+   * @throws {InvalidMemberIndexError} 멤버 인덱스가 1과 세션의 capacity 사이의 값이 아닌 경우
+   * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
+   * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
+   * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
+   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 리더, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
+  // TODO: 공연 관련 에러를 추가적으로 정의해야 함.
   public async createTeam(performanceId: number, teamData: CreateTeam) {
     return this._request<
       Team,
-      | ValidationError
       | AuthError
-      | ForbiddenError
-      | NotFoundError
+      | InvalidMemberIndexError
+      | DuplicateMemberIndexError
+      | DuplicateSessionUserError
+      | DuplicateTeamSessionError
+      | ReferencedEntityNotFoundError
+      | ConflictError
       | InternalServerError
     >(`/api/performances/${performanceId}/teams`, "POST", teamData)
   }
@@ -212,6 +246,14 @@ export default class ApiClient {
       `/api/performances/${performanceId}/teams`,
       "GET"
     )
+  }
+
+  /**
+   * 모든 팀 정보 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getTeams() {
+    return this._request<Team[], InternalServerError>(`/api/teams/`, "GET")
   }
 
   /**
@@ -230,19 +272,28 @@ export default class ApiClient {
    * 팀 수정
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ForbiddenError} 팀 수정 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {NotFoundError} 요청한 팀이 존재하지 않는 경우
+   * @throws {InvalidMemberIndexError} 멤버 인덱스가 1과 세션의 capacity 사이의 값이 아닌 경우
+   * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
+   * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
+   * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
+   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 리더, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async updateTeam(id: number, teamData: UpdateTeam) {
     return this._request<
       Team,
       | AuthError
-      | ForbiddenError
       | NotFoundError
-      | ValidationError
+      | InvalidMemberIndexError
+      | DuplicateMemberIndexError
+      | DuplicateSessionUserError
+      | DuplicateTeamSessionError
+      | ReferencedEntityNotFoundError
+      | ConflictError
       | InternalServerError
-    >(`/api/teams/${id}`, "PATCH", teamData)
+    >(`/api/teams/${id}`, "PUT", teamData)
   }
 
   /**
@@ -262,8 +313,11 @@ export default class ApiClient {
   /**
    * 팀에 지원
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {ConflictError} 이미 지원했거나 소속된 팀인 경우
+   * @throws {NotFoundError} 요청한 팀이 존재하지 않는 경우
+   * @throws {SessionNotFoundError} 요청한 세션이 팀에 존재하지 않는 경우
+   * @throws {ValidationError} 지원하고자 하는 팀의 index가 capacity를 초과하는 경우
+   * @throws {DuplicateApplicationError} 이미 해당 세션에 지원한 경우
+   * @throws {PositionOccupiedError} 이미 지원하고자 하는 index에 다른 멤버가 지원한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async applyToTeam(
@@ -272,15 +326,23 @@ export default class ApiClient {
   ) {
     return this._request<
       Team,
-      AuthError | NotFoundError | ConflictError | InternalServerError
+      | AuthError
+      | NotFoundError
+      | SessionNotFoundError
+      | ValidationError
+      | DuplicateApplicationError
+      | PositionOccupiedError
+      | InternalServerError
     >(`/api/teams/${teamId}/apply`, "POST", teamApplicationData)
   }
 
   /**
    * 팀 지원 취소
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {UnprocessableEntityError} 지원하지 않은 팀인 경우
+   * @throws {NotFoundError} 요청한 팀이 존재하지 않는 경우
+   * @throws {SessionNotFoundError} 요청한 세션이 팀에 존재하지 않는 경우
+   * @throws {NoApplicationFoundError} 해당 세션의 index에 지원한 기록이 없는 경우
+   * @throws {ForbiddenError} 다른 사용자의 지원을 취소하려는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
@@ -290,8 +352,13 @@ export default class ApiClient {
   ) {
     return this._request<
       Team,
-      AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
-    >(`/api/teams/${teamId}/cancel`, "POST", teamApplicationData)
+      | AuthError
+      | NotFoundError
+      | SessionNotFoundError
+      | NoApplicationFoundError
+      | ForbiddenError
+      | InternalServerError
+    >(`/api/teams/${teamId}/unapply`, "POST", teamApplicationData)
   }
 
   /**

@@ -103,3 +103,136 @@ export class UnprocessableEntityError extends ApiError {
     super("처리할 수 없는 엔티티입니다", detail, instance)
   }
 }
+
+// ----------------------------------
+// Domain Specific Errors
+// ----------------------------------
+
+// ----------------------------------
+// Team Specific Errors
+// ----------------------------------
+
+/**
+ * 사용자가 이미 지원한 세션에 중복으로 지원했을 때 발생하는 오류입니다.
+ */
+export class DuplicateApplicationError extends ApiError {
+  readonly type = "/errors/team/duplicate-application"
+  readonly status = 409
+  readonly title = "Conflict"
+
+  constructor(detail?: string, instance?: string) {
+    super("이미 해당 세션에 지원한 이력이 있습니다.", detail, instance)
+  }
+}
+
+/**
+ * 지원하려는 포지션(인덱스)을 이미 다른 사용자가 선점했을 때 발생하는 오류입니다.
+ */
+export class PositionOccupiedError extends ApiError {
+  readonly type = "/errors/team/position-occupied"
+  readonly status = 409
+  readonly title = "Conflict"
+
+  constructor(detail?: string, instance?: string) {
+    super("해당 포지션은 이미 다른 사용자가 지원했습니다.", detail, instance)
+  }
+}
+
+/**
+ * 요청한 팀 내에 특정 세션이 존재하지 않을 때 발생하는 오류입니다.
+ */
+export class SessionNotFoundError extends ApiError {
+  readonly type = "/errors/team/session-not-found"
+  readonly status = 404
+  readonly title = "Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("해당 세션이 팀에 존재하지 않습니다.", detail, instance)
+  }
+}
+
+/**
+ * 지원 기록이 존재하지 않아 취소할 수 없을 때 발생하는 오류입니다.
+ */
+export class NoApplicationFoundError extends ApiError {
+  readonly type = "/errors/team/no-application-found"
+  readonly status = 404
+  readonly title = "Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("취소할 지원 기록을 찾을 수 없습니다.", detail, instance)
+  }
+}
+
+/**
+ * 멤버의 인덱스가 세션 정원의 유효 범위를 벗어났을 때 발생하는 오류입니다.
+ */
+export class InvalidMemberIndexError extends ApiError {
+  readonly type = "/errors/team/invalid-member-index"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("멤버 인덱스가 유효 범위를 벗어났습니다.", detail, instance)
+  }
+}
+
+/**
+ * 한 세션 내에 동일한 인덱스를 가진 멤버가 중복될 때 발생하는 오류입니다.
+ */
+export class DuplicateMemberIndexError extends ApiError {
+  readonly type = "/errors/team/duplicate-member-index"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("세션 내에 중복된 멤버 인덱스가 존재합니다.", detail, instance)
+  }
+}
+
+/**
+ * 한 세션 내에 동일한 사용자가 중복될 때 발생하는 오류입니다.
+ */
+export class DuplicateSessionUserError extends ApiError {
+  readonly type = "/errors/team/duplicate-session-user"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("세션 내에 중복된 사용자가 존재합니다.", detail, instance)
+  }
+}
+
+/**
+ * 한 팀에 동일한 세션을 중복하여 추가하려고 할 때 발생하는 오류입니다.
+ */
+export class DuplicateTeamSessionError extends ApiError {
+  readonly type = "/errors/team/duplicate-team-session"
+  readonly status = 422
+  readonly title = "Unprocessable Entity"
+
+  constructor(detail?: string, instance?: string) {
+    super(
+      "한 팀에 동일한 세션을 중복하여 추가할 수 없습니다.",
+      detail,
+      instance
+    )
+  }
+}
+
+/**
+ * 존재하지 않는 엔티티(리더, 세션, 사용자 등)를 참조하려고 할 때 발생하는 오류입니다.
+ */
+export class ReferencedEntityNotFoundError extends ApiError {
+  readonly type = "/errors/team/referenced-entity-not-found"
+  readonly status = 422
+  readonly title = "Unprocessable Entity"
+
+  constructor(detail?: string, instance?: string) {
+    super(
+      "존재하지 않는 리소스(리더, 세션, 사용자 등)를 참조하고 있습니다.",
+      detail,
+      instance
+    )
+  }
+}
