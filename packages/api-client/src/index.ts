@@ -287,7 +287,6 @@ export default class ApiClient {
    * @throws {ValidationError} 지원하고자 하는 팀의 index가 capacity를 초과하는 경우
    * @throws {DuplicateApplicationError} 이미 해당 세션에 지원한 경우
    * @throws {PositionOccupiedError} 이미 지원하고자 하는 index에 다른 멤버가 지원한 경우
-   * @throws {ConflictError} 이미 지원했거나 소속된 팀인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async applyToTeam(
@@ -303,8 +302,10 @@ export default class ApiClient {
   /**
    * 팀 지원 취소
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {UnprocessableEntityError} 지원하지 않은 팀인 경우
+   * @throws {NotFoundError} 요청한 팀이 존재하지 않는 경우
+   * @throws {SessionNotFoundError} 요청한 세션이 팀에 존재하지 않는 경우
+   * @throws {NoApplicationFoundError} 해당 세션의 index에 지원한 기록이 없는 경우
+   * @throws {ForbiddenError} 다른 사용자의 지원을 취소하려는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
