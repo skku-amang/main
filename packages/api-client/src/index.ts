@@ -27,7 +27,11 @@ import {
   InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  DuplicateApplicationError,
+  PositionOccupiedError,
+  SessionNotFoundError,
+  NoApplicationFoundError
 } from "./errors"
 
 /**
@@ -52,6 +56,14 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new UnprocessableEntityError(detail, instance)
     case "/errors/internal-server-error":
       return new InternalServerError(detail, instance)
+    case "/errors/team/duplicate-application":
+      return new DuplicateApplicationError(detail, instance)
+    case "/errors/team/position-occupied":
+      return new PositionOccupiedError(detail, instance)
+    case "/errors/team/session-not-found":
+      return new SessionNotFoundError(detail, instance)
+    case "/errors/team/no-application-found":
+      return new NoApplicationFoundError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
