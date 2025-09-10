@@ -137,3 +137,29 @@ export class PositionOccupiedError extends ApiError {
     super("해당 포지션은 이미 다른 사용자가 지원했습니다.", detail, instance)
   }
 }
+
+/**
+ * 요청한 팀 내에 특정 세션이 존재하지 않을 때 발생하는 오류입니다.
+ */
+export class SessionNotFoundError extends ApiError {
+  readonly type = "/errors/team/session-not-found"
+  readonly status = 404
+  readonly title = "Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("해당 세션이 팀에 존재하지 않습니다.", detail, instance)
+  }
+}
+
+/**
+ * 지원 기록이 존재하지 않아 취소할 수 없을 때 발생하는 오류입니다.
+ */
+export class NoApplicationFoundError extends ApiError {
+  readonly type = "/errors/team/no-application-found"
+  readonly status = 404
+  readonly title = "Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("취소할 지원 기록을 찾을 수 없습니다.", detail, instance)
+  }
+}
