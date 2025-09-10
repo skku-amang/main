@@ -14,7 +14,12 @@ import {
   DuplicateApplicationError,
   PositionOccupiedError,
   SessionNotFoundError,
-  NoApplicationFoundError
+  NoApplicationFoundError,
+  InvalidMemberIndexError,
+  DuplicateMemberIndexError,
+  DuplicateSessionUserError,
+  DuplicateTeamSessionError,
+  ReferencedEntityNotFoundError
 } from "@repo/api-client"
 
 @Injectable()
@@ -34,17 +39,17 @@ export class TeamService {
 
         for (const member of members) {
           if (member.index < 1 || member.index > capacity) {
-            throw new ValidationError(
+            throw new InvalidMemberIndexError(
               `세션(ID: ${sessionId})의 멤버 인덱스는 1과 정원(${capacity}) 사이의 값이어야 합니다.`
             )
           }
           if (indexSet.has(member.index)) {
-            throw new ValidationError(
+            throw new DuplicateMemberIndexError(
               `세션(ID: ${sessionId}) 내에 중복된 인덱스(${member.index})가 존재합니다.`
             )
           }
           if (userSet.has(member.userId)) {
-            throw new ValidationError(
+            throw new DuplicateSessionUserError(
               `세션(ID: ${sessionId}) 내에 중복된 사용자(ID: ${member.userId})가 존재합니다.`
             )
           }
@@ -96,14 +101,14 @@ export class TeamService {
           case "P2002":
             const target = (error.meta?.target as string[]) ?? []
             if (target.includes("teamId") && target.includes("sessionId"))
-              throw new UnprocessableEntityError(
+              throw new DuplicateTeamSessionError(
                 "한 팀에 동일한 세션을 중복하여 추가할 수 없습니다."
               )
             throw new ConflictError(
               "이미 존재하는 데이터와 충돌이 발생했습니다."
             )
           case "P2003":
-            throw new UnprocessableEntityError(
+            throw new ReferencedEntityNotFoundError(
               "존재하지 않는 리더, 세션, 또는 유저를 팀에 추가할 수 없습니다."
             )
         }
@@ -213,15 +218,15 @@ export class TeamService {
 
         for (const member of members) {
           if (member.index < 1 || member.index > capacity)
-            throw new ValidationError(
+            throw new InvalidMemberIndexError(
               `세션(ID: ${sessionId})의 멤버 인덱스(${member.index})는 1과 정원(${capacity}) 사이의 값이어야 합니다.`
             )
           if (indexSet.has(member.index))
-            throw new ValidationError(
+            throw new DuplicateMemberIndexError(
               `세션(ID: ${sessionId}) 내에 중복된 인덱스(${member.index})가 존재합니다.`
             )
           if (userSet.has(member.userId))
-            throw new ValidationError(
+            throw new DuplicateSessionUserError(
               `세션(ID: ${sessionId}) 내에 중복된 사용자(ID: ${member.userId})가 존재합니다.`
             )
           userSet.add(member.userId)
@@ -287,14 +292,14 @@ export class TeamService {
           case "P2002":
             const target = (error.meta?.target as string[]) ?? []
             if (target.includes("teamId") && target.includes("sessionId"))
-              throw new UnprocessableEntityError(
+              throw new DuplicateTeamSessionError(
                 "한 팀에 동일한 세션을 중복하여 추가할 수 없습니다."
               )
             throw new ConflictError(
               "데이터 업데이트 중 중복 오류가 발생했습니다."
             )
           case "P2003":
-            throw new UnprocessableEntityError(
+            throw new ReferencedEntityNotFoundError(
               "존재하지 않는 리더, 세션, 또는 유저를 팀에 추가할 수 없습니다."
             )
           case "P2025":
