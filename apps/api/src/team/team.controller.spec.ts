@@ -8,7 +8,18 @@ describe("TeamController", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeamController],
-      providers: [TeamService]
+      providers: [
+        {
+          provide: TeamService,
+          useValue: {
+            create: jest.fn(),
+            findMany: jest.fn(),
+            findUnique: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn()
+          }
+        }
+      ]
     }).compile()
 
     controller = module.get<TeamController>(TeamController)
