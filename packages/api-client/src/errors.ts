@@ -163,3 +163,42 @@ export class NoApplicationFoundError extends ApiError {
     super("취소할 지원 기록을 찾을 수 없습니다.", detail, instance)
   }
 }
+
+/**
+ * 멤버의 인덱스가 세션 정원의 유효 범위를 벗어났을 때 발생하는 오류입니다.
+ */
+export class InvalidMemberIndexError extends ApiError {
+  readonly type = "/errors/team/invalid-member-index"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("멤버 인덱스가 유효 범위를 벗어났습니다.", detail, instance)
+  }
+}
+
+/**
+ * 한 세션 내에 동일한 인덱스를 가진 멤버가 중복될 때 발생하는 오류입니다.
+ */
+export class DuplicateMemberIndexError extends ApiError {
+  readonly type = "/errors/team/duplicate-member-index"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("세션 내에 중복된 멤버 인덱스가 존재합니다.", detail, instance)
+  }
+}
+
+/**
+ * 한 세션 내에 동일한 사용자가 중복될 때 발생하는 오류입니다.
+ */
+export class DuplicateSessionUserError extends ApiError {
+  readonly type = "/errors/team/duplicate-session-user"
+  readonly status = 400
+  readonly title = "Validation Error"
+
+  constructor(detail?: string, instance?: string) {
+    super("세션 내에 중복된 사용자가 존재합니다.", detail, instance)
+  }
+}
