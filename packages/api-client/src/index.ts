@@ -316,7 +316,7 @@ export default class ApiClient {
     return this._request<
       Team,
       AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
-    >(`/api/teams/${teamId}/cancel`, "POST", teamApplicationData)
+    >(`/api/teams/${teamId}/unapply`, "POST", teamApplicationData)
   }
 
   /**
