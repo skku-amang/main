@@ -242,7 +242,7 @@ export default class ApiClient {
   }
 
   /**
-   * 팀 정보 조회
+   * 모든 팀 정보 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public async getTeams() {
