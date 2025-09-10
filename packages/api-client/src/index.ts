@@ -325,7 +325,13 @@ export default class ApiClient {
   ) {
     return this._request<
       Team,
-      AuthError | NotFoundError | ConflictError | InternalServerError
+      | AuthError
+      | NotFoundError
+      | SessionNotFoundError
+      | ValidationError
+      | DuplicateApplicationError
+      | PositionOccupiedError
+      | InternalServerError
     >(`/api/teams/${teamId}/apply`, "POST", teamApplicationData)
   }
 
@@ -345,7 +351,12 @@ export default class ApiClient {
   ) {
     return this._request<
       Team,
-      AuthError | NotFoundError | UnprocessableEntityError | InternalServerError
+      | AuthError
+      | NotFoundError
+      | SessionNotFoundError
+      | NoApplicationFoundError
+      | ForbiddenError
+      | InternalServerError
     >(`/api/teams/${teamId}/unapply`, "POST", teamApplicationData)
   }
 
