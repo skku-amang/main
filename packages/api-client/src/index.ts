@@ -228,6 +228,14 @@ export default class ApiClient {
 
   /**
    * 팀 정보 조회
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public async getTeams() {
+    return this._request<Team[], InternalServerError>(`/api/teams/`, "GET")
+  }
+
+  /**
+   * 팀 정보 조회
    * @throws {NotFoundError} 팀이 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
