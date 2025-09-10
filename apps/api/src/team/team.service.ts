@@ -309,12 +309,13 @@ export class TeamService {
 
   async remove(id: number) {
     const team = await this.findOne(id)
+
     try {
       await this.prisma.team.delete({ where: { id } })
     } catch (error) {
-      // TODO: Handle specific Prisma errors
       throw error
     }
+
     return team
   }
 
