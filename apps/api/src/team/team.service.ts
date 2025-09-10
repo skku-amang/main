@@ -10,7 +10,11 @@ import {
   ForbiddenError,
   NotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  DuplicateApplicationError,
+  PositionOccupiedError,
+  SessionNotFoundError,
+  NoApplicationFoundError
 } from "@repo/api-client"
 
 @Injectable()
@@ -354,14 +358,14 @@ export class TeamService {
         (m) => m.userId === userId
       )
       if (isAlreadyApplied) {
-        throw new ConflictError(
+        throw new DuplicateApplicationError(
           `이미 세션(ID: ${sessionId})에 지원한 이력이 있습니다.`
         )
       }
 
       // 4. 지원하고자 하는 index에 이미 다른 멤버가 지원했는지 확인
       if (targetSession.members.some((m) => m.index === index)) {
-        throw new ConflictError(
+        throw new PositionOccupiedError(
           `세션(ID: ${sessionId})의 인덱스(${index})는 이미 다른 멤버가 지원했습니다.`
         )
       }
@@ -389,10 +393,12 @@ export class TeamService {
           const target = (error.meta?.target as string[]) ?? []
 
           if (target.includes("teamSessionId") && target.includes("userId"))
-            throw new ConflictError("이미 해당 세션에 지원한 이력이 있습니다.")
+            throw new DuplicateApplicationError(
+              "이미 해당 세션에 지원한 이력이 있습니다."
+            )
 
           if (target.includes("teamSessionId") && target.includes("index"))
-            throw new ConflictError(
+            throw new PositionOccupiedError(
               "해당 포지션은 방금 다른 사용자가 먼저 지원했습니다."
             )
         }
