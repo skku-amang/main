@@ -103,3 +103,37 @@ export class UnprocessableEntityError extends ApiError {
     super("처리할 수 없는 엔티티입니다", detail, instance)
   }
 }
+
+// ----------------------------------
+// Domain Specific Errors
+// ----------------------------------
+
+// ----------------------------------
+// Team Specific Errors
+// ----------------------------------
+
+/**
+ * 사용자가 이미 지원한 세션에 중복으로 지원했을 때 발생하는 오류입니다.
+ */
+export class DuplicateApplicationError extends ApiError {
+  readonly type = "/errors/team/duplicate-application"
+  readonly status = 409
+  readonly title = "Conflict"
+
+  constructor(detail?: string, instance?: string) {
+    super("이미 해당 세션에 지원한 이력이 있습니다.", detail, instance)
+  }
+}
+
+/**
+ * 지원하려는 포지션(인덱스)을 이미 다른 사용자가 선점했을 때 발생하는 오류입니다.
+ */
+export class PositionOccupiedError extends ApiError {
+  readonly type = "/errors/team/position-occupied"
+  readonly status = 409
+  readonly title = "Conflict"
+
+  constructor(detail?: string, instance?: string) {
+    super("해당 포지션은 이미 다른 사용자가 지원했습니다.", detail, instance)
+  }
+}
