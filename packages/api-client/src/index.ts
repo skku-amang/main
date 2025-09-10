@@ -212,19 +212,26 @@ export default class ApiClient {
 
   /**
    * 팀 생성
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 팀 생성 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 공연이 존재하지 않는 경우
+   * @throws {InvalidMemberIndexError} 멤버 인덱스가 1과 세션의 capacity 사이의 값이 아닌 경우
+   * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
+   * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
+   * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
+   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 리더, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
+  // TODO: 공연 관련 에러를 추가적으로 정의해야 함.
   public async createTeam(performanceId: number, teamData: CreateTeam) {
     return this._request<
       Team,
-      | ValidationError
       | AuthError
-      | ForbiddenError
-      | NotFoundError
+      | InvalidMemberIndexError
+      | DuplicateMemberIndexError
+      | DuplicateSessionUserError
+      | DuplicateTeamSessionError
+      | ReferencedEntityNotFoundError
+      | ConflictError
       | InternalServerError
     >(`/api/performances/${performanceId}/teams`, "POST", teamData)
   }
