@@ -343,7 +343,7 @@ export class TeamService {
       const targetSession = teamSessionMap.get(sessionId)
 
       if (!targetSession) {
-        throw new NotFoundError(
+        throw new SessionNotFoundError(
           `세션(ID: ${sessionId})이 팀에 존재하지 않습니다.`
         )
       }
