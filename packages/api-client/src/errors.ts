@@ -202,3 +202,37 @@ export class DuplicateSessionUserError extends ApiError {
     super("세션 내에 중복된 사용자가 존재합니다.", detail, instance)
   }
 }
+
+/**
+ * 한 팀에 동일한 세션을 중복하여 추가하려고 할 때 발생하는 오류입니다.
+ */
+export class DuplicateTeamSessionError extends ApiError {
+  readonly type = "/errors/team/duplicate-team-session"
+  readonly status = 422
+  readonly title = "Unprocessable Entity"
+
+  constructor(detail?: string, instance?: string) {
+    super(
+      "한 팀에 동일한 세션을 중복하여 추가할 수 없습니다.",
+      detail,
+      instance
+    )
+  }
+}
+
+/**
+ * 존재하지 않는 엔티티(리더, 세션, 사용자 등)를 참조하려고 할 때 발생하는 오류입니다.
+ */
+export class ReferencedEntityNotFoundError extends ApiError {
+  readonly type = "/errors/team/referenced-entity-not-found"
+  readonly status = 422
+  readonly title = "Unprocessable Entity"
+
+  constructor(detail?: string, instance?: string) {
+    super(
+      "존재하지 않는 리소스(리더, 세션, 사용자 등)를 참조하고 있습니다.",
+      detail,
+      instance
+    )
+  }
+}
