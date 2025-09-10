@@ -39,7 +39,7 @@ model User {
   sessions              Session[]
   leadingSession        Session?    @relation("sessionLeader")
 
-  teamMemberships       TeamMember[]
+  joinedTeams           TeamMember[]
   leadingTeams          Team[]      @relation("teamLeader")
 
   @@map("users")
