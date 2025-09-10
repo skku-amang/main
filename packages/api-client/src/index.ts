@@ -31,7 +31,12 @@ import {
   DuplicateApplicationError,
   PositionOccupiedError,
   SessionNotFoundError,
-  NoApplicationFoundError
+  NoApplicationFoundError,
+  InvalidMemberIndexError,
+  DuplicateMemberIndexError,
+  DuplicateSessionUserError,
+  DuplicateTeamSessionError,
+  ReferencedEntityNotFoundError
 } from "./errors"
 
 /**
@@ -64,6 +69,16 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new SessionNotFoundError(detail, instance)
     case "/errors/team/no-application-found":
       return new NoApplicationFoundError(detail, instance)
+    case "/errors/team/invalid-member-index":
+      return new InvalidMemberIndexError(detail, instance)
+    case "/errors/team/duplicate-member-index":
+      return new DuplicateMemberIndexError(detail, instance)
+    case "/errors/team/duplicate-session-user":
+      return new DuplicateSessionUserError(detail, instance)
+    case "/errors/team/duplicate-team-session":
+      return new DuplicateTeamSessionError(detail, instance)
+    case "/errors/team/referenced-entity-not-found":
+      return new ReferencedEntityNotFoundError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
