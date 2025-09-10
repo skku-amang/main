@@ -9,7 +9,6 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-  UnprocessableEntityError,
   ValidationError,
   DuplicateApplicationError,
   PositionOccupiedError,
