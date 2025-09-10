@@ -271,6 +271,7 @@ export default class ApiClient {
   /**
    * 팀 수정
    * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 팀 수정 권한이 없는 경우
    * @throws {NotFoundError} 요청한 팀이 존재하지 않는 경우
    * @throws {InvalidMemberIndexError} 멤버 인덱스가 1과 세션의 capacity 사이의 값이 아닌 경우
    * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
