@@ -1,16 +1,11 @@
 "use client"
 
-import ApiClient from "@repo/api-client"
 import { createContext, ReactNode, useContext } from "react"
 
-const ApiClientContext = createContext<ApiClient | null>(null)
+import { apiClient } from "@/lib/apiClient"
+import ApiClient from "@repo/api-client"
 
-/**
- * 서버 컴포넌트에서 사용
- */
-export const apiClient = new ApiClient(
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-)
+const ApiClientContext = createContext<ApiClient | null>(null)
 
 /**
  * 클라이언트 컴포넌트에서 사용
