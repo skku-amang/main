@@ -1,26 +1,87 @@
 import { Injectable } from "@nestjs/common"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
+import { PrismaService } from "../prisma/prisma.service"
+import { NotFoundError } from "@repo/api-client"
+import { publicUser } from "../prisma/selectors/user.selector"
 
 @Injectable()
 export class PerformanceService {
-  create(createPerformanceDto: CreatePerformanceDto) {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createPerformanceDto: CreatePerformanceDto) {
     return "This action adds a new performance"
   }
 
-  findAll() {
-    return `This action returns all performance`
+  async findAll() {
+    const performances = await this.prisma.performance.findMany({
+      include: { teams: true }
+    })
+    return performances
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} performance`
+  async findTeamsByPerformanceId(id: number) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id },
+      include: {
+        teams: {
+          include: {
+            teamSessions: {
+              include: {
+                session: true,
+                members: {
+                  include: {
+                    user: {
+                      select: publicUser
+                    }
+                  },
+                  orderBy: { index: "asc" }
+                }
+              }
+            },
+            leader: { select: publicUser }
+          }
+        }
+      }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+    return performance.teams
   }
 
-  update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
+  async findOne(id: number) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id },
+      include: {
+        teams: {
+          include: {
+            teamSessions: true,
+            leader: {
+              select: publicUser
+            }
+          }
+        }
+      }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+
+    return performance
+  }
+
+  async update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
     return `This action updates a #${id} performance`
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} performance`
+  async remove(id: number) {
+    const performance = await this.findOne(id)
+    try {
+      await this.prisma.performance.delete({ where: { id } })
+    } catch (error) {
+      throw error
+    }
+    return performance
   }
 }
