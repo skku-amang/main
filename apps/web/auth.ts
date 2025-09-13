@@ -2,11 +2,15 @@ import NextAuth, { NextAuthConfig, User } from "next-auth"
 import { JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 
-import { signInSchema, signUpSchema } from "@/constants/zodSchema"
+import { apiClient } from "@/lib/apiClient"
 import { isAccessTokenExpired } from "@/lib/auth/utils"
-import { apiClient } from "@/lib/providers/api-client-provider"
 import { AuthError, ValidationError } from "@repo/api-client"
-import { CreateUser, LoginUser } from "@repo/shared-types"
+import {
+  CreateUser,
+  CreateUserSchema,
+  LoginUser,
+  LoginUserSchema
+} from "@repo/shared-types"
 
 const authOptions: NextAuthConfig = {
   providers: [
@@ -16,8 +20,10 @@ const authOptions: NextAuthConfig = {
         nickname: { label: "Nickname", type: "text" },
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        sessions: { label: "Sessions", type: "text" },
-        generationId: { label: "Generation", type: "text" }
+        sessionIds: { label: "Sessions", type: "text" },
+        generationId: { label: "Generation", type: "text" },
+        csrfToken: { label: "csrfToken", type: "hidden" },
+        callbackUrl: { label: "callbackUrl", type: "hidden" }
       },
       /**
        * 로그인 또는 회원가입 시 호출되는 함수
@@ -25,15 +31,35 @@ const authOptions: NextAuthConfig = {
        * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `token`으로 전달됨
        */
       authorize: async (credentials) => {
-        if (credentials.name && credentials.nickname && credentials.sessions) {
-          credentials.sessions = (credentials.sessions as string)
-            .split(",")
-            .map((s) => +s)
-          const userInfo = await signUpSchema.parseAsync(credentials)
-          return _signIn("signup", userInfo)
+        console.log("credentials", credentials)
+        const { name, nickname, email, generationId, sessionIds, password } =
+          credentials
+        let parsedGenerationId: number | undefined
+        let parsedSessions: number[] | undefined
+        if (generationId) {
+          parsedGenerationId = parseInt(generationId as string, 10)
         }
-        const userInfo = await signInSchema.parseAsync(credentials)
-        return _signIn("login", userInfo)
+        if (sessionIds) {
+          parsedSessions =
+            (sessionIds as string).split(",").map((s) => parseInt(s)) || []
+        }
+
+        if (name && nickname && sessionIds) {
+          const userInfo = await CreateUserSchema.parseAsync({
+            name,
+            nickname,
+            email,
+            password,
+            generationId: parsedGenerationId,
+            sessionIds: parsedSessions
+          })
+          return _signIn({ type: "signup", body: userInfo })
+        }
+        const userInfo = await LoginUserSchema.parseAsync({
+          email,
+          password
+        })
+        return _signIn({ type: "login", body: userInfo })
       }
     })
   ],
@@ -47,8 +73,7 @@ const authOptions: NextAuthConfig = {
           nickname: user.nickname,
           image: user.image,
           email: user.email,
-          position: user.position,
-          is_admin: user.isAdmin,
+          isAdmin: user.isAdmin,
           access: user.access,
           refresh: user.refresh
         }
@@ -90,30 +115,43 @@ async function refreshAccessToken(prevToken: JWT) {
   }
 }
 
-async function _signIn(
-  type: "signup" | "login",
-  body: LoginUser | CreateUser
-): Promise<User> {
+async function _signIn({
+  type,
+  body
+}:
+  | {
+      type: "signup"
+      body: CreateUser
+    }
+  | {
+      type: "login"
+      body: LoginUser
+    }): Promise<User> {
   let result: User
   if (type === "signup") {
     try {
-      result = await apiClient.signup(body as CreateUser)
+      const { accessToken, refreshToken, ...user } =
+        await apiClient.signup(body)
+      result = { ...user, access: accessToken, refresh: refreshToken }
+      console.log("result for signup:", result)
     } catch (error) {
       if (error instanceof ValidationError) {
         // TODO: 에러 처리
         console.error("Validation error:", error)
       }
-      throw error
+      return null
     }
   } else {
     try {
-      result = await apiClient.login(body)
+      const { accessToken, refreshToken, ...user } = await apiClient.login(body)
+      result = { ...user, access: accessToken, refresh: refreshToken }
+      console.log("result for login:", result)
     } catch (error) {
       if (error instanceof AuthError) {
         // TODO: 에러 처리
         console.error("Authentication error:", error)
       }
-      throw error
+      return null
     }
   }
 

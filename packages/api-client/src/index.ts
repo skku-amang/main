@@ -115,7 +115,7 @@ export default class ApiClient {
    * 내부 API 요청 헬퍼 메소드
    */
   private _request<T, E extends ProblemDocument>(
-    endpoint: string, // 예: "/api/posts", "/api/projects/1" (항상 '/'로 시작 가정)
+    endpoint: string, // 예: "/posts", "/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any,
@@ -161,7 +161,7 @@ export default class ApiClient {
    */
   public createPerformance(performanceData: CreatePerformance) {
     return this._request<Performance, ValidationError | InternalServerError>(
-      `/api/performances`,
+      `/performances`,
       "POST",
       performanceData
     )
@@ -174,7 +174,7 @@ export default class ApiClient {
    */
   public getPerformanceById(id: number) {
     return this._request<Performance, NotFoundError | InternalServerError>(
-      `/api/performances/${id}`,
+      `/performances/${id}`,
       "GET"
     )
   }
@@ -185,7 +185,7 @@ export default class ApiClient {
    */
   public getPerformances() {
     return this._request<Performance[], InternalServerError>(
-      `/api/performances`,
+      `/performances`,
       "GET"
     )
   }
@@ -200,7 +200,7 @@ export default class ApiClient {
     return this._request<
       Performance,
       NotFoundError | ValidationError | InternalServerError
-    >(`/api/performances/${id}`, "PATCH", performanceData)
+    >(`/performances/${id}`, "PATCH", performanceData)
   }
 
   /**
@@ -214,7 +214,7 @@ export default class ApiClient {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/performances/${id}`, "DELETE")
+    >(`/performances/${id}`, "DELETE")
   }
 
   /**
@@ -239,7 +239,7 @@ export default class ApiClient {
       | ReferencedEntityNotFoundError
       | ConflictError
       | InternalServerError
-    >(`/api/performances/${performanceId}/teams`, "POST", teamData)
+    >(`/performances/${performanceId}/teams`, "POST", teamData)
   }
 
   /**
@@ -249,7 +249,7 @@ export default class ApiClient {
    */
   public getTeamsByPerformance(performanceId: number) {
     return this._request<Team[], NotFoundError | InternalServerError>(
-      `/api/performances/${performanceId}/teams`,
+      `/performances/${performanceId}/teams`,
       "GET"
     )
   }
@@ -269,7 +269,7 @@ export default class ApiClient {
    */
   public getTeamById(id: number) {
     return this._request<Team, NotFoundError | InternalServerError>(
-      `/api/teams/${id}`,
+      `/teams/${id}`,
       "GET"
     )
   }
@@ -299,7 +299,7 @@ export default class ApiClient {
       | ReferencedEntityNotFoundError
       | ConflictError
       | InternalServerError
-    >(`/api/teams/${id}`, "PUT", teamData)
+    >(`/teams/${id}`, "PUT", teamData)
   }
 
   /**
@@ -313,7 +313,7 @@ export default class ApiClient {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/teams/${id}`, "DELETE")
+    >(`/teams/${id}`, "DELETE")
   }
 
   /**
@@ -358,7 +358,7 @@ export default class ApiClient {
       | NoApplicationFoundError
       | ForbiddenError
       | InternalServerError
-    >(`/api/teams/${teamId}/unapply`, "POST", teamApplicationData)
+    >(`/teams/${teamId}/unapply`, "POST", teamApplicationData)
   }
 
   /**
@@ -372,7 +372,7 @@ export default class ApiClient {
     return this._request<
       Generation,
       AuthError | ForbiddenError | ValidationError | InternalServerError
-    >(`/api/generations`, "POST", generationData)
+    >(`/generations`, "POST", generationData)
   }
 
   /**
@@ -382,7 +382,7 @@ export default class ApiClient {
    */
   public getGenerationById(id: number) {
     return this._request<Generation, NotFoundError | InternalServerError>(
-      `/api/generations/${id}`,
+      `/generations/${id}`,
       "GET"
     )
   }
@@ -393,7 +393,7 @@ export default class ApiClient {
    */
   public getGenerations() {
     return this._request<Generation[], InternalServerError>(
-      `/api/generations`,
+      `/generations`,
       "GET"
     )
   }
@@ -414,7 +414,7 @@ export default class ApiClient {
       | NotFoundError
       | ValidationError
       | InternalServerError
-    >(`/api/generations/${id}`, "PATCH", generationData)
+    >(`/generations/${id}`, "PATCH", generationData)
   }
 
   /**
@@ -428,7 +428,7 @@ export default class ApiClient {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/generations/${id}`, "DELETE")
+    >(`/generations/${id}`, "DELETE")
   }
 
   /**
@@ -442,7 +442,7 @@ export default class ApiClient {
     return this._request<
       Session,
       AuthError | ForbiddenError | ValidationError | InternalServerError
-    >(`/api/sessions`, "POST", sessionData)
+    >(`/sessions`, "POST", sessionData)
   }
 
   /**
@@ -452,7 +452,7 @@ export default class ApiClient {
    */
   public getSessionById(id: number) {
     return this._request<Session, NotFoundError | InternalServerError>(
-      `/api/sessions/${id}`,
+      `/sessions/${id}`,
       "GET"
     )
   }
@@ -462,7 +462,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getSessions() {
-    return this._request<Session[], InternalServerError>(`/api/sessions`, "GET")
+    return this._request<Session[], InternalServerError>(`/sessions`, "GET")
   }
 
   /**
@@ -481,7 +481,7 @@ export default class ApiClient {
       | NotFoundError
       | ValidationError
       | InternalServerError
-    >(`/api/sessions/${id}`, "PATCH", sessionData)
+    >(`/sessions/${id}`, "PATCH", sessionData)
   }
 
   /**
@@ -495,7 +495,7 @@ export default class ApiClient {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/sessions/${id}`, "DELETE")
+    >(`/sessions/${id}`, "DELETE")
   }
 
   /**
@@ -514,7 +514,7 @@ export default class ApiClient {
       | ValidationError
       | ConflictError
       | InternalServerError
-    >(`/api/users`, "POST", userData)
+    >(`/users`, "POST", userData)
   }
 
   /**
@@ -528,7 +528,7 @@ export default class ApiClient {
     return this._request<
       User,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/users/${id}`, "GET")
+    >(`/users/${id}`, "GET")
   }
 
   /**
@@ -541,7 +541,7 @@ export default class ApiClient {
     return this._request<
       User[],
       AuthError | ForbiddenError | InternalServerError
-    >(`/api/users`, "GET")
+    >(`/users`, "GET")
   }
 
   /**
@@ -560,7 +560,7 @@ export default class ApiClient {
       | NotFoundError
       | ValidationError
       | InternalServerError
-    >(`/api/users/${id}`, "PATCH", userData)
+    >(`/users/${id}`, "PATCH", userData)
   }
 
   /**
@@ -574,7 +574,7 @@ export default class ApiClient {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/api/users/${id}`, "DELETE")
+    >(`/users/${id}`, "DELETE")
   }
 
   /**
@@ -586,12 +586,12 @@ export default class ApiClient {
    */
   public signup(userData: CreateUser) {
     return this._request<
-      User,
+      { accessToken: string; refreshToken: string; user: User },
       | ValidationError
       | ConflictError
       | UnprocessableEntityError
       | InternalServerError
-    >("/api/auth/signup", "POST", userData)
+    >("/auth/signup", "POST", userData)
   }
 
   /**
@@ -599,12 +599,13 @@ export default class ApiClient {
    * @throws {AuthError}
    * @throws {InternalServerError}
    */
-  public login(loginUser: LoginUser) {
-    return this._request<User, AuthError | InternalServerError>(
-      "/api/auth/login",
-      "POST",
-      loginUser
-    )
+  public async login(loginUser: LoginUser) {
+    const result = await this._request<
+      { accessToken: string; refreshToken: string; user: User },
+      AuthError | InternalServerError
+    >("/auth/login", "POST", loginUser)
+    console.log("result:", result)
+    return result
   }
 
   /**
@@ -616,7 +617,7 @@ export default class ApiClient {
         accessToken: string
       },
       AuthError | InternalServerError
-    >("/api/auth/refresh", "POST", { refresh_token: refreshToken }, { userId })
+    >("/auth/refresh", "POST", { refresh_token: refreshToken }, { userId })
   }
 }
 

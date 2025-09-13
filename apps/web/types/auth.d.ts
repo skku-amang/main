@@ -4,7 +4,6 @@ export type AuthData = {
   nickname: string
   image?: string | null
   email: string
-  position: string
   isAdmin: boolean
   access: string
   refresh: string

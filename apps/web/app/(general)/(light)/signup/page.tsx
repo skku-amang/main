@@ -23,7 +23,7 @@ const Signup = () => {
             backgroundSize: "cover"
           }}
         />
-        <SignupForm sessions={sessions} generations={generations} />
+        <SignupForm sessionIds={sessions} generations={generations} />
       </div>
     </div>
   )
