@@ -158,6 +158,9 @@ export class TeamService {
                 user: {
                   select: publicUser
                 }
+              },
+              orderBy: {
+                index: "asc"
               }
             }
           }
