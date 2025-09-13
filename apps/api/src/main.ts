@@ -3,14 +3,18 @@ import { HttpAdapterHost, NestFactory } from "@nestjs/core"
 import cookieParser from "cookie-parser"
 import { ZodValidationPipe } from "nestjs-zod"
 import { AppModule } from "./app.module"
-import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { AllErrorFilter } from "./common/filters/all-error.filter"
+import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const httpAdapterHost = app.get(HttpAdapterHost)
+  app.enableCors({
+    origin: "http://localhost:3000", // 프론트엔드 주소
+    credentials: true
+  })
   app.use(cookieParser())
   app.useGlobalPipes(new ZodValidationPipe())
   app.useGlobalFilters(
