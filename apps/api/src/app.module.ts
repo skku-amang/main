@@ -8,6 +8,7 @@ import { AuthModule } from "./auth/auth.module"
 import { GenerationModule } from "./generation/generation.module"
 import { SessionModule } from "./session/session.module"
 import { TeamModule } from "./team/team.module"
+import { PerformanceModule } from "./performance/performance.module"
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { TeamModule } from "./team/team.module"
     AuthModule,
     GenerationModule,
     SessionModule,
-    TeamModule
+    TeamModule,
+    PerformanceModule
   ],
   controllers: [AppController],
   providers: [AppService]
