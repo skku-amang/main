@@ -4,6 +4,7 @@ import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import { NotFoundError } from "@repo/api-client"
 import { publicUser } from "../prisma/selectors/user.selector"
+import { Prisma } from "@repo/database"
 
 @Injectable()
 export class PerformanceService {
@@ -14,9 +15,7 @@ export class PerformanceService {
   }
 
   async findAll() {
-    const performances = await this.prisma.performance.findMany({
-      include: { teams: true }
-    })
+    const performances = await this.prisma.performance.findMany()
     return performances
   }
 
