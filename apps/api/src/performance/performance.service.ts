@@ -11,7 +11,9 @@ export class PerformanceService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createPerformanceDto: CreatePerformanceDto) {
-    return "This action adds a new performance"
+    await this.prisma.performance.create({
+      data: createPerformanceDto
+    })
   }
 
   async findAll() {
