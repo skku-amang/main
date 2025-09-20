@@ -73,7 +73,32 @@ export class PerformanceService {
   }
 
   async update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
-    return `This action updates a #${id} performance`
+    const performance = await this.prisma.performance.findUnique({
+      where: { id }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+
+    try {
+      await this.prisma.performance.update({
+        where: { id },
+        data: updatePerformanceDto
+      })
+
+      return this.findOne(id)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          // Race Condition 방지
+          case "P2025":
+            throw new NotFoundError(
+              "업데이트하려는 데이터를 찾을 수 없습니다. 다른 요청에 의해 삭제되었을 수 있습니다."
+            )
+        }
+      }
+      throw error
+    }
   }
 
   async remove(id: number) {
