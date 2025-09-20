@@ -82,8 +82,8 @@ model Performance {
   description           String?      // 공연 설명
   representativeImage   String?      // 대표 이미지 URL
   location	            String?      // 공연 장소
-  startDatetime         DateTime?    // 공연 시작 일시
-  endDatetime           DateTime?    // 공연 종료 일시
+  startDateTime         DateTime?    // 공연 시작 일시
+  endDateTime           DateTime?    // 공연 종료 일시
 
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
