@@ -1,16 +1,29 @@
 import z from "zod"
+import { zfd } from "zod-form-data"
 
+const MAX_FILE_SIZE = 20000000 // 20MB
+export const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp"
+]
 export const CreatePerformanceSchema = z.object({
   name: z.string().min(1, "공연 이름은 필수입니다."),
   description: z.string().optional(),
-  posterImage: z
-    .string()
-    .url("대표 이미지 URL은 유효한 URL이어야 합니다()")
+  posterImage: zfd
+    .file()
+    .refine((file) => file.size < MAX_FILE_SIZE, {
+      message: "File can't be bigger than 20MB."
+    })
+    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+      message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace("image/", "")).join(", ")} 만 가능합니다.`
+    })
     .optional(),
   location: z.string().optional(),
-  startAt: z.string().datetime("시작 날짜는 유효한 날짜여야 합니다."),
-  endAt: z.string().datetime("종료 날짜는 유효한 날짜여야 합니다."),
-  status: z.enum(["예정", "진행중", "종료"]) // TODO: prisma enum으로 변경
+  startAt: z.date().optional(),
+  endAt: z.date().optional(),
+  status: z.enum(["예정", "진행중", "종료"]).optional().default("예정") // TODO: prisma enum으로 변경
 })
 export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
 

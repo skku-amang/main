@@ -27,6 +27,7 @@
     "*.{js,jsx,ts,tsx,json,css,md}": "prettier --check"
   },
   "dependencies": {
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "zod-form-data": "^2.0.7"
   }
 }

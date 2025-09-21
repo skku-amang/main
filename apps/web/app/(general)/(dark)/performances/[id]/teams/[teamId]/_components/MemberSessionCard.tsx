@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react"
 import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName, Team, User } from "@repo/shared-types"
+import { SessionName } from "@repo/database"
+import { Team, User } from "@repo/shared-types"
 
 interface MemberSessionCardProps {
   teamId: number

@@ -241,10 +241,10 @@ const SignupForm = ({ sessionIds, generations }: SignupFormProps) => {
                 <SelectContent>
                   {generations.map((generation) => (
                     <SelectItem
-                      key={generation.order}
+                      key={generation.order.toNumber()}
                       value={generation.id.toString()}
                     >
-                      {formatGenerationOrder(generation.order)}기
+                      {formatGenerationOrder(generation.order.toNumber())}기
                     </SelectItem>
                   ))}
                 </SelectContent>

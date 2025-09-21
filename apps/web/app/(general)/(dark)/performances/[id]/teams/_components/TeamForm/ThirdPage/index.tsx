@@ -1,15 +1,11 @@
 /* eslint-disable no-unused-vars */
 import { CircleAlert } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Form } from "@/components/ui/form"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
-import { User } from "@repo/shared-types"
 
+import { useUsers } from "@/hooks/api/useUser"
 import Description from "../Description"
 import Paginator from "../Paginator"
 import { memberSessionRequiredBaseSchema } from "../SecondPage/schema"
@@ -31,20 +27,7 @@ const ThirdPage = ({
   onInvalid,
   onPrevious
 }: ThirdPageProps) => {
-  const [users, setMembers] = useState<User[]>([])
-  const session = useSession()
-
-  // 유저 목록 가져오기
-  useEffect(() => {
-    fetchData(API_ENDPOINTS.USER.LIST, {
-      cache: "no-cache",
-      headers: {
-        Authorization: `Bearer ${session.data?.access}`
-      }
-    })
-      .then((data) => data.json())
-      .then((users) => setMembers(users))
-  }, [session.data?.access])
+  const { data: users } = useUsers()
 
   return (
     <Form {...form}>
@@ -72,7 +55,7 @@ const ThirdPage = ({
                   </td>
                   <td>
                     <UserSelect
-                      users={users}
+                      users={users || []}
                       form={form}
                       fieldName={fieldName}
                     />

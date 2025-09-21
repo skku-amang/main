@@ -1,6 +1,6 @@
 import { DEFAULT_REACT_QUERY_STALE_TIME } from "@/constants/api"
 import { useApiClient } from "@/lib/providers/api-client-provider"
-import { User } from "@repo/shared-types"
+import { CreateUser, UpdateUser, User } from "@repo/shared-types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useCreateUser() {
@@ -8,7 +8,7 @@ export function useCreateUser() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (userData: CreateUserDTO) => apiClient.createUser(userData),
+    mutationFn: (userData: CreateUser) => apiClient.createUser(userData),
     onSuccess: (newUser: User) => {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       queryClient.setQueryData(["user", newUser.id], newUser)
@@ -43,7 +43,7 @@ export function useUpdateUser(userId: number) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (updateData: UpdateUserDTO) =>
+    mutationFn: (updateData: UpdateUser) =>
       apiClient.updateUser(userId, updateData),
     onSuccess: (updatedUser: User) => {
       queryClient.setQueryData(["user", userId], updatedUser)

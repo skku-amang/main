@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { StatusCodes } from "http-status-codes"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -10,13 +9,11 @@ import { z } from "zod"
 
 import Loading from "@/app/_(errors)/Loading"
 import { useToast } from "@/components/hooks/use-toast"
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import fetchData from "@/lib/fetch"
-import { CreateRetrieveUpdateResponse } from "@/lib/fetch/responseBodyInterfaces"
 import { cn } from "@/lib/utils"
 import { Team } from "@repo/shared-types"
 
+import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
 import SecondPage from "./SecondPage"
@@ -37,6 +34,20 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const router = useRouter()
   const { toast } = useToast()
 
+  const isCreate = !initialData?.id
+  const {
+    mutate: mutateTeamCreate,
+    isError: isCreateError,
+    data: createData
+  } = useCreateTeam()
+  const {
+    mutate: mutateTeamUpdate,
+    isError: isUpdateError,
+    data: updateData
+  } = useUpdateTeam(initialData?.id as number)
+  const isError = isCreateError || isUpdateError
+  const data = createData || updateData
+
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
@@ -46,8 +57,8 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
       isSelfMade: initialData?.isSelfMade,
-      description: initialData?.description,
-      songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl
+      description: initialData?.description || "",
+      songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl || ""
     }
   })
   function onFirstPageValid(formData: z.infer<typeof basicInfoSchema>) {
@@ -224,45 +235,25 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       isSelfMade: firstPageForm.getValues("isSelfMade")
     }
 
-    const endpoint = initialData?.id
-      ? API_ENDPOINTS.TEAM.UPDATE(initialData.id)
-      : API_ENDPOINTS.TEAM.CREATE
-    const res = await fetchData(endpoint as ApiEndpoint, {
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.data?.access}`
-      },
-      body: JSON.stringify(allFormData)
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      switch (res.status) {
-        case StatusCodes.BAD_REQUEST:
-          toast({
-            title: res.statusText,
-            description: data.detail,
-            variant: "destructive"
-          })
-          break
-        case StatusCodes.UNAUTHORIZED:
-          toast({
-            title: res.statusText,
-            description: data.details,
-            variant: "destructive"
-          })
-          break
-        default:
-          toast({
-            title: res.statusText,
-            description: data.detail,
-            variant: "destructive"
-          })
-          break
-      }
+    if (isCreate) {
+      mutateTeamCreate({
+        performanceId: allFormData.performanceId,
+        teamData: allFormData
+      })
+    } else {
+      mutateTeamUpdate(allFormData)
+    }
+
+    if (isError || !data) {
+      toast({
+        title: "오류",
+        description: isCreate
+          ? "팀 생성 중 오류가 발생했습니다."
+          : "팀 수정 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
       return
     }
-    const data = (await res.json()) as CreateRetrieveUpdateResponse<Team>
     router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performance.id, data.id))
   }
   function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
@@ -279,7 +270,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
           form={firstPageForm}
           onValid={onFirstPageValid}
           onInvalid={onFirstPageInvalid}
-          accessToken={session.data?.access}
           onPrevious={
             initialData
               ? () =>

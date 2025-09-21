@@ -368,7 +368,12 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public createGeneration(generationData: CreateGeneration) {
+  public createGeneration(
+    generationData: CreateGeneration
+  ): PromiseWithError<
+    Generation,
+    AuthError | ForbiddenError | ValidationError | InternalServerError
+  > {
     return this._request<
       Generation,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -380,7 +385,9 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getGenerationById(id: number) {
+  public getGenerationById(
+    id: number
+  ): PromiseWithError<Generation, NotFoundError | InternalServerError> {
     return this._request<Generation, NotFoundError | InternalServerError>(
       `/generations/${id}`,
       "GET"
@@ -391,7 +398,7 @@ export default class ApiClient {
    * 기수 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getGenerations() {
+  public getGenerations(): PromiseWithError<Generation[], InternalServerError> {
     return this._request<Generation[], InternalServerError>(
       `/generations`,
       "GET"
@@ -406,7 +413,17 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public updateGeneration(id: number, generationData: UpdateGeneration) {
+  public updateGeneration(
+    id: number,
+    generationData: UpdateGeneration
+  ): PromiseWithError<
+    Generation,
+    | AuthError
+    | ForbiddenError
+    | NotFoundError
+    | ValidationError
+    | InternalServerError
+  > {
     return this._request<
       Generation,
       | AuthError
@@ -424,7 +441,12 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public deleteGeneration(id: number) {
+  public deleteGeneration(
+    id: number
+  ): PromiseWithError<
+    null,
+    AuthError | ForbiddenError | NotFoundError | InternalServerError
+  > {
     return this._request<
       null,
       AuthError | ForbiddenError | NotFoundError | InternalServerError

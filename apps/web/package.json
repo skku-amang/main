@@ -6,6 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev",
     "start": "next start",
+    "build": "next build",
     "format": "prettier --check \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
     "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix"
   },
@@ -32,6 +33,7 @@
     "@radix-ui/react-toast": "^1.2.6",
     "@repo/api-client": "workspace:*",
     "@repo/shared-types": "workspace:*",
+    "@repo/database": "workspace:*",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
     "@tanstack/react-table": "^8.20.1",

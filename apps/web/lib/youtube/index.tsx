@@ -106,14 +106,19 @@ class YoutubeVideo {
   public static getVideoId(url: string) {
     // case 1: https://youtu.be/OU24A9C8BUk
     if (url.includes("youtu.be/")) {
-      return url.split(".be/")[1].split("?")[0]
+      const videoIdPart = url.split(".be/")[1]
+      if (videoIdPart) {
+        return videoIdPart.split("?")[0] as string
+      }
     }
     // case 2: https://www.youtube.com/watch?v=zWvUFsWMmhY
     else if (url.includes("youtube.com/watch?v=")) {
-      return url.split("watch?v=")[1].split("?")[0]
-    } else {
-      throw new TypeError(`Invalid Youtube URL: '${url}'`)
+      const videoIdPart = url.split("watch?v=")[1]
+      if (videoIdPart) {
+        return videoIdPart.split("?")[0] as string
+      }
     }
+    throw new TypeError(`Invalid Youtube URL: '${url}'`)
   }
 
   public static getValidVideoIdOrNull(url: string): string | null {
