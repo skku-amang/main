@@ -27,7 +27,7 @@ const authOptions: NextAuthConfig = {
           type: "password",
           placeholder: "********"
         },
-        sessionIds: { label: "Sessions", type: "text" },
+        sessions: { label: "Sessions", type: "text" },
         generationId: { label: "Generation", type: "text" },
         csrfToken: { label: "csrfToken", type: "hidden" },
         callbackUrl: { label: "callbackUrl", type: "hidden" }
@@ -38,13 +38,13 @@ const authOptions: NextAuthConfig = {
        * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `token`으로 전달됨
        */
       authorize: async (credentials) => {
-        const { name, nickname, email, generationId, sessionIds, password } =
+        const { name, nickname, email, generationId, sessions, password } =
           credentials as {
             name?: string
             nickname?: string
             email?: string
             generationId?: string
-            sessionIds?: string
+            sessions?: string
             password?: string
           }
         let parsedGenerationId: number | undefined
@@ -52,19 +52,19 @@ const authOptions: NextAuthConfig = {
         if (generationId) {
           parsedGenerationId = parseInt(generationId as string)
         }
-        if (sessionIds) {
+        if (sessions) {
           parsedSessions =
-            (sessionIds as string).split(",").map((s) => parseInt(s)) || []
+            (sessions as string).split(",").map((s) => parseInt(s)) || []
         }
 
-        if (name && nickname && sessionIds) {
+        if (name && nickname && sessions) {
           const userInfo = await CreateUserSchema.parseAsync({
             name,
             nickname,
             email,
             password,
             generationId: parsedGenerationId,
-            sessionIds: parsedSessions
+            sessions: parsedSessions
           })
           return signup({ ...userInfo })
         }
@@ -127,7 +127,7 @@ async function signup({
   email,
   password,
   generationId,
-  sessionIds
+  sessions
 }: CreateUser): Promise<User> {
   const { accessToken, refreshToken, user } = await apiClient.signup({
     name,
@@ -135,7 +135,7 @@ async function signup({
     email,
     password,
     generationId,
-    sessionIds
+    sessions
   })
   const { id, ...rest } = user
   return {

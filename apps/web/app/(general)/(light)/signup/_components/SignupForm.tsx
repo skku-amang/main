@@ -53,7 +53,7 @@ const SignupForm = () => {
   const form = useForm<z.infer<typeof confirmPasswordMergedCreateUserSchema>>({
     resolver: zodResolver(confirmPasswordMergedCreateUserSchema),
     defaultValues: {
-      sessionIds: []
+      sessions: []
     }
   })
 
@@ -65,7 +65,7 @@ const SignupForm = () => {
       nickname: formData.nickname,
       email: formData.email,
       password: formData.password,
-      sessionIds: formData.sessionIds,
+      sessions: formData.sessions,
       generationId: formData.generationId,
       redirect: false
     })
@@ -256,7 +256,7 @@ const SignupForm = () => {
 
         <FormField
           control={form.control}
-          name="sessionIds"
+          name="sessions"
           render={() => (
             <FormItem>
               <div>
@@ -264,7 +264,7 @@ const SignupForm = () => {
                   required={
                     !(
                       confirmPasswordMergedCreateUserSchema._def.schema.shape
-                        .sessionIds instanceof z.ZodOptional
+                        .sessions instanceof z.ZodOptional
                     )
                   }
                 >
@@ -281,7 +281,7 @@ const SignupForm = () => {
                   <FormField
                     key={session.id}
                     control={form.control}
-                    name="sessionIds"
+                    name="sessions"
                     render={({ field }) => {
                       return (
                         <FormItem

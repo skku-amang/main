@@ -25,7 +25,7 @@ export const CreateUserSchema = z
     generationId: z
       .number({ invalid_type_error: "기수 ID는 숫자여야 합니다." })
       .int("기수 ID는 정수여야 합니다."),
-    sessionIds: z
+    sessions: z
       .array(z.number().int("세션 ID는 정수여야 합니다."))
       .min(1, { message: "최소 하나의 세션을 선택해야 합니다." })
   })
