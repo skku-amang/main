@@ -1,12 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  CreateUserSchema,
-  Generation,
-  Session,
-  passwordField
-} from "@repo/shared-types"
+import { CreateUserSchema, passwordField } from "@repo/shared-types"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -34,6 +29,8 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
+import { useGenerations } from "@/hooks/api/useGeneration"
+import { useSessions } from "@/hooks/api/useSession"
 import {
   DuplicatedCredentialsErrorCode,
   InvalidSignupCredentialsErrorCode
@@ -47,14 +44,11 @@ const confirmPasswordMergedCreateUserSchema = CreateUserSchema.merge(
   path: ["confirmPassword"]
 })
 
-interface SignupFormProps {
-  sessionIds: Session[]
-  generations: Generation[]
-}
-
-const SignupForm = ({ sessionIds, generations }: SignupFormProps) => {
+const SignupForm = () => {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: sessions, status: sessionsStatus } = useSessions()
+  const { data: generations, status: generationsStatus } = useGenerations()
 
   const form = useForm<z.infer<typeof confirmPasswordMergedCreateUserSchema>>({
     resolver: zodResolver(confirmPasswordMergedCreateUserSchema),
@@ -235,19 +229,25 @@ const SignupForm = ({ sessionIds, generations }: SignupFormProps) => {
                 value={field.value?.toString()}
                 onValueChange={(v) => field.onChange(parseInt(v))}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  {generations.map((generation) => (
-                    <SelectItem
-                      key={generation.order.toNumber()}
-                      value={generation.id.toString()}
-                    >
-                      {formatGenerationOrder(generation.order.toNumber())}기
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                {generationsStatus === "success" ? (
+                  <>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {generations.map((generation) => (
+                        <SelectItem
+                          key={generation.order}
+                          value={generation.id.toString()}
+                        >
+                          {formatGenerationOrder(generation.order)}기
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </>
+                ) : (
+                  <div>Loading...</div>
+                )}
               </Select>
               <FormMessage />
             </FormItem>
@@ -274,8 +274,10 @@ const SignupForm = ({ sessionIds, generations }: SignupFormProps) => {
                   연주 가능한 세션을 선택해주세요.
                 </FormDescription>
               </div>
-              {sessionIds &&
-                sessionIds.map((session) => (
+              {sessionsStatus !== "success" ? (
+                <div>Loading...</div>
+              ) : (
+                sessions.map((session) => (
                   <FormField
                     key={session.id}
                     control={form.control}
@@ -307,7 +309,8 @@ const SignupForm = ({ sessionIds, generations }: SignupFormProps) => {
                       )
                     }}
                   />
-                ))}
+                ))
+              )}
               <FormMessage />
             </FormItem>
           )}
