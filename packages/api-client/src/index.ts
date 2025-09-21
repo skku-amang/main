@@ -604,7 +604,6 @@ export default class ApiClient {
       { accessToken: string; refreshToken: string; user: User },
       AuthError | InternalServerError
     >("/auth/login", "POST", loginUser)
-    console.log("result:", result)
     return result
   }
 

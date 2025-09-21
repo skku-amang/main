@@ -1,10 +1,8 @@
-import NextAuth, { NextAuthConfig, User } from "next-auth"
-import { JWT } from "next-auth/jwt"
+import type { User } from "next-auth"
+import NextAuth, { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
 import { apiClient } from "@/lib/apiClient"
-import { isAccessTokenExpired } from "@/lib/auth/utils"
-import { AuthError, ValidationError } from "@repo/api-client"
 import {
   CreateUser,
   CreateUserSchema,
@@ -18,8 +16,17 @@ const authOptions: NextAuthConfig = {
       credentials: {
         name: { label: "Name", type: "text" },
         nickname: { label: "Nickname", type: "text" },
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: {
+          label: "Email",
+          type: "email",
+          autoComplete: "email",
+          placeholder: "amang@example.com"
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "********"
+        },
         sessionIds: { label: "Sessions", type: "text" },
         generationId: { label: "Generation", type: "text" },
         csrfToken: { label: "csrfToken", type: "hidden" },
@@ -31,13 +38,19 @@ const authOptions: NextAuthConfig = {
        * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `token`으로 전달됨
        */
       authorize: async (credentials) => {
-        console.log("credentials", credentials)
         const { name, nickname, email, generationId, sessionIds, password } =
-          credentials
+          credentials as {
+            name?: string
+            nickname?: string
+            email?: string
+            generationId?: string
+            sessionIds?: string
+            password?: string
+          }
         let parsedGenerationId: number | undefined
         let parsedSessions: number[] | undefined
         if (generationId) {
-          parsedGenerationId = parseInt(generationId as string, 10)
+          parsedGenerationId = parseInt(generationId as string)
         }
         if (sessionIds) {
           parsedSessions =
@@ -53,19 +66,19 @@ const authOptions: NextAuthConfig = {
             generationId: parsedGenerationId,
             sessionIds: parsedSessions
           })
-          return _signIn({ type: "signup", body: userInfo })
+          return signup({ ...userInfo })
         }
         const userInfo = await LoginUserSchema.parseAsync({
           email,
           password
         })
-        return _signIn({ type: "login", body: userInfo })
+        return login({ ...userInfo })
       }
     })
   ],
   callbacks: {
+    // TODO: user 타입이 소셜 인증 사용시 사용되는 `AdapterUser`인 경우 고려
     jwt: async ({ token, user }) => {
-      // 토큰 없는 상태(로그인 X)에서 로그인 시도 -> 토큰에 저장
       if (user?.email) {
         return {
           id: user.id,
@@ -79,17 +92,7 @@ const authOptions: NextAuthConfig = {
         }
       }
 
-      // 토큰 정상
-      if (!isAccessTokenExpired(token.access)) {
-        return token
-      }
-
-      // 액세스 토큰이 만료된 -> 리프레시 토큰을 사용하여 새로운 액세스 토큰 발급
-      const refreshedTokenOrNull = await refreshAccessToken(token)
-      return refreshedTokenOrNull
-    },
-    session: async ({ session, token }) => {
-      return { ...session, ...token }
+      return token
     }
   },
   debug: process.env.NODE_ENV === "development",
@@ -104,56 +107,41 @@ export const {
   unstable_update: update
 } = NextAuth(authOptions)
 
-async function refreshAccessToken(prevToken: JWT) {
-  const res = apiClient.refreshToken(
-    prevToken.userId as string,
-    prevToken.refresh as string
-  )
+async function login({ email, password }: LoginUser): Promise<User> {
+  const { accessToken, refreshToken, user } = await apiClient.login({
+    email,
+    password
+  })
+  const { id, ...rest } = user
   return {
-    ...prevToken,
-    access: (await res).accessToken
+    access: accessToken,
+    refresh: refreshToken,
+    id: id.toString(),
+    ...rest
   }
 }
 
-async function _signIn({
-  type,
-  body
-}:
-  | {
-      type: "signup"
-      body: CreateUser
-    }
-  | {
-      type: "login"
-      body: LoginUser
-    }): Promise<User> {
-  let result: User
-  if (type === "signup") {
-    try {
-      const { accessToken, refreshToken, ...user } =
-        await apiClient.signup(body)
-      result = { ...user, access: accessToken, refresh: refreshToken }
-      console.log("result for signup:", result)
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        // TODO: 에러 처리
-        console.error("Validation error:", error)
-      }
-      return null
-    }
-  } else {
-    try {
-      const { accessToken, refreshToken, ...user } = await apiClient.login(body)
-      result = { ...user, access: accessToken, refresh: refreshToken }
-      console.log("result for login:", result)
-    } catch (error) {
-      if (error instanceof AuthError) {
-        // TODO: 에러 처리
-        console.error("Authentication error:", error)
-      }
-      return null
-    }
+async function signup({
+  name,
+  nickname,
+  email,
+  password,
+  generationId,
+  sessionIds
+}: CreateUser): Promise<User> {
+  const { accessToken, refreshToken, user } = await apiClient.signup({
+    name,
+    nickname,
+    email,
+    password,
+    generationId,
+    sessionIds
+  })
+  const { id, ...rest } = user
+  return {
+    ...rest,
+    access: accessToken,
+    refresh: refreshToken,
+    id: id.toString()
   }
-
-  return result
 }

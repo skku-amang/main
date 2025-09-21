@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
-import { signInSchema } from "@/constants/zodSchema"
 import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
+import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
@@ -29,11 +29,11 @@ const Login = () => {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema)
+  } = useForm<z.infer<typeof LoginUserSchema>>({
+    resolver: zodResolver(LoginUserSchema)
   })
 
-  async function onValid(formData: z.infer<typeof signInSchema>) {
+  async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     const res = await signIn("credentials", { ...formData, redirect: false })
     if (!res?.error) return router.push(ROUTES.HOME)
 
