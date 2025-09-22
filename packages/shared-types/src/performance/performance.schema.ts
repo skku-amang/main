@@ -23,8 +23,7 @@ export const CreatePerformanceSchema = z.object({
     .optional(),
   location: z.string().optional(),
   startAt: z.date().optional(),
-  endAt: z.date().optional(),
-  status: z.enum(["예정", "진행중", "종료"]).optional().default("예정") // TODO: prisma enum으로 변경
+  endAt: z.date().optional()
 })
 export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
 
