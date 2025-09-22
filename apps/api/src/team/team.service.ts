@@ -25,7 +25,8 @@ import {
 export class TeamService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createTeamDto: CreateTeamDto) {
-    const { leaderId, memberSessions, ...scalarData } = createTeamDto
+    const { leaderId, memberSessions, performanceId, ...scalarData } =
+      createTeamDto
 
     if (memberSessions.length > 0) {
       for (const session of memberSessions) {
@@ -60,7 +61,8 @@ export class TeamService {
 
     const createPayload: Prisma.TeamCreateInput = {
       ...scalarData,
-      leader: { connect: { id: leaderId } }
+      leader: { connect: { id: leaderId } },
+      Performance: { connect: { id: performanceId } }
     }
 
     if (memberSessions && memberSessions.length > 0) {

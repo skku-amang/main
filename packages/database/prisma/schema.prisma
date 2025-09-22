@@ -107,8 +107,8 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  performanceId Int?
-  Performance   Performance? @relation(fields: [performanceId], references: [id])
+  performanceId Int
+  Performance   Performance @relation(fields: [performanceId], references: [id], onDelete: Cascade)
 
   leaderId Int
   leader   User @relation("teamLeader", fields: [leaderId], references: [id], onDelete: Restrict)
