@@ -8,7 +8,19 @@ describe("PerformanceController", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PerformanceController],
-      providers: [PerformanceService]
+      providers: [
+        {
+          provide: PerformanceService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findTeamsByPerformanceId: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn()
+          }
+        }
+      ]
     }).compile()
 
     controller = module.get<PerformanceController>(PerformanceController)
