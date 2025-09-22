@@ -27,7 +27,7 @@ export default function MobileCalendarField({
     daysInGrid.push(d)
   }
   return (
-    <div className="w-full h-auto px-2 relative flex flex-col mx-auto bg-white pt-16 pb-5">
+    <div className="w-full h-auto px-2 relative flex flex-col mx-auto rounded-lg bg-white pt-16 pb-5">
       <div className="w-full flex">
         {DayLabel.map((Day, i) => (
           <div

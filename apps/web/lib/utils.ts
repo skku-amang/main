@@ -1,3 +1,4 @@
+import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationField/MobileMyReservationCard"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -56,5 +57,16 @@ export function getRepresentativeRelativeTime(date: Date | string) {
     return `${diffMonths}개월 전`
   } else {
     return `${diffYears}년 전`
+  }
+}
+
+export function DateSplit(reservation: Reservation) {
+  const date = new Date(reservation.start)
+
+  return {
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    startTime: `${date.getHours()}:${date.getMinutes()}`,
+    endTime: `${new Date(reservation.end).getHours()}:${new Date(reservation.end).getMinutes()}`
   }
 }

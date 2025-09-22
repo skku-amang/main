@@ -13,6 +13,7 @@ import isoWeek from "dayjs/plugin/isoWeek"
 import WeekLabel from "../_components/WeekLable"
 import MonthCalendarField from "../_components/MonthCalendarField"
 import MobileCalendarField from "../_components/MobileCalendarField"
+import MobileReservationField from "../_components/MobileReservationField"
 dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
@@ -111,6 +112,9 @@ const ReservationPage = () => {
           mode="month"
           className="top-12 flex justify-between w-full px-5"
         />
+      </div>
+      <div className="mx-auto max-w-[400px] md:hidden pt-3">
+        <MobileReservationField />
       </div>
     </div>
   )
