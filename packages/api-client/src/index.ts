@@ -36,7 +36,8 @@ import {
   ReferencedEntityNotFoundError,
   SessionNotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  InvalidPerformanceDateError
 } from "./errors"
 
 /**
@@ -79,6 +80,8 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new DuplicateTeamSessionError(detail, instance)
     case "/errors/team/referenced-entity-not-found":
       return new ReferencedEntityNotFoundError(detail, instance)
+    case "/errors/performance/invalid-performance-date":
+      return new InvalidPerformanceDateError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
