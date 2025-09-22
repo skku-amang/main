@@ -11,8 +11,7 @@ import {
 export const CreatePerformanceSchema = PerformanceObjectSchema.refine(
   dateValidationRefine,
   {
-    message: "종료 일시는 시작 일시보다 이후여야 합니다.",
-    path: ["endAt"]
+    message: "종료 일시는 시작 일시보다 이후여야 합니다."
   }
 )
 export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
@@ -24,6 +23,5 @@ export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
 export const CreatePerformanceApiSchema = PerformanceObjectSchema.omit({
   posterImage: true
 }).refine(dateValidationRefine, {
-  message: "종료 일시는 시작 일시보다 이후여야 합니다.",
-  path: ["endAt"]
+  message: "종료 일시는 시작 일시보다 이후여야 합니다."
 })

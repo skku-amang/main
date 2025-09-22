@@ -11,8 +11,7 @@ import {
 export const UpdatePerformanceSchema = PartialPerformanceObjectSchema.refine(
   dateValidationRefine,
   {
-    message: "종료 일시는 시작 일시보다 이후여야 합니다.",
-    path: ["endAt"]
+    message: "종료 일시는 시작 일시보다 이후여야 합니다."
   }
 )
 
@@ -25,6 +24,5 @@ export type UpdatePerformance = zod.infer<typeof UpdatePerformanceSchema>
 export const UpdatePerformanceApiSchema = PartialPerformanceObjectSchema.omit({
   posterImage: true
 }).refine(dateValidationRefine, {
-  message: "종료 일시는 시작 일시보다 이후여야 합니다.",
-  path: ["endAt"]
+  message: "종료 일시는 시작 일시보다 이후여야 합니다."
 })
