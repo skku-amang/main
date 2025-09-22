@@ -1,15 +1,53 @@
 import { Injectable } from "@nestjs/common"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
+import { PrismaService } from "../prisma/prisma.service"
+import { publicUser } from "../prisma/selectors/user.selector"
+import { NotFoundError } from "@repo/api-client"
 
 @Injectable()
 export class PerformanceService {
-  create(createPerformanceDto: CreatePerformanceDto) {
-    return "This action adds a new performance"
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createPerformanceDto: CreatePerformanceDto) {
+    await this.prisma.performance.create({
+      data: createPerformanceDto
+    })
   }
 
-  findAll() {
-    return `This action returns all performance`
+  async findAll() {
+    const performances = await this.prisma.performance.findMany()
+    return performances
+  }
+
+  async findTeamsByPerformanceId(id: number) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id },
+      include: {
+        teams: {
+          include: {
+            teamSessions: {
+              include: {
+                session: true,
+                members: {
+                  include: {
+                    user: {
+                      select: publicUser
+                    }
+                  },
+                  orderBy: { index: "asc" }
+                }
+              }
+            },
+            leader: { select: publicUser }
+          }
+        }
+      }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+    return performance.teams
   }
 
   findOne(id: number) {
