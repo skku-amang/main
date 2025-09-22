@@ -50,8 +50,25 @@ export class PerformanceService {
     return performance.teams
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} performance`
+  async findOne(id: number) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id },
+      include: {
+        teams: {
+          include: {
+            teamSessions: true,
+            leader: {
+              select: publicUser
+            }
+          }
+        }
+      }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+
+    return performance
   }
 
   update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
