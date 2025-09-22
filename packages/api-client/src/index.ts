@@ -160,14 +160,15 @@ export default class ApiClient {
   /**
    * 공연 생성
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 공연 생성 권한이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public createPerformance(performanceData: CreatePerformance) {
-    return this._request<Performance, ValidationError | InternalServerError>(
-      `/performances`,
-      "POST",
-      performanceData
-    )
+    return this._request<
+      Performance,
+      ValidationError | AuthError | ForbiddenError | InternalServerError
+    >(`/performances`, "POST", performanceData)
   }
 
   /**
@@ -197,12 +198,20 @@ export default class ApiClient {
    * 공연 수정
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 공연 수정 권한이 없는 경우
+   * @throws {InvalidPerformanceDateError} 공연의 시작 일시가 종료 일시보다 이후인 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public updatePerformance(id: number, performanceData: UpdatePerformance) {
     return this._request<
       Performance,
-      NotFoundError | ValidationError | InternalServerError
+      | NotFoundError
+      | ValidationError
+      | InternalServerError
+      | AuthError
+      | ForbiddenError
+      | InvalidPerformanceDateError
     >(`/performances/${id}`, "PATCH", performanceData)
   }
 
