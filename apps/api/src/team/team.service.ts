@@ -109,8 +109,9 @@ export class TeamService {
               "이미 존재하는 데이터와 충돌이 발생했습니다."
             )
           case "P2003":
+          case "P2025":
             throw new ReferencedEntityNotFoundError(
-              "존재하지 않는 리더, 세션, 또는 유저를 팀에 추가할 수 없습니다."
+              "존재하지 않는 리더, 세션, 공연, 또는 유저를 팀에 추가할 수 없습니다."
             )
         }
       }
@@ -303,12 +304,9 @@ export class TeamService {
               "데이터 업데이트 중 중복 오류가 발생했습니다."
             )
           case "P2003":
+          case "P2025":
             throw new ReferencedEntityNotFoundError(
               "존재하지 않는 리더, 세션, 또는 유저를 팀에 추가할 수 없습니다."
-            )
-          case "P2025":
-            throw new NotFoundError(
-              "업데이트하려는 데이터를 찾을 수 없습니다. 다른 요청에 의해 삭제되었을 수 있습니다."
             )
         }
       }
