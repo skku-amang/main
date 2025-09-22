@@ -20,14 +20,14 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
+    "@repo/shared-types": "workspace:*",
     "http-problem-details": "^0.1.7",
-    "http-status-codes": "^2.3.0",
-    "@repo/shared-types": "workspace:*"
+    "http-status-codes": "^2.3.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.0.10"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }

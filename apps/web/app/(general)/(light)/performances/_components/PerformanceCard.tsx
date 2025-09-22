@@ -18,14 +18,14 @@ import { cn } from "@/lib/utils"
 interface PerformanceCardProp {
   id?: number
   name: string
-  representativeSrc?: string
+  posterSrc?: string
   description?: string
   location?: string
-  startDatetime?: Date
+  startAt?: Date
   className?: string
 }
 
-const RepresentativeImage = ({
+const PosterImage = ({
   alt,
   src,
   width,
@@ -50,10 +50,10 @@ const RepresentativeImage = ({
 const PerformanceCard = ({
   id,
   name,
-  representativeSrc,
+  posterSrc,
   description,
   location,
-  startDatetime,
+  startAt: startDatetime,
   className
 }: PerformanceCardProp) => {
   const width = 300
@@ -63,17 +63,17 @@ const PerformanceCard = ({
     <Card style={{ width }} className={cn("overflow-hidden", className)}>
       {id ? (
         <Link href={ROUTES.PERFORMANCE.DETAIL(id)}>
-          <RepresentativeImage
+          <PosterImage
             alt={`${name} 이미지`}
-            src={representativeSrc}
+            src={posterSrc}
             width={width}
             height={height}
           />
         </Link>
       ) : (
-        <RepresentativeImage
+        <PosterImage
           alt={`${name} 이미지`}
-          src={representativeSrc}
+          src={posterSrc}
           width={width}
           height={height}
         />

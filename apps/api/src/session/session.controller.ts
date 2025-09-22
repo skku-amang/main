@@ -1,22 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
   UseGuards
 } from "@nestjs/common"
-import { SessionService } from "./session.service"
-import { CreateSessionDto } from "./dto/create-session.dto"
-import { UpdateSessionDto } from "./dto/update-session.dto"
+import { Public } from "../auth/decorators/public.decorator"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
-import { Public } from "../auth/decorators/public.decorator"
+import { CreateSessionDto } from "./dto/create-session.dto"
+import { UpdateSessionDto } from "./dto/update-session.dto"
+import { SessionService } from "./session.service"
 
-@Controller("session")
+@Controller("sessions")
 @UseGuards(AccessTokenGuard)
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}

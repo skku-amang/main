@@ -1,33 +1,19 @@
+"use client"
+
 import Link from "next/link"
 import { CiCirclePlus } from "react-icons/ci"
 
 import PerformanceCard from "@/app/(general)/(light)/performances/_components/PerformanceCard"
-import Loading from "@/app/_(errors)/Loading"
-import { auth } from "@/auth"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import fetchData from "@/lib/fetch"
-import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
-import { Performance } from "@repo/shared-types"
+import { usePerformances } from "@/hooks/api/usePerformance"
 
-const PerformanceList = async () => {
-  const session = await auth()
-  if (!session) {
-    return <Loading />
-  }
-  const res = await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
-    cache: "no-cache",
-    credentials: "include",
-    headers: {
-      Authorization: `Bearer ${session.access}`
-    }
-  })
-  const performances = (await res.json()) as ListResponse<Performance>
+const PerformanceList = () => {
+  const { data: performances } = usePerformances()
 
   return (
     <div>
@@ -53,18 +39,20 @@ const PerformanceList = async () => {
 
       {/* 공연 카드 목록 */}
       <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 xl:grid-cols-4">
-        {performances.map((p) => (
-          <PerformanceCard
-            key={p.id}
-            id={p.id}
-            name={p.name}
-            representativeSrc={p.representativeImage}
-            location={p.location}
-            startDatetime={
-              p.startDatetime ? new Date(p.startDatetime) : undefined
-            }
-          />
-        ))}
+        {performances === undefined ? (
+          <div>Loading...</div>
+        ) : (
+          performances.map((p) => (
+            <PerformanceCard
+              key={p.id}
+              id={p.id}
+              name={p.name}
+              posterSrc={p.posterImage}
+              location={p.location}
+              startAt={p.startAt}
+            />
+          ))
+        )}
       </div>
     </div>
   )

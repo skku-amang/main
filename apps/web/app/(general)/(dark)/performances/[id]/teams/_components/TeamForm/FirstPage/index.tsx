@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleAlert, Youtube } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -24,13 +23,11 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import API_ENDPOINTS from "@/constants/apiEndpoints"
-import fetchData from "@/lib/fetch"
 import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
-import { Performance } from "@repo/shared-types"
 
+import { usePerformances } from "@/hooks/api/usePerformance"
 import Description from "../Description"
 import Paginator from "../Paginator"
 import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
@@ -41,7 +38,6 @@ interface FirstPageProps {
   onValid: (formData: z.infer<any>) => void
   // eslint-disable-next-line no-unused-vars
   onInvalid: (formData: z.infer<any>) => void
-  accessToken?: string
   onPrevious?: () => void
 }
 
@@ -49,20 +45,9 @@ const FirstPage = ({
   form,
   onValid,
   onInvalid,
-  accessToken,
   onPrevious
 }: FirstPageProps) => {
-  const [performances, setPerformances] = useState<Performance[]>([])
-  useEffect(() => {
-    fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
-      cache: "no-cache",
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
-      .then((res) => res.json())
-      .then((json) => setPerformances(json))
-  }, [accessToken])
+  const { data: performances } = usePerformances()
 
   // 유튜브 URL 로직
   const youtubeSchema = z.object({
@@ -132,7 +117,8 @@ const FirstPage = ({
                     <SelectValue placeholder="공연 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {performances.length > 0 &&
+                    {performances &&
+                      performances.length > 0 &&
                       performances.map((performance) => (
                         <SelectItem
                           key={performance.id}

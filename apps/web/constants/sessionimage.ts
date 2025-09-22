@@ -1,4 +1,4 @@
-import { SessionName } from "@repo/shared-types"
+import { SessionName } from "../../../packages/database/generated/prisma"
 
 type SessionImageType = {
   UNPRESSED: Record<SessionName, string>
@@ -7,22 +7,22 @@ type SessionImageType = {
 
 const SESSIONIMAGE: SessionImageType = {
   UNPRESSED: {
-    보컬: "/vocal.svg",
-    기타: "/guitar.svg",
-    베이스: "/bass.svg",
-    드럼: "/drums.svg",
-    신디: "/synth.svg",
-    관악기: "/flute.svg",
-    현악기: "/violin.svg"
+    VOCAL: "/vocal.svg",
+    GUITAR: "/guitar.svg",
+    BASS: "/bass.svg",
+    DRUM: "/drums.svg",
+    SYNTH: "/synth.svg",
+    WINDS: "/flute.svg",
+    STRINGS: "/violin.svg"
   },
   PRESSED: {
-    보컬: "/vocal-colored.svg",
-    기타: "/guitar-colored.svg",
-    베이스: "/bass-colored.svg",
-    드럼: "/drums-colored.svg",
-    신디: "/synth-colored.svg",
-    관악기: "/flute-colored.svg",
-    현악기: "/violin-colored.svg"
+    VOCAL: "/vocal-colored.svg",
+    GUITAR: "/guitar-colored.svg",
+    BASS: "/bass-colored.svg",
+    DRUM: "/drums-colored.svg",
+    SYNTH: "/synth-colored.svg",
+    WINDS: "/flute-colored.svg",
+    STRINGS: "/violin-colored.svg"
   }
 }
 
