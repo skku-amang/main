@@ -110,7 +110,13 @@ export class PerformanceService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} performance`
+  async remove(id: number) {
+    const performance = await this.findOne(id)
+    try {
+      await this.prisma.performance.delete({ where: { id } })
+    } catch (error) {
+      throw error
+    }
+    return performance
   }
 }
