@@ -3,7 +3,8 @@ import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import { publicUser } from "../prisma/selectors/user.selector"
-import { NotFoundError } from "@repo/api-client"
+import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
+import { Prisma } from "@repo/database"
 
 @Injectable()
 export class PerformanceService {
@@ -71,8 +72,42 @@ export class PerformanceService {
     return performance
   }
 
-  update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
-    return `This action updates a #${id} performance`
+  async update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id }
+    })
+
+    if (!performance)
+      throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+
+    const startAt = updatePerformanceDto.startAt ?? performance.startAt
+    const endAt = updatePerformanceDto.endAt ?? performance.endAt
+
+    if (startAt && endAt && startAt > endAt) {
+      throw new InvalidPerformanceDateError(
+        "공연의 시작 일시는 종료 일시보다 이전이어야 합니다."
+      )
+    }
+
+    try {
+      await this.prisma.performance.update({
+        where: { id },
+        data: updatePerformanceDto
+      })
+
+      return this.findOne(id)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          // Race Condition 방지
+          case "P2025":
+            throw new NotFoundError(
+              "업데이트하려는 데이터를 찾을 수 없습니다. 다른 요청에 의해 삭제되었을 수 있습니다."
+            )
+        }
+      }
+      throw error
+    }
   }
 
   remove(id: number) {
