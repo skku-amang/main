@@ -11,9 +11,11 @@ export class PerformanceService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createPerformanceDto: CreatePerformanceDto) {
-    await this.prisma.performance.create({
+    const performance = await this.prisma.performance.create({
       data: createPerformanceDto
     })
+
+    return this.findOne(performance.id)
   }
 
   async findAll() {
