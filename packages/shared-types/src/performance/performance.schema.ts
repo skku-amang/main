@@ -7,9 +7,10 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp"
 ]
-export const CreatePerformanceSchema = z.object({
+
+export const PerformanceObjectSchema = z.object({
   name: z.string().min(1, "공연 이름은 필수입니다."),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   posterImage: z
     .instanceof(File)
     .refine((file) => file.size < MAX_FILE_SIZE, {
@@ -20,12 +21,20 @@ export const CreatePerformanceSchema = z.object({
         t.replace("image/", "")
       ).join(", ")} 만 가능합니다.`
     })
+    .nullable()
     .optional(),
-  location: z.string().optional(),
-  startAt: z.date().optional(),
-  endAt: z.date().optional()
+  location: z.string().nullable().optional(),
+  startAt: z.coerce.date().nullable().optional(),
+  endAt: z.coerce.date().nullable().optional()
 })
-export type CreatePerformance = z.infer<typeof CreatePerformanceSchema>
 
-export const UpdatePerformanceSchema = CreatePerformanceSchema.partial()
-export type UpdatePerformance = z.infer<typeof UpdatePerformanceSchema>
+export const PartialPerformanceObjectSchema = PerformanceObjectSchema.partial()
+
+export const dateValidationRefine = (
+  data: z.infer<typeof PartialPerformanceObjectSchema>
+) => {
+  if (data.startAt && data.endAt) {
+    return data.endAt >= data.startAt
+  }
+  return true
+}
