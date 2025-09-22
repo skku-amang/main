@@ -11,9 +11,6 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
-      zod-form-data:
-        specifier: ^2.0.7
-        version: 2.0.7(zod@3.25.76)
     devDependencies:
       eslint:
         specifier: ^8.57.0

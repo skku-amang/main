@@ -1,5 +1,4 @@
 import z from "zod"
-import { zfd } from "zod-form-data"
 
 const MAX_FILE_SIZE = 20000000 // 20MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -11,13 +10,15 @@ export const ACCEPTED_IMAGE_TYPES = [
 export const CreatePerformanceSchema = z.object({
   name: z.string().min(1, "공연 이름은 필수입니다."),
   description: z.string().optional(),
-  posterImage: zfd
-    .file()
+  posterImage: z
+    .instanceof(File)
     .refine((file) => file.size < MAX_FILE_SIZE, {
       message: "File can't be bigger than 20MB."
     })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-      message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace("image/", "")).join(", ")} 만 가능합니다.`
+      message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) =>
+        t.replace("image/", "")
+      ).join(", ")} 만 가능합니다.`
     })
     .optional(),
   location: z.string().optional(),
