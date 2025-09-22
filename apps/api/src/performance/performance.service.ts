@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 import { PrismaService } from "../prisma/prisma.service"
-import { NotFoundError } from "@repo/api-client"
+import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { publicUser } from "../prisma/selectors/user.selector"
 import { Prisma } from "@repo/database"
 
@@ -79,6 +79,17 @@ export class PerformanceService {
 
     if (!performance)
       throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
+
+    const startDateTime =
+      updatePerformanceDto.startDateTime ?? performance.startDateTime
+    const endDateTime =
+      updatePerformanceDto.endDateTime ?? performance.endDateTime
+
+    if (startDateTime && endDateTime && startDateTime > endDateTime) {
+      throw new InvalidPerformanceDateError(
+        "공연의 시작 일시는 종료 일시보다 이전이어야 합니다."
+      )
+    }
 
     try {
       await this.prisma.performance.update({
