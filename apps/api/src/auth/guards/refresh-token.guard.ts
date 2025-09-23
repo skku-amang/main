@@ -1,6 +1,6 @@
 import { ExecutionContext, Injectable } from "@nestjs/common"
 import { AuthGuard } from "@nestjs/passport"
-import { AuthError } from "@repo/api-client"
+import { AuthError, RefreshTokenExpiredError } from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 
@@ -15,7 +15,7 @@ export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
   ): TUser {
     if (info) {
       if (info instanceof TokenExpiredError) {
-        throw new AuthError("리프레쉬 토큰이 만료되었습니다.")
+        throw new RefreshTokenExpiredError("리프레쉬 토큰이 만료되었습니다.")
       }
 
       if (info instanceof JsonWebTokenError) {

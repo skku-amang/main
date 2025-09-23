@@ -258,3 +258,33 @@ export class InvalidPerformanceDateError extends ApiError {
     )
   }
 }
+
+// ----------------------------------
+// Token Specific Errors
+// ----------------------------------
+
+/**
+ * 리프레시 토큰이 유효하지 않거나 만료되었을 때 발생하는 오류입니다.
+ */
+export class RefreshTokenExpiredError extends ApiError {
+  readonly type = "/errors/token/refresh-token-expired"
+  readonly status = 401
+  readonly title = "Refresh Token Expired"
+
+  constructor(detail?: string, instance?: string) {
+    super("리프레시 토큰이 만료되었습니다.", detail, instance)
+  }
+}
+
+/**
+ * 액세스 토큰이 유효하지 않거나 만료되었을 때 발생하는 오류입니다.
+ */
+export class AccessTokenExpiredError extends ApiError {
+  readonly type = "/errors/token/access-token-expired"
+  readonly status = 401
+  readonly title = "Access Token Expired"
+
+  constructor(detail?: string, instance?: string) {
+    super("액세스 토큰이 만료되었습니다.", detail, instance)
+  }
+}

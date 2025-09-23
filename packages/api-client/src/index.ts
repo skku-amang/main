@@ -37,7 +37,9 @@ import {
   SessionNotFoundError,
   UnprocessableEntityError,
   ValidationError,
-  InvalidPerformanceDateError
+  InvalidPerformanceDateError,
+  RefreshTokenExpiredError,
+  AccessTokenExpiredError
 } from "./errors"
 
 /**
@@ -82,6 +84,10 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new ReferencedEntityNotFoundError(detail, instance)
     case "/errors/performance/invalid-performance-date":
       return new InvalidPerformanceDateError(detail, instance)
+    case "/errors/token/refresh-token-expired":
+      return new RefreshTokenExpiredError(detail, instance)
+    case "/errors/token/access-token-expired":
+      return new AccessTokenExpiredError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
