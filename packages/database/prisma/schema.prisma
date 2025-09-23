@@ -74,6 +74,24 @@ model Session {
   @@map("sessions")
 }
 
+model Performance {
+  id Int @id @default(autoincrement())
+
+  name        String // 공연 이름
+  description String? // 공연 설명
+  posterImage String? // 대표 이미지 URL
+  location    String? // 공연 장소
+  startAt     DateTime? // 공연 시작 일시
+  endAt       DateTime? // 공연 종료 일시
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teams Team[] // 이 공연에 속한 팀들
+
+  @@map("performances")
+}
+
 model Team {
   id Int @id @default(autoincrement())
 
@@ -88,6 +106,9 @@ model Team {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  performanceId Int
+  Performance   Performance @relation(fields: [performanceId], references: [id], onDelete: Cascade)
 
   leaderId Int
   leader   User @relation("teamLeader", fields: [leaderId], references: [id], onDelete: Restrict)
