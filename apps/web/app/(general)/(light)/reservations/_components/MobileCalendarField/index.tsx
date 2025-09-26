@@ -1,5 +1,8 @@
-import { Dayjs } from "dayjs"
+"use client"
+
+import dayjs, { Dayjs } from "dayjs"
 import MobileMonthBlock from "./MobileMonthBlock"
+import { useState } from "react"
 
 interface MobileCalendarFieldProps {
   currentMonday: Dayjs
@@ -8,6 +11,7 @@ interface MobileCalendarFieldProps {
 export default function MobileCalendarField({
   currentMonday
 }: MobileCalendarFieldProps) {
+  const [focusDay, setFocusDay] = useState<Dayjs>(dayjs())
   const DayLabel = ["M", "T", "W", "T", "F", "S", "S"]
 
   // 1) 이 달의 첫째 날
@@ -38,7 +42,12 @@ export default function MobileCalendarField({
           </div>
         ))}
       </div>
-      <MobileMonthBlock days={daysInGrid} currentMonth={currentMonth} />
+      <MobileMonthBlock
+        focusDay={focusDay}
+        setFocusDay={setFocusDay}
+        days={daysInGrid}
+        currentMonth={currentMonth}
+      />
     </div>
   )
 }
