@@ -1,4 +1,4 @@
-import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationField/MobileMyReservationCard"
+import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationField"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
