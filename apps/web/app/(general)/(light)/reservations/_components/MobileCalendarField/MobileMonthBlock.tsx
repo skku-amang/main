@@ -15,7 +15,6 @@ export default function MobileMonthBlock({
     <div className="grid grid-cols-7 border-gray-100">
       {days.map((d, i) => {
         const isThisMonth = d.month() === currentMonth.month()
-        const isToday = d.isSame(new Date(), "day")
         return (
           <div key={i} className="flex-1 h-12">
             <div

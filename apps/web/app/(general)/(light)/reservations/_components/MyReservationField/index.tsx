@@ -1,6 +1,13 @@
+import { Reservation } from "../MobileReservationField"
 import ReservationCard from "./ReservationCard"
 
-export default function MyReservationField() {
+interface MyReservationFieldProps {
+  myReservation: Reservation[]
+}
+
+export default function MyReservationField({
+  myReservation
+}: MyReservationFieldProps) {
   const monthNames = [
     "January",
     "February",
@@ -26,7 +33,9 @@ export default function MyReservationField() {
       </span>
       <div className="w-full flex flex-col pt-3 gap-[10px]">
         {/* TODO: API 연결 시, map 함수 도입 */}
-        <ReservationCard />
+        {myReservation.map((reservation, i) => (
+          <ReservationCard key={i} reservation={reservation} />
+        ))}
       </div>
     </div>
   )

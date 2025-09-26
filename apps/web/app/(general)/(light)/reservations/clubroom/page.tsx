@@ -44,6 +44,52 @@ const ReservationPage = () => {
   const daysInCalendar = Array.from({ length: 42 }, (_, i) =>
     calendarStart.add(i, "day")
   )
+
+  const fakeReservation = [
+    {
+      start: "2025-09-27T09:00:00",
+      end: "2025-09-27T09:59:00",
+      user: "김수연 외 2명",
+      title: "아침 회의"
+    },
+    {
+      start: "2025-09-28T10:30:00",
+      end: "2025-09-28T11:29:00",
+      user: "박지훈 외 1명",
+      title: "스터디 모임"
+    },
+    {
+      start: "2025-09-28T12:00:00",
+      end: "2025-09-28T12:59:00",
+      user: "이민호 외 3명",
+      title: "팀 점심 회식"
+    },
+    {
+      start: "2025-09-28T13:30:00",
+      end: "2025-09-28T14:29:00",
+      user: "최지현",
+      title: "개인 상담"
+    },
+    {
+      start: "2025-09-28T15:00:00",
+      end: "2025-09-28T15:59:00",
+      user: "정은지 외 4명",
+      title: "프로젝트 발표 연습"
+    },
+    {
+      start: "2025-09-28T16:00:00",
+      end: "2025-09-28T16:59:00",
+      user: "오세훈 외 2명",
+      title: "스터디 그룹"
+    },
+    {
+      start: "2025-09-28T17:30:00",
+      end: "2025-09-28T18:29:00",
+      user: "김유진 외 1명",
+      title: "과제 토론"
+    }
+  ]
+
   return (
     <div>
       <DefaultPageHeader
@@ -57,7 +103,7 @@ const ReservationPage = () => {
       {/* PC 페이지 */}
       <div className={`w-full min-h-[739px] hidden md:flex gap-5`}>
         <div className="w-1/4">
-          <MyReservationField />
+          <MyReservationField myReservation={fakeReservation} />
         </div>
         <div className="w-3/4">
           <Tabs defaultValue="week">
@@ -114,7 +160,7 @@ const ReservationPage = () => {
         />
       </div>
       <div className="mx-auto max-w-[400px] md:hidden pt-3">
-        <MobileReservationField />
+        <MobileReservationField myReservation={fakeReservation} />
       </div>
     </div>
   )
