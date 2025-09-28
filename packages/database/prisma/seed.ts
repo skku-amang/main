@@ -1,5 +1,10 @@
 import { PrismaClient } from "../generated/prisma"
-import { seedSessions, seedGenerations, seedUsers } from "./seeds"
+import {
+  seedGenerations,
+  seedPerformance,
+  seedSessions,
+  seedUsers
+} from "./seeds"
 const prisma = new PrismaClient()
 
 const main = async () => {
@@ -7,6 +12,7 @@ const main = async () => {
   await seedSessions(prisma)
   await seedGenerations(prisma)
   await seedUsers(prisma)
+  await seedPerformance(prisma)
   console.log("Seeding finished.")
 }
 
