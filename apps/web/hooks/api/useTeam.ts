@@ -3,9 +3,10 @@ import ApiClient from "@repo/api-client"
 
 export const useCreateTeam = createMutationHook(ApiClient.prototype.createTeam)
 
-export const useTeams = createQueryHook(ApiClient.prototype.getTeams, () => [
-  "teams"
-])
+export const useTeams = createQueryHook(
+  ApiClient.prototype.getTeams,
+  (performanceId: number) => ["teams", "performance", performanceId]
+)
 
 export const useTeam = createQueryHook(
   ApiClient.prototype.getTeamById,

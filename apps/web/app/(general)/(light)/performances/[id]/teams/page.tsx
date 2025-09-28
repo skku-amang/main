@@ -15,7 +15,7 @@ const TeamList = () => {
   const params = useParams()
   const performanceId = Number(params.id)
 
-  const { data: teams, isError, error } = useTeams(performanceId)
+  const { data: teams } = useTeams(performanceId)
   const { data: relatedPerformances } = usePerformances()
 
   if (teams === undefined || relatedPerformances === undefined) {
