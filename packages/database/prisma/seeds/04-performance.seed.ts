@@ -3,8 +3,10 @@ import { PrismaClient } from "../../generated/prisma"
 export const seedPerformance = async (prisma: PrismaClient) => {
   console.log("Seeding performance...")
 
-  await prisma.performance.create({
-    data: {
+  await prisma.performance.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
       name: "샘플 공연",
       description: "샘플 공연 설명입니다.",
       posterImage: "https://picsum.photos/200/300",
