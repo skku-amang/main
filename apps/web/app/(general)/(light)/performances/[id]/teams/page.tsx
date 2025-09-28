@@ -15,11 +15,21 @@ const TeamList = () => {
   const params = useParams()
   const performanceId = Number(params.id)
 
-  const { data: teams } = useTeams(performanceId)
-  const { data: relatedPerformances } = usePerformances()
+  const { data: teams, status: teamsStatus } = useTeams(performanceId)
+  const { data: relatedPerformances, status: relatedPerformancesStatus } =
+    usePerformances()
 
-  if (teams === undefined || relatedPerformances === undefined) {
+  if (teamsStatus === "pending" || relatedPerformancesStatus === "pending") {
     return <div>로딩중...</div>
+  }
+
+  if (
+    teamsStatus === "error" ||
+    relatedPerformancesStatus === "error" ||
+    teams === undefined ||
+    relatedPerformances === undefined
+  ) {
+    return <div>오류가 발생했습니다.</div>
   }
 
   return (
