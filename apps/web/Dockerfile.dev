@@ -10,7 +10,7 @@ COPY . .
 
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm run db:generate
+RUN turbo db:generate
 
 ENV NODE_ENV=development
 ENV HOSTNAME="0.0.0.0"
