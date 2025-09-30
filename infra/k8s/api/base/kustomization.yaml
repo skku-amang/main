@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: api
 
 resources:
+  - namespace.yaml
   - configmap.yaml
   - deployment.yaml
   - ingress.yaml
