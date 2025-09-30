@@ -1,35 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: amang-api
-  labels:
-    app: amang-api
+  name: api
+  namespace: api
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      app: amang-api
+      app: api
   template:
     metadata:
       labels:
-        app: amang-api
+        app: api
     spec:
       containers:
         - name: api
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: ghcr.io/skku-amang/amang-api:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
-          env:
-            {{- range $key, $value := .Values.env }}
-            - name: {{ $key }}
-              valueFrom:
-                configMapKeyRef:
-                  name: amang-api-config
-                  key: {{ $key }}
-            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
           livenessProbe:
             httpGet:
               path: /
@@ -47,4 +43,9 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
