@@ -1,13 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Loading from "@/app/_(errors)/Loading"
 import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
@@ -23,36 +21,35 @@ import {
 } from "./SecondPage/schema"
 import ThirdPage from "./ThirdPage"
 
-interface TeamCreateFormProps {
-  initialData?: Team
-  className?: string
-}
+type TeamFormProps = { userId: number; className?: string } & (
+  | {
+      initialData?: undefined
+      useCreateOrUpdateTeam: ReturnType<typeof useCreateTeam>
+    }
+  | {
+      initialData: Team
+      useCreateOrUpdateTeam: ReturnType<typeof useUpdateTeam>
+    }
+)
 
-const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
+const TeamForm = ({
+  userId,
+  initialData,
+  useCreateOrUpdateTeam,
+  className
+}: TeamFormProps) => {
   const [currentPage, setCurrentPage] = useState(1)
-  const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
 
   const isCreate = !initialData?.id
-  const {
-    mutate: mutateTeamCreate,
-    isError: isCreateError,
-    data: createData
-  } = useCreateTeam()
-  const {
-    mutate: mutateTeamUpdate,
-    isError: isUpdateError,
-    data: updateData
-  } = useUpdateTeam(initialData?.id as number)
-  const isError = isCreateError || isUpdateError
-  const data = createData || updateData
+  const { mutate, isError, data } = useCreateOrUpdateTeam
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
     defaultValues: {
-      performanceId: initialData?.performance.id,
+      performanceId: initialData?.performanceId,
       songName: initialData?.songName,
       isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
@@ -224,6 +221,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     )
 
     const allFormData = {
+      leaderId: userId,
       performanceId: firstPageForm.getValues("performanceId"),
       songName: firstPageForm.getValues("songName"),
       songArtist: firstPageForm.getValues("songArtist"),
@@ -235,14 +233,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       isSelfMade: firstPageForm.getValues("isSelfMade")
     }
 
-    if (isCreate) {
-      mutateTeamCreate({
-        performanceId: allFormData.performanceId,
-        teamData: allFormData
-      })
-    } else {
-      mutateTeamUpdate(allFormData)
-    }
+    mutate(allFormData)
 
     if (isError || !data) {
       toast({
@@ -254,14 +245,11 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       })
       return
     }
-    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performance.id, data.id))
+    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
   }
   function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
     console.warn("FormInvalid:", errors)
   }
-
-  if (session.status === "loading") return <Loading />
-  if (!session.data) router.push(ROUTES.HOME)
 
   return (
     <div className={cn(`mb-20 rounded-2xl shadow-2xl`, className)}>
@@ -275,7 +263,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
               ? () =>
                   router.push(
                     ROUTES.PERFORMANCE.TEAM.DETAIL(
-                      initialData.performance.id,
+                      initialData.performanceId,
                       initialData.id
                     )
                   )

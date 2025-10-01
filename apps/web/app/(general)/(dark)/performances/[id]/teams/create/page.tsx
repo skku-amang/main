@@ -1,24 +1,29 @@
-import { redirect } from "next/navigation"
+"use client"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
-import { auth } from "@/auth"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
+import { useCreateTeam } from "@/hooks/api/useTeam"
+import { useSession } from "next-auth/react"
+import { redirect, useParams } from "next/navigation"
 import TeamForm from "../_components/TeamForm"
 
-interface TeamCreatePageProps {
-  params: Promise<{
-    id: number
-  }>
-}
+const TeamCreatePage = () => {
+  const params = useParams()
+  const performanceId = Number(params.id)
+  const useCreateTeamResult = useCreateTeam()
 
-const TeamCreatePage = async (props: TeamCreatePageProps) => {
-  const params = await props.params
-  const performanceId = params.id
+  const session = useSession()
 
-  const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN)
+  if (session.status === "loading") {
+    return <div>Loading...</div>
+  }
+
+  if (session.status === "unauthenticated") {
+    redirect(ROUTES.LOGIN)
+  }
+  const userId = session.data?.user?.id
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
@@ -29,7 +34,11 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
       />
 
-      <TeamForm className="w-full bg-white px-7 py-10 md:p-20" />
+      <TeamForm
+        userId={Number(userId)}
+        useCreateOrUpdateTeam={useCreateTeamResult}
+        className="w-full bg-white px-7 py-10 md:p-20"
+      />
     </div>
   )
 }
