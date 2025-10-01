@@ -246,7 +246,7 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public createTeam(performanceId: number, teamData: CreateTeam) {
+  public createTeam(teamData: CreateTeam) {
     return this._request<
       Team,
       | AuthError
@@ -257,7 +257,7 @@ export default class ApiClient {
       | ReferencedEntityNotFoundError
       | ConflictError
       | InternalServerError
-    >(`/performances/${performanceId}/teams`, "POST", teamData)
+    >(`/teams`, "POST", teamData)
   }
 
   /**
