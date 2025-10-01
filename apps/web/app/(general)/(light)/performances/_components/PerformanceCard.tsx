@@ -18,10 +18,10 @@ import { cn } from "@/lib/utils"
 interface PerformanceCardProp {
   id?: number
   name: string
-  posterSrc?: string
+  posterSrc: string | null
   description?: string
-  location?: string
-  startAt?: Date
+  location: string | null
+  startAt: Date | null
   className?: string
 }
 
@@ -53,7 +53,7 @@ const PerformanceCard = ({
   posterSrc,
   description,
   location,
-  startAt: startDatetime,
+  startAt,
   className
 }: PerformanceCardProp) => {
   const width = 300
@@ -65,7 +65,7 @@ const PerformanceCard = ({
         <Link href={ROUTES.PERFORMANCE.DETAIL(id)}>
           <PosterImage
             alt={`${name} 이미지`}
-            src={posterSrc}
+            src={posterSrc || undefined}
             width={width}
             height={height}
           />
@@ -73,7 +73,7 @@ const PerformanceCard = ({
       ) : (
         <PosterImage
           alt={`${name} 이미지`}
-          src={posterSrc}
+          src={posterSrc || undefined}
           width={width}
           height={height}
         />
@@ -82,8 +82,8 @@ const PerformanceCard = ({
       <CardHeader className="pb-0">
         <CardTitle>{name}</CardTitle>
         <CardDescription>
-          {startDatetime
-            ? `${startDatetime.getFullYear()}년 ${startDatetime.getMonth()}월 ${startDatetime.getDate()}일`
+          {startAt
+            ? `${startAt.getFullYear()}년 ${startAt.getMonth()}월 ${startAt.getDate()}일`
             : "미정"}
         </CardDescription>
       </CardHeader>

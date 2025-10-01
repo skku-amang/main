@@ -11,7 +11,15 @@ const PerformanceDetail = () => {
   const params = useParams()
   const { id } = params
 
-  const { data: performance } = usePerformance(Number(id))
+  const { data: performance, status } = usePerformance(Number(id))
+
+  if (status === "pending") {
+    return <div>로딩중...</div>
+  }
+
+  if (status === "error" || performance === undefined) {
+    return <div>오류가 발생했습니다.</div>
+  }
 
   return (
     <>
@@ -34,9 +42,11 @@ const PerformanceDetail = () => {
             <div className="flex items-center">
               <FaClock />
               &nbsp;
-              {new Date(performance.startDatetime).toLocaleString(
-                "ko-KR"
-              )} ~ {new Date(performance.endDatetime).toLocaleTimeString()}
+              {performance.startAt &&
+                new Date(performance.startAt).toLocaleString("ko-KR")}{" "}
+              ~&nbsp;
+              {performance.endAt &&
+                new Date(performance.endAt).toLocaleTimeString()}
             </div>
             <div className="flex items-center">
               <IoLocationSharp />

@@ -19,6 +19,7 @@ import {
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
+  AccessTokenExpiredError,
   ApiError,
   AuthError,
   ConflictError,
@@ -29,17 +30,16 @@ import {
   ForbiddenError,
   InternalServerError,
   InvalidMemberIndexError,
+  InvalidPerformanceDateError,
   NoApplicationFoundError,
   NotFoundError,
   PositionOccupiedError,
   ProblemDocument,
   ReferencedEntityNotFoundError,
+  RefreshTokenExpiredError,
   SessionNotFoundError,
   UnprocessableEntityError,
-  ValidationError,
-  InvalidPerformanceDateError,
-  RefreshTokenExpiredError,
-  AccessTokenExpiredError
+  ValidationError
 } from "./errors"
 
 /**
@@ -277,7 +277,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getTeams() {
-    return this._request<Team[], InternalServerError>(`/api/teams/`, "GET")
+    return this._request<Team[], InternalServerError>(`/teams/`, "GET")
   }
 
   /**
@@ -354,7 +354,7 @@ export default class ApiClient {
       | DuplicateApplicationError
       | PositionOccupiedError
       | InternalServerError
-    >(`/api/teams/${teamId}/apply`, "POST", teamApplicationData)
+    >(`/teams/${teamId}/apply`, "POST", teamApplicationData)
   }
 
   /**
