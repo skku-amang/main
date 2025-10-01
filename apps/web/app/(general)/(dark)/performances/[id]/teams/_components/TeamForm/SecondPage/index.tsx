@@ -15,7 +15,7 @@ interface SecondPageProps {
     typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
   >
   onValid: (formData: z.infer<any>) => void
-  onInvalid: (formData: z.infer<any>) => void
+  onInvalid?: (formData: z.infer<any>) => void
   onPrevious: () => void
 }
 

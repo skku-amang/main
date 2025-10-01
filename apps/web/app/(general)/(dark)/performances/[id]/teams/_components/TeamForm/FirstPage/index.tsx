@@ -27,17 +27,22 @@ import { cn } from "@/lib/utils"
 import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
 
+import { FirstPageSchema } from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import Description from "../Description"
 import Paginator from "../Paginator"
-import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
+
+export const songYoutubeVideoUrlSchema = z
+  .string({ required_error: "필수 항목" })
+  .min(5, { message: "최소 5자 이상" })
+  .refine((value) => YoutubeVideo.isUrlValid(value), {
+    message: "유효한 URL이 아닙니다"
+  })
 
 interface FirstPageProps {
-  form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
-  // eslint-disable-next-line no-unused-vars
-  onValid: (formData: z.infer<any>) => void
-  // eslint-disable-next-line no-unused-vars
-  onInvalid: (formData: z.infer<any>) => void
+  form: ReturnType<typeof useForm<z.infer<typeof FirstPageSchema>>>
+  onValid: (formData: z.infer<typeof FirstPageSchema>) => void
+  onInvalid?: (formData: z.infer<typeof FirstPageSchema>) => void
   onPrevious?: () => void
 }
 
@@ -49,11 +54,10 @@ const FirstPage = ({
 }: FirstPageProps) => {
   const { data: performances } = usePerformances()
 
-  // 유튜브 URL 로직
   const youtubeSchema = z.object({
     songYoutubeVideoUrl: songYoutubeVideoUrlSchema
   })
-  const youtubeForm = useForm<z.infer<typeof youtubeSchema>>({
+  const youtubeForm = useForm({
     resolver: zodResolver(youtubeSchema),
     defaultValues: {
       songYoutubeVideoUrl: YoutubeVideo.getURL(
@@ -62,7 +66,7 @@ const FirstPage = ({
     }
   })
 
-  function onInnerFormValid(formData: any) {
+  function onYoutubeFormValid(formData: z.infer<typeof youtubeSchema>) {
     form.clearErrors("songYoutubeVideoUrl")
     form.setValue("songYoutubeVideoUrl", formData.songYoutubeVideoUrl)
   }
@@ -273,7 +277,7 @@ const FirstPage = ({
         {/* TODO: 기존 값 그대로 사용하려고 할 때 에러 발생하는 버그 수정 필요 */}
         <Form {...youtubeForm}>
           <form
-            onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
+            onSubmit={youtubeForm.handleSubmit(onYoutubeFormValid, (e) =>
               console.log(e)
             )}
           >

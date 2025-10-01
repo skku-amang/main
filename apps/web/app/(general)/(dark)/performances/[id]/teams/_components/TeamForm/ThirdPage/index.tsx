@@ -16,9 +16,8 @@ interface ThirdPageProps {
     typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
   >
   onValid: (formData: z.infer<any>) => void
-  onInvalid: (errors: FieldErrors<z.infer<any>>) => void
+  onInvalid?: (errors: FieldErrors<z.infer<any>>) => void
   onPrevious: () => void
-  firstPageForm: ReturnType<typeof useForm<any>>
 }
 
 const ThirdPage = ({

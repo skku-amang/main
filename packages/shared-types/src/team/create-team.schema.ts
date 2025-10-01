@@ -1,14 +1,14 @@
 import { z } from "zod"
 
+export const TeamSessionMemberSchema = z.object({
+  userId: z.number().int().positive("사용자 ID는 정수여야 합니다."),
+  index: z.number().int().positive("인덱스는 1 이상이어야 합니다.")
+})
+
 export const TeamSessionSchema = z.object({
   sessionId: z.number().int().positive(),
   capacity: z.number().int().positive("세션 정원은 1 이상이어야 합니다."),
-  members: z.array(
-    z.object({
-      userId: z.number().int().positive(),
-      index: z.number().int().positive("인덱스는 1 이상이어야 합니다.")
-    })
-  )
+  members: z.array(TeamSessionMemberSchema)
 })
 
 export const CreateTeamSchema = z.object({
@@ -29,7 +29,7 @@ export const CreateTeamSchema = z.object({
     .url("유튜브 영상 URL은 유효한 URL이어야 합니다.")
     .nullable()
     .optional(),
-  memberSessions: z.array(TeamSessionSchema)
+  teamSessions: z.array(TeamSessionSchema)
 })
 
 export type CreateTeam = z.infer<typeof CreateTeamSchema>
