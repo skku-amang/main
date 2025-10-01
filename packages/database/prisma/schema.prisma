@@ -95,7 +95,6 @@ model Performance {
 model Team {
   id Int @id @default(autoincrement())
 
-  name                String // 팀 이름
   description         String? // 팀 설명
   posterImage         String? // 포스터 이미지 URL
   songName            String // 곡 제목
