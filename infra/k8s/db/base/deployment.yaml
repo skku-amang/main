@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: amang-postgres
+  namespace: amang-db
 spec:
   replicas: 1
   selector:

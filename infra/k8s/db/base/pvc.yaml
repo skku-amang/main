@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: amang-postgres
+  namespace: amang-db
 spec:
   accessModes:
     - ReadWriteOnce
