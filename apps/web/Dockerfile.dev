@@ -10,6 +10,7 @@ COPY . .
 
 RUN pnpm install --frozen-lockfile
 
+RUN turbo build --filter=@repo/api-client
 RUN turbo db:generate
 
 ENV NODE_ENV=development

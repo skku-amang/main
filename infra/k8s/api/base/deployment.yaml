@@ -15,7 +15,7 @@ spec:
       containers:
         - name: api
           image: ghcr.io/skku-amang/amang-api:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always # TODO: use Argocd Image Updater
           ports:
             - name: http
               containerPort: 8000
