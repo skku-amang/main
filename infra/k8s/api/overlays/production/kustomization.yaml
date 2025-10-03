@@ -5,4 +5,5 @@ namespace: amang-api-production
 resources:
   - namespace.yaml
   - ../../base
+  - ingress.yaml
   - secret.yaml
