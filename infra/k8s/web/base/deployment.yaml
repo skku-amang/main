@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/skku-amang/amang-web:latest
+          imagePullPolicy: Always # TODO: use Argocd Image Updater
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: web-config
+            - secretRef:
+                name: web-secrets
+          # TODO: Enable health checks after setting up proper health check endpoints in the application
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 30
+          #   timeoutSeconds: 5
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
+          #   timeoutSeconds: 3
+          #   failureThreshold: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 1Gi
