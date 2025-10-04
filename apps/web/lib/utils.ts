@@ -1,3 +1,4 @@
+import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationField"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -56,4 +57,26 @@ export function getRepresentativeRelativeTime(date: Date | string) {
   } else {
     return `${diffYears}년 전`
   }
+}
+
+export function ReservationSplit(reservation: Reservation) {
+  const date = new Date(reservation.start)
+
+  return {
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    startTime: `${date.getHours()}:${date.getMinutes()}${date.getMinutes() == 0 ? "0" : ""}`,
+    endTime: `${new Date(reservation.end).getHours()}:${new Date(reservation.end).getMinutes()}`,
+    dayOfTheWeek: dayOfTheWeekList[date.getDay()]
+  }
+}
+
+const dayOfTheWeekList: { [key: number]: string } = {
+  0: "Mon",
+  1: "Tue",
+  2: "Wed",
+  3: "Thu",
+  4: "Fri",
+  5: "Sat",
+  6: "Sun"
 }
