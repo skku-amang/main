@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common"
-import { ForbiddenError, AuthError } from "@repo/api-client"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
+import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+import * as bcrypt from "bcrypt"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
-import * as bcrypt from "bcrypt"
 import { UsersService } from "../users/users.service"
 @Injectable()
 export class AuthService {
@@ -29,8 +29,12 @@ export class AuthService {
 
   async login(loginDto: LoginUserDto) {
     const user = await this.usersService.findOneByEmail(loginDto.email)
-    if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-      throw new AuthError("이메일 또는 비밀번호가 올바르지 않습니다.")
+    if (!user) {
+      throw new AuthError("존재하지 않는 이메일입니다.")
+    }
+    const isMatch = await bcrypt.compare(loginDto.password, user.password)
+    if (!isMatch) {
+      throw new AuthError("비밀번호가 일치하지 않습니다.")
     }
 
     const tokens = await this.getTokens(

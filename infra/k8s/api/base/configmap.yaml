@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+data:
+  ACCESS_TOKEN_EXPIRES_IN: 1h
+  REFRESH_TOKEN_EXPIRES_IN: 7d

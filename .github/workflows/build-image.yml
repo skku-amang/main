@@ -17,12 +17,15 @@ jobs:
       matrix:
         app:
           - name: web
-            dockerfile: apps/web/Dockerfile
+            dockerfile: apps/web/Dockerfile.dev
           - name: api
             dockerfile: apps/api/Dockerfile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -39,6 +42,7 @@ jobs:
         with:
           context: .
           file: ${{ matrix.app.dockerfile }}
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}

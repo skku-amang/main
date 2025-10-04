@@ -1,22 +1,26 @@
 import { Injectable } from "@nestjs/common"
 import { ConflictError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import { CreateUserDto } from "./dto/create-user.dto"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
+import { CreateUserDto } from "./dto/create-user.dto"
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10)
+    const { sessions: sessionIds, ...restOfDto } = createUserDto
+    const hashedPassword = await bcrypt.hash(restOfDto.password, 10)
 
     try {
       const user = await this.prisma.user.create({
         data: {
-          ...createUserDto,
-          password: hashedPassword
+          ...restOfDto,
+          password: hashedPassword,
+          sessions: {
+            connect: sessionIds.map((id) => ({ id }))
+          }
         }
       })
 

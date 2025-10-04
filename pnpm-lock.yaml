@@ -217,6 +217,9 @@ importers:
       '@repo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@repo/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@repo/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types

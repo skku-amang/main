@@ -1,26 +1,27 @@
 "use client"
 
-import ApiClient from "@repo/api-client"
 import { createContext, ReactNode, useContext } from "react"
+
+import { apiClient } from "@/lib/apiClient"
+import ApiClient from "@repo/api-client"
 
 const ApiClientContext = createContext<ApiClient | null>(null)
 
-export const ApiClientProvider = ({ children }: { children: ReactNode }) => {
-  const apiClient = new ApiClient(
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-  )
-
-  return (
-    <ApiClientContext.Provider value={apiClient}>
-      {children}
-    </ApiClientContext.Provider>
-  )
-}
-
+/**
+ * 클라이언트 컴포넌트에서 사용
+ */
 export const useApiClient = () => {
   const context = useContext(ApiClientContext)
   if (!context) {
     throw new Error("useApiClient must be used within ApiClientProvider")
   }
   return context
+}
+
+export const ApiClientProvider = ({ children }: { children: ReactNode }) => {
+  return (
+    <ApiClientContext.Provider value={apiClient}>
+      {children}
+    </ApiClientContext.Provider>
+  )
 }

@@ -1,61 +1,36 @@
-import { redirect } from "next/navigation"
+"use client"
 
-import { auth } from "@/auth"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
 import ROUTES from "@/constants/routes"
-import fetchData from "@/lib/fetch"
-import { ListResponse } from "@/lib/fetch/responseBodyInterfaces"
-import { Team } from "@repo/shared-types"
 
+import { usePerformances } from "@/hooks/api/usePerformance"
+import { useTeams } from "@/hooks/api/useTeam"
+import { useParams } from "next/navigation"
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 
-interface TeamListProps {
-  params: Promise<{
-    id: number
-  }>
-}
+const TeamList = () => {
+  const params = useParams()
+  const performanceId = Number(params.id)
 
-const TeamList = async (props: TeamListProps) => {
-  const params = await props.params
-  const { id } = params
-  const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN)
+  const { data: teams, status: teamsStatus } = useTeams(performanceId)
+  const { data: relatedPerformances, status: relatedPerformancesStatus } =
+    usePerformances()
 
-  const res = await fetchData(
-    API_ENDPOINTS.PERFORMANCE.RETRIEVE_TEAMS(id) as ApiEndpoint,
-    {
-      cache: "no-cache",
-      headers: {
-        Authorization: `Bearer ${session.access}`
-      }
-    }
-  )
+  if (teamsStatus === "pending" || relatedPerformancesStatus === "pending") {
+    return <div>로딩중...</div>
+  }
 
-  const data = (await res.json()) as ListResponse<Team>
-  const teams = data.map((team) => ({
-    performanceId: team.performance.id,
-    id: team.id,
-    songName: team.songName,
-    songArtist: team.songArtist,
-    leader: team.leader,
-    memberSessions: team.memberSessions,
-    songYoutubeVideoUrl: team.songYoutubeVideoUrl,
-    isFreshmenFixed: team.isFreshmenFixed,
-    isSelfMade: team.isSelfMade
-  }))
-
-  const relatedPerformances = await (
-    await fetchData(API_ENDPOINTS.PERFORMANCE.LIST, {
-      cache: "no-cache",
-      headers: {
-        Authorization: `Bearer ${session.access}`
-      }
-    })
-  ).json()
+  if (
+    teamsStatus === "error" ||
+    relatedPerformancesStatus === "error" ||
+    teams === undefined ||
+    relatedPerformances === undefined
+  ) {
+    return <div>오류가 발생했습니다.</div>
+  }
 
   return (
     <div>
@@ -72,7 +47,7 @@ const TeamList = async (props: TeamListProps) => {
           },
           {
             display: "공연팀 목록",
-            href: ROUTES.PERFORMANCE.TEAM.LIST(id)
+            href: ROUTES.PERFORMANCE.TEAM.LIST(performanceId)
           }
         ]}
       />
@@ -83,7 +58,7 @@ const TeamList = async (props: TeamListProps) => {
         columns={columns}
         data={teams}
         relatedPerformances={relatedPerformances}
-        performanceId={id}
+        performanceId={performanceId}
       />
     </div>
   )

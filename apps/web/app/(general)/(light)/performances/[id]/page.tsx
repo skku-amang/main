@@ -1,36 +1,25 @@
-import { redirect } from "next/dist/client/components/redirect"
+"use client"
+
 import Image from "next/image"
 import { FaClock } from "react-icons/fa"
 import { IoLocationSharp } from "react-icons/io5"
 
-import { auth } from "@/auth"
-import API_ENDPOINTS, { ApiEndpoint } from "@/constants/apiEndpoints"
-import ROUTES from "@/constants/routes"
-import fetchData from "@/lib/fetch"
+import { usePerformance } from "@/hooks/api/usePerformance"
+import { useParams } from "next/navigation"
 
-interface PerformanceDetailProp {
-  params: Promise<{
-    id: number
-  }>
-}
-
-const PerformanceDetail = async (props: PerformanceDetailProp) => {
-  const params = await props.params
+const PerformanceDetail = () => {
+  const params = useParams()
   const { id } = params
-  const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN)
 
-  const res = await fetchData(
-    API_ENDPOINTS.PERFORMANCE.RETRIEVE(id) as ApiEndpoint,
-    {
-      cache: "no-cache",
-      credentials: "include",
-      headers: {
-        Authorization: `Bearer ${session.access}`
-      }
-    }
-  )
-  const performance = await res.json()
+  const { data: performance, status } = usePerformance(Number(id))
+
+  if (status === "pending") {
+    return <div>로딩중...</div>
+  }
+
+  if (status === "error" || performance === undefined) {
+    return <div>오류가 발생했습니다.</div>
+  }
 
   return (
     <>
@@ -39,7 +28,7 @@ const PerformanceDetail = async (props: PerformanceDetailProp) => {
         {/* 이미지 */}
         <Image
           alt={`${performance.name} 사진`}
-          src={performance.representativeImage ?? "/images/default.jpg"}
+          src={performance.posterImage ?? "/images/default.jpg"}
           width={300}
           height={300}
           className="m-10 rounded-lg shadow-2xl"
@@ -53,9 +42,11 @@ const PerformanceDetail = async (props: PerformanceDetailProp) => {
             <div className="flex items-center">
               <FaClock />
               &nbsp;
-              {new Date(performance.startDatetime).toLocaleString(
-                "ko-KR"
-              )} ~ {new Date(performance.endDatetime).toLocaleTimeString()}
+              {performance.startAt &&
+                new Date(performance.startAt).toLocaleString("ko-KR")}{" "}
+              ~&nbsp;
+              {performance.endAt &&
+                new Date(performance.endAt).toLocaleTimeString()}
             </div>
             <div className="flex items-center">
               <IoLocationSharp />

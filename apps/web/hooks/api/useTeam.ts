@@ -1,96 +1,26 @@
-import { DEFAULT_REACT_QUERY_STALE_TIME } from "@/constants/api"
-import { useApiClient } from "@/lib/providers/api-client-provider"
-import {
-  CreateTeam,
-  Team,
-  TeamApplication,
-  UpdateTeam
-} from "@repo/shared-types"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createMutationHook, createQueryHook } from "@/hooks/useCustomQuery"
+import ApiClient from "@repo/api-client"
 
-export function useCreateTeam() {
-  const apiClient = useApiClient()
-  const queryClient = useQueryClient()
+export const useCreateTeam = createMutationHook(ApiClient.prototype.createTeam)
 
-  return useMutation({
-    mutationFn: ({
-      performanceId,
-      teamData
-    }: {
-      performanceId: number
-      teamData: CreateTeam
-    }) => apiClient.createTeam(performanceId, teamData),
-    onSuccess: (newTeam: Team) => {
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
-      queryClient.setQueryData(["team", newTeam.id], newTeam)
-      if (newTeam.performance.id) {
-        queryClient.invalidateQueries({
-          queryKey: ["teams", "performance", newTeam.performance.id]
-        })
-      }
-    }
-  })
-}
+export const useTeams = createQueryHook(
+  ApiClient.prototype.getTeamsByPerformance,
+  (performanceId: number) => ["teams", "performance", performanceId]
+)
 
-export function useTeams(performanceId: number, enabled: boolean = true) {
-  const apiClient = useApiClient()
+export const useTeam = createQueryHook(
+  ApiClient.prototype.getTeamById,
+  (teamId: number) => ["team", teamId]
+)
 
-  return useQuery({
-    queryKey: ["teams", "performance", performanceId],
-    queryFn: () => apiClient.getTeamsByPerformance(performanceId),
-    enabled: enabled && !!performanceId,
-    staleTime: DEFAULT_REACT_QUERY_STALE_TIME
-  })
-}
+export const useUpdateTeam = createMutationHook(ApiClient.prototype.updateTeam)
 
-export function useTeam(teamId: number, enabled: boolean = true) {
-  const apiClient = useApiClient()
+export const useDeleteTeam = createMutationHook(ApiClient.prototype.deleteTeam)
 
-  return useQuery({
-    queryKey: ["team", teamId],
-    queryFn: () => apiClient.getTeamById(teamId),
-    enabled: enabled && !!teamId,
-    staleTime: DEFAULT_REACT_QUERY_STALE_TIME
-  })
-}
+export const useApplyToTeam = createMutationHook(
+  ApiClient.prototype.applyToTeam
+)
 
-export function useUpdateTeam(teamId: number) {
-  const apiClient = useApiClient()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (updateData: UpdateTeam) =>
-      apiClient.updateTeam(teamId, updateData),
-    onSuccess: (updatedTeam: Team) => {
-      queryClient.setQueryData(["team", teamId], updatedTeam)
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
-    }
-  })
-}
-
-export function useDeleteTeam() {
-  const apiClient = useApiClient()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (teamId: number) => apiClient.deleteTeam(teamId),
-    onSuccess: (_, deletedTeamId) => {
-      queryClient.removeQueries({ queryKey: ["team", deletedTeamId] })
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
-    }
-  })
-}
-
-export function useTeamApplication(teamId: number) {
-  const apiClient = useApiClient()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (applicationData: TeamApplication) =>
-      apiClient.applyToTeam(teamId, applicationData),
-    onSuccess: (updatedTeam: Team) => {
-      queryClient.setQueryData(["team", teamId], updatedTeam)
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
-    }
-  })
-}
+export const useUnapplyFromTeam = createMutationHook(
+  ApiClient.prototype.unapplyFromTeam
+)

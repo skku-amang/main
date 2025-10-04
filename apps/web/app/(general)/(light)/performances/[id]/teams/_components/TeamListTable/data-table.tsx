@@ -182,7 +182,7 @@ export function TeamListDataTable<TValue>({
     result: data,
     originalData: data
   } as State)
-  const filterValues: { [key: string]: FilterValue[] } = {
+  const filterValues: Record<keyof State["filters"], FilterValue[]> = {
     필요세션: [
       {
         label: "모두",
@@ -312,8 +312,8 @@ export function TeamListDataTable<TValue>({
     { id: "songName", display: "곡명 오름차순", desc: false },
     { id: "songArtist", display: "곡명 내림차순", desc: true }
     // TODO: 최신순 추가
-    // { id: "createdDatetime", display: "최신순", desc: true },
-    // { id: "createdDatetime", display: "오래된순", desc: false },
+    // { id: "createdAt", display: "최신순", desc: true },
+    // { id: "createdAt", display: "오래된순", desc: false },
   ]
 
   return (

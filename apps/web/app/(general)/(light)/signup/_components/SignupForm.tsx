@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Generation, Session } from "@repo/shared-types"
+import { CreateUserSchema, passwordField } from "@repo/shared-types"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -29,37 +29,37 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
-import { signUpSchema as _signUpSchema, password } from "@/constants/zodSchema"
+import { useGenerations } from "@/hooks/api/useGeneration"
+import { useSessions } from "@/hooks/api/useSession"
 import {
   DuplicatedCredentialsErrorCode,
   InvalidSignupCredentialsErrorCode
 } from "@/lib/auth/errors"
 import { formatGenerationOrder } from "@/lib/utils"
 
-const signUpSchema = _signUpSchema
-  .merge(z.object({ confirmPassword: password }))
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "패스워드가 일치하지 않습니다.",
-    path: ["confirmPassword"]
-  })
+const confirmPasswordMergedCreateUserSchema = CreateUserSchema.merge(
+  z.object({ confirmPassword: passwordField })
+).refine((data) => data.password === data.confirmPassword, {
+  message: "패스워드가 일치하지 않습니다.",
+  path: ["confirmPassword"]
+})
 
-interface SignupFormProps {
-  sessions: Session[]
-  generations: Generation[]
-}
-
-const SignupForm = ({ sessions, generations }: SignupFormProps) => {
+const SignupForm = () => {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: sessions, status: sessionsStatus } = useSessions()
+  const { data: generations, status: generationsStatus } = useGenerations()
 
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<z.infer<typeof confirmPasswordMergedCreateUserSchema>>({
+    resolver: zodResolver(confirmPasswordMergedCreateUserSchema),
     defaultValues: {
       sessions: []
     }
   })
 
-  async function onSubmit(formData: z.infer<typeof signUpSchema>) {
+  async function onSubmit(
+    formData: z.infer<typeof confirmPasswordMergedCreateUserSchema>
+  ) {
     const res = await signIn("credentials", {
       name: formData.name,
       nickname: formData.nickname,
@@ -72,14 +72,19 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
     if (!res?.error) return router.push(ROUTES.HOME)
 
     const shouldBeUniqueFields = ["nickname", "email"]
-    const allFields = Object.keys(signUpSchema._def.schema.shape)
+    const allFields = Object.keys(
+      confirmPasswordMergedCreateUserSchema._def.schema.shape
+    )
     switch (res.code) {
       case DuplicatedCredentialsErrorCode:
         shouldBeUniqueFields.forEach((key) => {
-          form.setError(key as keyof z.infer<typeof signUpSchema>, {
-            type: "manual",
-            message: "이미 가입된 회원 정보입니다."
-          })
+          form.setError(
+            key as keyof z.infer<typeof confirmPasswordMergedCreateUserSchema>,
+            {
+              type: "manual",
+              message: "이미 가입된 회원 정보입니다."
+            }
+          )
         })
         toast({
           title: "회원가입 실패",
@@ -90,10 +95,13 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
 
       case InvalidSignupCredentialsErrorCode:
         allFields.forEach((key) => {
-          form.setError(key as keyof z.infer<typeof signUpSchema>, {
-            type: "manual",
-            message: "회원가입 정보가 올바르지 않습니다."
-          })
+          form.setError(
+            key as keyof z.infer<typeof confirmPasswordMergedCreateUserSchema>,
+            {
+              type: "manual",
+              message: "회원가입 정보가 올바르지 않습니다."
+            }
+          )
         })
         toast({
           title: "회원가입 실패",
@@ -122,9 +130,15 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
           name="name"
           label="이름"
           placeholder="김아망"
-          description={signUpSchema._def.schema.shape.name.description}
+          description={
+            confirmPasswordMergedCreateUserSchema._def.schema.shape.name
+              .description
+          }
           required={
-            !(signUpSchema._def.schema.shape.name instanceof z.ZodOptional)
+            !(
+              confirmPasswordMergedCreateUserSchema._def.schema.shape
+                .name instanceof z.ZodOptional
+            )
           }
         />
         <SimpleStringField
@@ -132,9 +146,15 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
           name="nickname"
           label="닉네임"
           placeholder="베이스 !== 기타"
-          description={signUpSchema._def.schema.shape.nickname.description}
+          description={
+            confirmPasswordMergedCreateUserSchema._def.schema.shape.nickname
+              .description
+          }
           required={
-            !(signUpSchema._def.schema.shape.nickname instanceof z.ZodOptional)
+            !(
+              confirmPasswordMergedCreateUserSchema._def.schema.shape
+                .nickname instanceof z.ZodOptional
+            )
           }
         />
         <SimpleStringField
@@ -142,9 +162,15 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
           name="email"
           label="이메일"
           placeholder="example@g.skku.edu"
-          description={signUpSchema._def.schema.shape.email.description}
+          description={
+            confirmPasswordMergedCreateUserSchema._def.schema.shape.email
+              .description
+          }
           required={
-            !(signUpSchema._def.schema.shape.email instanceof z.ZodOptional)
+            !(
+              confirmPasswordMergedCreateUserSchema._def.schema.shape
+                .email instanceof z.ZodOptional
+            )
           }
         />
         <SimpleStringField
@@ -152,9 +178,15 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
           name="password"
           label="비밀번호"
           placeholder="비밀번호"
-          description={signUpSchema._def.schema.shape.password.description}
+          description={
+            confirmPasswordMergedCreateUserSchema._def.schema.shape.password
+              .description
+          }
           required={
-            !(signUpSchema._def.schema.shape.password instanceof z.ZodOptional)
+            !(
+              confirmPasswordMergedCreateUserSchema._def.schema.shape
+                .password instanceof z.ZodOptional
+            )
           }
           inputType="password"
         />
@@ -163,11 +195,14 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
           name="confirmPassword"
           label="비밀번호 확인"
           placeholder="비밀번호 확인"
-          description={signUpSchema._def.schema.shape.password.description}
+          description={
+            confirmPasswordMergedCreateUserSchema._def.schema.shape.password
+              .description
+          }
           required={
             !(
-              signUpSchema._def.schema.shape.confirmPassword instanceof
-              z.ZodOptional
+              confirmPasswordMergedCreateUserSchema._def.schema.shape
+                .confirmPassword instanceof z.ZodOptional
             )
           }
           inputType="password"
@@ -182,8 +217,8 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                 <SimpleLabel
                   required={
                     !(
-                      signUpSchema._def.schema.shape.generationId instanceof
-                      z.ZodOptional
+                      confirmPasswordMergedCreateUserSchema._def.schema.shape
+                        .generationId instanceof z.ZodOptional
                     )
                   }
                 >
@@ -192,21 +227,27 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
               </div>
               <Select
                 value={field.value?.toString()}
-                onValueChange={(v) => field.onChange(v)}
+                onValueChange={(v) => field.onChange(parseInt(v))}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  {generations.map((generation) => (
-                    <SelectItem
-                      key={generation.order}
-                      value={generation.id.toString()}
-                    >
-                      {formatGenerationOrder(generation.order)}기
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                {generationsStatus === "success" ? (
+                  <>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {generations.map((generation) => (
+                        <SelectItem
+                          key={generation.order}
+                          value={generation.id.toString()}
+                        >
+                          {formatGenerationOrder(generation.order)}기
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </>
+                ) : (
+                  <div>Loading...</div>
+                )}
               </Select>
               <FormMessage />
             </FormItem>
@@ -222,8 +263,8 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                 <SimpleLabel
                   required={
                     !(
-                      signUpSchema._def.schema.shape.sessions instanceof
-                      z.ZodOptional
+                      confirmPasswordMergedCreateUserSchema._def.schema.shape
+                        .sessions instanceof z.ZodOptional
                     )
                   }
                 >
@@ -233,7 +274,9 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                   연주 가능한 세션을 선택해주세요.
                 </FormDescription>
               </div>
-              {sessions &&
+              {sessionsStatus !== "success" ? (
+                <div>Loading...</div>
+              ) : (
                 sessions.map((session) => (
                   <FormField
                     key={session.id}
@@ -266,7 +309,8 @@ const SignupForm = ({ sessions, generations }: SignupFormProps) => {
                       )
                     }}
                   />
-                ))}
+                ))
+              )}
               <FormMessage />
             </FormItem>
           )}

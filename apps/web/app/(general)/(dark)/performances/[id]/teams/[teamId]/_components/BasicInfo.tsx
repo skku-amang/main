@@ -43,7 +43,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
           {team.leader.name}
         </div>
         <div className=" text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
-          {getRepresentativeRelativeTime(team.createdDatetime)}
+          {getRepresentativeRelativeTime(team.createdAt)}
         </div>
       </div>
 
