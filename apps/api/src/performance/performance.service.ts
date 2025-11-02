@@ -29,7 +29,7 @@ export class PerformanceService {
     return performances
   }
 
-  async findTeamsByPerformanceId(id: number): Promise<PerformanceTeamsList> {
+  async findTeamsByPerformanceId(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
       include: performanceTeamsInclude
@@ -40,7 +40,7 @@ export class PerformanceService {
     return performance.teams
   }
 
-  async findOne(id: number): Promise<PerformanceWithDetails> {
+  async findOne(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
       include: performanceFindOneInclude
