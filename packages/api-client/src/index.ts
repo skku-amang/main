@@ -15,7 +15,9 @@ import {
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User
+  User,
+  PerformanceWithDetails,
+  PerformanceTeamsList
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
@@ -172,7 +174,7 @@ export default class ApiClient {
    */
   public createPerformance(performanceData: CreatePerformance) {
     return this._request<
-      Performance,
+      PerformanceWithDetails,
       ValidationError | AuthError | ForbiddenError | InternalServerError
     >(`/performances`, "POST", performanceData)
   }
@@ -183,10 +185,10 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getPerformanceById(id: number) {
-    return this._request<Performance, NotFoundError | InternalServerError>(
-      `/performances/${id}`,
-      "GET"
-    )
+    return this._request<
+      PerformanceWithDetails,
+      NotFoundError | InternalServerError
+    >(`/performances/${id}`, "GET")
   }
 
   /**
@@ -211,7 +213,7 @@ export default class ApiClient {
    */
   public updatePerformance(id: number, performanceData: UpdatePerformance) {
     return this._request<
-      Performance,
+      PerformanceWithDetails,
       | NotFoundError
       | ValidationError
       | InternalServerError
@@ -230,7 +232,7 @@ export default class ApiClient {
    */
   public deletePerformance(id: number) {
     return this._request<
-      null,
+      PerformanceWithDetails,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/performances/${id}`, "DELETE")
   }
@@ -266,10 +268,10 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getTeamsByPerformance(performanceId: number) {
-    return this._request<Team[], NotFoundError | InternalServerError>(
-      `/performances/${performanceId}/teams`,
-      "GET"
-    )
+    return this._request<
+      PerformanceTeamsList,
+      NotFoundError | InternalServerError
+    >(`/performances/${performanceId}/teams`, "GET")
   }
 
   /**
