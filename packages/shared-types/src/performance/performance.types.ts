@@ -39,7 +39,7 @@ export const performanceTeamsInclude = {
   }
 } satisfies Prisma.PerformanceInclude
 
-export type PerformanceWithTeams = Prisma.PerformanceGetPayload<{
+type PerformanceWithTeams = Prisma.PerformanceGetPayload<{
   include: typeof performanceTeamsInclude
 }>
 
