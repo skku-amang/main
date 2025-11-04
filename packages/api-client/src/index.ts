@@ -7,6 +7,8 @@ import {
   LoginUser,
   Performance,
   Session,
+  SessionDetail,
+  SessionList,
   Team,
   TeamApplication,
   UpdateGeneration,
@@ -486,7 +488,7 @@ export default class ApiClient {
    */
   public createSession(sessionData: CreateSession) {
     return this._request<
-      Session,
+      SessionDetail,
       AuthError | ForbiddenError | ValidationError | InternalServerError
     >(`/sessions`, "POST", sessionData)
   }
@@ -497,7 +499,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getSessionById(id: number) {
-    return this._request<Session, NotFoundError | InternalServerError>(
+    return this._request<SessionDetail, NotFoundError | InternalServerError>(
       `/sessions/${id}`,
       "GET"
     )
@@ -508,7 +510,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getSessions() {
-    return this._request<Session[], InternalServerError>(`/sessions`, "GET")
+    return this._request<SessionList, InternalServerError>(`/sessions`, "GET")
   }
 
   /**
@@ -521,7 +523,7 @@ export default class ApiClient {
    */
   public updateSession(id: number, sessionData: UpdateSession) {
     return this._request<
-      Session,
+      SessionDetail,
       | AuthError
       | ForbiddenError
       | NotFoundError
@@ -539,7 +541,7 @@ export default class ApiClient {
    */
   public deleteSession(id: number) {
     return this._request<
-      null,
+      SessionDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/sessions/${id}`, "DELETE")
   }
