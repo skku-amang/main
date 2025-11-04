@@ -4,7 +4,6 @@ import {
   CreateSession,
   CreateTeam,
   CreateUser,
-  Generation,
   LoginUser,
   Performance,
   Session,
@@ -17,7 +16,9 @@ import {
   UpdateUser,
   User,
   PerformanceDetails,
-  PerformanceTeamsList
+  PerformanceTeamsList,
+  GenerationDetail,
+  GenerationList
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
@@ -391,11 +392,11 @@ export default class ApiClient {
   public createGeneration(
     generationData: CreateGeneration
   ): PromiseWithError<
-    Generation,
+    GenerationDetail,
     AuthError | ForbiddenError | ValidationError | InternalServerError
   > {
     return this._request<
-      Generation,
+      GenerationDetail,
       AuthError | ForbiddenError | ValidationError | InternalServerError
     >(`/generations`, "POST", generationData)
   }
@@ -407,8 +408,8 @@ export default class ApiClient {
    */
   public getGenerationById(
     id: number
-  ): PromiseWithError<Generation, NotFoundError | InternalServerError> {
-    return this._request<Generation, NotFoundError | InternalServerError>(
+  ): PromiseWithError<GenerationDetail, NotFoundError | InternalServerError> {
+    return this._request<GenerationDetail, NotFoundError | InternalServerError>(
       `/generations/${id}`,
       "GET"
     )
@@ -418,8 +419,11 @@ export default class ApiClient {
    * 기수 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getGenerations(): PromiseWithError<Generation[], InternalServerError> {
-    return this._request<Generation[], InternalServerError>(
+  public getGenerations(): PromiseWithError<
+    GenerationList,
+    InternalServerError
+  > {
+    return this._request<GenerationList, InternalServerError>(
       `/generations`,
       "GET"
     )
@@ -437,7 +441,7 @@ export default class ApiClient {
     id: number,
     generationData: UpdateGeneration
   ): PromiseWithError<
-    Generation,
+    GenerationDetail,
     | AuthError
     | ForbiddenError
     | NotFoundError
@@ -445,7 +449,7 @@ export default class ApiClient {
     | InternalServerError
   > {
     return this._request<
-      Generation,
+      GenerationDetail,
       | AuthError
       | ForbiddenError
       | NotFoundError
@@ -464,11 +468,11 @@ export default class ApiClient {
   public deleteGeneration(
     id: number
   ): PromiseWithError<
-    null,
+    GenerationDetail,
     AuthError | ForbiddenError | NotFoundError | InternalServerError
   > {
     return this._request<
-      null,
+      GenerationDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/generations/${id}`, "DELETE")
   }
