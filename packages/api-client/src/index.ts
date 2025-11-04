@@ -16,7 +16,7 @@ import {
   UpdateTeam,
   UpdateUser,
   User,
-  PerformanceWithDetails,
+  PerformanceDetails,
   PerformanceTeamsList
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
@@ -174,7 +174,7 @@ export default class ApiClient {
    */
   public createPerformance(performanceData: CreatePerformance) {
     return this._request<
-      PerformanceWithDetails,
+      PerformanceDetails,
       ValidationError | AuthError | ForbiddenError | InternalServerError
     >(`/performances`, "POST", performanceData)
   }
@@ -186,7 +186,7 @@ export default class ApiClient {
    */
   public getPerformanceById(id: number) {
     return this._request<
-      PerformanceWithDetails,
+      PerformanceDetails,
       NotFoundError | InternalServerError
     >(`/performances/${id}`, "GET")
   }
@@ -213,7 +213,7 @@ export default class ApiClient {
    */
   public updatePerformance(id: number, performanceData: UpdatePerformance) {
     return this._request<
-      PerformanceWithDetails,
+      PerformanceDetails,
       | NotFoundError
       | ValidationError
       | InternalServerError
@@ -232,7 +232,7 @@ export default class ApiClient {
    */
   public deletePerformance(id: number) {
     return this._request<
-      PerformanceWithDetails,
+      PerformanceDetails,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/performances/${id}`, "DELETE")
   }

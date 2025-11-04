@@ -14,7 +14,7 @@ export const performanceFindOneInclude = {
   }
 } satisfies Prisma.PerformanceInclude
 
-export type PerformanceWithDetails = Prisma.PerformanceGetPayload<{
+export type PerformanceDetails = Prisma.PerformanceGetPayload<{
   include: typeof performanceFindOneInclude
 }>
 
