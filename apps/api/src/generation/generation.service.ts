@@ -9,9 +9,9 @@ import { CreateGenerationDto } from "./dto/create-generation.dto"
 import { UpdateGenerationDto } from "./dto/update-generation.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import {
-  generationWithBasicUsers,
-  generationWithPublicUsers
-} from "./../prisma/selectors/generation.selector"
+  generationWithBasicUsersSelector,
+  generationWithPublicUsersSelector
+} from "@repo/shared-types"
 
 @Injectable()
 export class GenerationService {
@@ -52,7 +52,7 @@ export class GenerationService {
 
   async findAll() {
     const generations = await this.prisma.generation.findMany({
-      select: generationWithBasicUsers,
+      select: generationWithBasicUsersSelector,
       orderBy: {
         order: "desc"
       }
@@ -64,7 +64,7 @@ export class GenerationService {
   async findOne(id: number) {
     const generation = await this.prisma.generation.findUnique({
       where: { id },
-      select: generationWithPublicUsers
+      select: generationWithPublicUsersSelector
     })
     if (!generation) {
       throw new NotFoundError(`ID ${id}에 해당하는 기수를 찾을 수 없습니다.`)
