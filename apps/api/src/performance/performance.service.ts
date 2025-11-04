@@ -6,10 +6,7 @@ import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
   performanceFindOneInclude,
-  PerformanceWithDetails,
-  PerformanceTeamsList,
-  performanceTeamsInclude,
-  Performance
+  performanceTeamsInclude
 } from "@repo/shared-types"
 
 @Injectable()
@@ -24,7 +21,7 @@ export class PerformanceService {
     return this.findOne(performance.id)
   }
 
-  async findAll(): Promise<Performance[]> {
+  async findAll() {
     const performances = await this.prisma.performance.findMany()
     return performances
   }
