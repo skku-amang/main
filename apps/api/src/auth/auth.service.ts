@@ -24,7 +24,8 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    const { hashedRefreshToken, ...userResponse } = user
+    return { ...tokens, user: userResponse }
   }
 
   async login(loginDto: LoginUserDto) {
