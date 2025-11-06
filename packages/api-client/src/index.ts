@@ -659,6 +659,17 @@ export default class ApiClient {
   }
 
   /**
+   * 로그아웃
+   * @throws {InternalServerError}
+   */
+  public logout() {
+    return this._request<LogoutResponse, AuthError | InternalServerError>(
+      "/auth/logout",
+      "POST"
+    )
+  }
+
+  /**
    * 토큰 갱신
    */
   public refreshToken(userId: string, refreshToken: string) {
