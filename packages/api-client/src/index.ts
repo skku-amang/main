@@ -10,6 +10,8 @@ import {
   SessionDetail,
   SessionList,
   Team,
+  TeamDetail,
+  TeamList,
   TeamApplication,
   UpdateGeneration,
   UpdatePerformance,
@@ -285,7 +287,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getTeams() {
-    return this._request<Team[], InternalServerError>(`/teams/`, "GET")
+    return this._request<TeamList, InternalServerError>(`/teams/`, "GET")
   }
 
   /**
@@ -294,7 +296,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getTeamById(id: number) {
-    return this._request<Team, NotFoundError | InternalServerError>(
+    return this._request<TeamDetail, NotFoundError | InternalServerError>(
       `/teams/${id}`,
       "GET"
     )
@@ -315,7 +317,7 @@ export default class ApiClient {
    */
   public updateTeam(id: number, teamData: UpdateTeam) {
     return this._request<
-      Team,
+      TeamDetail,
       | AuthError
       | NotFoundError
       | InvalidMemberIndexError
@@ -337,7 +339,7 @@ export default class ApiClient {
    */
   public deleteTeam(id: number) {
     return this._request<
-      null,
+      TeamDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/teams/${id}`, "DELETE")
   }
@@ -354,7 +356,7 @@ export default class ApiClient {
    */
   public applyToTeam(teamId: number, teamApplicationData: TeamApplication) {
     return this._request<
-      Team,
+      TeamDetail,
       | AuthError
       | NotFoundError
       | SessionNotFoundError
@@ -377,7 +379,7 @@ export default class ApiClient {
   // TODO: 추가적으로 오류 타입 정의 필요(예: 공연 종료로 인해 이미 마감된 팀인 경우 등)
   public unapplyFromTeam(teamId: number, teamApplicationData: TeamApplication) {
     return this._request<
-      Team,
+      TeamDetail,
       | AuthError
       | NotFoundError
       | SessionNotFoundError
