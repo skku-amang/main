@@ -3,7 +3,7 @@ import { basicUserSelector, publicUserSelector } from "../user/user.selector"
 
 export type { Team }
 
-const teamWithBasicUsersInclude = {
+export const teamWithBasicUsersInclude = {
   leader: {
     select: basicUserSelector
   },
@@ -24,7 +24,7 @@ const teamWithBasicUsersInclude = {
   }
 } satisfies Prisma.TeamInclude
 
-const teamWithPublicUsersInclude = {
+export const teamWithPublicUsersInclude = {
   leader: {
     select: publicUserSelector
   },
