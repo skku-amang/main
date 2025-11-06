@@ -246,6 +246,18 @@ export default class ApiClient {
   }
 
   /**
+   * 공연에 속한 팀 목록 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getTeamsByPerformance(performanceId: number) {
+    return this._request<
+      PerformanceTeamsList,
+      NotFoundError | InternalServerError
+    >(`/performances/${performanceId}/teams`, "GET")
+  }
+
+  /**
    * 팀 생성
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {InvalidMemberIndexError} 멤버 인덱스가 1과 세션의 capacity 사이의 값이 아닌 경우
@@ -256,9 +268,9 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public createTeam(performanceId: number, teamData: CreateTeam) {
+  public createTeam(teamData: CreateTeam) {
     return this._request<
-      Team,
+      TeamDetail,
       | AuthError
       | InvalidMemberIndexError
       | DuplicateMemberIndexError
@@ -267,19 +279,7 @@ export default class ApiClient {
       | ReferencedEntityNotFoundError
       | ConflictError
       | InternalServerError
-    >(`/performances/${performanceId}/teams`, "POST", teamData)
-  }
-
-  /**
-   * 공연에 속한 팀 목록 조회
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public getTeamsByPerformance(performanceId: number) {
-    return this._request<
-      PerformanceTeamsList,
-      NotFoundError | InternalServerError
-    >(`/performances/${performanceId}/teams`, "GET")
+    >(`/teams`, "POST", teamData)
   }
 
   /**
