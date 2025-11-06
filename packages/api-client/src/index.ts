@@ -17,6 +17,9 @@ import {
   UpdateTeam,
   UpdateUser,
   User,
+  AuthResponse,
+  RefreshTokenResponse,
+  LogoutResponse,
   PerformanceDetails,
   PerformanceTeamsList,
   GenerationDetail,
@@ -634,7 +637,7 @@ export default class ApiClient {
    */
   public signup(userData: CreateUser) {
     return this._request<
-      { accessToken: string; refreshToken: string; user: User },
+      AuthResponse,
       | ValidationError
       | ConflictError
       | UnprocessableEntityError
@@ -649,7 +652,7 @@ export default class ApiClient {
    */
   public async login(loginUser: LoginUser) {
     const result = await this._request<
-      { accessToken: string; refreshToken: string; user: User },
+      AuthResponse,
       AuthError | InternalServerError
     >("/auth/login", "POST", loginUser)
     return result
@@ -659,12 +662,12 @@ export default class ApiClient {
    * 토큰 갱신
    */
   public refreshToken(userId: string, refreshToken: string) {
-    return this._request<
-      {
-        accessToken: string
-      },
-      AuthError | InternalServerError
-    >("/auth/refresh", "POST", { refresh_token: refreshToken }, { userId })
+    return this._request<RefreshTokenResponse, AuthError | InternalServerError>(
+      "/auth/refresh",
+      "POST",
+      { refresh_token: refreshToken },
+      { userId }
+    )
   }
 }
 
