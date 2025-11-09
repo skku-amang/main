@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Performance, Session, User } from "@repo/shared-types"
+import { Generation, Performance, Session, User } from "@repo/shared-types"
 
 /**
  * 필드별 변환 함수 타입 정의
@@ -109,6 +109,11 @@ export const TRANSFORM_CONFIGS = {
   },
 
   session: {
+    createdAt: FIELD_TRANSFORMERS.toDate,
+    updatedAt: FIELD_TRANSFORMERS.toDate
+  },
+
+  generation: {
     createdAt: FIELD_TRANSFORMERS.toDate,
     updatedAt: FIELD_TRANSFORMERS.toDate
   }
@@ -233,6 +238,16 @@ export const mapSessions = createArrayConfigBasedMapper<
   Session,
   typeof TRANSFORM_CONFIGS.session
 >(TRANSFORM_CONFIGS.session)
+
+export const mapGeneration = createConfigBasedMapper<
+  Generation,
+  typeof TRANSFORM_CONFIGS.generation
+>(TRANSFORM_CONFIGS.generation)
+
+export const mapGenerations = createArrayConfigBasedMapper<
+  Generation,
+  typeof TRANSFORM_CONFIGS.generation
+>(TRANSFORM_CONFIGS.generation)
 
 // 타입 테스트 (개발 시 확인용)
 type TestPerformance = MapperResult<
