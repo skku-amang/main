@@ -396,12 +396,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public createGeneration(
-    generationData: CreateGeneration
-  ): PromiseWithError<
-    GenerationDetail,
-    AuthError | ForbiddenError | ValidationError | InternalServerError
-  > {
+  public createGeneration(generationData: CreateGeneration) {
     return this._request<
       GenerationDetail,
       AuthError | ForbiddenError | ValidationError | InternalServerError
@@ -413,9 +408,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getGenerationById(
-    id: number
-  ): PromiseWithError<GenerationDetail, NotFoundError | InternalServerError> {
+  public getGenerationById(id: number) {
     return this._request<GenerationDetail, NotFoundError | InternalServerError>(
       `/generations/${id}`,
       "GET"
@@ -426,10 +419,7 @@ export default class ApiClient {
    * 기수 목록 조회
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getGenerations(): PromiseWithError<
-    GenerationList,
-    InternalServerError
-  > {
+  public getGenerations() {
     return this._request<GenerationList, InternalServerError>(
       `/generations`,
       "GET"
@@ -444,17 +434,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public updateGeneration(
-    id: number,
-    generationData: UpdateGeneration
-  ): PromiseWithError<
-    GenerationDetail,
-    | AuthError
-    | ForbiddenError
-    | NotFoundError
-    | ValidationError
-    | InternalServerError
-  > {
+  public updateGeneration(id: number, generationData: UpdateGeneration) {
     return this._request<
       GenerationDetail,
       | AuthError
@@ -472,12 +452,7 @@ export default class ApiClient {
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public deleteGeneration(
-    id: number
-  ): PromiseWithError<
-    GenerationDetail,
-    AuthError | ForbiddenError | NotFoundError | InternalServerError
-  > {
+  public deleteGeneration(id: number) {
     return this._request<
       GenerationDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
