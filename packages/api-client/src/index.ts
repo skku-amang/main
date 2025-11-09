@@ -627,12 +627,12 @@ export default class ApiClient {
    * @throws {AuthError}
    * @throws {InternalServerError}
    */
-  public async login(loginUser: LoginUser) {
-    const result = await this._request<
-      AuthResponse,
-      AuthError | InternalServerError
-    >("/auth/login", "POST", loginUser)
-    return result
+  public login(loginUser: LoginUser) {
+    return this._request<AuthResponse, AuthError | InternalServerError>(
+      "/auth/login",
+      "POST",
+      loginUser
+    )
   }
 
   /**
