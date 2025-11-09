@@ -4,7 +4,6 @@ import { UpdateTeamDto } from "./dto/update-team.dto"
 import { TeamApplicationDto } from "./dto/team-application.dto"
 import { PrismaService } from "../prisma/prisma.service"
 import { Prisma } from "@repo/database"
-import { basicUser, publicUser } from "../prisma/selectors/user.selector"
 import {
   ConflictError,
   ForbiddenError,
@@ -20,6 +19,10 @@ import {
   DuplicateTeamSessionError,
   ReferencedEntityNotFoundError
 } from "@repo/api-client"
+import {
+  teamWithBasicUsersInclude,
+  teamWithPublicUsersInclude
+} from "@repo/shared-types"
 
 @Injectable()
 export class TeamService {
@@ -121,26 +124,7 @@ export class TeamService {
 
   async findAll() {
     const teams = await this.prisma.team.findMany({
-      include: {
-        leader: {
-          select: basicUser
-        },
-        teamSessions: {
-          include: {
-            session: true,
-            members: {
-              include: {
-                user: {
-                  select: basicUser
-                }
-              },
-              orderBy: {
-                index: "asc"
-              }
-            }
-          }
-        }
-      }
+      include: teamWithBasicUsersInclude
     })
 
     return teams
@@ -149,26 +133,7 @@ export class TeamService {
   async findOne(id: number) {
     const team = await this.prisma.team.findUnique({
       where: { id },
-      include: {
-        leader: {
-          select: publicUser
-        },
-        teamSessions: {
-          include: {
-            session: true,
-            members: {
-              include: {
-                user: {
-                  select: publicUser
-                }
-              },
-              orderBy: {
-                index: "asc"
-              }
-            }
-          }
-        }
-      }
+      include: teamWithPublicUsersInclude
     })
     if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
 

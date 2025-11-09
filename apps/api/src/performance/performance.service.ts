@@ -2,9 +2,12 @@ import { Injectable } from "@nestjs/common"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 import { PrismaService } from "../prisma/prisma.service"
-import { publicUser } from "../prisma/selectors/user.selector"
 import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
+import {
+  performanceFindOneInclude,
+  performanceTeamsInclude
+} from "@repo/shared-types"
 
 @Injectable()
 export class PerformanceService {
@@ -26,26 +29,7 @@ export class PerformanceService {
   async findTeamsByPerformanceId(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
-      include: {
-        teams: {
-          include: {
-            teamSessions: {
-              include: {
-                session: true,
-                members: {
-                  include: {
-                    user: {
-                      select: publicUser
-                    }
-                  },
-                  orderBy: { index: "asc" }
-                }
-              }
-            },
-            leader: { select: publicUser }
-          }
-        }
-      }
+      include: performanceTeamsInclude
     })
 
     if (!performance)
@@ -56,16 +40,7 @@ export class PerformanceService {
   async findOne(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
-      include: {
-        teams: {
-          include: {
-            teamSessions: true,
-            leader: {
-              select: publicUser
-            }
-          }
-        }
-      }
+      include: performanceFindOneInclude
     })
 
     if (!performance)

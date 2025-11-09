@@ -24,7 +24,9 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedRefreshToken, ...userResponse } = user
+    return { ...tokens, user: userResponse }
   }
 
   async login(loginDto: LoginUserDto) {
