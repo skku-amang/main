@@ -1,3 +1,5 @@
+import { PlusCircle } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -8,7 +10,6 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
-import { PlusCircle } from "lucide-react"
 
 interface AddScheduleButtonProps {
   className?: string

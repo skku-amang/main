@@ -1,17 +1,18 @@
 import { Injectable } from "@nestjs/common"
-import { CreateSessionDto } from "./dto/create-session.dto"
-import { UpdateSessionDto } from "./dto/update-session.dto"
-import { PrismaService } from "../prisma/prisma.service"
 import {
-  NotFoundError,
   ConflictError,
+  NotFoundError,
   UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
+
+import { PrismaService } from "../prisma/prisma.service"
 import {
   sessionWithBasicUsers,
   sessionWithPublicUsers
 } from "../prisma/selectors/session.selector"
+import { CreateSessionDto } from "./dto/create-session.dto"
+import { UpdateSessionDto } from "./dto/update-session.dto"
 
 @Injectable()
 export class SessionService {

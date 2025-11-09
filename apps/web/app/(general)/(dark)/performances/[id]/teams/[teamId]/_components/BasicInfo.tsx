@@ -1,3 +1,5 @@
+import { MemberSessionSet, Team } from "@repo/shared-types"
+
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
@@ -6,7 +8,6 @@ import {
   formatGenerationOrder,
   getRepresentativeRelativeTime
 } from "@/lib/utils"
-import { MemberSessionSet, Team } from "@repo/shared-types"
 
 interface BasicInfoProps {
   team: Team

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common"
-import { GenerationService } from "./generation.service"
+
 import { GenerationController } from "./generation.controller"
+import { GenerationService } from "./generation.service"
 
 @Module({
   controllers: [GenerationController],

@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 "use client"
 
+import { type SessionName } from "@repo/database"
 import { Check } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
 import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
-import { type SessionName } from "@repo/database"
 
 interface ApplyButtonProps {
   session: SessionName

@@ -1,6 +1,6 @@
-import { ExceptionFilter, Catch, ArgumentsHost } from "@nestjs/common"
+import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
-import { ValidationError, Failure } from "@repo/api-client"
+import { Failure, ValidationError } from "@repo/api-client"
 import { ZodValidationException } from "nestjs-zod"
 import { fromZodError } from "zod-validation-error/v3"
 

@@ -1,4 +1,5 @@
-import { Prisma, Generation } from "@repo/database"
+import { Generation, Prisma } from "@repo/database"
+
 import { basicUserSelector, publicUserSelector } from "../user/user.selector"
 
 export type { Generation }

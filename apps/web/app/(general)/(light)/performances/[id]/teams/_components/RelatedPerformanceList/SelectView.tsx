@@ -1,5 +1,6 @@
 "use client"
 
+import { Performance } from "@repo/shared-types"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -11,7 +12,6 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
-import { Performance } from "@repo/shared-types"
 
 interface SelectViewProps {
   currentPerformanceId: number

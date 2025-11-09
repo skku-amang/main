@@ -1,20 +1,21 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  ParseIntPipe
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards
 } from "@nestjs/common"
-import { PerformanceService } from "./performance.service"
-import { CreatePerformanceDto } from "./dto/create-performance.dto"
-import { UpdatePerformanceDto } from "./dto/update-performance.dto"
+
+import { Public } from "../auth/decorators/public.decorator"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
-import { Public } from "../auth/decorators/public.decorator"
+import { CreatePerformanceDto } from "./dto/create-performance.dto"
+import { UpdatePerformanceDto } from "./dto/update-performance.dto"
+import { PerformanceService } from "./performance.service"
 
 @Controller("performances")
 @UseGuards(AccessTokenGuard)

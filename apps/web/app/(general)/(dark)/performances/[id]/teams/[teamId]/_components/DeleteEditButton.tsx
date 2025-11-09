@@ -1,12 +1,12 @@
 "use client"
 
+import { Team } from "@repo/shared-types"
 import { Edit3, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { Team } from "@repo/shared-types"
 
 interface DeleteEditButtonProps {
   performanceId: number

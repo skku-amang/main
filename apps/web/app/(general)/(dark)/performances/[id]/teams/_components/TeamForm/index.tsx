@@ -1,8 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useSession } from "next-auth/react"
+import { Team } from "@repo/shared-types"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -10,10 +11,9 @@ import { z } from "zod"
 import Loading from "@/app/_(errors)/Loading"
 import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
-import { Team } from "@repo/shared-types"
-
 import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
+import { cn } from "@/lib/utils"
+
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
 import SecondPage from "./SecondPage"

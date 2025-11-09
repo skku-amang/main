@@ -1,25 +1,26 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
   Put,
-  Req
+  Req,
+  UseGuards
 } from "@nestjs/common"
-import { TeamService } from "./team.service"
-import { CreateTeamDto } from "./dto/create-team.dto"
-import { UpdateTeamDto } from "./dto/update-team.dto"
-import { TeamApplicationDto } from "./dto/team-application.dto"
+import { JwtPayload } from "@repo/shared-types"
+import { Request } from "express"
+
+import { Public } from "../auth/decorators/public.decorator"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { TeamOwnerGuard } from "../auth/guards/team-owner.guard"
-import { Request } from "express"
-import { JwtPayload } from "@repo/shared-types"
-import { Public } from "../auth/decorators/public.decorator"
+import { CreateTeamDto } from "./dto/create-team.dto"
+import { TeamApplicationDto } from "./dto/team-application.dto"
+import { UpdateTeamDto } from "./dto/update-team.dto"
+import { TeamService } from "./team.service"
 
 @Controller("teams")
 @UseGuards(AccessTokenGuard)

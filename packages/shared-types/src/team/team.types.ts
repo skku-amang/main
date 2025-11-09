@@ -1,4 +1,5 @@
 import { Prisma, Team } from "@repo/database"
+
 import { basicUserSelector, publicUserSelector } from "../user/user.selector"
 
 export type { Team }

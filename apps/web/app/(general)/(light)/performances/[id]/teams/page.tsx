@@ -1,13 +1,14 @@
 "use client"
 
+import { useParams } from "next/navigation"
+
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import ROUTES from "@/constants/routes"
-
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useTeams } from "@/hooks/api/useTeam"
-import { useParams } from "next/navigation"
+
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 

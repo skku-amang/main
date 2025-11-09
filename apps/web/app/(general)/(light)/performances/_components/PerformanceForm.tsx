@@ -1,6 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import {
+  ACCEPTED_IMAGE_TYPES,
+  CreatePerformanceSchema
+} from "@repo/shared-types"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -12,12 +16,8 @@ import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import ROUTES from "@/constants/routes"
-
 import { useCreatePerformance } from "@/hooks/api/usePerformance"
-import {
-  ACCEPTED_IMAGE_TYPES,
-  CreatePerformanceSchema
-} from "@repo/shared-types"
+
 import PerformanceCard from "./PerformanceCard"
 
 const PerformanceForm = () => {

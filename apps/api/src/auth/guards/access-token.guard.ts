@@ -1,10 +1,11 @@
 import { ExecutionContext, Injectable } from "@nestjs/common"
 import { Reflector } from "@nestjs/core"
+import { JsonWebTokenError, TokenExpiredError } from "@nestjs/jwt"
 import { AuthGuard } from "@nestjs/passport"
-import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
-import { AuthError, AccessTokenExpiredError } from "@repo/api-client"
-import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
+import { AccessTokenExpiredError, AuthError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+
+import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {

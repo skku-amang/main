@@ -1,8 +1,9 @@
 "use client"
 
+import { MemberSession, User } from "@repo/shared-types"
 import { Image, PencilLine, Trash2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
@@ -12,7 +13,6 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { MemberSession, User } from "@repo/shared-types"
 
 interface TeamCardProps {
   performanceId: number

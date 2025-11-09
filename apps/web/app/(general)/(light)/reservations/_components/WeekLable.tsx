@@ -1,10 +1,12 @@
+import { Dayjs } from "dayjs"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
 import {
   DropdownMenu,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+
 import SmallCalendar from "./SmallCalendar"
-import { Dayjs } from "dayjs"
 
 interface WeekLabelProps {
   setCurrentMonday: React.Dispatch<React.SetStateAction<Dayjs>>

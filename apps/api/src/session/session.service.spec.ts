@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing"
-import { SessionService } from "./session.service"
+
 import { PrismaService } from "../prisma/prisma.service"
+import { SessionService } from "./session.service"
 
 describe("SessionService", () => {
   let service: SessionService

@@ -2,20 +2,21 @@
 
 import { Separator } from "@radix-ui/react-separator"
 import { Maximize2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
+import Loading from "@/app/_(errors)/Loading"
+import NotFoundPage from "@/app/_(errors)/NotFound"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
-import Loading from "@/app/_(errors)/Loading"
-import NotFoundPage from "@/app/_(errors)/NotFound"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import ROUTES from "@/constants/routes"
 import { useTeam } from "@/hooks/api/useTeam"
 import YoutubePlayer from "@/lib/youtube/Player"
+
 import useTeamApplication from "./_hooks/useTeamApplication"
 
 interface TeamDetailProps {

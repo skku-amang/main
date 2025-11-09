@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common"
-import { CreatePerformanceDto } from "./dto/create-performance.dto"
-import { UpdatePerformanceDto } from "./dto/update-performance.dto"
-import { PrismaService } from "../prisma/prisma.service"
-import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
+import { InvalidPerformanceDateError, NotFoundError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
   performanceFindOneInclude,
   performanceTeamsInclude
 } from "@repo/shared-types"
+
+import { PrismaService } from "../prisma/prisma.service"
+import { CreatePerformanceDto } from "./dto/create-performance.dto"
+import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 
 @Injectable()
 export class PerformanceService {
