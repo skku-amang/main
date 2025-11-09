@@ -1,6 +1,7 @@
+import { Performance } from "@repo/shared-types"
+
 import ButtonView from "@/app/(general)/(light)/performances/[id]/teams/_components/RelatedPerformanceList/ButtonView"
 import SelectView from "@/app/(general)/(light)/performances/[id]/teams/_components/RelatedPerformanceList/SelectView"
-import { Performance } from "@repo/shared-types"
 
 interface RelatedPerformanceListProps {
   currentPerformanceId: number

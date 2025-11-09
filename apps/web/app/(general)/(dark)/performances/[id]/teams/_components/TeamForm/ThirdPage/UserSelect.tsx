@@ -1,3 +1,4 @@
+import { User } from "@repo/shared-types"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
@@ -17,7 +18,6 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { User } from "@repo/shared-types"
 
 interface UserSelectProps {
   users: User[]

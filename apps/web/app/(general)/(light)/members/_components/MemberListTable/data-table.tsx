@@ -1,5 +1,6 @@
 "use client"
 
+import { User } from "@repo/shared-types"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -27,7 +28,6 @@ import {
   TableRow
 } from "@/components/ui/table"
 import ROUTES from "@/constants/routes"
-import { User } from "@repo/shared-types"
 
 interface DataTableProps<TValue> {
   columns: ColumnDef<User, TValue>[]

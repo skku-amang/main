@@ -1,7 +1,8 @@
 "use client"
 
-import { useDeleteTeam } from "@/hooks/api/useTeam"
 import React from "react"
+
+import { useDeleteTeam } from "@/hooks/api/useTeam"
 
 interface DeleteButtonProps {
   children: React.ReactNode

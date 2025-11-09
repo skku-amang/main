@@ -2,8 +2,10 @@ import js from "@eslint/js"
 import eslintConfigPrettier from "eslint-config-prettier"
 import pluginReact from "eslint-plugin-react"
 import pluginReactHooks from "eslint-plugin-react-hooks"
+import simpleImportSort from "eslint-plugin-simple-import-sort"
 import globals from "globals"
 import tseslint from "typescript-eslint"
+
 import baseConfig from "./base.js"
 
 /**
@@ -27,13 +29,16 @@ const reactInternalConfig = [
   },
   {
     plugins: {
-      "react-hooks": pluginReactHooks
+      "react-hooks": pluginReactHooks,
+      "simple-import-sort": simpleImportSort
     },
     settings: { react: { version: "detect" } },
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
       // React scope no longer necessary with new JSX transform.
-      "react/react-in-jsx-scope": "off"
+      "react/react-in-jsx-scope": "off",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error"
     }
   }
 ]

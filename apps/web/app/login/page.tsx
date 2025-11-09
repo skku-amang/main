@@ -1,11 +1,12 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
+import { LoginUserSchema } from "@repo/shared-types"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -16,7 +17,6 @@ import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
 import { InvalidSigninErrorCode } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
-import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 

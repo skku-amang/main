@@ -1,9 +1,9 @@
 "use client"
 
+import ApiClient from "@repo/api-client"
 import { createContext, ReactNode, useContext } from "react"
 
 import { apiClient } from "@/lib/apiClient"
-import ApiClient from "@repo/api-client"
 
 const ApiClientContext = createContext<ApiClient | null>(null)
 

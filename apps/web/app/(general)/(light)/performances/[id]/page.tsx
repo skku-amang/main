@@ -1,11 +1,11 @@
 "use client"
 
 import Image from "next/image"
+import { useParams } from "next/navigation"
 import { FaClock } from "react-icons/fa"
 import { IoLocationSharp } from "react-icons/io5"
 
 import { usePerformance } from "@/hooks/api/usePerformance"
-import { useParams } from "next/navigation"
 
 const PerformanceDetail = () => {
   const params = useParams()

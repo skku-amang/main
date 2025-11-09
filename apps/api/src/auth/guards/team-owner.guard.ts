@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common"
 import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+
 import { TeamService } from "../../team/team.service"
 
 @Injectable()

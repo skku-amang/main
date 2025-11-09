@@ -1,17 +1,18 @@
 import { Injectable } from "@nestjs/common"
 import {
-  NotFoundError,
   ConflictError,
+  NotFoundError,
   UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import { CreateGenerationDto } from "./dto/create-generation.dto"
-import { UpdateGenerationDto } from "./dto/update-generation.dto"
-import { PrismaService } from "../prisma/prisma.service"
 import {
   generationWithBasicUsersSelector,
   generationWithPublicUsersSelector
 } from "@repo/shared-types"
+
+import { PrismaService } from "../prisma/prisma.service"
+import { CreateGenerationDto } from "./dto/create-generation.dto"
+import { UpdateGenerationDto } from "./dto/update-generation.dto"
 
 @Injectable()
 export class GenerationService {

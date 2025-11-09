@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { ConflictError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
+
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 

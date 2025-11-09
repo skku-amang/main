@@ -1,4 +1,5 @@
 import { Prisma } from "@repo/database"
+
 import { basicUser, publicUser } from "./user.selector"
 
 /**

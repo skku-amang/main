@@ -1,5 +1,6 @@
 "use client"
 
+import { MemberSession, MemberSessionSet, User } from "@repo/shared-types"
 import { CellContext, ColumnDef } from "@tanstack/react-table"
 import {
   ArrowUpDown,
@@ -9,8 +10,8 @@ import {
   Pencil,
   Trash2
 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
@@ -27,7 +28,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import YoutubeVideo from "@/lib/youtube"
-import { MemberSession, MemberSessionSet, User } from "@repo/shared-types"
 
 export type TeamColumn = {
   performanceId: number

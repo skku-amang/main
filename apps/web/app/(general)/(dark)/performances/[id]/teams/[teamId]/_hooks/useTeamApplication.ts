@@ -1,6 +1,7 @@
+import { useState } from "react"
+
 import { useToast } from "@/components/hooks/use-toast"
 import { useTeamApplication as useTeamApplicationOriginal } from "@/hooks/api/useTeam"
-import { useState } from "react"
 
 type SelectedSessionWithIndex = {
   sessionId: number

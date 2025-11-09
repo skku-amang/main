@@ -2,12 +2,12 @@
 
 import { useParams } from "next/navigation"
 
-import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import ErrorPage from "@/app/_(errors)/Error"
+import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
-
 import { useTeam } from "@/hooks/api/useTeam"
+
 import TeamForm from "../../_components/TeamForm"
 
 const TeamEditPage = () => {

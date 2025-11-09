@@ -1,5 +1,6 @@
 "use client"
 
+import { Session, User } from "@repo/shared-types"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import React from "react"
@@ -7,7 +8,6 @@ import React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatGenerationOrder } from "@/lib/utils"
-import { Session, User } from "@repo/shared-types"
 
 const SortButton = ({
   column,

@@ -1,28 +1,29 @@
 import { Injectable } from "@nestjs/common"
-import { CreateTeamDto } from "./dto/create-team.dto"
-import { UpdateTeamDto } from "./dto/update-team.dto"
-import { TeamApplicationDto } from "./dto/team-application.dto"
-import { PrismaService } from "../prisma/prisma.service"
-import { Prisma } from "@repo/database"
 import {
   ConflictError,
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
   DuplicateApplicationError,
-  PositionOccupiedError,
-  SessionNotFoundError,
-  NoApplicationFoundError,
-  InvalidMemberIndexError,
   DuplicateMemberIndexError,
   DuplicateSessionUserError,
   DuplicateTeamSessionError,
-  ReferencedEntityNotFoundError
+  ForbiddenError,
+  InvalidMemberIndexError,
+  NoApplicationFoundError,
+  NotFoundError,
+  PositionOccupiedError,
+  ReferencedEntityNotFoundError,
+  SessionNotFoundError,
+  ValidationError
 } from "@repo/api-client"
+import { Prisma } from "@repo/database"
 import {
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
+
+import { PrismaService } from "../prisma/prisma.service"
+import { CreateTeamDto } from "./dto/create-team.dto"
+import { TeamApplicationDto } from "./dto/team-application.dto"
+import { UpdateTeamDto } from "./dto/update-team.dto"
 
 @Injectable()
 export class TeamService {
