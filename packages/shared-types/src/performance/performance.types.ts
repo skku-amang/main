@@ -1,4 +1,4 @@
-import { Prisma, Performance } from "@repo/database"
+import { Performance, Prisma } from "@repo/database"
 import { publicUserSelector } from "../user/user.selector"
 
 export type { Performance }
@@ -14,7 +14,7 @@ export const performanceFindOneInclude = {
   }
 } satisfies Prisma.PerformanceInclude
 
-export type PerformanceDetails = Prisma.PerformanceGetPayload<{
+export type PerformanceDetail = Prisma.PerformanceGetPayload<{
   include: typeof performanceFindOneInclude
 }>
 

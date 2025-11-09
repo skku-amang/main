@@ -10,7 +10,7 @@ import {
   LoginUser,
   LogoutResponse,
   Performance,
-  PerformanceDetails,
+  PerformanceDetail,
   PerformanceTeamsList,
   RefreshTokenResponse,
   SessionDetail,
@@ -180,7 +180,7 @@ export default class ApiClient {
    */
   public createPerformance(performanceData: CreatePerformance) {
     return this._request<
-      PerformanceDetails,
+      PerformanceDetail,
       ValidationError | AuthError | ForbiddenError | InternalServerError
     >(`/performances`, "POST", performanceData)
   }
@@ -192,7 +192,7 @@ export default class ApiClient {
    */
   public getPerformanceById(id: number) {
     return this._request<
-      PerformanceDetails,
+      PerformanceDetail,
       NotFoundError | InternalServerError
     >(`/performances/${id}`, "GET")
   }
@@ -219,7 +219,7 @@ export default class ApiClient {
    */
   public updatePerformance(id: number, performanceData: UpdatePerformance) {
     return this._request<
-      PerformanceDetails,
+      PerformanceDetail,
       | NotFoundError
       | ValidationError
       | InternalServerError
@@ -238,7 +238,7 @@ export default class ApiClient {
    */
   public deletePerformance(id: number) {
     return this._request<
-      PerformanceDetails,
+      PerformanceDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/performances/${id}`, "DELETE")
   }
