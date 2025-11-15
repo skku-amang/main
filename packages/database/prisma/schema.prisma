@@ -22,15 +22,15 @@ enum EquipCategory {
   ROOM //동아리 방
   SYNTHESIZER //신디사이저
   MICROPHONE //마이크
-  GUITAR
+  GUITAR //기타
   BASS //베이스
-  DRUM
-  AUDIO_INTERFACE
-  CABLE
-  AMPLIFIER
-  SPEAKER
-  MIXER
-  ETC
+  DRUM //드럼
+  AUDIO_INTERFACE //오디오 인터페이스
+  CABLE //케이블
+  AMPLIFIER //앰프
+  SPEAKER //스피커
+  MIXER //믹서
+  ETC //그 외
 }
 
 model User {
