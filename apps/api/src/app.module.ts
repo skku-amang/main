@@ -9,6 +9,7 @@ import { GenerationModule } from "./generation/generation.module"
 import { SessionModule } from "./session/session.module"
 import { TeamModule } from "./team/team.module"
 import { PerformanceModule } from "./performance/performance.module"
+import { EquipmentModule } from "./equipment/equipment.module"
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { PerformanceModule } from "./performance/performance.module"
     GenerationModule,
     SessionModule,
     TeamModule,
-    PerformanceModule
+    PerformanceModule,
+    EquipmentModule
   ],
   controllers: [AppController],
   providers: [AppService]
