@@ -195,6 +195,7 @@ model EquipmentRental {
   equipment   Equipment? @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
   equipmentId Int?
 
+  title   String
   startAt DateTime
   endAt   DateTime
 
