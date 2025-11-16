@@ -1,6 +1,7 @@
 export * from "./auth/jwt.types"
 export * from "./auth/auth.types"
 export * from "./constants/regex"
+export * from "./constants/file-validation"
 export * from "./generation/create-generation.schema"
 export * from "./generation/update-generation.schema"
 export * from "./generation/generation.types"
