@@ -1,6 +1,9 @@
 import { z } from "zod"
 import { EquipCategory } from "@repo/database"
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../constants/file"
+import {
+  ACCEPTED_IMAGE_TYPES,
+  MAX_FILE_SIZE
+} from "../constants/file-validation"
 
 /**
  * @description 장비 생성 원본 Zod 스키마
