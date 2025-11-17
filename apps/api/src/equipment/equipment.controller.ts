@@ -8,7 +8,9 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
-  Query
+  Query,
+  UseInterceptors,
+  UploadedFile
 } from "@nestjs/common"
 import { EquipmentService } from "./equipment.service"
 import { CreateEquipmentDto } from "./dto/create-equipment.dto"
@@ -16,6 +18,8 @@ import { UpdateEquipmentDto } from "./dto/update-equipment.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { Public } from "../auth/decorators/public.decorator"
+import { FileInterceptor } from "@nestjs/platform-express"
+import { optionalImageFileValidationPipe } from "../common/pipes/image-validation.pipe"
 
 @Controller("equipment")
 @UseGuards(AccessTokenGuard)
@@ -24,8 +28,13 @@ export class EquipmentController {
 
   @Post()
   @UseGuards(AdminGuard)
-  create(@Body() createEquipmentDto: CreateEquipmentDto) {
-    return this.equipmentService.create(createEquipmentDto)
+  @UseInterceptors(FileInterceptor("image"))
+  create(
+    @Body() createEquipmentDto: CreateEquipmentDto,
+    @UploadedFile(optionalImageFileValidationPipe)
+    file?: Express.Multer.File
+  ) {
+    return this.equipmentService.create(createEquipmentDto, file)
   }
 
   @Get()
@@ -42,11 +51,14 @@ export class EquipmentController {
 
   @Patch(":id")
   @UseGuards(AdminGuard)
+  @UseInterceptors(FileInterceptor("image"))
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateEquipmentDto: UpdateEquipmentDto
+    @Body() updateEquipmentDto: UpdateEquipmentDto,
+    @UploadedFile(optionalImageFileValidationPipe)
+    file?: Express.Multer.File
   ) {
-    return this.equipmentService.update(id, updateEquipmentDto)
+    return this.equipmentService.update(id, updateEquipmentDto, file)
   }
 
   @Delete(":id")

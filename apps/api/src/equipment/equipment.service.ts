@@ -4,14 +4,31 @@ import { CreateEquipmentDto } from "./dto/create-equipment.dto"
 import { UpdateEquipmentDto } from "./dto/update-equipment.dto"
 import { Prisma, EquipCategory } from "@repo/database"
 import { ConflictError, NotFoundError } from "@repo/api-client"
+import * as path from "node:path"
+import { v4 as uuidv4 } from "uuid"
 
 @Injectable()
 export class EquipmentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createEquipmentDto: CreateEquipmentDto) {
+  async create(
+    createEquipmentDto: CreateEquipmentDto,
+    file?: Express.Multer.File
+  ) {
+    const imageUrl: string | undefined = undefined
+    if (file) {
+      // 파일 업로드 필요.
+      const fileExt = path.extname(file.originalname)
+      const fileName = `${uuidv4()}${fileExt}`
+
+      // 파일 업로드 구현 필요
+      // await this.minioService.upload ?
+    }
     const equipment = await this.prisma.equipment.create({
-      data: createEquipmentDto
+      data: {
+        ...createEquipmentDto,
+        image: imageUrl
+      }
     })
 
     return this.findOne(equipment.id)
@@ -47,11 +64,40 @@ export class EquipmentService {
     return equipment
   }
 
-  async update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
+  async update(
+    id: number,
+    updateEquipmentDto: UpdateEquipmentDto,
+    file?: Express.Multer.File
+  ) {
     try {
+      const oldEquipment = await this.prisma.equipment.findUnique({
+        where: { id },
+        select: { image: true }
+      })
+      if (!oldEquipment)
+        throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
+
+      const oldImageUrl = oldEquipment?.image
+      const imageUrl: string | undefined = undefined
+
+      if (file) {
+        // 파일 업로드 필요.
+        const fileExt = path.extname(file.originalname)
+        const fileName = `${uuidv4()}${fileExt}`
+
+        // 파일 업로드 구현 필요
+        // imageUrl =
+      }
+      if (oldImageUrl && imageUrl) {
+        // oldImageUrl에 있는 기존 이미지 삭제 필요
+      }
+      const updateData: Prisma.EquipmentUpdateInput = {
+        ...updateEquipmentDto,
+        image: imageUrl
+      }
       const equipment = await this.prisma.equipment.update({
         where: { id },
-        data: updateEquipmentDto,
+        data: updateData,
         include: {
           rentalLogs: true
         }
@@ -69,9 +115,13 @@ export class EquipmentService {
 
   async remove(id: number) {
     try {
-      await this.prisma.equipment.delete({
+      const equipment = await this.prisma.equipment.delete({
         where: { id }
       })
+
+      if (equipment.image) {
+        // 이미지 삭제 로직 구현 필요
+      }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
