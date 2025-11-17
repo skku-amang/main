@@ -21,7 +21,7 @@ import { Public } from "../auth/decorators/public.decorator"
 import { FileInterceptor } from "@nestjs/platform-express"
 import { optionalImageFileValidationPipe } from "../common/pipes/image-validation.pipe"
 
-@Controller("equipment")
+@Controller("equipments")
 @UseGuards(AccessTokenGuard)
 export class EquipmentController {
   constructor(private readonly equipmentService: EquipmentService) {}
