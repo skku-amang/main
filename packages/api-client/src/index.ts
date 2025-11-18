@@ -23,7 +23,11 @@ import {
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User
+  User,
+  Equipment,
+  CreateEquipment,
+  UpdateEquipment,
+  EquipmentWithRentalLog
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
@@ -49,6 +53,7 @@ import {
   UnprocessableEntityError,
   ValidationError
 } from "./errors"
+import { URLSearchParams } from "url"
 
 /**
  * 서버에서 plain object로 전달되는 에러를
@@ -526,6 +531,90 @@ export default class ApiClient {
       SessionDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/sessions/${id}`, "DELETE")
+  }
+
+  /**
+   * 장비 생성
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 정바 생성 권한이 없는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public createEquipment(equipmentData: CreateEquipment) {
+    return this._request<
+      Equipment,
+      AuthError | ForbiddenError | ValidationError | InternalServerError
+    >(`/equipments`, "POST", equipmentData)
+  }
+
+  /**
+   * 장비 목록 조회
+   * @param type - (선택) 장비 타입 필터 ('room' | 'item')
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getEquipments(type?: "room" | "item") {
+    const searchParams = new URLSearchParams()
+
+    if (type) searchParams.set("type", type)
+
+    const queryString = searchParams.toString()
+      ? `?${searchParams.toString()}`
+      : ""
+
+    return this._request<Equipment[], InternalServerError>(
+      `/equipments${queryString}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 장비 조회
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getEquipmentById(id: number) {
+    return this._request<
+      EquipmentWithRentalLog,
+      NotFoundError | InternalServerError
+    >(`/equipments/${id}`, "GET")
+  }
+
+  /**
+   * 장비 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 장비 수정 권한이 없는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateEquipment(id: number, equipmentData: UpdateEquipment) {
+    return this._request<
+      EquipmentWithRentalLog,
+      | AuthError
+      | ForbiddenError
+      | ValidationError
+      | NotFoundError
+      | InternalServerError
+    >(`/equipments/${id}`, "PATCH", equipmentData)
+  }
+
+  /**
+   * 장비 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 장비 삭제 권한이 없는 경우
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ConflictError} 요청한 리소스에 대여 기록이 존재해 삭제할 수 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public deleteEquipment(id: number) {
+    return this._request<
+      null,
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ConflictError
+      | InternalServerError
+    >(`/equipments/${id}`, "DELETE")
   }
 
   /**
