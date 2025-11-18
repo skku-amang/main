@@ -192,8 +192,8 @@ model Equipment {
 model EquipmentRental {
   id Int @id @default(autoincrement())
 
-  equipment   Equipment? @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
-  equipmentId Int?
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  equipmentId Int
 
   title   String
   startAt DateTime
