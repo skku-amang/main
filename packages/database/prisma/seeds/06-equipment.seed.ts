@@ -8,6 +8,16 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       where: { id: 1 },
       update: {},
       create: {
+        brand: "AMANG",
+        model: "ROOM",
+        category: EquipCategory.ROOM,
+        description: "아망의 동아리방입니다."
+      }
+    }),
+    prisma.equipment.upsert({
+      where: { id: 2 },
+      update: {},
+      create: {
         brand: "Corona",
         model: "Mordern Plus T",
         category: EquipCategory.GUITAR,
@@ -15,7 +25,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 2 },
+      where: { id: 3 },
       update: {},
       create: {
         brand: "Zildjian",
@@ -25,7 +35,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 3 },
+      where: { id: 4 },
       update: {},
       create: {
         brand: "SHURE",
@@ -34,7 +44,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 4 },
+      where: { id: 5 },
       update: {},
       create: {
         brand: "Inter M",
@@ -43,7 +53,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 5 },
+      where: { id: 6 },
       update: {},
       create: {
         brand: "Squier",
@@ -52,7 +62,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 6 },
+      where: { id: 7 },
       update: {},
       create: {
         brand: "ALTO Professional",
@@ -61,7 +71,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 7 },
+      where: { id: 8 },
       update: {},
       create: {
         brand: "Roland",
@@ -71,7 +81,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 8 },
+      where: { id: 9 },
       update: {},
       create: {
         brand: "Marshall",
@@ -81,7 +91,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 9 },
+      where: { id: 10 },
       update: {},
       create: {
         brand: "Forcusrite",
@@ -90,7 +100,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
       }
     }),
     prisma.equipment.upsert({
-      where: { id: 10 },
+      where: { id: 11 },
       update: {},
       create: {
         brand: "Muztek",
