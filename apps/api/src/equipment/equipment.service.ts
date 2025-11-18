@@ -5,7 +5,7 @@ import { UpdateEquipmentDto } from "./dto/update-equipment.dto"
 import { Prisma, EquipCategory } from "@repo/database"
 import { ConflictError, NotFoundError } from "@repo/api-client"
 import * as path from "node:path"
-import { v4 as uuidv4 } from "uuid"
+import { randomUUID } from "node:crypto"
 import { equipmentWithRentalLogInclude } from "@repo/shared-types"
 
 @Injectable()
@@ -20,7 +20,7 @@ export class EquipmentService {
     if (file) {
       // 파일 업로드 필요.
       const fileExt = path.extname(file.originalname)
-      const fileName = `${uuidv4()}${fileExt}`
+      const fileName = `${randomUUID()}${fileExt}`
 
       // 파일 업로드 구현 필요
       // await this.minioService.upload ?
@@ -84,7 +84,7 @@ export class EquipmentService {
       if (file) {
         // 파일 업로드 필요.
         const fileExt = path.extname(file.originalname)
-        const fileName = `${uuidv4()}${fileExt}`
+        const fileName = `${randomUUID()}${fileExt}`
 
         // 파일 업로드 구현 필요
         // imageUrl =
