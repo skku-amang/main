@@ -6,6 +6,7 @@ import { Prisma, EquipCategory } from "@repo/database"
 import { ConflictError, NotFoundError } from "@repo/api-client"
 import * as path from "node:path"
 import { v4 as uuidv4 } from "uuid"
+import { equipmentWithRentalLogInclude } from "@repo/shared-types"
 
 @Injectable()
 export class EquipmentService {
@@ -31,7 +32,7 @@ export class EquipmentService {
       }
     })
 
-    return this.findOne(equipment.id)
+    return equipment
   }
 
   async findAll(type?: string) {
@@ -55,7 +56,7 @@ export class EquipmentService {
   async findOne(id: number) {
     const equipment = await this.prisma.equipment.findUnique({
       where: { id },
-      include: { rentalLogs: true }
+      include: equipmentWithRentalLogInclude
     })
 
     if (!equipment)
@@ -98,15 +99,14 @@ export class EquipmentService {
       const equipment = await this.prisma.equipment.update({
         where: { id },
         data: updateData,
-        include: {
-          rentalLogs: true
-        }
+        include: equipmentWithRentalLogInclude
       })
 
       return equipment
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025")
+          // Race Condition 방지 처리
           throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
       }
       throw error
