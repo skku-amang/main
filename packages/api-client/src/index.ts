@@ -150,8 +150,12 @@ export default class ApiClient {
         method === "PATCH" ||
         method === "DELETE")
     ) {
-      options.headers = { "Content-Type": "application/json" }
-      options.body = JSON.stringify(body)
+      if (body instanceof FormData) {
+        options.body = body
+      } else {
+        options.headers = { "Content-Type": "application/json" }
+        options.body = JSON.stringify(body)
+      }
     }
 
     const promise = fetch(`${this.baseUrl}${endpoint}`, options)
