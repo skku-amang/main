@@ -18,11 +18,10 @@ export class EquipmentService {
   ) {
     const imageUrl: string | undefined = undefined
     if (file) {
-      // 파일 업로드 필요.
       const fileExt = path.extname(file.originalname)
       const fileName = `${randomUUID()}${fileExt}`
 
-      // 파일 업로드 구현 필요
+      // TODO: 파일 업로드 구현 필요
       // await this.minioService.upload ?
     }
     const equipment = await this.prisma.equipment.create({
@@ -86,11 +85,11 @@ export class EquipmentService {
         const fileExt = path.extname(file.originalname)
         const fileName = `${randomUUID()}${fileExt}`
 
-        // 파일 업로드 구현 필요
+        // TODO: 파일 업로드 구현 필요
         // imageUrl =
       }
       if (oldImageUrl && imageUrl) {
-        // oldImageUrl에 있는 기존 이미지 삭제 필요
+        // TODO: oldImageUrl에 있는 기존 이미지 삭제 필요
       }
       const updateData: Prisma.EquipmentUpdateInput = {
         ...updateEquipmentDto,
@@ -120,7 +119,7 @@ export class EquipmentService {
       })
 
       if (equipment.image) {
-        // 이미지 삭제 로직 구현 필요
+        // TODO: 이미지 삭제 로직 구현 필요
       }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
