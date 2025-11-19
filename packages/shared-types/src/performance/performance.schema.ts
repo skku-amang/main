@@ -1,12 +1,8 @@
 import z from "zod"
-
-const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
-export const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp"
-]
+import {
+  MAX_FILE_SIZE,
+  ACCEPTED_IMAGE_TYPES
+} from "../constants/file-validation"
 
 export const PerformanceObjectSchema = z.object({
   name: z.string().min(1, "공연 이름은 필수입니다."),

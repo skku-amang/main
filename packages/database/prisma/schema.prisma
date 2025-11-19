@@ -18,6 +18,21 @@ enum SessionName {
   WINDS // 관악기
 }
 
+enum EquipCategory {
+  ROOM //동아리 방
+  SYNTHESIZER //신디사이저
+  MICROPHONE //마이크
+  GUITAR //기타
+  BASS //베이스
+  DRUM //드럼
+  AUDIO_INTERFACE //오디오 인터페이스
+  CABLE //케이블
+  AMPLIFIER //앰프
+  SPEAKER //스피커
+  MIXER //믹서
+  ETC //그 외
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
   email              String   @unique
@@ -40,6 +55,8 @@ model User {
 
   joinedTeams  TeamMember[]
   leadingTeams Team[]       @relation("teamLeader")
+
+  rentalLogs EquipmentRental[]
 
   @@map("users")
 }
@@ -152,4 +169,40 @@ model TeamMember {
   @@unique([teamSessionId, userId])
   @@unique([teamSessionId, index])
   @@map("team_members")
+}
+
+model Equipment {
+  id Int @id @default(autoincrement())
+
+  brand       String
+  model       String
+  category    EquipCategory
+  isAvailable Boolean       @default(true)
+  description String?
+  image       String?
+
+  rentalLogs EquipmentRental[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("equipments")
+}
+
+model EquipmentRental {
+  id Int @id @default(autoincrement())
+
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  equipmentId Int
+
+  title   String
+  startAt DateTime
+  endAt   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@map("equipment_rentals")
 }
