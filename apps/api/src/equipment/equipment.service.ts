@@ -124,10 +124,6 @@ export class EquipmentService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
-          case "P2003":
-            throw new ConflictError(
-              `해당 장비는 대여 기록이 존재하여 삭제할 수 없습니다.`
-            )
           case "P2025":
             throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
         }

@@ -192,7 +192,7 @@ model Equipment {
 model EquipmentRental {
   id Int @id @default(autoincrement())
 
-  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
   equipmentId Int
 
   title   String
