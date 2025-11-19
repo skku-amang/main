@@ -603,7 +603,6 @@ export default class ApiClient {
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ForbiddenError} 장비 삭제 권한이 없는 경우
    * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {ConflictError} 요청한 리소스에 대여 기록이 존재해 삭제할 수 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public deleteEquipment(id: number) {
