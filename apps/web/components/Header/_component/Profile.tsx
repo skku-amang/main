@@ -1,7 +1,6 @@
 "use client"
 
 import { LoaderCircle, LogOut, User, Users } from "lucide-react"
-import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React from "react"
@@ -17,6 +16,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 interface MenuItemProps {
@@ -42,12 +42,13 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
 }
 
 const Profile = () => {
-  const { status, data: session } = useSession()
+  const { isPending, data: session } = authClient.useSession()
+  const { signOut } = authClient
 
   if (!session) {
     return (
       <>
-        {status === "loading" ? (
+        {isPending ? (
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
           <Button

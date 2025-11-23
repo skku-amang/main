@@ -11,13 +11,13 @@ import {
   Youtube
 } from "lucide-react"
 import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
 import { FaCircle } from "react-icons/fa"
 
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import SOCIAL from "@/constants/social"
 
+import { authClient } from "@/lib/auth-client"
 import NavLink from "./NavLink"
 import NavLinkHeader from "./NavLinkHeader"
 
@@ -30,7 +30,7 @@ const SheetInnerContent = ({
 }: {
   setIsOpen: (state: boolean) => void
 }) => {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
 
   return (
     <div className="items-between flex h-full flex-col justify-center">

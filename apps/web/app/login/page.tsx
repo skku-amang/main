@@ -1,22 +1,46 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
-import { InvalidSigninErrorCode } from "@/lib/auth/errors"
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
+import { Github } from "lucide-react"
+
+const signIn = async () =>
+  await authClient.signIn.social({
+    /**
+     * The social provider ID
+     * @example "github", "google", "apple"
+     */
+    provider: "github",
+    /**
+     * A URL to redirect after the user authenticates with the provider
+     * @default "/"
+     */
+    callbackURL: "/",
+    /**
+     * A URL to redirect if an error occurs during the sign in process
+     */
+    errorCallbackURL: "/error",
+    /**
+     * A URL to redirect if the user is newly registered
+     */
+    newUserCallbackURL: "/welcome",
+    /**
+     * disable the automatic redirect to the provider.
+     * @default false
+     */
+    disableRedirect: true
+  })
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
@@ -34,11 +58,13 @@ const Login = () => {
   })
 
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
-    const res = await signIn("credentials", { ...formData, redirect: false })
+    const res = await signIn()
     if (!res?.error) return router.push(ROUTES.HOME)
 
-    switch (res.code) {
-      case InvalidSigninErrorCode:
+    console.error(res.error.code)
+
+    switch (res.error.code) {
+      case "InvalidSigninErrorCode":
         setError("email", {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
@@ -55,6 +81,17 @@ const Login = () => {
           description: "알 수 없는 에러 발생!",
           variant: "destructive"
         })
+    }
+  }
+
+  async function onSocialLogin() {
+    try {
+      const res = await authClient.signIn.social({
+        provider: "github"
+      })
+      if (!res?.error) return router.push(ROUTES.HOME)
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -93,57 +130,73 @@ const Login = () => {
             Log in and join the rhythm
           </div>
         </div>
+
         <div className="flex flex-col items-center justify-center lg:absolute lg:right-20 lg:top-[8.5rem] xl:right-32">
           <h3 className="mb-2 text-2xl font-black text-slate-900">로그인</h3>
           <h5 className="mb-8 text-sm font-black text-slate-500">
             계속하려면 로그인해주세요
           </h5>
-          {/* 일반 로그인 */}
-          <form
-            className="flex flex-col items-center"
-            onSubmit={handleSubmit(onValid)}
-          >
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="email" className="font-semibold">
-                아이디
-              </Label>
-              <Input
-                {...register("email")}
-                name="email"
-                placeholder="Input text"
-                className=" h-12 border-slate-300 bg-white px-7 text-xl shadow-sm lg:w-80"
-              />
-            </div>
-            <div className="mb-6 text-destructive">{errors.email?.message}</div>
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="password" className="font-semibold">
-                비밀번호
-              </Label>
-              <Input
-                {...register("password")}
-                name="password"
-                placeholder="Input text"
-                type="password"
-                className=" mt-1 h-12 border-slate-300 bg-white px-7 text-xl shadow-sm lg:w-80"
-              />
-            </div>
-            <div className="text-destructive">{errors.password?.message}</div>
-            <Button
-              type="submit"
-              className="mt-8 h-12 w-72 bg-third text-base font-semibold"
-              disabled={isSubmitting}
+
+          <div className="flex flex-col w-72">
+            {/* 일반 로그인
+            <form
+              className="flex flex-col items-center"
+              onSubmit={handleSubmit(onValid)}
             >
-              {isSubmitting ? "Login on Progress..." : "로그인"}
-            </Button>
-            <div className="flex justify-center pt-4">
-              <div className="pr-2 text-sm font-extrabold text-slate-900">
-                아직 계정이 없으신가요?
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="email" className="font-semibold">
+                  아이디
+                </Label>
+                <Input
+                  {...register("email")}
+                  name="email"
+                  placeholder="Input text"
+                  className=" h-12 border-slate-300 bg-white px-7 text-xl shadow-sm lg:w-80"
+                />
               </div>
-              <Link href={ROUTES.SIGNUP} className="text-blue-40 text-sm">
-                회원가입
-              </Link>
-            </div>
-          </form>
+              <div className="mb-6 text-destructive">{errors.email?.message}</div>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="password" className="font-semibold">
+                  비밀번호
+                </Label>
+                <Input
+                  {...register("password")}
+                  name="password"
+                  placeholder="Input text"
+                  type="password"
+                  className=" mt-1 h-12 border-slate-300 bg-white px-7 text-xl shadow-sm lg:w-80"
+                />
+              </div>
+              <div className="text-destructive">{errors.password?.message}</div>
+              <Button
+                type="submit"
+                className="mt-8 h-12 w-72 bg-third text-base font-semibold"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Login on Progress..." : "로그인"}
+              </Button>
+              <div className="flex justify-center pt-4">
+                <div className="pr-2 text-sm font-extrabold text-slate-900">
+                  아직 계정이 없으신가요?
+                </div>
+                <Link href={ROUTES.SIGNUP} className="text-blue-40 text-sm">
+                  회원가입
+                </Link>
+              </div>
+            </form> */}
+
+            {/* <div className="mt-6 flex w-72 items-center justify-center space-x-4">
+              <div className="h-px flex-1 bg-slate-300" />
+              <div className="text-sm font-medium text-slate-500">OR</div>
+              <div className="h-px flex-1 bg-slate-300" />
+            </div> */}
+
+            {/* 소셜 로그인 */}
+            <Button onClick={onSocialLogin}>
+              <Github size={20} />
+              <span>GitHub</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

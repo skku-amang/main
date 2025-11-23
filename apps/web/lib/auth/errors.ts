@@ -1,5 +1,3 @@
-import { CredentialsSignin } from "next-auth"
-
 // 공통
 export const InvalidSigninErrorCode = "base_auth_error"
 export class InvalidSigninError extends CredentialsSignin {

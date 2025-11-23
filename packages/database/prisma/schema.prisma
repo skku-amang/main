@@ -21,6 +21,7 @@ enum SessionName {
 model User {
   id                 Int      @id @default(autoincrement())
   email              String   @unique
+  emailVerified      Boolean  @default(false) // added by better-auth
   password           String
   name               String
   nickname           String   @unique
@@ -29,7 +30,7 @@ model User {
   isAdmin            Boolean  @default(false)
   hashedRefreshToken String?
   createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime @default(now()) @updatedAt
 
   generationId      Int
   generation        Generation  @relation(fields: [generationId], references: [id], onDelete: Restrict)
@@ -41,7 +42,56 @@ model User {
   joinedTeams  TeamMember[]
   leadingTeams Team[]       @relation("teamLeader")
 
+  // better auth specific relations
+  authSessions AuthSession[]
+  accounts     Account[]
+
   @@map("users")
+}
+
+model AuthSession {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
 }
 
 model Generation {
