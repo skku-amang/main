@@ -4,13 +4,13 @@ import { useSession } from "next-auth/react"
 import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName } from "@repo/database"
+import { BandSessionName } from "@repo/database"
 import { Team, User } from "@repo/shared-types"
 
 interface MemberSessionCardProps {
   teamId: number
   sessionId: number
-  sessionName: SessionName
+  sessionName: BandSessionName
   sessionIndex: number
   user: User
   // eslint-disable-next-line no-unused-vars

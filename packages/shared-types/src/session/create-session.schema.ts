@@ -1,4 +1,4 @@
-import { SessionName } from "@repo/database"
+import { BandSessionName } from "@repo/database"
 import { z } from "zod"
 
 /**
@@ -7,7 +7,7 @@ import { z } from "zod"
  */
 export const CreateSessionSchema = z
   .object({
-    name: z.nativeEnum(SessionName, {
+    name: z.nativeEnum(BandSessionName, {
       required_error: "세션 이름은 필수 항목입니다.",
       invalid_type_error: "세션 이름은 유효한 값이어야 합니다."
     }),

@@ -1,8 +1,8 @@
-import { SessionName } from "../../../packages/database/generated/prisma"
+import { BandSessionName } from "../../../packages/database/generated/prisma"
 
 type SessionImageType = {
-  UNPRESSED: Record<SessionName, string>
-  PRESSED: Record<SessionName, string>
+  UNPRESSED: Record<BandSessionName, string>
+  PRESSED: Record<BandSessionName, string>
 }
 
 const SESSIONIMAGE: SessionImageType = {

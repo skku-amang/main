@@ -7,7 +7,8 @@
     "dev": "next dev",
     "start": "next start",
     "format": "prettier --check \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
-    "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix"
+    "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix",
+    "better-auth:generate": "npx @better-auth/cli generate --output ../../packages/database/prisma/schema.prisma"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -36,7 +37,7 @@
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
     "@tanstack/react-table": "^8.20.1",
-    "better-auth": "^1.3.34",
+    "better-auth": "^1.4.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -60,6 +61,7 @@
     "zod-form-data": "^2.0.2"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.1",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20",

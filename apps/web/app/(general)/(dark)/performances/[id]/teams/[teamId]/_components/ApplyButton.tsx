@@ -7,10 +7,9 @@ import { useEffect, useState } from "react"
 
 import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
-import { type SessionName } from "@repo/database"
 
 interface ApplyButtonProps {
-  session: SessionName
+  session: BandSessionName
   memberSessionIndex: number
   selectedSessionsWithIndex: string[]
   toggleSelectedSessionWithIndex: (memberSessionWithWithIndex: string) => void

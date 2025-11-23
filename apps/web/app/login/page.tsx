@@ -49,14 +49,18 @@ const Login = () => {
   const { toast } = useToast()
 
   const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting }
+    // register,
+    // handleSubmit,
+    setError
+    // formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof LoginUserSchema>>({
     resolver: zodResolver(LoginUserSchema)
   })
 
+  /**
+   * @deprecated 일반 로그인 (이메일 + 비밀번호)
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     const res = await signIn()
     if (!res?.error) return router.push(ROUTES.HOME)
@@ -138,6 +142,7 @@ const Login = () => {
           </h5>
 
           <div className="flex flex-col w-72">
+            {/* deprecated */}
             {/* 일반 로그인
             <form
               className="flex flex-col items-center"

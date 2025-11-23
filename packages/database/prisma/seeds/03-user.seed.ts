@@ -1,14 +1,7 @@
 import { PrismaClient } from "../../generated/prisma"
-import * as bcrypt from "bcrypt"
 
 export const seedUsers = async (prisma: PrismaClient) => {
   console.log("Seeding users...")
-
-  const defaultPassword = process.env.SEED_DEFAULT_PASSWORD
-  if (!defaultPassword) {
-    console.error("SEED_DEFAULT_PASSWORD is not set.")
-    return
-  }
 
   const generation = await prisma.generation.findFirst()
   if (!generation) {
@@ -16,30 +9,40 @@ export const seedUsers = async (prisma: PrismaClient) => {
     return
   }
 
-  const hashedPassword = await bcrypt.hash(defaultPassword, 10)
-  await prisma.user.upsert({
-    where: {
-      nickname: "관리자"
-    },
+  // admin user
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@amang.com" },
     create: {
       name: "관리자",
       email: "admin@amang.com",
-      password: hashedPassword,
+      role: "admin"
+    },
+    update: {}
+  })
+  // create profile for admin
+  await prisma.profile.upsert({
+    where: { userId: admin.id },
+    create: {
+      userId: admin.id,
       nickname: "관리자",
-      generationId: generation.id,
-      isAdmin: true
+      generationId: generation.id
     },
     update: {}
   })
 
-  await prisma.user.upsert({
-    where: {
-      nickname: "사용자"
-    },
+  // regular user
+  const user = await prisma.user.upsert({
+    where: { email: "user@amang.com" },
     create: {
       name: "사용자",
-      email: "user@amang.com",
-      password: hashedPassword,
+      email: "user@amang.com"
+    },
+    update: {}
+  })
+  await prisma.profile.upsert({
+    where: { userId: user.id },
+    create: {
+      userId: user.id,
       nickname: "사용자",
       generationId: generation.id
     },

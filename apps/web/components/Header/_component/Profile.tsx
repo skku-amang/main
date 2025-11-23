@@ -43,6 +43,7 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
 
 const Profile = () => {
   const { isPending, data: session } = authClient.useSession()
+  console.log("session:", session)
   const { signOut } = authClient
 
   if (!session) {
