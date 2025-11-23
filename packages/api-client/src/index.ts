@@ -1,10 +1,13 @@
 import {
   AuthResponse,
+  CreateEquipment,
   CreateGeneration,
   CreatePerformance,
   CreateSession,
   CreateTeam,
   CreateUser,
+  Equipment,
+  EquipmentWithRentalLog,
   GenerationDetail,
   GenerationList,
   LoginUser,
@@ -18,17 +21,15 @@ import {
   TeamApplication,
   TeamDetail,
   TeamList,
+  UpdateEquipment,
   UpdateGeneration,
   UpdatePerformance,
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User,
-  Equipment,
-  CreateEquipment,
-  UpdateEquipment,
-  EquipmentWithRentalLog
+  User
 } from "@repo/shared-types"
+import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
 import {
   AccessTokenExpiredError,
@@ -53,7 +54,6 @@ import {
   UnprocessableEntityError,
   ValidationError
 } from "./errors"
-import { URLSearchParams } from "url"
 
 /**
  * 서버에서 plain object로 전달되는 에러를
@@ -160,21 +160,19 @@ export default class ApiClient {
       } else {
         options.headers = { "Content-Type": "application/json" }
         options.body = JSON.stringify(body)
+        options.credentials = "include"
       }
     }
 
-    const promise = fetch(`${this.baseUrl}${endpoint}`, options)
-      .then(async (response) => {
+    const promise = fetch(`${this.baseUrl}${endpoint}`, options).then(
+      async (response) => {
         const data = (await response.json()) as ApiResult<T>
         if (data.isSuccess) {
           return data.data
         }
         throw createErrorFromProblemDocument(data.error as ApiError)
-      })
-      .catch(() => {
-        // fetch 실패(네트워크 에러 등) 시
-        throw new InternalServerError()
-      })
+      }
+    )
 
     // 타입스크립트가 타입을 올바르게 추론하도록 명시적 캐스팅
     return promise as PromiseWithError<T, E>

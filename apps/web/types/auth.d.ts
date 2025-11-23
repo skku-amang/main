@@ -26,5 +26,4 @@ type AuthData = {
   email: string
   isAdmin: boolean
   access: string
-  refresh: string
 }
