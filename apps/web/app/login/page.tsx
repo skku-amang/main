@@ -14,33 +14,7 @@ import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
 import { Github } from "lucide-react"
-
-const signIn = async () =>
-  await authClient.signIn.social({
-    /**
-     * The social provider ID
-     * @example "github", "google", "apple"
-     */
-    provider: "github",
-    /**
-     * A URL to redirect after the user authenticates with the provider
-     * @default "/"
-     */
-    callbackURL: "/",
-    /**
-     * A URL to redirect if an error occurs during the sign in process
-     */
-    errorCallbackURL: "/error",
-    /**
-     * A URL to redirect if the user is newly registered
-     */
-    newUserCallbackURL: "/welcome",
-    /**
-     * disable the automatic redirect to the provider.
-     * @default false
-     */
-    disableRedirect: true
-  })
+import { FaGoogle } from "react-icons/fa"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
@@ -88,10 +62,10 @@ const Login = () => {
     }
   }
 
-  async function onSocialLogin() {
+  async function onSocialLogin(provider: "github" | "google") {
     try {
       const res = await authClient.signIn.social({
-        provider: "github"
+        provider
       })
       if (!res?.error) return router.push(ROUTES.HOME)
     } catch (error) {
@@ -197,10 +171,17 @@ const Login = () => {
             </div> */}
 
             {/* 소셜 로그인 */}
-            <Button onClick={onSocialLogin}>
-              <Github size={20} />
-              <span>GitHub</span>
-            </Button>
+            <div className="flex flex-col gap-4">
+              <Button onClick={() => onSocialLogin("github")}>
+                <Github size={20} />
+                <span>GitHub</span>
+              </Button>
+
+              <Button onClick={() => onSocialLogin("google")}>
+                <FaGoogle size={20} />
+                <span>Google</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
