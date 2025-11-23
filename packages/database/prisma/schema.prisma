@@ -19,7 +19,7 @@ enum BandSessionName {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String   @id
   email         String   @unique
   emailVerified Boolean  @default(false) // added by better-auth
   name          String
@@ -48,7 +48,7 @@ model Session {
   updatedAt DateTime @updatedAt
   ipAddress String?
   userAgent String?
-  userId    Int
+  userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   impersonatedBy String?
@@ -62,7 +62,7 @@ model Account {
   id                    String    @id
   accountId             String
   providerId            String
-  userId                Int
+  userId                String    @unique
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
@@ -200,9 +200,9 @@ model TeamMember {
 }
 
 model Profile {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   nickname String  @unique
   bio      String?
