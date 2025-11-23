@@ -9,7 +9,6 @@ import {
   Pencil,
   Trash2
 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
 
@@ -26,6 +25,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import { authClient } from "@/lib/auth-client"
 import YoutubeVideo from "@/lib/youtube"
 import { MemberSession, MemberSessionSet, User } from "@repo/shared-types"
 
@@ -61,7 +61,7 @@ const SortButton = ({
 }
 
 const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
-  const { data: user } = useSession()
+  const { data: user } = authClient.useSession()
 
   if (
     user &&

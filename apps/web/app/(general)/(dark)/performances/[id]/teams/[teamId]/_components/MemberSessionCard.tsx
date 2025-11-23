@@ -1,8 +1,8 @@
 import { Minus } from "lucide-react"
-import { useSession } from "next-auth/react"
 
 import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { authClient } from "@/lib/auth-client"
 import { formatGenerationOrder } from "@/lib/utils"
 import { BandSessionName } from "@repo/database"
 import { Team, User } from "@repo/shared-types"
@@ -25,7 +25,7 @@ const MemberSessionCard = ({
   sessionIndex,
   user
 }: MemberSessionCardProps) => {
-  const authSession = useSession()
+  const authSession = authClient.useSession()
 
   const { onRemoveSession, onSubmit } = useTeamApplication(teamId)
 

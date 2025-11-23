@@ -13,6 +13,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
   const admin = await prisma.user.upsert({
     where: { email: "admin@amang.com" },
     create: {
+      id: "1",
       name: "관리자",
       email: "admin@amang.com",
       role: "admin"
@@ -34,6 +35,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
   const user = await prisma.user.upsert({
     where: { email: "user@amang.com" },
     create: {
+      id: "2",
       name: "사용자",
       email: "user@amang.com"
     },

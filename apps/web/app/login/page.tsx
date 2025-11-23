@@ -22,10 +22,11 @@ const Login = () => {
   const router = useRouter()
   const { toast } = useToast()
 
+  // eslint-disable-next-line no-empty-pattern
   const {
     // register,
     // handleSubmit,
-    setError
+    // setError
     // formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof LoginUserSchema>>({
     resolver: zodResolver(LoginUserSchema)
@@ -35,32 +36,32 @@ const Login = () => {
    * @deprecated 일반 로그인 (이메일 + 비밀번호)
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async function onValid(formData: z.infer<typeof LoginUserSchema>) {
-    const res = await signIn()
-    if (!res?.error) return router.push(ROUTES.HOME)
+  // async function onValid(formData: z.infer<typeof LoginUserSchema>) {
+  //   const res = await signIn()
+  //   if (!res?.error) return router.push(ROUTES.HOME)
 
-    console.error(res.error.code)
+  //   console.error(res.error.code)
 
-    switch (res.error.code) {
-      case "InvalidSigninErrorCode":
-        setError("email", {
-          type: "manual",
-          message: "이메일 또는 비밀번호가 일치하지 않습니다."
-        })
-        setError("password", {
-          type: "manual",
-          message: "이메일 또는 비밀번호가 일치하지 않습니다."
-        })
-        break
+  //   switch (res.error.code) {
+  //     case "InvalidSigninErrorCode":
+  //       setError("email", {
+  //         type: "manual",
+  //         message: "이메일 또는 비밀번호가 일치하지 않습니다."
+  //       })
+  //       setError("password", {
+  //         type: "manual",
+  //         message: "이메일 또는 비밀번호가 일치하지 않습니다."
+  //       })
+  //       break
 
-      default:
-        toast({
-          title: "로그인 실패",
-          description: "알 수 없는 에러 발생!",
-          variant: "destructive"
-        })
-    }
-  }
+  //     default:
+  //       toast({
+  //         title: "로그인 실패",
+  //         description: "알 수 없는 에러 발생!",
+  //         variant: "destructive"
+  //       })
+  //   }
+  // }
 
   async function onSocialLogin(provider: "github" | "google") {
     try {
@@ -70,6 +71,11 @@ const Login = () => {
       if (!res?.error) return router.push(ROUTES.HOME)
     } catch (error) {
       console.error(error)
+      toast({
+        title: "로그인 실패",
+        description: "알 수 없는 에러 발생!",
+        variant: "destructive"
+      })
     }
   }
 

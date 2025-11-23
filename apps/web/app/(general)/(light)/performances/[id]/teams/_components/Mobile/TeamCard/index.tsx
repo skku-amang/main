@@ -1,7 +1,6 @@
 "use client"
 
 import { Image, PencilLine, Trash2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
@@ -12,6 +11,7 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
+import { authClient } from "@/lib/auth-client"
 import { MemberSession, User } from "@repo/shared-types"
 
 interface TeamCardProps {
@@ -37,8 +37,7 @@ const TeamCard = ({
   leader,
   memberSessions
 }: TeamCardProps) => {
-  const session = useSession()
-  const user = session?.data
+  const session = authClient.useSession()
 
   return (
     <div className="rounded-lg bg-white p-5 shadow-md">
@@ -85,7 +84,7 @@ const TeamCard = ({
             <h4 className="w-20 text-xs">팀장</h4>
             <div className="flex items-center gap-x-3">
               <Avatar className="h-5 w-5">
-                <AvatarImage src={leader.profileImage} />
+                <AvatarImage src={leader.image ?? undefined} />
                 <AvatarFallback className="text-xs">
                   {leader.name.substring(0, 1)}
                 </AvatarFallback>
@@ -111,32 +110,38 @@ const TeamCard = ({
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      {user && (user.isAdmin || (user.id && +user?.id === leader.id)) && (
-        <div className="mt-3 grid grid-cols-2 gap-x-4">
-          <Button
-            asChild
-            className="flex h-9 w-full items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
-            variant="outline"
-          >
-            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
-              <PencilLine size={14} strokeWidth={2} className="font-bold" />
-              편집하기
-            </Link>
-          </Button>
-          <TeamDeleteButton teamId={id} className="w-full">
+      {session.data &&
+        (session.data.user.role === "ADMIN" ||
+          (session.data.user.id && session.data.user.id === leader.id)) && (
+          <div className="mt-3 grid grid-cols-2 gap-x-4">
             <Button
               asChild
-              className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
-              variant="destructive"
+              className="flex h-9 w-full items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
+              variant="outline"
             >
-              <div>
-                <Trash2 size={14} strokeWidth={2} className="font-bold" />
-                삭제하기
-              </div>
+              <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
+                <PencilLine size={14} strokeWidth={2} className="font-bold" />
+                편집하기
+              </Link>
             </Button>
-          </TeamDeleteButton>
-        </div>
-      )}
+            <TeamDeleteButton
+              teamId={id}
+              className="w-full"
+              redirectUrl={ROUTES.PERFORMANCE.DETAIL(performanceId)}
+            >
+              <Button
+                asChild
+                className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
+                variant="destructive"
+              >
+                <div>
+                  <Trash2 size={14} strokeWidth={2} className="font-bold" />
+                  삭제하기
+                </div>
+              </Button>
+            </TeamDeleteButton>
+          </div>
+        )}
     </div>
   )
 }

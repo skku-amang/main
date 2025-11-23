@@ -2,9 +2,7 @@
 
 import { Separator } from "@radix-ui/react-separator"
 import { Maximize2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
@@ -15,6 +13,7 @@ import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import ROUTES from "@/constants/routes"
 import { useTeam } from "@/hooks/api/useTeam"
+import { authClient } from "@/lib/auth-client"
 import YoutubePlayer from "@/lib/youtube/Player"
 import useTeamApplication from "./_hooks/useTeamApplication"
 
@@ -26,8 +25,7 @@ interface TeamDetailProps {
 }
 
 const TeamDetail = (props: TeamDetailProps) => {
-  const session = useSession()
-  const router = useRouter()
+  const session = authClient.useSession()
 
   const performanceId = props.params.id
   const id = props.params.teamId
@@ -35,9 +33,7 @@ const TeamDetail = (props: TeamDetailProps) => {
   const { data: team, isLoading, isError } = useTeam(id)
   const { selectedSessions } = useTeamApplication(id)
 
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
-
-  if (isLoading) {
+  if (session.isPending || isLoading) {
     return <Loading />
   } else if (isError) {
     return <div>Error</div>
@@ -78,14 +74,11 @@ const TeamDetail = (props: TeamDetailProps) => {
 
       {/*수정 및 삭제 (모바일)*/}
       {session.data &&
-        (session.data.isAdmin ||
-          (session.data.id && +session.data.id === team.leaderId)) && (
+        (session.data.user.role === "admin" ||
+          (session.data.user.id &&
+            +session.data.user.id === team.leaderId)) && (
           <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-            <DeleteEditButton
-              performanceId={performanceId}
-              team={team}
-              accessToken={session.data?.access}
-            />
+            <DeleteEditButton performanceId={performanceId} team={team} />
           </div>
         )}
 
