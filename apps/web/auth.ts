@@ -40,6 +40,7 @@ const authOptions: NextAuthConfig = {
       authorize: async (credentials) => {
         const { name, nickname, email, generationId, sessions, password } =
           credentials as {
+            id?: string
             name?: string
             nickname?: string
             email?: string
@@ -79,7 +80,7 @@ const authOptions: NextAuthConfig = {
   callbacks: {
     // TODO: user 타입이 소셜 인증 사용시 사용되는 `AdapterUser`인 경우 고려
     jwt: async ({ token, user }) => {
-      if (user?.email) {
+      if (user?.id) {
         return {
           id: user.id,
           name: user.name,
@@ -87,12 +88,23 @@ const authOptions: NextAuthConfig = {
           image: user.image,
           email: user.email,
           isAdmin: user.isAdmin,
-          access: user.access,
-          refresh: user.refresh
+          access: user.access
         }
       }
 
       return token
+    },
+    session: async ({ session, token }) => {
+      return {
+        ...session,
+        id: token.id as string,
+        name: token.name as string,
+        nickname: token.nickname as string,
+        image: token.image as string | null,
+        email: token.email as string,
+        isAdmin: token.isAdmin as boolean,
+        access: token.access as string
+      }
     }
   },
   debug: process.env.NODE_ENV === "development",
