@@ -116,6 +116,7 @@ export type PromiseWithError<T, TError> = Promise<T> & {
 
 export default class ApiClient {
   private static instance: ApiClient | null = null
+  private accessToken: string | null = null
 
   constructor(private baseUrl: string) {}
 
@@ -134,6 +135,15 @@ export default class ApiClient {
   }
 
   /**
+   * 액세스 토큰을 설정합니다.
+   * 설정된 토큰은 이후 모든 API 요청의 Authorization 헤더에 포함됩니다.
+   * @param token 액세스 토큰
+   */
+  public setAccessToken(token: string | null): void {
+    this.accessToken = token
+  }
+
+  /**
    * 내부 API 요청 헬퍼 메소드
    */
   private _request<T, E extends ProblemDocument>(
@@ -145,7 +155,10 @@ export default class ApiClient {
   ): PromiseWithError<T, E> {
     const options: RequestInit = {
       method,
-      headers
+      headers: {
+        ...headers,
+        ...(this.accessToken && { Authorization: `Bearer ${this.accessToken}` })
+      }
     }
 
     if (
@@ -158,7 +171,10 @@ export default class ApiClient {
       if (body instanceof FormData) {
         options.body = body
       } else {
-        options.headers = { "Content-Type": "application/json" }
+        options.headers = {
+          ...options.headers,
+          "Content-Type": "application/json"
+        }
         options.body = JSON.stringify(body)
         options.credentials = "include"
       }
