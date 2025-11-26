@@ -197,5 +197,5 @@ async function signup({
 }
 
 async function refreshAccessToken(refreshToken: string) {
-  return await apiClient.refreshToken(refreshToken)
+  return apiClient.refreshToken(refreshToken)
 }
