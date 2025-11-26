@@ -18,17 +18,18 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @Public()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto)
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.usersService.findAll()
   }
 
   @Get(":id")
+  @Public()
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.findOneById(id)
   }

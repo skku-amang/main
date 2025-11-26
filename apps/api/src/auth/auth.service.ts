@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
-import { JwtPayload } from "@repo/shared-types"
+import {
+  AuthResponse,
+  JwtPayload,
+  RefreshTokenResponse
+} from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -15,7 +19,7 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async signUp(createUserDto: CreateUserDto) {
+  async signUp(createUserDto: CreateUserDto): Promise<AuthResponse> {
     const user = await this.usersService.create(createUserDto)
     const tokens = await this.getTokens(
       user.id,
@@ -29,7 +33,7 @@ export class AuthService {
     return { ...tokens, user: userResponse }
   }
 
-  async login(loginDto: LoginUserDto) {
+  async login(loginDto: LoginUserDto): Promise<AuthResponse> {
     const user = await this.usersService.findOneByEmail(loginDto.email)
     if (!user) {
       throw new AuthError("존재하지 않는 이메일입니다.")
@@ -68,10 +72,13 @@ export class AuthService {
       name,
       isAdmin
     }
+    const accessTokenExpiresIn = this.configService.get<string>(
+      "ACCESS_TOKEN_EXPIRES_IN"
+    ) as string
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN")
+        expiresIn: accessTokenExpiresIn
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
@@ -79,10 +86,17 @@ export class AuthService {
       })
     ])
 
-    return { accessToken, refreshToken }
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: parseInt(accessTokenExpiresIn)
+    }
   }
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(
+    userId: number,
+    refreshToken: string
+  ): Promise<RefreshTokenResponse> {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
       throw new ForbiddenError("Access Denied")

@@ -741,10 +741,11 @@ export default class ApiClient {
   /**
    * 토큰 갱신
    */
-  public refreshToken() {
+  public refreshToken(refreshToken: string) {
     return this._request<RefreshTokenResponse, AuthError | InternalServerError>(
       "/auth/refresh",
-      "POST"
+      "POST",
+      { refreshToken }
     )
   }
 }

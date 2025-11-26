@@ -1,5 +1,5 @@
-import type { User } from "next-auth"
-import NextAuth, { NextAuthConfig } from "next-auth"
+import NextAuth, { NextAuthConfig, User } from "next-auth"
+import { type JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 
 import { apiClient } from "@/lib/apiClient"
@@ -35,7 +35,7 @@ const authOptions: NextAuthConfig = {
       /**
        * 로그인 또는 회원가입 시 호출되는 함수
        * @param credentials 유저가 입력한 로그인 정보
-       * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `token`으로 전달됨
+       * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `user`으로 전달됨
        */
       authorize: async (credentials) => {
         const { name, nickname, email, generationId, sessions, password } =
@@ -67,43 +67,73 @@ const authOptions: NextAuthConfig = {
             generationId: parsedGenerationId,
             sessions: parsedSessions
           })
-          return signup({ ...userInfo })
+          return await signup({ ...userInfo })
         }
         const userInfo = await LoginUserSchema.parseAsync({
           email,
           password
         })
-        return login({ ...userInfo })
+        return await login({ ...userInfo })
       }
     })
   ],
   callbacks: {
-    // TODO: user 타입이 소셜 인증 사용시 사용되는 `AdapterUser`인 경우 고려
+    /**
+     * 1. JWT 콜백은 토큰을 갱신하거나 생성하는 역할을 합니다.
+     * @token 이전 JWT 토큰 (처음에는 빈 객체)
+     * @user `authorize` 함수에서 반환한 유저 객체 (처음 로그인 시에만 존재)
+     */
     jwt: async ({ token, user }) => {
-      if (user?.id) {
+      // 최초 로그인 시 user 존재
+      if (user) {
         return {
+          ...token,
+          // User 정보 복사
           id: user.id,
           name: user.name,
-          nickname: user.nickname,
-          image: user.image,
           email: user.email,
+          image: user.image,
+          nickname: user.nickname,
           isAdmin: user.isAdmin,
-          access: user.access
-        }
+          // 토큰 정보 복사
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+          expiresIn: user.expiresIn
+        } as JWT
       }
 
-      return token
+      // 만료 체크 및 갱신
+      if (token.exp && Date.now() < token.exp * 1000) {
+        return token
+      }
+
+      const { accessToken, expiresIn } = await refreshAccessToken(
+        token?.refreshToken
+      )
+      return {
+        ...token,
+        accessToken,
+        expiresIn
+      }
     },
+    /**
+     * 2. 세션 콜백은 클라이언트에 반환되는 세션 객체를 구성합니다.
+     * @session 기본 세션 객체 { user, expires }
+     * @token jwt 콜백에서 반환한 토큰
+     */
     session: async ({ session, token }) => {
       return {
         ...session,
-        id: token.id as string,
-        name: token.name as string,
-        nickname: token.nickname as string,
-        image: token.image as string | null,
-        email: token.email as string,
-        isAdmin: token.isAdmin as boolean,
-        access: token.access as string
+        user: {
+          ...session.user,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          image: token.image,
+          nickname: token.nickname,
+          isAdmin: token.isAdmin
+        },
+        accessToken: token.accessToken
       }
     }
   },
@@ -119,18 +149,21 @@ export const {
   unstable_update: update
 } = NextAuth(authOptions)
 
-async function login({ email, password }: LoginUser): Promise<User> {
-  const { accessToken, refreshToken, user } = await apiClient.login({
+async function login({ email, password }: LoginUser) {
+  const { user, accessToken, expiresIn, refreshToken } = await apiClient.login({
     email,
     password
   })
-  const { id, ...rest } = user
   return {
-    access: accessToken,
-    refresh: refreshToken,
-    id: id.toString(),
-    ...rest
-  }
+    id: user.id.toString(),
+    name: user.name,
+    nickname: user.nickname,
+    email: user.email,
+    isAdmin: user.isAdmin,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    expiresIn: expiresIn
+  } as User
 }
 
 async function signup({
@@ -140,20 +173,29 @@ async function signup({
   password,
   generationId,
   sessions
-}: CreateUser): Promise<User> {
-  const { accessToken, refreshToken, user } = await apiClient.signup({
-    name,
-    nickname,
-    email,
-    password,
-    generationId,
-    sessions
-  })
-  const { id, ...rest } = user
+}: CreateUser) {
+  const { user, accessToken, expiresIn, refreshToken } = await apiClient.signup(
+    {
+      name,
+      nickname,
+      email,
+      password,
+      generationId,
+      sessions
+    }
+  )
   return {
-    ...rest,
-    access: accessToken,
-    refresh: refreshToken,
-    id: id.toString()
+    id: user.id.toString(),
+    name: user.name,
+    nickname: user.nickname,
+    email: user.email,
+    isAdmin: user.isAdmin,
+    accessToken,
+    refreshToken,
+    expiresIn
   }
+}
+
+async function refreshAccessToken(refreshToken: string) {
+  return await apiClient.refreshToken(refreshToken)
 }
