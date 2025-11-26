@@ -1,5 +1,5 @@
 import type { User } from "next-auth"
-import NextAuth, { NextAuthConfig } from "next-auth"
+import NextAuth, { NextAuthConfig, NextAuthResult } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
 import { apiClient } from "@/lib/apiClient"
@@ -111,23 +111,23 @@ const authOptions: NextAuthConfig = {
   trustHost: true
 }
 
-export const {
-  handlers,
-  signIn,
-  signOut,
-  auth,
-  unstable_update: update
-} = NextAuth(authOptions)
+const nextAuthResult: NextAuthResult = NextAuth(authOptions)
+
+export const handlers: NextAuthResult["handlers"] = nextAuthResult.handlers
+export const signIn: NextAuthResult["signIn"] = nextAuthResult.signIn
+export const signOut: NextAuthResult["signOut"] = nextAuthResult.signOut
+export const auth: NextAuthResult["auth"] = nextAuthResult.auth
+export const update: NextAuthResult["unstable_update"] =
+  nextAuthResult.unstable_update
 
 async function login({ email, password }: LoginUser): Promise<User> {
-  const { accessToken, refreshToken, user } = await apiClient.login({
+  const { accessToken, user } = await apiClient.login({
     email,
     password
   })
   const { id, ...rest } = user
   return {
     access: accessToken,
-    refresh: refreshToken,
     id: id.toString(),
     ...rest
   }
@@ -141,7 +141,7 @@ async function signup({
   generationId,
   sessions
 }: CreateUser): Promise<User> {
-  const { accessToken, refreshToken, user } = await apiClient.signup({
+  const { accessToken, user } = await apiClient.signup({
     name,
     nickname,
     email,
@@ -153,7 +153,6 @@ async function signup({
   return {
     ...rest,
     access: accessToken,
-    refresh: refreshToken,
     id: id.toString()
   }
 }
