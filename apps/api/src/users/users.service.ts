@@ -1,10 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { ConflictError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import {
-  userWithBasicGenerationInclude,
-  userWithJoinedTeams
-} from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
@@ -56,20 +52,11 @@ export class UsersService {
     })
   }
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      include: userWithBasicGenerationInclude
-    })
-  }
-
   async findOneByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } })
   }
 
   async findOneById(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
-      include: userWithJoinedTeams
-    })
+    return this.prisma.user.findUnique({ where: { id } })
   }
 }
