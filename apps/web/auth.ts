@@ -1,3 +1,4 @@
+import type { Session } from "next-auth"
 import NextAuth, { NextAuthConfig, User } from "next-auth"
 import { type JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
@@ -141,13 +142,12 @@ const authOptions: NextAuthConfig = {
   trustHost: true
 }
 
-export const {
-  handlers,
-  signIn,
-  signOut,
-  auth,
-  unstable_update: update
-} = NextAuth(authOptions)
+const nextAuth = NextAuth(authOptions)
+
+export const handlers = nextAuth.handlers
+export const signIn = nextAuth.signIn
+export const signOut = nextAuth.signOut
+export const auth: () => Promise<Session | null> = nextAuth.auth
 
 async function login({ email, password }: LoginUser) {
   const { user, accessToken, expiresIn, refreshToken } = await apiClient.login({
