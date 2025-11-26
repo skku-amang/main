@@ -2,11 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
-import {
-  AuthResponse,
-  JwtPayload,
-  RefreshTokenResponse
-} from "@repo/shared-types"
+import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -19,7 +15,7 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async signUp(createUserDto: CreateUserDto): Promise<AuthResponse> {
+  async signUp(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto)
     const tokens = await this.getTokens(
       user.id,
@@ -33,7 +29,7 @@ export class AuthService {
     return { ...tokens, user: userResponse }
   }
 
-  async login(loginDto: LoginUserDto): Promise<AuthResponse> {
+  async login(loginDto: LoginUserDto) {
     const user = await this.usersService.findOneByEmail(loginDto.email)
     if (!user) {
       throw new AuthError("존재하지 않는 이메일입니다.")
@@ -93,10 +89,7 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(
-    userId: number,
-    refreshToken: string
-  ): Promise<RefreshTokenResponse> {
+  async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
       throw new ForbiddenError("Access Denied")

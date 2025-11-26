@@ -5,10 +5,9 @@ import {
   HttpStatus,
   Post,
   Req,
-  Res,
   UseGuards
 } from "@nestjs/common"
-import { Request, Response } from "express"
+import { Request } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { AuthService } from "./auth.service"
@@ -22,22 +21,21 @@ export class AuthController {
   @Post("signup")
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() createUserDto: CreateUserDto) {
-    return await this.authService.signUp(createUserDto)
+    return this.authService.signUp(createUserDto)
   }
 
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authService.login(loginUserDto)
+    return this.authService.login(loginUserDto)
   }
 
   @Post("logout")
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request) {
     const { sub: userId } = req.user as { sub: number }
     await this.authService.logout(userId)
-    res.clearCookie("refresh_token", { path: "/" })
     return { message: "성공적으로 로그아웃되었습니다." }
   }
 
@@ -49,6 +47,6 @@ export class AuthController {
       sub: number
       refreshToken: string
     }
-    return await this.authService.refreshTokens(userId, refreshToken)
+    return this.authService.refreshTokens(userId, refreshToken)
   }
 }
