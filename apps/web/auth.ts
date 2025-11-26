@@ -68,13 +68,13 @@ const authOptions: NextAuthConfig = {
             generationId: parsedGenerationId,
             sessions: parsedSessions
           })
-          return await signup({ ...userInfo })
+          return signup({ ...userInfo })
         }
         const userInfo = await LoginUserSchema.parseAsync({
           email,
           password
         })
-        return await login({ ...userInfo })
+        return login({ ...userInfo })
       }
     })
   ],
@@ -145,7 +145,7 @@ const authOptions: NextAuthConfig = {
 const nextAuth = NextAuth(authOptions)
 
 export const handlers = nextAuth.handlers
-export const signIn = nextAuth.signIn
+export const signIn: typeof nextAuth.signIn = nextAuth.signIn
 export const signOut = nextAuth.signOut
 export const auth: () => Promise<Session | null> = nextAuth.auth
 
