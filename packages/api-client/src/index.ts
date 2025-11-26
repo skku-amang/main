@@ -1,10 +1,13 @@
 import {
   AuthResponse,
+  CreateEquipment,
   CreateGeneration,
   CreatePerformance,
   CreateSession,
   CreateTeam,
   CreateUser,
+  Equipment,
+  EquipmentWithRentalLog,
   GenerationDetail,
   GenerationList,
   LoginUser,
@@ -18,17 +21,17 @@ import {
   TeamApplication,
   TeamDetail,
   TeamList,
+  UpdateEquipment,
   UpdateGeneration,
   UpdatePerformance,
   UpdateSession,
   UpdateTeam,
   UpdateUser,
   User,
-  Equipment,
-  CreateEquipment,
-  UpdateEquipment,
-  EquipmentWithRentalLog
+  UserDetail,
+  UserList
 } from "@repo/shared-types"
+import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
 import {
   AccessTokenExpiredError,
@@ -53,7 +56,6 @@ import {
   UnprocessableEntityError,
   ValidationError
 } from "./errors"
-import { URLSearchParams } from "url"
 
 /**
  * 서버에서 plain object로 전달되는 에러를
@@ -644,7 +646,7 @@ export default class ApiClient {
    */
   public getUserById(id: number) {
     return this._request<
-      User,
+      UserDetail,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/users/${id}`, "GET")
   }
@@ -657,7 +659,7 @@ export default class ApiClient {
    */
   public getUsers() {
     return this._request<
-      User[],
+      UserList,
       AuthError | ForbiddenError | InternalServerError
     >(`/users`, "GET")
   }
