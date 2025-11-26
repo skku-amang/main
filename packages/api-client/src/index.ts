@@ -27,9 +27,7 @@ import {
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User,
-  UserDetail,
-  UserList
+  User
 } from "@repo/shared-types"
 import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
@@ -644,7 +642,7 @@ export default class ApiClient {
    */
   public getUserById(id: number) {
     return this._request<
-      UserDetail,
+      User,
       AuthError | ForbiddenError | NotFoundError | InternalServerError
     >(`/users/${id}`, "GET")
   }
@@ -657,7 +655,7 @@ export default class ApiClient {
    */
   public getUsers() {
     return this._request<
-      UserList,
+      User[],
       AuthError | ForbiddenError | InternalServerError
     >(`/users`, "GET")
   }
