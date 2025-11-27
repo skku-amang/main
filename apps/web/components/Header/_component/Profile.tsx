@@ -89,7 +89,7 @@ const Profile = () => {
         <MenuItem icon={<User size={iconSize} />} href={ROUTES.PROFILE.INDEX}>
           내 프로필
         </MenuItem>
-        <MenuItem icon={<Users size={iconSize} />} href="#">
+        <MenuItem icon={<Users size={iconSize} />} href={ROUTES.PROFILE.TEAMS}>
           참여 중인 팀
         </MenuItem>
 

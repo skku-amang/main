@@ -9,7 +9,7 @@ export const useUsers = createQueryHook(ApiClient.prototype.getUsers, () => [
 
 export const useUser = createQueryHook(
   ApiClient.prototype.getUserById,
-  (userId: number) => ["user", userId]
+  (userId: number | undefined) => ["user", userId]
 )
 
 export const useUpdateUser = createMutationHook(ApiClient.prototype.updateUser)
