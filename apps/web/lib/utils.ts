@@ -1,3 +1,4 @@
+import { SessionList } from "@repo/shared-types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -56,4 +57,15 @@ export function getRepresentativeRelativeTime(date: Date | string) {
   } else {
     return `${diffYears}년 전`
   }
+}
+
+export function getSessionIdBySessionName(
+  sessionName: string,
+  sessions: SessionList
+): number {
+  const session = sessions.find((s) => s.name === sessionName)
+  if (!session) {
+    throw new Error(`세션을 찾을 수 없습니다: ${sessionName}`)
+  }
+  return session.id
 }

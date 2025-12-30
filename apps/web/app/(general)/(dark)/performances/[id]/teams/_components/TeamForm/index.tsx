@@ -10,10 +10,12 @@ import { z } from "zod"
 import Loading from "@/app/_(errors)/Loading"
 import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
-import { Team } from "@repo/shared-types"
+import { cn, getSessionIdBySessionName } from "@/lib/utils"
+import { CreateTeam, TeamDetail, UpdateTeam } from "@repo/shared-types"
 
+import { useSessions } from "@/hooks/api/useSession"
 import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
+import { SessionName } from "@repo/database"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
 import SecondPage from "./SecondPage"
@@ -24,7 +26,7 @@ import {
 import ThirdPage from "./ThirdPage"
 
 interface TeamCreateFormProps {
-  initialData?: Team
+  initialData?: TeamDetail
   className?: string
 }
 
@@ -34,7 +36,10 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const router = useRouter()
   const { toast } = useToast()
 
+  const { data: sessions } = useSessions()
+
   const isCreate = !initialData?.id
+
   const {
     mutate: mutateTeamCreate,
     isError: isCreateError,
@@ -44,7 +49,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     mutate: mutateTeamUpdate,
     isError: isUpdateError,
     data: updateData
-  } = useUpdateTeam(initialData?.id as number)
+  } = useUpdateTeam()
   const isError = isCreateError || isUpdateError
   const data = createData || updateData
 
@@ -52,7 +57,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
     defaultValues: {
-      performanceId: initialData?.performance.id,
+      performanceId: initialData?.performanceId,
       songName: initialData?.songName,
       isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
@@ -76,90 +81,90 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   }
 
   // Second Page
-  function constructDefaultValues(initialData?: Team) {
+  function constructDefaultValues(initialData?: TeamDetail) {
     const defaultValues: {
       [key: string]: z.infer<ReturnType<typeof memberSessionRequiredField>>
     } = {
       보컬1: {
-        session: "보컬",
+        session: SessionName.VOCAL,
         required: false,
         member: null,
         index: 1
       },
       보컬2: {
-        session: "보컬",
+        session: SessionName.VOCAL,
         required: false,
         member: null,
         index: 2
       },
       보컬3: {
-        session: "보컬",
+        session: SessionName.VOCAL,
         required: false,
         member: null,
         index: 3
       },
       기타1: {
-        session: "기타",
+        session: SessionName.GUITAR,
         required: false,
         member: null,
         index: 1
       },
       기타2: {
-        session: "기타",
+        session: SessionName.GUITAR,
         required: false,
         member: null,
         index: 2
       },
       기타3: {
-        session: "기타",
+        session: SessionName.GUITAR,
         required: false,
         member: null,
         index: 3
       },
       베이스1: {
-        session: "베이스",
+        session: SessionName.BASS,
         required: false,
         member: null,
         index: 1
       },
       베이스2: {
-        session: "베이스",
+        session: SessionName.BASS,
         required: false,
         member: null,
         index: 2
       },
       드럼1: {
-        session: "드럼",
+        session: SessionName.DRUM,
         required: false,
         member: null,
         index: 1
       },
       신디1: {
-        session: "신디",
+        session: SessionName.SYNTH,
         required: false,
         member: null,
         index: 1
       },
       신디2: {
-        session: "신디",
+        session: SessionName.SYNTH,
         required: false,
         member: null,
         index: 2
       },
       신디3: {
-        session: "신디",
+        session: SessionName.SYNTH,
         required: false,
         member: null,
         index: 3
       },
       현악기1: {
-        session: "현악기",
+        session: SessionName.STRINGS,
         required: false,
         member: null,
         index: 1
       },
       관악기1: {
-        session: "관악기",
+        session: SessionName.WINDS,
         required: false,
         member: null,
         index: 1
@@ -169,17 +174,17 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     // Create: 디폴트 값 없음
     if (!initialData) return defaultValues
 
-    // Edit: 디폴트 값 존재
-    initialData.memberSessions?.forEach((ms) => {
-      ms.members.forEach((member, index) => {
-        const fieldName = `${ms.session}${index + 1}` as keyof z.infer<
+    // Edit: 디폴트 값 존재 (teamSessions 사용)
+    initialData.teamSessions?.forEach((ts) => {
+      ts.members.forEach((member) => {
+        const fieldName = `${ts.session.name}${member.index}` as keyof z.infer<
           typeof memberSessionRequiredBaseSchema
         >
         const fieldKey = defaultValues[fieldName]
         if (!fieldKey) return
         fieldKey.required = true
-        if (member) {
-          fieldKey.member = member.id
+        if (member.user) {
+          fieldKey.member = member.user.id
         }
       })
     })
@@ -211,37 +216,94 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   async function onThirdPageValid(
     secondPageFormData: z.infer<typeof memberSessionRequiredBaseSchema>
   ) {
-    const memberSessionData: { [key: string]: (number | null)[] } = {}
-    Object.values(secondPageFormData).map((ms) => {
+    // 세션 이름별로 멤버들을 그룹화
+    const memberSessionData: {
+      [sessionName: string]: { userId: number; index: number }[]
+    } = {}
+
+    Object.values(secondPageFormData).forEach((ms) => {
       if (!ms.required) return
       if (!(ms.session in memberSessionData)) {
         memberSessionData[ms.session] = []
       }
-      memberSessionData[ms.session][ms.index - 1] = ms.member
+      if (ms.member !== null) {
+        memberSessionData[ms.session]!.push({
+          userId: ms.member,
+          index: ms.index
+        })
+      }
     })
-    const memberSessions = Object.entries(memberSessionData).map(
-      ([session, membersId]) => ({ session, membersId })
-    )
 
-    const allFormData = {
-      performanceId: firstPageForm.getValues("performanceId"),
-      songName: firstPageForm.getValues("songName"),
-      songArtist: firstPageForm.getValues("songArtist"),
-      memberSessions,
-      description: firstPageForm.getValues("description"),
-      songYoutubeVideoUrl: firstPageForm.getValues("songYoutubeVideoUrl"),
-      posterImage: firstPageForm.getValues("posterImage"),
-      isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed"),
-      isSelfMade: firstPageForm.getValues("isSelfMade")
+    // 서버에서 세션 목록 가져왔는지 확인
+    if (!sessions) {
+      toast({
+        title: "오류",
+        description:
+          "세션 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    // CreateTeam/UpdateTeam 형식으로 변환
+    const memberSessions: CreateTeam["memberSessions"] = Object.entries(
+      memberSessionData
+    ).map(([sessionName, members]) => {
+      if (!sessionName) {
+        throw new Error(`세션을 찾을 수 없습니다: ${sessionName}`)
+      }
+      // capacity는 해당 세션의 멤버 수 (required로 표시된 슬롯 수)
+      const capacity = Object.values(secondPageFormData).filter(
+        (ms) => ms.session === sessionName && ms.required
+      ).length
+      return {
+        sessionId: getSessionIdBySessionName(sessionName, sessions),
+        capacity,
+        members
+      }
+    })
+
+    const userId = session?.data?.user?.id
+    if (!userId) {
+      toast({
+        title: "오류",
+        description: "로그인이 필요합니다.",
+        variant: "destructive"
+      })
+      return
     }
 
     if (isCreate) {
-      mutateTeamCreate({
-        performanceId: allFormData.performanceId,
-        teamData: allFormData
-      })
+      const createData: CreateTeam = {
+        name: firstPageForm.getValues("songName"),
+        leaderId: Number(userId),
+        performanceId: firstPageForm.getValues("performanceId"),
+        songName: firstPageForm.getValues("songName"),
+        songArtist: firstPageForm.getValues("songArtist"),
+        memberSessions,
+        description: firstPageForm.getValues("description") || null,
+        songYoutubeVideoUrl:
+          firstPageForm.getValues("songYoutubeVideoUrl") || null,
+        posterImage: firstPageForm.getValues("posterImage") || null,
+        isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
+        isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
+      }
+      mutateTeamCreate(createData)
     } else {
-      mutateTeamUpdate(allFormData)
+      const updateData: UpdateTeam = {
+        name: initialData.name,
+        leaderId: initialData.leaderId,
+        songName: firstPageForm.getValues("songName"),
+        songArtist: firstPageForm.getValues("songArtist"),
+        memberSessions,
+        description: firstPageForm.getValues("description") || null,
+        songYoutubeVideoUrl:
+          firstPageForm.getValues("songYoutubeVideoUrl") || null,
+        posterImage: firstPageForm.getValues("posterImage") || null,
+        isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
+        isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
+      }
+      mutateTeamUpdate(initialData.id, updateData)
     }
 
     if (isError || !data) {
@@ -254,9 +316,11 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       })
       return
     }
-    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performance.id, data.id))
+    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
   }
-  function onThirdPageInvalid(errors: FieldErrors<z.infer<any>>) {
+  function onThirdPageInvalid(
+    errors: FieldErrors<z.infer<typeof memberSessionRequiredBaseSchema>>
+  ) {
     console.warn("FormInvalid:", errors)
   }
 
@@ -275,7 +339,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
               ? () =>
                   router.push(
                     ROUTES.PERFORMANCE.TEAM.DETAIL(
-                      initialData.performance.id,
+                      initialData.performanceId,
                       initialData.id
                     )
                   )
