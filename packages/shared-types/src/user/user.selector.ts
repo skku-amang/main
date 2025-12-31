@@ -9,5 +9,8 @@ export const basicUserSelector = {
 export const publicUserSelector = {
   ...basicUserSelector,
   nickname: true,
-  bio: true
+  bio: true,
+  generation: {
+    select: { order: true }
+  }
 } satisfies Prisma.UserSelect
