@@ -25,36 +25,46 @@ export class RentalService {
     if (existingRental)
       throw new ConflictError("해당 시간에 이미 예약된 장비입니다.")
 
-    return this.prisma.equipmentRental.create({
-      data: {
-        startAt,
-        endAt,
-        title,
-        equipment: {
-          connect: {
-            id: equipmentId
+    try {
+      return await this.prisma.equipmentRental.create({
+        data: {
+          startAt,
+          endAt,
+          title,
+          equipment: {
+            connect: {
+              id: equipmentId
+            }
+          },
+          users: {
+            connect: userIds.map((userId) => ({ id: userId }))
           }
         },
-        users: {
-          connect: userIds.map((userId) => ({ id: userId }))
-        }
-      },
-      include: {
-        equipment: true,
-        users: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            nickname: true,
-            bio: true,
-            generation: {
-              select: { order: true }
+        include: {
+          equipment: true,
+          users: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              nickname: true,
+              bio: true,
+              generation: {
+                select: { order: true }
+              }
             }
           }
         }
+      })
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2003" || err.code === "P2025")
+          throw new UnprocessableEntityError(
+            "존재하지 않는 장비 또는 유저 ID가 포함되어 있습니다."
+          )
       }
-    })
+      throw err
+    }
   }
 
   async findAll(
