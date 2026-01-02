@@ -116,7 +116,18 @@ export class RentalService {
       where: { id },
       include: {
         equipment: true,
-        users: true
+        users: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            nickname: true,
+            bio: true,
+            generation: {
+              select: { order: true }
+            }
+          }
+        }
       }
     })
 
@@ -178,7 +189,18 @@ export class RentalService {
         },
         include: {
           equipment: true,
-          users: true
+          users: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              nickname: true,
+              bio: true,
+              generation: {
+                select: { order: true }
+              }
+            }
+          }
         }
       })
     } catch (err) {
