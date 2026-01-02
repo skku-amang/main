@@ -11,4 +11,4 @@ export const GetRentalsQuerySchema = z.object({
   to: z.coerce.date().optional()
 })
 
-export type GetRentalQuery = z.infer<typeof GetRentalsQuerySchema>
+export type GetRentalsQuery = z.infer<typeof GetRentalsQuerySchema>
