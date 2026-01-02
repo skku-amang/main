@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common"
 import { CreateRentalDto } from "./dto/create-rental.dto"
 import { UpdateRentalDto } from "./dto/update-rental.dto"
 import { PrismaService } from "../prisma/prisma.service"
-import { ConflictError, NotFoundError } from "@repo/api-client"
+import {
+  ConflictError,
+  NotFoundError,
+  UnprocessableEntityError
+} from "@repo/api-client"
 import { Prisma } from "@repo/database"
 
 @Injectable()
@@ -158,24 +162,36 @@ export class RentalService {
         throw new ConflictError("해당 시간에 이미 예약된 장비입니다.")
     }
 
-    return this.prisma.equipmentRental.update({
-      where: { id },
-      data: {
-        title: updateRentalDto.title,
-        startAt: updateRentalDto.startAt,
-        endAt: updateRentalDto.endAt,
-        equipmentId: newEquipmentID,
-        users: updateRentalDto.userIds
-          ? {
-              set: updateRentalDto.userIds.map((userId) => ({ id: userId }))
-            }
-          : undefined
-      },
-      include: {
-        equipment: true,
-        users: true
+    try {
+      return await this.prisma.equipmentRental.update({
+        where: { id },
+        data: {
+          title: updateRentalDto.title,
+          startAt: updateRentalDto.startAt,
+          endAt: updateRentalDto.endAt,
+          equipmentId: newEquipmentID,
+          users: updateRentalDto.userIds
+            ? {
+                set: updateRentalDto.userIds.map((userId) => ({ id: userId }))
+              }
+            : undefined
+        },
+        include: {
+          equipment: true,
+          users: true
+        }
+      })
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2003" || err.code === "P2025") {
+          throw new UnprocessableEntityError(
+            "존재하지 않는 장비 또는 유저 ID가 포함되어 있습니다."
+          )
+        }
       }
-    })
+
+      throw err
+    }
   }
 
   async remove(id: number) {
