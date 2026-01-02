@@ -1,4 +1,4 @@
-import { PartialType } from "@nestjs/mapped-types"
-import { CreateRentalDto } from "./create-rental.dto"
+import { createZodDto } from "nestjs-zod"
+import { UpdateRentalSchema } from "@repo/shared-types"
 
-export class UpdateRentalDto extends PartialType(CreateRentalDto) {}
+export class UpdateRentalDto extends createZodDto(UpdateRentalSchema) {}
