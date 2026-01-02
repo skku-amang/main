@@ -18,11 +18,10 @@ export const RentalSchema = z.object({
   }),
   userIds: z
     .array(z.number().int().positive())
-    .min(0)
+    .min(1)
     .refine((users) => new Set(users).size === users.length, {
       message: "중복된 유저 ID가 포함되어 있습니다."
     })
-    .optional()
 })
 
 /**
