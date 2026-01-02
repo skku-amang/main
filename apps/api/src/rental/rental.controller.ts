@@ -16,6 +16,7 @@ import { UpdateRentalDto } from "./dto/update-rental.dto"
 import { GetRentalQueryDto } from "./dto/get-rentals-query.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { Public } from "../auth/decorators/public.decorator"
+import { RentalOwnerGuard } from "../auth/guards/rental-owner.guard"
 
 @Controller("rentals")
 @UseGuards(AccessTokenGuard)
@@ -45,6 +46,7 @@ export class RentalController {
   }
 
   @Patch(":id")
+  @UseGuards(RentalOwnerGuard)
   update(
     @Param("id", ParseIntPipe) id: number,
     @Body() updateRentalDto: UpdateRentalDto
@@ -53,6 +55,7 @@ export class RentalController {
   }
 
   @Delete(":id")
+  @UseGuards(RentalOwnerGuard)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.rentalService.remove(id)
   }
