@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
-  ParseIntPipe
+  ParseIntPipe,
+  Query
 } from "@nestjs/common"
 import { RentalService } from "./rental.service"
 import { CreateRentalDto } from "./dto/create-rental.dto"
 import { UpdateRentalDto } from "./dto/update-rental.dto"
+import { GetRentalQueryDto } from "./dto/get-rentals-query.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { Public } from "../auth/decorators/public.decorator"
 
@@ -27,8 +29,13 @@ export class RentalController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.rentalService.findAll()
+  findAll(@Query() query: GetRentalQueryDto) {
+    return this.rentalService.findAll(
+      query.type,
+      query.equipmentId,
+      query.from,
+      query.to
+    )
   }
 
   @Get(":id")
