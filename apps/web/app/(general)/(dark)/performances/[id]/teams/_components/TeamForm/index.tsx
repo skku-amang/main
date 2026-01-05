@@ -16,6 +16,7 @@ import { CreateTeam, TeamDetail, UpdateTeam } from "@repo/shared-types"
 import { useSessions } from "@/hooks/api/useSession"
 import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import { SessionName } from "@repo/database"
+import { useQueryClient } from "@tanstack/react-query"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
 import SecondPage from "./SecondPage"
@@ -37,6 +38,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const { toast } = useToast()
 
   const { data: sessions } = useSessions()
+  const queryClient = useQueryClient()
 
   const isCreate = !initialData?.id
 
@@ -54,6 +56,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   })
   const { mutate: mutateTeamUpdate } = useUpdateTeam({
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["team", data.id] })
       router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
     },
     onError: () => {
