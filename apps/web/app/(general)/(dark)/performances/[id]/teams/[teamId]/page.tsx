@@ -78,13 +78,14 @@ const TeamDetail = (props: TeamDetailProps) => {
 
       {/*수정 및 삭제 (모바일)*/}
       {session.data &&
-        (session.data.isAdmin ||
-          (session.data.id && +session.data.id === team.leaderId)) && (
+        (session.data.user.isAdmin ||
+          (session.data.user.id &&
+            +session.data.user.id === team.leaderId)) && (
           <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
             <DeleteEditButton
               performanceId={performanceId}
               team={team}
-              accessToken={session.data?.access}
+              accessToken={session.data?.accessToken}
             />
           </div>
         )}
@@ -111,31 +112,24 @@ const TeamDetail = (props: TeamDetailProps) => {
         {/* 세션 구성 */}
         <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
           {/* 세션 구성 */}
-          {team.memberSessions && (
+          {team.teamSessions && (
             <SessionSetCard
               header="세션구성"
               className="h-fit bg-white shadow-md"
             >
               <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">
-                {team.memberSessions
-                  .sort((a, b) => {
+                {team.teamSessions.map((ts) =>
+                  ts.members.map((member) => {
+                    const sessionWithIndex = `${ts.session.name}${member.index}`
                     return (
-                      SessionOrder.indexOf(a.session) -
-                      SessionOrder.indexOf(b.session)
+                      <SessionBadge
+                        key={sessionWithIndex}
+                        session={sessionWithIndex}
+                        className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
+                      />
                     )
                   })
-                  .map((ms) =>
-                    ms.members.map((_, index) => {
-                      const sessionWithIndex = `${ms.session}${index + 1}`
-                      return (
-                        <SessionBadge
-                          key={sessionWithIndex}
-                          session={sessionWithIndex}
-                          className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
-                        />
-                      )
-                    })
-                  )}
+                )}
               </div>
             </SessionSetCard>
           )}

@@ -33,7 +33,7 @@ const TeamDeleteButton = ({
   const deleteTeam = useDeleteTeam()
 
   const onDelete = async () => {
-    const res = await deleteTeam.mutateAsync(teamId)
+    const res = await deleteTeam.mutateAsync([teamId])
     if (res) {
       setIsOpen(false)
       router.push(redirectUrl)
