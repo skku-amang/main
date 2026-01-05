@@ -4,11 +4,6 @@ import { Image, PencilLine, Trash2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 
-import {
-  getMissingIndices,
-  TeamFromList,
-  TeamSessionFromList
-} from "@/app/(general)/(light)/performances/[id]/teams/_utils/teamSession"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -17,6 +12,11 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
+import {
+  getMissingIndices,
+  TeamFromList,
+  TeamSessionFromList
+} from "@/lib/team/teamSession"
 
 interface TeamCardProps {
   performanceId: number

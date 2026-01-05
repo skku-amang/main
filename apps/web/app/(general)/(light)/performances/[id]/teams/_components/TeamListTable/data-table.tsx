@@ -29,10 +29,6 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
-import {
-  getSessionsWithMissingMembers,
-  isTeamSatisfied
-} from "@/app/(general)/(light)/performances/[id]/teams/_utils/teamSession"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,6 +38,10 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import {
+  getSessionsWithMissingMembers,
+  isTeamSatisfied
+} from "@/lib/team/teamSession"
 import { Performance } from "@repo/shared-types"
 
 import {

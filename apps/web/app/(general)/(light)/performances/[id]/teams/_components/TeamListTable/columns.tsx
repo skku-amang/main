@@ -14,11 +14,6 @@ import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
-import {
-  getMissingIndices,
-  isTeamSatisfied,
-  TeamFromList
-} from "@/app/(general)/(light)/performances/[id]/teams/_utils/teamSession"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -31,6 +26,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import {
+  getMissingIndices,
+  isTeamSatisfied,
+  TeamFromList
+} from "@/lib/team/teamSession"
 import YoutubeVideo from "@/lib/youtube"
 
 export type TeamColumn = TeamFromList
