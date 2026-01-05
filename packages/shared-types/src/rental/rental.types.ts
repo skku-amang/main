@@ -10,6 +10,9 @@ export const rentalLogWithUserInlcude = {
   }
 } satisfies Prisma.EquipmentRentalInclude
 
-export type RentalLogWithUsers = Prisma.EquipmentRentalGetPayload<{
+type RentalLogWithUsers = Prisma.EquipmentRentalGetPayload<{
   include: typeof rentalLogWithUserInlcude
 }>
+
+export type RentalList = RentalLogWithUsers[]
+export type RentalDetail = RentalLogWithUsers
