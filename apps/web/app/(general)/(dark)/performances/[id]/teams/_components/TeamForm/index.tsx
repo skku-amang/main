@@ -40,18 +40,30 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
 
   const isCreate = !initialData?.id
 
-  const {
-    mutate: mutateTeamCreate,
-    isError: isCreateError,
-    data: createData
-  } = useCreateTeam()
-  const {
-    mutate: mutateTeamUpdate,
-    isError: isUpdateError,
-    data: updateData
-  } = useUpdateTeam()
-  const isError = isCreateError || isUpdateError
-  const data = createData || updateData
+  const { mutate: mutateTeamCreate } = useCreateTeam({
+    onSuccess: (data) => {
+      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+    },
+    onError: () => {
+      toast({
+        title: "오류",
+        description: "팀 생성 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
+  const { mutate: mutateTeamUpdate } = useUpdateTeam({
+    onSuccess: (data) => {
+      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+    },
+    onError: () => {
+      toast({
+        title: "오류",
+        description: "팀 수정 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
@@ -333,18 +345,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       }
       mutateTeamUpdate([initialData.id, updateData])
     }
-
-    if (isError || !data) {
-      toast({
-        title: "오류",
-        description: isCreate
-          ? "팀 생성 중 오류가 발생했습니다."
-          : "팀 수정 중 오류가 발생했습니다.",
-        variant: "destructive"
-      })
-      return
-    }
-    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
   }
   function onThirdPageInvalid(
     errors: FieldErrors<z.infer<typeof memberSessionRequiredBaseSchema>>
