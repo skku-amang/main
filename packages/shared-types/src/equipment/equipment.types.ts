@@ -6,6 +6,9 @@ export const equipmentWithRentalLogInclude = {
   rentalLogs: true
 } satisfies Prisma.EquipmentInclude
 
-export type EquipmentWithRentalLog = Prisma.EquipmentGetPayload<{
+type EquipmentWithRentalLog = Prisma.EquipmentGetPayload<{
   include: typeof equipmentWithRentalLogInclude
 }>
+
+export type RentalList = EquipmentWithRentalLog[]
+export type RentalDetail = EquipmentWithRentalLog
