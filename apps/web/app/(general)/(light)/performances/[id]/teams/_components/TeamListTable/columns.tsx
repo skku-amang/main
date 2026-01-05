@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import {
   getMissingIndices,
   isTeamSatisfied,
@@ -161,7 +162,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
             return missingIndices.map((index) => (
               <SessionBadge
                 key={`${ts.session.name}-${index}`}
-                session={`${ts.session.name}${index}`}
+                session={`${getSessionDisplayName(ts.session.name)}${index}`}
               />
             ))
           })}

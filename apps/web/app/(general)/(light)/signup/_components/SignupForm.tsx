@@ -29,6 +29,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import {
@@ -303,7 +304,7 @@ const SignupForm = () => {
                             />
                           </FormControl>
                           <FormLabel className="font-normal">
-                            {session.name}
+                            {getSessionDisplayName(session.name)}
                           </FormLabel>
                         </FormItem>
                       )

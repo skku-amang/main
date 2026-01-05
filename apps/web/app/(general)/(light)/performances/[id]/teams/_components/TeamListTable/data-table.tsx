@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
@@ -143,7 +144,9 @@ const reducer = (state: State, action: Action) => {
             if ((filterValues as Set<string>).size === 0) return true
             return getSessionsWithMissingMembers(team.teamSessions).some(
               (ts) => {
-                return (filterValues as Set<string>).has(ts.session.name)
+                return (filterValues as Set<string>).has(
+                  getSessionDisplayName(ts.session.name)
+                )
               }
             )
           default:

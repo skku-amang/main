@@ -6,6 +6,7 @@ import React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { getSessionDisplayName } from "@/constants/session"
 import { formatGenerationOrder } from "@/lib/utils"
 import { Session, User } from "@repo/shared-types"
 
@@ -29,7 +30,9 @@ const SortButton = ({
 
 const SessionBadge = ({ session }: { session: Session }) => {
   return (
-    <Badge className="rounded-lg bg-slate-200 text-black">{session.name}</Badge>
+    <Badge className="rounded-lg bg-slate-200 text-black">
+      {getSessionDisplayName(session.name)}
+    </Badge>
   )
 }
 
