@@ -8,6 +8,7 @@ import {
   UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
+import { rentalLogWithUserInlcude } from "@repo/shared-types"
 
 @Injectable()
 export class RentalService {
@@ -40,21 +41,7 @@ export class RentalService {
             connect: userIds.map((userId) => ({ id: userId }))
           }
         },
-        include: {
-          equipment: true,
-          users: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-              nickname: true,
-              bio: true,
-              generation: {
-                select: { order: true }
-              }
-            }
-          }
-        }
+        include: rentalLogWithUserInlcude
       })
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -100,21 +87,7 @@ export class RentalService {
 
     return this.prisma.equipmentRental.findMany({
       where: where,
-      include: {
-        equipment: true,
-        users: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            nickname: true,
-            bio: true,
-            generation: {
-              select: { order: true }
-            }
-          }
-        }
-      },
+      include: rentalLogWithUserInlcude,
       orderBy: {
         startAt: "asc"
       }
@@ -124,21 +97,7 @@ export class RentalService {
   async findOne(id: number) {
     const rentalLog = await this.prisma.equipmentRental.findUnique({
       where: { id },
-      include: {
-        equipment: true,
-        users: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            nickname: true,
-            bio: true,
-            generation: {
-              select: { order: true }
-            }
-          }
-        }
-      }
+      include: rentalLogWithUserInlcudes
     })
 
     if (!rentalLog)
@@ -197,21 +156,7 @@ export class RentalService {
               }
             : undefined
         },
-        include: {
-          equipment: true,
-          users: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-              nickname: true,
-              bio: true,
-              generation: {
-                select: { order: true }
-              }
-            }
-          }
-        }
+        include: rentalLogWithUserInlcude
       })
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
