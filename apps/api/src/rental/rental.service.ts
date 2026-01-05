@@ -97,7 +97,7 @@ export class RentalService {
   async findOne(id: number) {
     const rentalLog = await this.prisma.equipmentRental.findUnique({
       where: { id },
-      include: rentalLogWithUserInlcudes
+      include: rentalLogWithUserInlcude
     })
 
     if (!rentalLog)
