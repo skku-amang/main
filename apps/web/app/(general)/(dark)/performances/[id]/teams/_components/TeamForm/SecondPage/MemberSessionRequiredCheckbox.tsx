@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import z from "zod"
 
@@ -20,9 +19,9 @@ const MemberSessionRequiredCheckbox = ({
 }: CheckboxFieldProps) => {
   const requiredFieldName = `${fieldName}.required` as any
   const memberFieldName = `${fieldName}.member` as any
-  const [checked, setChecked] = useState<boolean>(
-    secondPageForm.getValues(requiredFieldName)
-  )
+
+  // watch를 사용하여 폼 값 변경을 실시간으로 반영
+  const checked = secondPageForm.watch(requiredFieldName)
 
   return (
     <div className="flex items-center gap-x-2">
@@ -33,7 +32,6 @@ const MemberSessionRequiredCheckbox = ({
         onCheckedChange={(e) => {
           secondPageForm.setValue(requiredFieldName, !!e)
           secondPageForm.setValue(memberFieldName, null)
-          setChecked(!!e)
         }}
         checked={checked}
       />
