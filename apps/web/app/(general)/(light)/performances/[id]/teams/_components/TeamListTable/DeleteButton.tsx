@@ -13,7 +13,7 @@ const DeleteButton = ({ children, className, teamId }: DeleteButtonProps) => {
   const { mutateAsync, error, isError } = useDeleteTeam()
 
   const onDelete = async () => {
-    await mutateAsync(teamId)
+    await mutateAsync([teamId])
     if (isError) {
       console.error("팀 삭제 오류:", error)
       alert("팀 삭제에 실패했습니다. 다시 시도해주세요.")

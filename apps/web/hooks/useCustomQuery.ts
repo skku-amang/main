@@ -98,7 +98,7 @@ export function createMutationHook<
   type TRawData = ApiSuccessType<TApiFn>
   type TData = TMappedData
   type TError = ApiErrorType<TApiFn>
-  type TVariables = Parameters<TApiFn>[0]
+  type TVariables = Parameters<TApiFn>
 
   return (
     options?: Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn">
@@ -107,7 +107,7 @@ export function createMutationHook<
 
     return useMutation<TData, TError, TVariables>({
       mutationFn: async (variables: TVariables) => {
-        const rawData = (await apiFn.bind(apiClient)(variables)) as TRawData
+        const rawData = (await apiFn.bind(apiClient)(...variables)) as TRawData
         return mapper ? mapper(rawData) : (rawData as unknown as TData)
       },
       ...options

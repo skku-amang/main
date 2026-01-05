@@ -1,13 +1,17 @@
-import { PerformanceTeamsList } from "@repo/shared-types"
+import { PerformanceTeamsList, TeamDetail } from "@repo/shared-types"
 
 // PerformanceTeamsList의 단일 팀 타입
 export type TeamFromList = PerformanceTeamsList[number]
 
-// 팀의 teamSessions 타입
+// 팀의 teamSessions 타입 (TeamFromList와 TeamDetail 모두 호환)
 export type TeamSessionFromList = TeamFromList["teamSessions"][number]
+export type TeamSessionFromDetail = TeamDetail["teamSessions"][number]
 
 // teamSession의 member 타입
 export type TeamSessionMember = TeamSessionFromList["members"][number]
+
+// 공통 타입 (두 타입이 동일한 구조를 가지므로 TeamSessionFromList 사용)
+export type TeamSession = TeamSessionFromList
 
 /**
  * 팀의 모든 세션이 정원을 충족했는지 확인

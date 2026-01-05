@@ -288,7 +288,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }
-      mutateTeamCreate(createData)
+      mutateTeamCreate([createData])
     } else {
       const updateData: UpdateTeam = {
         name: initialData.name,
@@ -303,7 +303,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }
-      mutateTeamUpdate(initialData.id, updateData)
+      mutateTeamUpdate([initialData.id, updateData])
     }
 
     if (isError || !data) {

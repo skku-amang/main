@@ -34,7 +34,7 @@ const PerformanceForm = () => {
 
   async function onSubmit(formData: z.infer<typeof CreatePerformanceSchema>) {
     formData.posterImage = formData.posterImage || undefined
-    mutate(formData)
+    mutate([formData])
 
     if (isError || data === undefined) {
       toast({

@@ -6,11 +6,11 @@ import Link from "next/link"
 import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { Team } from "@repo/shared-types"
+import { TeamDetail } from "@repo/shared-types"
 
 interface DeleteEditButtonProps {
   performanceId: number
-  team: Team
+  team: TeamDetail
   className?: string
   accessToken?: string
 }
@@ -22,7 +22,7 @@ const DeleteEditButton = ({ team, className }: DeleteEditButtonProps) => {
       <Button asChild variant="outline" className="px-2 py-1 shadow">
         <Link
           className="text-white hover:animate-none"
-          href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performance.id, team.id)}
+          href={ROUTES.PERFORMANCE.TEAM.EDIT(team.performanceId, team.id)}
         >
           <Edit3 strokeWidth={1} size={20} className="text-gray-600" />
         </Link>
@@ -31,7 +31,7 @@ const DeleteEditButton = ({ team, className }: DeleteEditButtonProps) => {
       {/* 삭제 버튼 */}
       <TeamDeleteButton
         teamId={team.id}
-        redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(team.performance.id)}
+        redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(team.performanceId)}
       >
         <div className="rounded-md border p-2 shadow transition-colors hover:bg-accent">
           <Trash2 strokeWidth={1} size={20} className="text-gray-600" />

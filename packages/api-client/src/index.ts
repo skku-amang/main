@@ -425,7 +425,7 @@ export default class ApiClient {
       | DuplicateApplicationError
       | PositionOccupiedError
       | InternalServerError
-    >(`/teams/${teamId}/apply`, "POST", teamApplicationData)
+    >(`/teams/${teamId}/apply`, "PATCH", teamApplicationData)
   }
 
   /**
@@ -447,7 +447,7 @@ export default class ApiClient {
       | NoApplicationFoundError
       | ForbiddenError
       | InternalServerError
-    >(`/teams/${teamId}/unapply`, "POST", teamApplicationData)
+    >(`/teams/${teamId}/unapply`, "PATCH", teamApplicationData)
   }
 
   /**

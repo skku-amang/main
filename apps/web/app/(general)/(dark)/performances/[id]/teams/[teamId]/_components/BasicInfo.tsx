@@ -2,18 +2,16 @@ import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[te
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  formatGenerationOrder,
-  getRepresentativeRelativeTime
-} from "@/lib/utils"
-import { MemberSessionSet, Team } from "@repo/shared-types"
+import { isTeamSatisfied } from "@/lib/team/teamSession"
+import { getRepresentativeRelativeTime } from "@/lib/utils"
+import { TeamDetail } from "@repo/shared-types"
 
 interface BasicInfoProps {
-  team: Team
+  team: TeamDetail
 }
 
 const BasicInfo = ({ team }: BasicInfoProps) => {
-  const memberSessionSet = new MemberSessionSet(team.memberSessions ?? [])
+  const isSatisfied = isTeamSatisfied(team.teamSessions ?? [])
 
   return (
     <div className="relative h-fit w-full rounded-2xl bg-white px-10 py-14 text-lg font-semibold shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
@@ -35,11 +33,10 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
       {/* 팀장 */}
       <div className="mb-6 flex items-center justify-start gap-x-[8px] md:mb-[24px] md:gap-x-[10px]">
         <Avatar className="h-[24px] w-[24px] md:h-[48px] md:w-[48px]">
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={team.leader?.image ?? undefined} />
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
         <div className="text-xs font-medium leading-3 text-primary md:text-base">
-          {formatGenerationOrder(team.leader.generation.order)}기&nbsp;
           {team.leader.name}
         </div>
         <div className=" text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
@@ -54,7 +51,7 @@ const BasicInfo = ({ team }: BasicInfoProps) => {
             {team.songName}
           </h3>
           <StatusBadge
-            status={memberSessionSet.isSatisfied ? "Inactive" : "Active"}
+            status={isSatisfied ? "Inactive" : "Active"}
             className="mb-1 h-5 w-20 justify-center max-sm:text-xs md:h-[32px] md:w-[130px]"
           />
         </div>
