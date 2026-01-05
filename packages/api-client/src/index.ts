@@ -117,6 +117,8 @@ export type PromiseWithError<T, TError> = Promise<T> & {
 export default class ApiClient {
   private static instance: ApiClient | null = null
   private accessToken: string | null = null
+  private onTokenExpired: (() => Promise<string | null>) | null = null
+  private refreshPromise: Promise<string | null> | null = null
 
   constructor(private baseUrl: string) {}
 
@@ -144,15 +146,24 @@ export default class ApiClient {
   }
 
   /**
+   * 토큰이 만료되었을 때 호출할 콜백을 설정합니다.
+   * 콜백은 새로운 액세스 토큰을 반환하거나, 갱신에 실패하면 null을 반환해야 합니다.
+   * @param handler 토큰 만료 핸들러
+   */
+  public setOnTokenExpired(handler: () => Promise<string | null>): void {
+    this.onTokenExpired = handler
+  }
+
+  /**
    * 내부 API 요청 헬퍼 메소드
    */
-  private _request<T, E extends ProblemDocument>(
+  private async _request<T, E extends ProblemDocument>(
     endpoint: string, // 예: "/posts", "/projects/1" (항상 '/'로 시작 가정)
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any,
     headers?: Record<string, string>
-  ): PromiseWithError<T, E> {
+  ): Promise<PromiseWithError<T, E>> {
     const options: RequestInit = {
       method,
       headers: {
@@ -180,18 +191,47 @@ export default class ApiClient {
       }
     }
 
-    const promise = fetch(`${this.baseUrl}${endpoint}`, options).then(
-      async (response) => {
-        const data = (await response.json()) as ApiResult<T>
-        if (data.isSuccess) {
-          return data.data
-        }
-        throw createErrorFromProblemDocument(data.error as ApiError)
-      }
-    )
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, options)
+      const data = (await response.json()) as ApiResult<T>
 
-    // 타입스크립트가 타입을 올바르게 추론하도록 명시적 캐스팅
-    return promise as PromiseWithError<T, E>
+      if (data.isSuccess) {
+        return data.data as T
+      }
+
+      const error = createErrorFromProblemDocument(
+        data.error as ProblemDocument
+      )
+
+      // 액세스 토큰이 만료되었고 핸들러가 등록되어 있는 경우 갱신 시도
+      if (error instanceof AccessTokenExpiredError && this.onTokenExpired) {
+        // 여러 요청이 동시에 만료되었을 때 한 번만 갱신하도록 promise 공유
+        if (!this.refreshPromise) {
+          this.refreshPromise = this.onTokenExpired().finally(() => {
+            this.refreshPromise = null
+          })
+        }
+
+        const newToken = await this.refreshPromise
+
+        if (newToken) {
+          this.setAccessToken(newToken)
+          // 새로운 토큰으로 재시도
+          return this._request<T, E>(endpoint, method, body, headers)
+        }
+      }
+
+      throw error
+    } catch (error) {
+      // 이미 ApiError인 경우 그대로 던짐
+      if (error instanceof ApiError) {
+        throw error
+      }
+      // 그 외의 경우 InternalServerError로 래핑 (네트워크 오류 등)
+      throw new InternalServerError(
+        error instanceof Error ? error.message : "Unknown error"
+      )
+    }
   }
 
   /**

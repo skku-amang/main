@@ -47,5 +47,6 @@ interface AuthExtras {
 interface AuthTokens {
   accessToken: string
   refreshToken: string // 파싱 되어 Session이 아니라 JWT에만 저장됨
-  expiresIn: number
+  expiresIn: number // 만료 시점 (Timestamp, ms)
+  error?: "RefreshAccessTokenError"
 }

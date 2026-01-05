@@ -21,12 +21,20 @@ export const useApiClient = () => {
 }
 
 export const ApiClientProvider = ({ children }: { children: ReactNode }) => {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
 
   // 세션의 accessToken이 변경될 때마다 토큰만 업데이트
   useEffect(() => {
     apiClient.setAccessToken(session?.accessToken ?? null)
   }, [session?.accessToken])
+
+  // 토큰 만료 시 세션 갱신 핸들러 설정
+  useEffect(() => {
+    apiClient.setOnTokenExpired(async () => {
+      const newSession = await update()
+      return newSession?.accessToken ?? null
+    })
+  }, [update])
 
   return (
     <ApiClientContext.Provider value={apiClient}>

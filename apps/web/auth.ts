@@ -1,6 +1,5 @@
 import type { Session } from "next-auth"
 import NextAuth, { NextAuthConfig, User } from "next-auth"
-import { type JWT } from "next-auth/jwt"
 import Credentials from "next-auth/providers/credentials"
 
 import { apiClient } from "@/lib/apiClient"
@@ -99,22 +98,28 @@ const authOptions: NextAuthConfig = {
           // 토큰 정보 복사
           accessToken: user.accessToken,
           refreshToken: user.refreshToken,
-          expiresIn: user.expiresIn
-        } as JWT
+          expiresIn: Date.now() + (user.expiresIn as number) * 1000
+        }
       }
 
-      // 만료 체크 및 갱신
-      if (token.exp && Date.now() < token.exp * 1000) {
+      // 백엔드 액세스 토큰 만료 여부 확인 (여유 시간 10초)
+      if (token.expiresIn && Date.now() < (token.expiresIn as number) - 10000) {
         return token
       }
 
-      const { accessToken, expiresIn } = await refreshAccessToken(
-        token?.refreshToken
-      )
-      return {
-        ...token,
-        accessToken,
-        expiresIn
+      // 토큰 갱신 시도
+      try {
+        const { accessToken, expiresIn } = await refreshAccessToken(
+          token?.refreshToken as string
+        )
+        return {
+          ...token,
+          accessToken,
+          expiresIn: Date.now() + expiresIn * 1000
+        }
+      } catch (error) {
+        console.error("Error refreshing access token", error)
+        return { ...token, error: "RefreshAccessTokenError" }
       }
     },
     /**
@@ -127,14 +132,15 @@ const authOptions: NextAuthConfig = {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
-          name: token.name,
-          email: token.email,
-          image: token.image,
-          nickname: token.nickname,
-          isAdmin: token.isAdmin
+          id: token.id as string,
+          name: token.name as string,
+          email: token.email as string,
+          image: token.image as string | null,
+          nickname: token.nickname as string,
+          isAdmin: token.isAdmin as boolean
         },
-        accessToken: token.accessToken
+        accessToken: token.accessToken,
+        error: token.error
       }
     }
   },
