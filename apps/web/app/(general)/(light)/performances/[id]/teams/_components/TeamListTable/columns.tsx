@@ -26,21 +26,14 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import {
+  getMissingIndices,
+  isTeamSatisfied,
+  TeamFromList
+} from "@/lib/team/teamSession"
 import YoutubeVideo from "@/lib/youtube"
-import { MemberSession, MemberSessionSet, User } from "@repo/shared-types"
 
-export type TeamColumn = {
-  performanceId: number
-  id: number
-  songName: string
-  songArtist: string
-  leader: User
-  memberSessions?: MemberSession[]
-  posterImage?: string
-  songYoutubeVideoUrl?: string
-  isFreshmenFixed: boolean
-  isSelfMade: boolean
-}
+export type TeamColumn = TeamFromList
 
 const SortButton = ({
   column,
@@ -61,11 +54,12 @@ const SortButton = ({
 }
 
 const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
-  const { data: user } = useSession()
+  const { data: session } = useSession()
 
   if (
-    user &&
-    ((user.id && row.original.leader.id === +user.id) || user.isAdmin)
+    session?.user &&
+    ((session.user.id && row.original.leader.id === +session.user.id) ||
+      session.user.isAdmin)
   ) {
     return (
       <DropdownMenu>
@@ -162,16 +156,14 @@ export const columns: ColumnDef<TeamColumn>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex justify-start gap-1 text-right font-medium">
-          {row.original.memberSessions?.map((ms) => {
-            return ms.members.map((member, index) => {
-              if (member !== null) return null
-              return (
-                <SessionBadge
-                  key={`${ms.session}-${index}`}
-                  session={`${ms.session}${index + 1}`}
-                />
-              )
-            })
+          {row.original.teamSessions.map((ts) => {
+            const missingIndices = getMissingIndices(ts)
+            return missingIndices.map((index) => (
+              <SessionBadge
+                key={`${ts.session.name}-${index}`}
+                session={`${ts.session.name}${index}`}
+              />
+            ))
           })}
         </div>
       )
@@ -183,9 +175,8 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="flex items-center justify-center">모집상태</div>
     ),
     cell: ({ row }) => {
-      const memberSessions = row.original.memberSessions
-      const memberSessionsSet = new MemberSessionSet(memberSessions ?? [])
-      const status = memberSessionsSet.isSatisfied ? "Inactive" : "Active"
+      const teamSessions = row.original.teamSessions
+      const status = isTeamSatisfied(teamSessions) ? "Inactive" : "Active"
       return (
         <div className="flex items-center justify-center">
           <StatusBadge status={status} />

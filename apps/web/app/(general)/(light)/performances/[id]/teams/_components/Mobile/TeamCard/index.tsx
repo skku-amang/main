@@ -12,7 +12,11 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
-import { MemberSession, User } from "@repo/shared-types"
+import {
+  getMissingIndices,
+  TeamFromList,
+  TeamSessionFromList
+} from "@/lib/team/teamSession"
 
 interface TeamCardProps {
   performanceId: number
@@ -21,9 +25,9 @@ interface TeamCardProps {
   songArtist: string
   isFreshmenFixed: boolean
   isSelfMade: boolean
-  image?: string
-  leader: User
-  memberSessions: MemberSession[]
+  image?: string | null
+  leader: TeamFromList["leader"]
+  missingTeamSessions: TeamSessionFromList[]
 }
 
 const TeamCard = ({
@@ -35,10 +39,10 @@ const TeamCard = ({
   isSelfMade = false,
   image,
   leader,
-  memberSessions
+  missingTeamSessions
 }: TeamCardProps) => {
-  const session = useSession()
-  const user = session?.data
+  const { data: session } = useSession()
+  const user = session?.user
 
   return (
     <div className="rounded-lg bg-white p-5 shadow-md">
@@ -60,7 +64,7 @@ const TeamCard = ({
 
             {/* 상태 */}
             <StatusBadge
-              status={memberSessions.length > 0 ? "Active" : "Inactive"}
+              status={missingTeamSessions.length > 0 ? "Active" : "Inactive"}
               className="text-xs"
             />
           </div>
@@ -85,7 +89,7 @@ const TeamCard = ({
             <h4 className="w-20 text-xs">팀장</h4>
             <div className="flex items-center gap-x-3">
               <Avatar className="h-5 w-5">
-                <AvatarImage src={leader.profileImage} />
+                <AvatarImage src={leader.image ?? undefined} />
                 <AvatarFallback className="text-xs">
                   {leader.name.substring(0, 1)}
                 </AvatarFallback>
@@ -98,20 +102,23 @@ const TeamCard = ({
           <div className="mt-4 flex items-center justify-between text-xs">
             <h4 className="w-20 text-xs text-neutral-500">필요세션</h4>
             <div className="gap-x-1 text-right">
-              {memberSessions?.map((ms, index) => (
-                <SessionBadge
-                  key={`${ms.session}-${index}`}
-                  session={`${ms.session}${index + 1}`}
-                  className="m-0.5 rounded-lg p-1"
-                />
-              ))}
+              {missingTeamSessions?.map((ts) => {
+                const missingIndices = getMissingIndices(ts)
+                return missingIndices.map((index) => (
+                  <SessionBadge
+                    key={`${ts.session.name}-${index}`}
+                    session={`${ts.session.name}${index}`}
+                    className="m-0.5 rounded-lg p-1"
+                  />
+                ))
+              })}
             </div>
           </div>
         </div>
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      {user && (user.isAdmin || (user.id && +user?.id === leader.id)) && (
+      {user && (user.isAdmin || (user.id && +user.id === leader.id)) && (
         <div className="mt-3 grid grid-cols-2 gap-x-4">
           <Button
             asChild
@@ -123,7 +130,11 @@ const TeamCard = ({
               편집하기
             </Link>
           </Button>
-          <TeamDeleteButton teamId={id} className="w-full">
+          <TeamDeleteButton
+            teamId={id}
+            className="w-full"
+            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
+          >
             <Button
               asChild
               className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
