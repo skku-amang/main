@@ -78,8 +78,8 @@ export class RentalService {
     let endDate = to
 
     if (!startDate && !endDate) {
-      startDate = new Date(now.getFullYear(), now.getMonth())
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1)
+      endDate = new Date(now.getFullYear(), now.getMonth() + 2, 0)
       endDate.setHours(23, 59, 59, 999)
     } else if (startDate && !endDate) {
       endDate = new Date(startDate)
