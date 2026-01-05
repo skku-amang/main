@@ -24,8 +24,8 @@ import useTeamApplication from "./_hooks/useTeamApplication"
 
 interface TeamDetailProps {
   params: {
-    id: number
-    teamId: number
+    id: string
+    teamId: string
   }
 }
 
@@ -33,8 +33,8 @@ const TeamDetail = (props: TeamDetailProps) => {
   const session = useSession()
   const router = useRouter()
 
-  const performanceId = props.params.id
-  const id = props.params.teamId
+  const performanceId = Number(props.params.id)
+  const id = Number(props.params.teamId)
 
   const { data: team, isLoading, isError } = useTeam(id)
   const {

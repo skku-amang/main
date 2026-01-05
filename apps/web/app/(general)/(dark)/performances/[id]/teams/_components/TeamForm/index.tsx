@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -16,6 +16,7 @@ import { CreateTeam, TeamDetail, UpdateTeam } from "@repo/shared-types"
 import { useSessions } from "@/hooks/api/useSession"
 import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import { SessionName } from "@repo/database"
+import { useQueryClient } from "@tanstack/react-query"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
 import SecondPage from "./SecondPage"
@@ -37,21 +38,35 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const { toast } = useToast()
 
   const { data: sessions } = useSessions()
+  const queryClient = useQueryClient()
 
   const isCreate = !initialData?.id
 
-  const {
-    mutate: mutateTeamCreate,
-    isError: isCreateError,
-    data: createData
-  } = useCreateTeam()
-  const {
-    mutate: mutateTeamUpdate,
-    isError: isUpdateError,
-    data: updateData
-  } = useUpdateTeam()
-  const isError = isCreateError || isUpdateError
-  const data = createData || updateData
+  const { mutate: mutateTeamCreate } = useCreateTeam({
+    onSuccess: (data) => {
+      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+    },
+    onError: () => {
+      toast({
+        title: "오류",
+        description: "팀 생성 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
+  const { mutate: mutateTeamUpdate } = useUpdateTeam({
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["team", data.id] })
+      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+    },
+    onError: () => {
+      toast({
+        title: "오류",
+        description: "팀 수정 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
@@ -175,16 +190,26 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     if (!initialData) return defaultValues
 
     // Edit: 디폴트 값 존재 (teamSessions 사용)
+    // defaultValues의 session, index를 기준으로 매칭
     initialData.teamSessions?.forEach((ts) => {
+      // capacity만큼의 모든 슬롯을 required로 설정
+      for (let i = 1; i <= ts.capacity; i++) {
+        const entry = Object.entries(defaultValues).find(
+          ([, value]) => value.session === ts.session.name && value.index === i
+        )
+        if (entry) {
+          entry[1].required = true
+        }
+      }
+
+      // 멤버가 있는 슬롯에는 멤버 정보 설정
       ts.members.forEach((member) => {
-        const fieldName = `${ts.session.name}${member.index}` as keyof z.infer<
-          typeof memberSessionRequiredBaseSchema
-        >
-        const fieldKey = defaultValues[fieldName]
-        if (!fieldKey) return
-        fieldKey.required = true
-        if (member.user) {
-          fieldKey.member = member.user.id
+        const entry = Object.entries(defaultValues).find(
+          ([, value]) =>
+            value.session === ts.session.name && value.index === member.index
+        )
+        if (entry && member.user) {
+          entry[1].member = member.user.id
         }
       })
     })
@@ -196,6 +221,24 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     resolver: zodResolver(memberSessionRequiredBaseSchema),
     defaultValues: constructDefaultValues(initialData)
   })
+
+  // initialData가 나중에 로드될 때 폼 값 업데이트
+  useEffect(() => {
+    if (initialData) {
+      firstPageForm.reset({
+        performanceId: initialData.performanceId,
+        songName: initialData.songName,
+        isFreshmenFixed: initialData.isFreshmenFixed,
+        songArtist: initialData.songArtist,
+        isSelfMade: initialData.isSelfMade,
+        description: initialData.description || "",
+        songYoutubeVideoUrl: initialData.songYoutubeVideoUrl || ""
+      })
+      secondPageForm.reset(constructDefaultValues(initialData))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData])
+
   function onSecondPageValid(
     formData: z.infer<typeof memberSessionRequiredBaseSchema>
   ) {
@@ -305,18 +348,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       }
       mutateTeamUpdate([initialData.id, updateData])
     }
-
-    if (isError || !data) {
-      toast({
-        title: "오류",
-        description: isCreate
-          ? "팀 생성 중 오류가 발생했습니다."
-          : "팀 수정 중 오류가 발생했습니다.",
-        variant: "destructive"
-      })
-      return
-    }
-    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
   }
   function onThirdPageInvalid(
     errors: FieldErrors<z.infer<typeof memberSessionRequiredBaseSchema>>
