@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
+import { useDeleteTeam } from "@/hooks/api/useTeam"
 import { cn } from "@/lib/utils"
 
 interface TeamCardDeleteButtonProps {
@@ -24,10 +24,10 @@ const TeamCardDeleteButton = ({
   className
 }: TeamCardDeleteButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { deleteTeam } = useTeamDelete()
+  const deleteTeam = useDeleteTeam()
 
   const onDelete = async () => {
-    const res = await deleteTeam(teamId)
+    const res = await deleteTeam.mutateAsync(teamId)
     if (res) {
       setIsOpen(false)
     }
