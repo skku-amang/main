@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 
 import SESSIONIMAGE from "@/constants/sessionimage"
+import { getSessionDisplayName } from "@/constants/session"
 import { cn } from "@/lib/utils"
 import { type SessionName } from "@repo/database"
 
@@ -87,7 +88,7 @@ const ApplyButton = ({
         />
         {/* 세션명 */}
         <div className="absolute right-[8px] z-10 text-center text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
-          {sessionName}
+          {getSessionDisplayName(sessionName)}
           {sessionIndex}
         </div>
       </div>

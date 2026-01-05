@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react"
 
 import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getSessionDisplayName } from "@/constants/session"
 import { SessionName } from "@repo/database"
 import { TeamDetail } from "@repo/shared-types"
 
@@ -38,7 +39,7 @@ const MemberSessionCard = ({
   return (
     <div className="flex py-4">
       <div className="hidden h-[48px] w-[160px] items-center pl-4 md:flex">
-        {sessionName}
+        {getSessionDisplayName(sessionName)}
         {sessionIndex}
       </div>
 

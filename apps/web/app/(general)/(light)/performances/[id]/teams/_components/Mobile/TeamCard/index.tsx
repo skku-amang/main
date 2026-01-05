@@ -12,6 +12,7 @@ import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import {
   getMissingIndices,
   TeamFromList,
@@ -107,7 +108,7 @@ const TeamCard = ({
                 return missingIndices.map((index) => (
                   <SessionBadge
                     key={`${ts.session.name}-${index}`}
-                    session={`${ts.session.name}${index}`}
+                    session={`${getSessionDisplayName(ts.session.name)}${index}`}
                     className="m-0.5 rounded-lg p-1"
                   />
                 ))

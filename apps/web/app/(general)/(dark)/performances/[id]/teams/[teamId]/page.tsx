@@ -17,6 +17,7 @@ import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import { useTeam } from "@/hooks/api/useTeam"
 import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/lib/youtube/Player"
@@ -134,7 +135,7 @@ const TeamDetail = (props: TeamDetailProps) => {
                     { length: ts.capacity },
                     (_, i) => i + 1
                   ).map((index) => {
-                    const sessionWithIndex = `${ts.session.name}${index}`
+                    const sessionWithIndex = `${getSessionDisplayName(ts.session.name)}${index}`
                     return (
                       <SessionBadge
                         key={`${ts.session.id}-${index}`}

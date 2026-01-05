@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { getSessionDisplayName } from "@/constants/session"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
@@ -303,7 +304,7 @@ const SignupForm = () => {
                             />
                           </FormControl>
                           <FormLabel className="font-normal">
-                            {session.name}
+                            {getSessionDisplayName(session.name)}
                           </FormLabel>
                         </FormItem>
                       )
