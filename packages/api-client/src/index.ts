@@ -3,6 +3,7 @@ import {
   CreateEquipment,
   CreateGeneration,
   CreatePerformance,
+  CreateRental,
   CreateSession,
   CreateTeam,
   CreateUser,
@@ -10,6 +11,7 @@ import {
   EquipmentWithRentalLog,
   GenerationDetail,
   GenerationList,
+  GetRentalsQuery,
   LoginUser,
   LogoutResponse,
   Performance,
@@ -24,6 +26,9 @@ import {
   UpdateEquipment,
   UpdateGeneration,
   UpdatePerformance,
+  UpdateRental,
+  RentalDetail,
+  RentalList,
   UpdateSession,
   UpdateTeam,
   UpdateUser,
@@ -628,6 +633,109 @@ export default class ApiClient {
       | ConflictError
       | InternalServerError
     >(`/equipments/${id}`, "DELETE")
+  }
+
+  /**
+   * 대여 생성
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ConflictError} 해당 시간에 이미 예약된 장비인 경우
+   * @throws {UnprocessableEntityError} 존재하지 않는 장비 또는 유저 ID가 포함된 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public createRental(rentalData: CreateRental) {
+    return this._request<
+      RentalDetail,
+      | AuthError
+      | ValidationError
+      | ConflictError
+      | UnprocessableEntityError
+      | InternalServerError
+    >(`/rentals`, "POST", rentalData)
+  }
+
+  /**
+   * 대여 목록 조회
+   * @param query - 검색 필터 (type, equipmentId, from, to)
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getRentals(query?: GetRentalsQuery) {
+    const searchParams = new URLSearchParams()
+
+    if (query) {
+      if (query.type) {
+        searchParams.append("type", query.type)
+      }
+      if (query.equipmentId) {
+        searchParams.append("equipmentId", String(query.equipmentId))
+      }
+      if (query.from) {
+        const fromDate = query.from.toISOString()
+        searchParams.append("from", String(fromDate))
+      }
+      if (query.to) {
+        const toDate = query.to.toISOString()
+        searchParams.append("to", String(toDate))
+      }
+    }
+
+    const queryString = searchParams.toString()
+      ? `?${searchParams.toString()}`
+      : ""
+
+    return this._request<RentalList, InternalServerError>(
+      `/rentals${queryString}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 대여 상세 조회
+   * @throws {NotFoundError} 요청한 대여 기록이 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getRentalById(id: number) {
+    return this._request<RentalDetail, NotFoundError | InternalServerError>(
+      `/rentals/${id}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 대여 수정
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 수정 권한이 없는 경우
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우 (ID 형식 등)
+   * @throws {ConflictError} 시간 충돌 또는 종료 시간이 시작 시간보다 앞서는 경우
+   * @throws {UnprocessableEntityError} 존재하지 않는 장비 또는 유저 ID가 포함된 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateRental(id: number, rentalData: UpdateRental) {
+    return this._request<
+      RentalDetail,
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | ConflictError
+      | UnprocessableEntityError
+      | InternalServerError
+    >(`/rentals/${id}`, "PATCH", rentalData)
+  }
+
+  /**
+   * 대여 삭제
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 삭제 권한이 없는 경우 (본인 또는 관리자 아님)
+   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public deleteRental(id: number) {
+    return this._request<
+      null,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/rentals/${id}`, "DELETE")
   }
 
   /**
