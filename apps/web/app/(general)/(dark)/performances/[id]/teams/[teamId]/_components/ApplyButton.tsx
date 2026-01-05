@@ -5,8 +5,8 @@ import { Check } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
-import SESSIONIMAGE from "@/constants/sessionimage"
 import { getSessionDisplayName } from "@/constants/session"
+import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
 import { type SessionName } from "@repo/database"
 

@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { getSessionDisplayName } from "@/constants/session"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
@@ -30,6 +29,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import {
