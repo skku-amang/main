@@ -74,6 +74,7 @@ const useTeamApplication = (teamId: number) => {
   return {
     selectedSessions,
     setSelectedSessions,
+    isSelected,
     onAppendSession,
     onRemoveSession,
     onSubmit

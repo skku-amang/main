@@ -10,21 +10,18 @@ import { cn } from "@/lib/utils"
 import { type SessionName } from "@repo/database"
 
 interface ApplyButtonProps {
-  session: SessionName
-  memberSessionIndex: number
-  selectedSessionsWithIndex: string[]
-  toggleSelectedSessionWithIndex: (memberSessionWithWithIndex: string) => void
+  sessionName: SessionName
+  sessionIndex: number
+  isSelected: boolean
+  onToggle: () => void
 }
 
 const ApplyButton = ({
-  session,
-  memberSessionIndex,
-  selectedSessionsWithIndex,
-  toggleSelectedSessionWithIndex
+  sessionName,
+  sessionIndex,
+  isSelected,
+  onToggle
 }: ApplyButtonProps) => {
-  const memberSessionWithIndex = `${session}__${memberSessionIndex}`
-  const isSelected = selectedSessionsWithIndex.includes(memberSessionWithIndex)
-
   const [isLargeScreen, setIsLargeScreen] = useState(false) // 768px 이상
   const [isMediumScreen, setIsMediumScreen] = useState(false) // 410px 이상
   const [isSmallScreen, setIsSmallScreen] = useState(false) // 410px 이하
@@ -49,10 +46,7 @@ const ApplyButton = ({
   }, [])
 
   return (
-    <button
-      className="relative h-full w-full"
-      onClick={() => toggleSelectedSessionWithIndex(memberSessionWithIndex)}
-    >
+    <button className="relative h-full w-full" onClick={onToggle}>
       <div
         className={cn(
           "relative flex h-[100px] w-full items-center overflow-hidden rounded bg-slate-50 max-[470px]:h-[60px] md:h-[160px] md:w-[250px] md:overflow-visible",
@@ -65,10 +59,10 @@ const ApplyButton = ({
         <Image
           src={
             isSelected
-              ? SESSIONIMAGE.PRESSED[session]
-              : SESSIONIMAGE.UNPRESSED[session]
+              ? SESSIONIMAGE.PRESSED[sessionName]
+              : SESSIONIMAGE.UNPRESSED[sessionName]
           }
-          alt={`${session} session image`}
+          alt={`${sessionName} session image`}
           className="absolute left-0 top-0"
           // 화면 크기에 따라 width와 height 설정
           width={
@@ -93,8 +87,8 @@ const ApplyButton = ({
         />
         {/* 세션명 */}
         <div className="absolute right-[8px] z-10 text-center text-sm font-semibold text-slate-600 md:right-[16px] md:text-2xl">
-          {session}
-          {memberSessionIndex}
+          {sessionName}
+          {sessionIndex}
         </div>
       </div>
       <div
