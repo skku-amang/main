@@ -42,31 +42,8 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
 
   const isCreate = !initialData?.id
 
-  const { mutate: mutateTeamCreate } = useCreateTeam({
-    onSuccess: (data) => {
-      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
-    },
-    onError: () => {
-      toast({
-        title: "오류",
-        description: "팀 생성 중 오류가 발생했습니다.",
-        variant: "destructive"
-      })
-    }
-  })
-  const { mutate: mutateTeamUpdate } = useUpdateTeam({
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["team", data.id] })
-      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
-    },
-    onError: () => {
-      toast({
-        title: "오류",
-        description: "팀 수정 중 오류가 발생했습니다.",
-        variant: "destructive"
-      })
-    }
-  })
+  const { mutateAsync: mutateTeamCreate } = useCreateTeam()
+  const { mutateAsync: mutateTeamUpdate } = useUpdateTeam()
 
   // First Page
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
@@ -331,7 +308,20 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }
-      mutateTeamCreate([createData])
+      try {
+        const data = await mutateTeamCreate([createData])
+        await queryClient.invalidateQueries({
+          queryKey: ["teams", "performance"],
+          refetchType: "all"
+        })
+        router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+      } catch {
+        toast({
+          title: "오류",
+          description: "팀 생성 중 오류가 발생했습니다.",
+          variant: "destructive"
+        })
+      }
     } else {
       const updateData: UpdateTeam = {
         name: initialData.name,
@@ -346,7 +336,28 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }
-      mutateTeamUpdate([initialData.id, updateData])
+      try {
+        const data = await mutateTeamUpdate([initialData.id, updateData])
+        await queryClient.invalidateQueries({
+          queryKey: ["team", data.id],
+          refetchType: "all"
+        })
+        await queryClient.invalidateQueries({
+          queryKey: ["teams"],
+          refetchType: "all"
+        })
+        await queryClient.invalidateQueries({
+          queryKey: ["teams", "performance"],
+          refetchType: "all"
+        })
+        router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
+      } catch {
+        toast({
+          title: "오류",
+          description: "팀 수정 중 오류가 발생했습니다.",
+          variant: "destructive"
+        })
+      }
     }
   }
   function onThirdPageInvalid(
