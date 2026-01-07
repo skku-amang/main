@@ -10,6 +10,7 @@ import { SessionModule } from "./session/session.module"
 import { TeamModule } from "./team/team.module"
 import { PerformanceModule } from "./performance/performance.module"
 import { EquipmentModule } from "./equipment/equipment.module"
+import { RentalModule } from "./rental/rental.module"
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { EquipmentModule } from "./equipment/equipment.module"
     SessionModule,
     TeamModule,
     PerformanceModule,
-    EquipmentModule
+    EquipmentModule,
+    RentalModule
   ],
   controllers: [AppController],
   providers: [AppService]
