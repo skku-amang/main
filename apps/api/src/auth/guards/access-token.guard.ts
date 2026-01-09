@@ -44,6 +44,10 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
         throw new AuthError("유효하지 않은 형식의 액세스 토큰입니다.")
       }
 
+      if (info.message === "No auth token") {
+        throw new AuthError("액세스 토큰이 존재하지 않습니다.")
+      }
+
       throw new AuthError("액세스 토큰 인증 중 알 수 없는 오류가 발생했습니다.")
     }
 
