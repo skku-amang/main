@@ -22,6 +22,10 @@ export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
         throw new AuthError("유효하지 않은 형식의 리프레쉬 토큰입니다.")
       }
 
+      if (info.message === "No auth token") {
+        throw new AuthError("리프레쉬 토큰이 존재하지 않습니다.")
+      }
+
       throw new AuthError(
         "리프레쉬 토큰 인증 중 알 수 없는 오류가 발생했습니다."
       )
