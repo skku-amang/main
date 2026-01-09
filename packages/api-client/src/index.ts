@@ -32,7 +32,8 @@ import {
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User
+  User,
+  publicUserList
 } from "@repo/shared-types"
 import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
@@ -814,12 +815,11 @@ export default class ApiClient {
   /**
    * 유저 목록 조회
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUsers() {
     return this._request<
-      User[],
+      publicUserList,
       AuthError | ForbiddenError | InternalServerError
     >(`/users`, "GET")
   }
