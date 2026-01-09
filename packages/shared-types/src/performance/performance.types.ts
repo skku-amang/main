@@ -1,5 +1,5 @@
 import { Performance, Prisma } from "@repo/database"
-import { publicUserSelector } from "../user/user.selector"
+import { publicUserSelector } from "../user/user.types"
 
 export type { Performance }
 
