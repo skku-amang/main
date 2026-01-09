@@ -14,3 +14,9 @@ export const publicUserSelector = {
     select: { order: true }
   }
 } satisfies Prisma.UserSelect
+
+type publicUser = Prisma.UserGetPayload<{
+  select: typeof publicUserSelector
+}>
+
+export type publicUserList = publicUser[]
