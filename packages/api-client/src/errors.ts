@@ -288,3 +288,29 @@ export class AccessTokenExpiredError extends ApiError {
     super("액세스 토큰이 만료되었습니다.", detail, instance)
   }
 }
+
+/**
+ * 리프레시 토큰이 요청에 존재하지 않을 때 발생하는 오류입니다.
+ */
+export class RefreshTokenNotFoundError extends ApiError {
+  readonly type = "/errors/token/refresh-token-not-found"
+  readonly status = 401
+  readonly title = "Refresh Token Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("리프레시 토큰이 존재하지 않습니다.", detail, instance)
+  }
+}
+
+/**
+ * 액세스 토큰이 요청에 존재하지 않을 때 발생하는 오류입니다.
+ */
+export class AccessTokenNotFoundError extends ApiError {
+  readonly type = "/errors/token/access-token-not-found"
+  readonly status = 401
+  readonly title = "Access Token Not Found"
+
+  constructor(detail?: string, instance?: string) {
+    super("액세스 토큰이 존재하지 않습니다.", detail, instance)
+  }
+}
