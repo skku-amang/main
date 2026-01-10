@@ -1,0 +1,467 @@
+# AMANG Performance Management System - AI Development Guide
+
+## Project Overview
+
+### Purpose
+AMANG Performance Management System is a comprehensive platform for managing music performances at Sungkyunkwan University. The system facilitates:
+- Performance event management
+- Team formation and session coordination
+- Member recruitment and application workflow
+- Role-based access control for administrators and users
+
+### Business Domain
+**AMANG** is a music performance group at SKKU. The system manages:
+- **Performances**: Concert events with teams performing songs
+- **Teams**: Groups of musicians performing specific songs at performances
+- **Sessions**: Musical roles (Vocal, Guitar, Bass, Synth, Drum, Strings, Winds)
+- **Members**: Users who participate in teams through specific sessions
+- **Generations**: Year-based cohorts of members
+
+## Architecture
+
+### Technology Stack
+
+#### Monorepo Setup
+- **Turborepo**: Monorepo orchestration with task caching and parallel execution
+- **pnpm**: Package manager with workspace support
+- **Package Manager**: pnpm@10.13.1
+- **Node.js**: >=18
+
+#### Backend (apps/api)
+- **Framework**: NestJS 11.x (TypeScript)
+- **Runtime**: Node.js with Express
+- **Database ORM**: Prisma 6.x
+- **Database**: PostgreSQL
+- **Authentication**: JWT-based auth with refresh tokens
+  - `@nestjs/jwt`, `@nestjs/passport`, `passport-jwt`
+  - Cookie-based token storage
+- **Validation**: Zod schemas via `nestjs-zod`
+- **Password**: bcrypt for hashing
+- **Testing**: Jest with Supertest for e2e tests
+
+#### Frontend (apps/web)
+- **Framework**: Next.js 14.x (App Router)
+- **UI Library**: React 18.3
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: TanStack Query (React Query) v5
+- **Forms**: React Hook Form with Zod validation
+- **Auth**: NextAuth.js v5 (beta)
+- **Date Handling**: date-fns, dayjs
+- **Calendar**: FullCalendar
+- **HTTP Client**: Custom API client in `@repo/api-client`
+
+#### Shared Packages
+- **@repo/ui**: Shared React component library (shadcn/ui based)
+- **@repo/shared-types**: TypeScript type definitions shared across apps
+- **@repo/database**: Prisma schema, client, and database utilities
+- **@repo/api-client**: HTTP client and error types for API communication
+- **@repo/eslint-config**: Shared ESLint and Prettier configurations
+- **@repo/typescript-config**: Shared TypeScript configurations
+
+### Project Structure
+
+```
+main/
+├── apps/
+│   ├── api/                    # NestJS backend application
+│   │   ├── src/
+│   │   │   ├── auth/          # JWT authentication, guards, strategies
+│   │   │   ├── users/         # User management endpoints
+│   │   │   ├── generation/    # Generation (cohort) management
+│   │   │   ├── session/       # Musical session management
+│   │   │   ├── performance/   # Performance event management
+│   │   │   ├── team/          # Team management (CRUD + apply/unapply)
+│   │   │   ├── prisma/        # Prisma service and selectors
+│   │   │   ├── common/        # Common utilities and filters
+│   │   │   └── main.ts        # Application entry point
+│   │   ├── test/              # E2E tests
+│   │   └── package.json
+│   │
+│   └── web/                    # Next.js frontend application
+│       ├── app/               # Next.js App Router
+│       │   ├── (general)/     # General pages (teams, performances, etc.)
+│       │   ├── (home)/        # Home page
+│       │   ├── _(errors)/     # Error pages
+│       │   ├── api/           # API routes (NextAuth)
+│       │   ├── login/         # Login page
+│       │   └── test/          # Test/demo pages
+│       ├── components/        # React components
+│       ├── hooks/             # Custom React hooks
+│       │   └── api/           # API hooks using TanStack Query
+│       ├── lib/               # Utility functions
+│       ├── types/             # TypeScript types
+│       └── package.json
+│
+├── packages/
+│   ├── ui/                    # Shared UI component library
+│   │   └── src/              # React components built with shadcn/ui
+│   ├── shared-types/          # Shared TypeScript types
+│   │   └── src/              # Type definitions for API, auth, etc.
+│   ├── database/              # Database package
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma # Database schema
+│   │   │   ├── migrations/   # Database migrations
+│   │   │   ├── seed.ts       # Database seeding
+│   │   │   └── seeds/        # Seed data files
+│   │   └── src/              # Prisma client exports
+│   ├── api-client/            # API client package
+│   │   └── src/              # HTTP client and error classes
+│   ├── eslint-config/         # Shared ESLint config
+│   └── typescript-config/     # Shared TypeScript config
+│
+├── infra/                     # Infrastructure configuration
+├── .github/                   # GitHub workflows and templates
+├── turbo.json                 # Turborepo configuration
+├── pnpm-workspace.yaml        # pnpm workspace definition
+└── package.json               # Root package.json
+```
+
+### Data Model and Business Rules
+
+#### Core Entities
+
+**User**
+- Identity: email (unique), password (hashed), name, nickname (unique)
+- Profile: bio, image, isAdmin flag
+- Relationships: belongs to one Generation, may have one Session, can join multiple Teams
+- Authentication: refresh tokens stored as hashed
+
+**Generation**
+- Represents a year-based cohort (order field indicates year/sequence)
+- Has one leader (User)
+- Contains multiple users
+
+**Session**
+- Musical roles: VOCAL, GUITAR, BASS, SYNTH, DRUM, STRINGS, WINDS
+- Has one leader (User)
+- Used to categorize team members by their musical role
+
+**Performance**
+- Concert event with name, description, poster image, location, dates
+- Contains multiple teams
+- Teams are CASCADE deleted when performance is deleted
+
+**Team**
+- Belongs to exactly one Performance (CASCADE on delete)
+- Has one leader (User, RESTRICT on delete)
+- Song info: songName, songArtist, songYoutubeVideoUrl
+- Flags: isFreshmenFixed, isSelfMade
+- Has multiple TeamSessions (session requirements)
+
+**TeamSession**
+- Links a Team to a Session with capacity
+- Defines how many members needed for a specific session role
+- Unique constraint: (teamId, sessionId) - one session type per team
+- Contains TeamMembers (participants)
+
+**TeamMember**
+- Represents a user's application to a team session
+- Has index (position within session, 1-based)
+- Unique constraints:
+  - (teamSessionId, userId) - user can only apply once per session
+  - (teamSessionId, index) - position can only be taken once
+- CASCADE deleted with team or user
+
+#### Critical Business Rules
+
+1. **Team-Performance Dependency**
+   - Every team MUST belong to exactly one performance
+   - Teams cannot exist without a performance
+   - Deleting a performance deletes all its teams (CASCADE)
+
+2. **Session Requirements**
+   - Each team defines session requirements via TeamSession
+   - A team can have multiple sessions (e.g., 2 guitars, 1 vocal, 1 drum)
+   - Cannot have duplicate sessions for the same team (unique constraint)
+   - Each TeamSession specifies capacity (number of positions)
+
+3. **Member Application Rules**
+   - Users apply to specific positions (index) within a TeamSession
+   - Index must be between 1 and capacity (inclusive)
+   - Each position (index) can only be taken by one member
+   - Each user can only apply once per session in a team
+   - Users can apply to multiple sessions in the same team
+   - Race conditions handled via database unique constraints
+
+4. **Application Workflow**
+   - Apply: POST /teams/:id/apply with sessionId and index
+   - Unapply: POST /teams/:id/unapply with sessionId and index
+   - Only the user who applied can unapply from their position
+
+5. **Authorization**
+   - Team leader can update/delete their team (TeamOwnerGuard)
+   - Only authenticated users can apply/unapply
+   - Public endpoints: GET /teams, GET /teams/:id
+   - Admin users have elevated permissions (isAdmin flag)
+
+6. **Data Integrity**
+   - Leaders, sessions, performances must exist (RESTRICT or foreign key errors)
+   - Cannot delete users if they're referenced as leaders (RESTRICT)
+   - Deleting teams cascades to TeamSessions and TeamMembers
+   - Session leaders are optional (nullable)
+
+## Development Guidelines
+
+### Code Organization
+
+#### Backend (NestJS)
+- **Controllers**: Handle HTTP requests, use DTOs for validation
+- **Services**: Business logic, database operations via Prisma
+- **DTOs**: Zod schemas for request validation (e.g., `create-team.dto.ts`)
+- **Guards**: Authentication and authorization logic
+- **Selectors**: Prisma select objects in `prisma/selectors/` (e.g., `basicUser`, `publicUser`)
+- **Error Handling**: Custom error classes from `@repo/api-client`
+
+#### Frontend (Next.js)
+- **App Router**: File-based routing in `app/` directory
+- **Server Components**: Default for data fetching
+- **Client Components**: Use `'use client'` directive
+- **API Hooks**: TanStack Query hooks in `hooks/api/`
+- **Components**: Reusable UI in `components/`, import from `@repo/ui` for shared components
+
+#### Shared Packages
+- **Place UI Components in**: `packages/ui/src/` for reusable React components
+- **Place Types in**: `packages/shared-types/src/` for shared TypeScript definitions
+- **Place Database Code in**: `packages/database/` for schema and Prisma client
+- **Place API Client in**: `packages/api-client/src/` for HTTP utilities and errors
+
+### Coding Standards
+
+#### TypeScript
+- Strict type checking enabled
+- Use interfaces for object shapes
+- Use type for unions and primitives
+- Avoid `any`, use `unknown` with type guards if needed
+
+#### Naming Conventions
+- **Files**: kebab-case (e.g., `team-application.dto.ts`)
+- **Folders**: kebab-case (e.g., `team-session`)
+- **Classes**: PascalCase (e.g., `TeamService`)
+- **Functions**: camelCase (e.g., `findOne`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_PAGE_SIZE`)
+- **Interfaces**: PascalCase without I prefix (e.g., `User`)
+
+#### Error Handling
+- Use custom error classes from `@repo/api-client`:
+  - `NotFoundError`: Entity not found (404)
+  - `ValidationError`: Invalid input (400)
+  - `ConflictError`: Duplicate/conflict (409)
+  - `ForbiddenError`: Permission denied (403)
+  - Domain-specific errors: `DuplicateApplicationError`, `PositionOccupiedError`, etc.
+- Always catch Prisma errors and convert to domain errors
+- Handle race conditions with unique constraint violations (P2002)
+
+#### Database
+- **Migrations**: Always create migrations for schema changes
+- **Seeding**: Use `packages/database/prisma/seed.ts`
+- **Queries**: Use Prisma Client, leverage selectors for common field patterns
+- **Transactions**: Use `$transaction` for multi-step operations
+
+### Testing Strategy
+- **Backend**: Jest unit tests for services, Supertest for e2e
+- **Frontend**: (Not yet implemented, but should use Jest + React Testing Library)
+- **E2E**: Test critical flows like team creation, application workflow
+
+### Build and Run Commands
+
+```bash
+# Install dependencies
+pnpm install
+
+# Development (all apps)
+pnpm dev
+
+# Development (specific app)
+pnpm --filter api dev
+pnpm --filter web dev
+
+# Build
+pnpm build
+
+# Lint
+pnpm lint
+
+# Type checking
+pnpm check-types
+
+# Database
+pnpm db:deploy          # Run migrations
+pnpm --filter @repo/database db:seed  # Seed database
+
+# Testing
+pnpm --filter api test
+pnpm --filter api test:e2e
+```
+
+## Current Project Status
+
+### ✅ Completed
+- **Database Schema**: Fully designed with all entities and relationships
+- **Backend Infrastructure**: NestJS setup with authentication, guards, error handling
+- **Team API**: Complete CRUD + apply/unapply endpoints
+  - POST /teams - Create team with sessions and initial members
+  - GET /teams - List all teams with members
+  - GET /teams/:id - Get team details
+  - PUT /teams/:id - Update team (leader only)
+  - DELETE /teams/:id - Delete team (leader only)
+  - PATCH /teams/:id/apply - Apply to team positions
+  - PATCH /teams/:id/unapply - Cancel application
+- **Performance API**: Basic CRUD operations
+- **Generation API**: Basic CRUD operations
+- **Session API**: Basic CRUD operations
+- **Users API**: User management with authentication
+- **Authentication**: JWT-based auth with refresh tokens
+
+### 🚧 In Progress / Pending
+- **Frontend Integration**: Waiting for API connection
+  - Team list/detail pages need to connect to API
+  - Application flow UI needs implementation
+  - Performance management UI needs implementation
+- **Additional Features**:
+  - User profile pages
+  - Admin dashboard
+  - Team search and filtering
+  - Performance calendar view
+  - Notification system
+  - File uploads (images, videos)
+
+### 📋 Next Steps
+1. Connect frontend to Team API endpoints using TanStack Query
+2. Implement team application UI workflow
+3. Add performance management pages
+4. Implement admin dashboard
+5. Add comprehensive E2E tests
+6. Deploy to production environment
+
+## Common Patterns and Examples
+
+### Creating a New API Endpoint
+
+1. **Create DTO** (e.g., `apps/api/src/team/dto/create-team.dto.ts`)
+```typescript
+import { z } from 'zod';
+import { createZodDto } from 'nestjs-zod';
+
+export const createTeamSchema = z.object({
+  name: z.string().min(1),
+  leaderId: z.number().int().positive(),
+  // ... other fields
+});
+
+export class CreateTeamDto extends createZodDto(createTeamSchema) {}
+```
+
+2. **Add Service Method** (e.g., `apps/api/src/team/team.service.ts`)
+```typescript
+async create(createDto: CreateTeamDto) {
+  try {
+    const result = await this.prisma.team.create({
+      data: createDto,
+    });
+    return result;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        throw new ConflictError('Already exists');
+      }
+    }
+    throw error;
+  }
+}
+```
+
+3. **Add Controller Endpoint**
+```typescript
+@Post()
+@UseGuards(AccessTokenGuard)
+create(@Body() createDto: CreateTeamDto) {
+  return this.teamService.create(createDto);
+}
+```
+
+### Creating a Frontend API Hook
+
+1. **Define API call** (e.g., `apps/web/hooks/api/useTeams.ts`)
+```typescript
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@repo/api-client';
+
+export function useTeams() {
+  return useQuery({
+    queryKey: ['teams'],
+    queryFn: () => apiClient.get('/teams'),
+  });
+}
+```
+
+2. **Use in Component**
+```typescript
+'use client';
+import { useTeams } from '@/hooks/api/useTeams';
+
+export function TeamList() {
+  const { data: teams, isLoading } = useTeams();
+  
+  if (isLoading) return <div>Loading...</div>;
+  return <div>{teams.map(team => ...)}</div>;
+}
+```
+
+### Database Migration Workflow
+
+```bash
+# Create migration
+cd packages/database
+pnpm prisma migrate dev --name add_new_field
+
+# Apply to production
+pnpm db:deploy
+
+# Regenerate Prisma client (if needed)
+pnpm db:generate
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Prisma Client Not Generated**
+   - Run: `pnpm --filter @repo/database db:generate`
+
+2. **Database Connection Failed**
+   - Check DATABASE_URL in .env
+   - Ensure PostgreSQL is running
+
+3. **Type Errors After Schema Change**
+   - Regenerate Prisma client
+   - Rebuild packages: `pnpm build`
+
+4. **Turbo Cache Issues**
+   - Clear cache: `pnpm turbo clean`
+   - Delete node_modules and reinstall
+
+## Security Considerations
+
+- Never commit secrets or .env files
+- Passwords are always hashed with bcrypt
+- Use guards for protected endpoints
+- Validate all user input with Zod schemas
+- Use parameterized queries (Prisma handles this)
+- Refresh tokens are hashed before storage
+- Implement rate limiting on authentication endpoints
+- Use HTTPS in production
+- Set secure cookie flags in production
+
+## Performance Considerations
+
+- Use Prisma select to fetch only needed fields
+- Leverage Turborepo caching for builds
+- Use TanStack Query for frontend caching
+- Implement pagination for large lists
+- Add database indexes on frequently queried fields
+- Use database transactions for multi-step operations
+
+---
+
+**Last Updated**: 2024-11-09
+**Maintainer**: AMANG Development Team
