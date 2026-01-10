@@ -2,7 +2,11 @@ import { ExecutionContext, Injectable } from "@nestjs/common"
 import { Reflector } from "@nestjs/core"
 import { AuthGuard } from "@nestjs/passport"
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
-import { AuthError, AccessTokenExpiredError } from "@repo/api-client"
+import {
+  AuthError,
+  AccessTokenExpiredError,
+  AccessTokenNotFoundError
+} from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 
@@ -45,7 +49,7 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
       }
 
       if (info.message === "No auth token") {
-        throw new AuthError("액세스 토큰이 존재하지 않습니다.")
+        throw new AccessTokenNotFoundError("액세스 토큰이 존재하지 않습니다.")
       }
 
       throw new AuthError("액세스 토큰 인증 중 알 수 없는 오류가 발생했습니다.")

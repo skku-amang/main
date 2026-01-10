@@ -1,6 +1,10 @@
 import { ExecutionContext, Injectable } from "@nestjs/common"
 import { AuthGuard } from "@nestjs/passport"
-import { AuthError, RefreshTokenExpiredError } from "@repo/api-client"
+import {
+  AuthError,
+  RefreshTokenExpiredError,
+  RefreshTokenNotFoundError
+} from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 
@@ -23,7 +27,9 @@ export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
       }
 
       if (info.message === "No auth token") {
-        throw new AuthError("리프레쉬 토큰이 존재하지 않습니다.")
+        throw new RefreshTokenNotFoundError(
+          "리프레쉬 토큰이 존재하지 않습니다."
+        )
       }
 
       throw new AuthError(
