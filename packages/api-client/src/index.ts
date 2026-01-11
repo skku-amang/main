@@ -32,7 +32,8 @@ import {
   UpdateSession,
   UpdateTeam,
   UpdateUser,
-  User
+  User,
+  publicUserList
 } from "@repo/shared-types"
 import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
@@ -779,82 +780,15 @@ export default class ApiClient {
   }
 
   /**
-   * 유저 생성
-   * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 생성 권한이 없는 경우
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {ConflictError} 이미 존재하는 유저인 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public createUser(userData: CreateUser) {
-    return this._request<
-      User,
-      | AuthError
-      | ForbiddenError
-      | ValidationError
-      | ConflictError
-      | InternalServerError
-    >(`/users`, "POST", userData)
-  }
-
-  /**
-   * 유저 정보 조회
-   * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public getUserById(id: number) {
-    return this._request<
-      User,
-      AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/users/${id}`, "GET")
-  }
-
-  /**
    * 유저 목록 조회
    * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 정보 조회 권한이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUsers() {
     return this._request<
-      User[],
+      publicUserList,
       AuthError | ForbiddenError | InternalServerError
     >(`/users`, "GET")
-  }
-
-  /**
-   * 유저 수정
-   * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public updateUser(id: number, userData: UpdateUser) {
-    return this._request<
-      User,
-      | AuthError
-      | ForbiddenError
-      | NotFoundError
-      | ValidationError
-      | InternalServerError
-    >(`/users/${id}`, "PATCH", userData)
-  }
-
-  /**
-   * 유저 삭제
-   * @throws {AuthError} 로그인 하지 않은 경우
-   * @throws {ForbiddenError} 유저 삭제 권한이 없는 경우
-   * @throws {NotFoundError} 요청한 리소스가 존재하지 않는 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public deleteUser(id: number) {
-    return this._request<
-      null,
-      AuthError | ForbiddenError | NotFoundError | InternalServerError
-    >(`/users/${id}`, "DELETE")
   }
 
   /**

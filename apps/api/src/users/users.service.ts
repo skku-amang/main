@@ -4,7 +4,7 @@ import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
-
+import { publicUserSelector } from "@repo/shared-types"
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -40,6 +40,14 @@ export class UsersService {
       }
       throw error
     }
+  }
+
+  async findAll() {
+    const users = await this.prisma.user.findMany({
+      select: publicUserSelector
+    })
+
+    return users
   }
 
   async updateRefreshToken(userId: number, refreshToken: string | null) {
