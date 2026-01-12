@@ -43,7 +43,13 @@ jobs:
           echo "=== Checking api-client dist ==="
           ls -la packages/api-client/dist/
           echo "=== Checking createUser in types ==="
-          grep -n "createUser" packages/api-client/dist/index.d.ts | head -5
+          grep -n "createUser" packages/api-client/dist/index.d.ts | head -5 || echo "createUser not found!"
+          echo "=== First 100 lines of index.d.ts ==="
+          head -100 packages/api-client/dist/index.d.ts
+          echo "=== Checking web node_modules symlink ==="
+          ls -la apps/web/node_modules/@repo/api-client/
+          echo "=== Checking web node_modules api-client dist ==="
+          ls -la apps/web/node_modules/@repo/api-client/dist/ || echo "dist not found in web node_modules"
 
       # 앱 빌드
       - name: Build apps
