@@ -34,7 +34,16 @@ jobs:
         run: pnpm turbo db:generate
 
       - name: Run Build
-        run: pnpm turbo build --force
+        run: pnpm turbo build --force --verbosity=2
+
+      - name: Verify package builds
+        run: |
+          echo "=== Checking dist folders ==="
+          ls -la packages/database/dist/ || echo "database dist missing"
+          ls -la packages/shared-types/dist/ || echo "shared-types dist missing"
+          ls -la packages/api-client/dist/ || echo "api-client dist missing"
+          echo "=== Checking api-client exports ==="
+          head -50 packages/api-client/dist/index.d.ts || echo "api-client index.d.ts missing"
 
       - name: Run Checks & Tests
         run: pnpm turbo lint check-types test
