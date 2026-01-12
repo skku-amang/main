@@ -10,13 +10,23 @@ export const seedUsers = async (prisma: PrismaClient) => {
     return
   }
 
-  const generation = await prisma.generation.findFirst()
-  if (!generation) {
-    console.error("No generation found.")
+  const generations = await prisma.generation.findMany()
+  const sessions = await prisma.session.findMany()
+
+  if (generations.length === 0) {
+    console.log("No Generation found. Please run generation seeds first.")
+    return
+  }
+
+  if (sessions.length === 0) {
+    console.log("No Session found. Please run session seeds first.")
     return
   }
 
   const hashedPassword = await bcrypt.hash(defaultPassword, 10)
+
+  console.log("Seeding Admin Users")
+
   await prisma.user.upsert({
     where: {
       nickname: "관리자"
