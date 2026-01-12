@@ -1,5 +1,6 @@
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
+import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -24,25 +25,43 @@ interface SelectableUser {
   nickname: string
 }
 
-interface UserSelectProps {
+interface UserSelectProps<T extends FieldValues> {
   users: SelectableUser[]
-  form: any
+  form: UseFormReturn<T>
   fieldName: string
 }
 
-const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
-  const hasError = !!form.formState.errors[fieldName]
-  let initialMemberIdWithName = ""
-  const userId = form.getValues(fieldName)
-  if (userId) {
-    const userName = users.find((user) => user.id === userId)?.name
-    initialMemberIdWithName = `${userId}-${userName}`
-  }
+function getNestedError(
+  errors: Record<string, unknown>,
+  path: string
+): unknown {
+  return path.split(".").reduce<unknown>((obj, key) => {
+    if (obj && typeof obj === "object") {
+      return (obj as Record<string, unknown>)[key]
+    }
+    return undefined
+  }, errors)
+}
+
+const UserSelect = <T extends FieldValues>({
+  users,
+  form,
+  fieldName
+}: UserSelectProps<T>) => {
+  const hasError = !!getNestedError(
+    form.formState.errors as Record<string, unknown>,
+    fieldName
+  )
+  const initialUserId = form.getValues(fieldName as Path<T>) as
+    | number
+    | undefined
 
   const [open, setOpen] = useState(false)
-  const [memberIdWithName, setMemberIdWithName] = useState(
-    initialMemberIdWithName
-  ) // {id}-{name}
+  const [selectedUserId, setSelectedUserId] = useState<number | undefined>(
+    initialUserId
+  )
+
+  const selectedUser = users.find((user) => user.id === selectedUserId)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,11 +75,7 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
             hasError && "border-destructive"
           )}
         >
-          {memberIdWithName
-            ? users.find(
-                (user) => user.id.toString() === memberIdWithName.split("-")[0]
-              )?.name
-            : "미정"}
+          {selectedUser?.name ?? "미정"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -74,31 +89,20 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
                 <CommandItem
                   key={user.id}
                   value={`${user.id}-${user.name}`}
-                  onSelect={(currentValue: string) => {
-                    const [userId] = currentValue.split("-")
-                    if (userId) form.setValue(fieldName, +userId as any)
-                    // const previousMembers = form.getValues(
-                    //   fieldName
-                    // ) as number[]
-                    // console.log("fieldName:", fieldName)
-                    // console.log("form:", form.getValues("보컬.membersId.0"))
-                    // console.log("previousMembers:", previousMembers)
-                    // const parsedValue = currentValue.split("-")[0]
-                    // form.setValue(fieldName, [
-                    //   ...previousMembers,
-                    //   +parsedValue
-                    // ])
-                    form.clearErrors(fieldName)
-                    setMemberIdWithName(`${userId}-${user.name}`)
+                  onSelect={() => {
+                    form.setValue(
+                      fieldName as Path<T>,
+                      user.id as PathValue<T, Path<T>>
+                    )
+                    form.clearErrors(fieldName as Path<T>)
+                    setSelectedUserId(user.id)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      memberIdWithName === user.id.toString()
-                        ? "opacity-100"
-                        : "opacity-0"
+                      selectedUserId === user.id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div className="flex items-center gap-x-5">
