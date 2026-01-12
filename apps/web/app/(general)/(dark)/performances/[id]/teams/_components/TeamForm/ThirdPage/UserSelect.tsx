@@ -17,10 +17,15 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { User } from "@repo/shared-types"
+
+interface SelectableUser {
+  id: number
+  name: string
+  nickname: string
+}
 
 interface UserSelectProps {
-  users: User[]
+  users: SelectableUser[]
   form: any
   fieldName: string
 }
