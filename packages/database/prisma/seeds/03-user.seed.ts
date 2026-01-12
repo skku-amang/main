@@ -1,5 +1,6 @@
 import { PrismaClient } from "../../generated/prisma"
 import * as bcrypt from "bcrypt"
+import { getRandomItem } from "./utils"
 
 export const seedUsers = async (prisma: PrismaClient) => {
   console.log("Seeding users...")
@@ -27,20 +28,37 @@ export const seedUsers = async (prisma: PrismaClient) => {
 
   console.log("Seeding Admin Users")
 
-  await prisma.user.upsert({
-    where: {
-      nickname: "관리자"
-    },
-    create: {
-      name: "관리자",
-      email: "admin@amang.com",
-      password: hashedPassword,
-      nickname: "관리자",
-      generationId: generation.id,
-      isAdmin: true
-    },
-    update: {}
+  const adminUsers = Array.from({ length: 5 }, (_, index) => {
+    const userNumber = index + 1
+    const nickname = `관리자${userNumber}`
+    const email = `admin${userNumber}@g.skku.edu`
+    const generation = getRandomItem(generations)
+    const session = getRandomItem(sessions)
+
+    return prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name: nickname,
+        nickname: nickname,
+        bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+        isAdmin: true,
+        generation: {
+          connect: {
+            id: generation.id
+          }
+        },
+        sessions: {
+          connect: {
+            id: session.id
+          }
+        }
+      }
+    })
   })
+
+  await Promise.all(adminUsers)
+  console.log("Seeding admin users completed.")
 
   await prisma.user.upsert({
     where: {
