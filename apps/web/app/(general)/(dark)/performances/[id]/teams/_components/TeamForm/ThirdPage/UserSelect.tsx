@@ -70,8 +70,8 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
                   key={user.id}
                   value={`${user.id}-${user.name}`}
                   onSelect={(currentValue: string) => {
-                    const [userId, userName] = currentValue.split("-")
-                    form.setValue(fieldName, +userId as any)
+                    const [userId] = currentValue.split("-")
+                    if (userId) form.setValue(fieldName, +userId as any)
                     // const previousMembers = form.getValues(
                     //   fieldName
                     // ) as number[]
@@ -84,7 +84,7 @@ const UserSelect = ({ users, form, fieldName }: UserSelectProps) => {
                     //   +parsedValue
                     // ])
                     form.clearErrors(fieldName)
-                    setMemberIdWithName(`${userId}-${userName}`)
+                    setMemberIdWithName(`${userId}-${user.name}`)
                     setOpen(false)
                   }}
                 >
