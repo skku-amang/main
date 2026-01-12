@@ -33,17 +33,17 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm turbo db:generate
 
-      - name: Run Build
-        run: pnpm turbo build --force --verbosity=2
-
-      - name: Verify package builds
+      # 패키지를 먼저 빌드 (순차적으로)
+      - name: Build packages
         run: |
-          echo "=== Checking dist folders ==="
-          ls -la packages/database/dist/ || echo "database dist missing"
-          ls -la packages/shared-types/dist/ || echo "shared-types dist missing"
-          ls -la packages/api-client/dist/ || echo "api-client dist missing"
-          echo "=== Checking api-client exports ==="
-          head -50 packages/api-client/dist/index.d.ts || echo "api-client index.d.ts missing"
+          pnpm turbo build --filter=@repo/database --force
+          pnpm turbo build --filter=@repo/shared-types --force
+          pnpm turbo build --filter=@repo/api-client --force
+          pnpm turbo build --filter=@repo/ui --force
+
+      # 앱 빌드
+      - name: Build apps
+        run: pnpm turbo build --filter=web --filter=api --force
 
       - name: Run Checks & Tests
         run: pnpm turbo lint check-types test

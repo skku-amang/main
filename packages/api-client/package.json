@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "build": "echo 'Starting tsc...' && tsc && echo 'tsc completed' && ls -la dist/",
+    "build": "tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",
