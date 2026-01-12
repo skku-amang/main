@@ -25,11 +25,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # TODO: pnpm 캐시와 turbo 캐시 충돌로 인한 빌드 에러 임시 해결
+      # 근본적인 해결을 위해 캐시 전략 재검토 필요
+      - name: Clean build artifacts
+        run: rm -rf packages/*/dist apps/web/.next apps/api/dist
+
       - name: Generate Prisma Client
         run: pnpm turbo db:generate
 
       - name: Run Build
-        run: pnpm turbo build
+        run: pnpm turbo build --force
 
       - name: Run Checks & Tests
         run: pnpm turbo lint check-types test
