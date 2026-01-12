@@ -69,9 +69,9 @@ const NavLink = ({
 }: NavLinkProps) => {
   const pathname = usePathname()
   const { data } = useSession()
-  const isAvailable = data?.isAdmin || (!isAdminOnly && isActive)
+  const isAvailable = data?.user?.isAdmin || (!isAdminOnly && isActive)
 
-  if (isAdminOnly && !data?.isAdmin) {
+  if (isAdminOnly && !data?.user?.isAdmin) {
     return null
   }
 

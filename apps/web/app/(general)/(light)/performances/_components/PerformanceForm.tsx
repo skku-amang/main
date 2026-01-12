@@ -16,7 +16,8 @@ import ROUTES from "@/constants/routes"
 import { useCreatePerformance } from "@/hooks/api/usePerformance"
 import {
   ACCEPTED_IMAGE_TYPES,
-  CreatePerformanceSchema
+  CreatePerformanceSchema,
+  PerformanceObjectSchema
 } from "@repo/shared-types"
 import PerformanceCard from "./PerformanceCard"
 
@@ -64,7 +65,7 @@ const PerformanceForm = () => {
                 ? URL.createObjectURL(formValues.posterImage)
                 : "/no-image.svg"
             }
-            description={formValues.description}
+            description={formValues.description ?? undefined}
             location={formValues.location || "미정"}
             startAt={formValues.startAt || new Date()}
             className="shadow-2xl hover:cursor-pointer"
@@ -93,7 +94,7 @@ const PerformanceForm = () => {
                 label="이름"
                 placeholder="2024년 1학기 정기공연"
                 required={
-                  !(CreatePerformanceSchema.shape.name instanceof z.ZodOptional)
+                  !(PerformanceObjectSchema.shape.name instanceof z.ZodOptional)
                 }
               />
               <SimpleStringField
@@ -103,7 +104,7 @@ const PerformanceForm = () => {
                 placeholder="신입 부원들과 함께하는 2024년 첫 공연입니다. 많은 참여 부탁드려요!"
                 required={
                   !(
-                    CreatePerformanceSchema.shape.description instanceof
+                    PerformanceObjectSchema.shape.description instanceof
                     z.ZodOptional
                   )
                 }
@@ -114,7 +115,7 @@ const PerformanceForm = () => {
                 label="대표 이미지"
                 required={
                   !(
-                    CreatePerformanceSchema.shape.posterImage instanceof
+                    PerformanceObjectSchema.shape.posterImage instanceof
                     z.ZodOptional
                   )
                 }
@@ -128,7 +129,7 @@ const PerformanceForm = () => {
                 description="공연장의 주소 입니다."
                 required={
                   !(
-                    CreatePerformanceSchema.shape.location instanceof
+                    PerformanceObjectSchema.shape.location instanceof
                     z.ZodOptional
                   )
                 }
@@ -139,7 +140,7 @@ const PerformanceForm = () => {
                 label="시작 일시"
                 required={
                   !(
-                    CreatePerformanceSchema.shape.startAt instanceof
+                    PerformanceObjectSchema.shape.startAt instanceof
                     z.ZodOptional
                   )
                 }
@@ -150,7 +151,7 @@ const PerformanceForm = () => {
                 label="종료 일시"
                 required={
                   !(
-                    CreatePerformanceSchema.shape.endAt instanceof z.ZodOptional
+                    PerformanceObjectSchema.shape.endAt instanceof z.ZodOptional
                   )
                 }
               />

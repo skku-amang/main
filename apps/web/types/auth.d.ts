@@ -12,6 +12,7 @@ export declare module "next-auth" {
   interface Session {
     user: UserInfo & AuthExtras
     accessToken: string
+    error?: "RefreshAccessTokenError"
   }
 }
 

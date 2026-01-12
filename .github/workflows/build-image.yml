@@ -17,7 +17,7 @@ jobs:
       matrix:
         app:
           - name: web
-            dockerfile: apps/web/Dockerfile.dev
+            dockerfile: apps/web/Dockerfile
           - name: api
             dockerfile: apps/api/Dockerfile
     steps:

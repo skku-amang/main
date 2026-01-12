@@ -10,8 +10,8 @@ import {
   Music4,
   Youtube
 } from "lucide-react"
-import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
+import Link from "next/link"
 import { FaCircle } from "react-icons/fa"
 
 import { Separator } from "@/components/ui/separator"
@@ -55,7 +55,7 @@ const SheetInnerContent = ({
             </Avatar>
             <div className="w-full">
               <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">
-                {session.name}
+                {session.user?.name}
               </div>
               <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400">
                 <span>&gt;</span> 마이페이지
