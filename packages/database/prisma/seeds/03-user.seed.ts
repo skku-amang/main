@@ -58,20 +58,39 @@ export const seedUsers = async (prisma: PrismaClient) => {
   })
 
   await Promise.all(adminUsers)
-  console.log("Seeding admin users completed.")
+  console.log("Seeding Admin Uers completed.")
 
-  await prisma.user.upsert({
-    where: {
-      nickname: "사용자"
-    },
-    create: {
-      name: "사용자",
-      email: "user@amang.com",
-      password: hashedPassword,
-      nickname: "사용자",
-      generationId: generation.id
-    },
-    update: {}
+  console.log("Seeding General Users")
+
+  const generalUsers = Array.from({ length: 10 }, (_, index) => {
+    const userNumber = index + 1
+    const nickname = `사용자${userNumber}`
+    const email = `user${userNumber}@g.skku.edu`
+    const generation = getRandomItem(generations)
+    const session = getRandomItem(sessions)
+
+    return prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name: nickname,
+        nickname: nickname,
+        bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+        isAdmin: true,
+        generation: {
+          connect: {
+            id: generation.id
+          }
+        },
+        sessions: {
+          connect: {
+            id: session.id
+          }
+        }
+      }
+    })
   })
-  console.log("Seeding users completed.")
+
+  await Promise.all(generalUsers)
+  console.log("Seeding General Users completed.")
 }
