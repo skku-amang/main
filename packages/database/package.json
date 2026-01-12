@@ -2,14 +2,10 @@
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./dist/index.js"
   },
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "prisma generate && tsc",
     "dev": "tsc --watch",
