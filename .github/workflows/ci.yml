@@ -40,6 +40,10 @@ jobs:
           pnpm turbo build --filter=@repo/shared-types --force
           pnpm turbo build --filter=@repo/api-client --force
           pnpm turbo build --filter=@repo/ui --force
+          echo "=== Checking api-client dist ==="
+          ls -la packages/api-client/dist/
+          echo "=== Checking createUser in types ==="
+          grep -n "createUser" packages/api-client/dist/index.d.ts | head -5
 
       # 앱 빌드
       - name: Build apps
