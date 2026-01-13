@@ -34,9 +34,8 @@ jobs:
       - name: Check Format
         run: pnpm turbo format
 
-      - name: Build API
-        run: pnpm turbo build --filter=api
-
+      # check-types가 ^build에 의존하므로 packages가 이미 빌드됨
+      # test가 ^build에 의존하므로 api도 빌드됨
       - name: Run Tests
         run: pnpm turbo test
 
