@@ -14,6 +14,9 @@ RUN apk update
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 COPY --from=builder /app/out/json/ .
 RUN pnpm install --frozen-lockfile
 

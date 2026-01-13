@@ -18,8 +18,11 @@ jobs:
         app:
           - name: web
             dockerfile: apps/web/Dockerfile
+            build-args: |
+              NEXT_PUBLIC_API_URL=https://amang-api.json-server.win
           - name: api
             dockerfile: apps/api/Dockerfile
+            build-args: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,5 +50,6 @@ jobs:
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:latest
+          build-args: ${{ matrix.app.build-args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
