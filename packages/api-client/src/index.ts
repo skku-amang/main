@@ -234,9 +234,12 @@ export default class ApiClient {
         throw error
       }
       // 그 외의 경우 InternalServerError로 래핑 (네트워크 오류 등)
-      throw new InternalServerError(
+      const errorMessage =
         error instanceof Error ? error.message : "Unknown error"
+      console.error(
+        `[ApiClient] Network error - URL: ${this.baseUrl}${endpoint}, Error: ${errorMessage}`
       )
+      throw new InternalServerError(errorMessage)
     }
   }
 
