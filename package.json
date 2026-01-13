@@ -8,7 +8,7 @@
     "format": "turbo format",
     "check-types": "turbo check-types",
     "db:deploy": "turbo db:deploy",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

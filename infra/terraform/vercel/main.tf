@@ -24,8 +24,7 @@ resource "vercel_project" "web" {
 
   root_directory = "apps/web"
 
-  install_command  = "cd ../.. && pnpm install"
-  build_command    = "cd ../.. && pnpm turbo run build --filter=web"
+  build_command    = "cd ../.. && HUSKY=0 pnpm install && pnpm turbo run build --filter=web"
   output_directory = ".next"
 
   enable_affected_projects_deployments = false
