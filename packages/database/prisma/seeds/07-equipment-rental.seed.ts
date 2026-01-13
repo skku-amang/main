@@ -1,4 +1,4 @@
-import { PrismaClient, Equipment, User, Prisma } from "../../generated/prisma"
+import { PrismaClient, Equipment, User } from "../../generated/prisma"
 import { EquipCategory } from "../../generated/prisma"
 import {
   getRandomBoolean,
@@ -24,7 +24,7 @@ const generateSequentialRentals = async (
     const breakHours = getRandomInt(0, 2)
 
     const startAt = new Date(
-      currentTime.getDate() + breakHours * 60 * 60 * 1000
+      currentTime.getTime() + breakHours * 60 * 60 * 1000
     )
     startAt.setMinutes(startAt.getMinutes() + 15)
 
