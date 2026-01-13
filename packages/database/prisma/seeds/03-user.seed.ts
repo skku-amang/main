@@ -62,7 +62,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
 
   console.log("Seeding General Users")
 
-  const generalUsers = Array.from({ length: 10 }, (_, index) => {
+  const generalUsers = Array.from({ length: 20 }, (_, index) => {
     const userNumber = index + 1
     const nickname = `사용자${userNumber}`
     const email = `user${userNumber}@g.skku.edu`
