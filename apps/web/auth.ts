@@ -156,20 +156,30 @@ export const signOut = nextAuth.signOut
 export const auth: () => Promise<Session | null> = nextAuth.auth
 
 async function login({ email, password }: LoginUser) {
-  const { user, accessToken, expiresIn, refreshToken } = await apiClient.login({
-    email,
-    password
-  })
-  return {
-    id: user.id.toString(),
-    name: user.name,
-    nickname: user.nickname,
-    email: user.email,
-    isAdmin: user.isAdmin,
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    expiresIn: expiresIn
-  } as User
+  console.log(
+    "[auth] login attempt with API URL:",
+    process.env.NEXT_PUBLIC_API_URL
+  )
+  try {
+    const { user, accessToken, expiresIn, refreshToken } =
+      await apiClient.login({
+        email,
+        password
+      })
+    return {
+      id: user.id.toString(),
+      name: user.name,
+      nickname: user.nickname,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      expiresIn: expiresIn
+    } as User
+  } catch (error) {
+    console.error("[auth] login error:", error)
+    throw error
+  }
 }
 
 async function signup({
