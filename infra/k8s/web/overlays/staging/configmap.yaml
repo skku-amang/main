@@ -4,4 +4,3 @@ metadata:
   name: web-config
 data:
   NODE_ENV: development
-  NEXT_PUBLIC_DEVELOPMENT_URL: https://amang-api-staging.json-server.win
