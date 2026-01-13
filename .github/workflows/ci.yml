@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
+  lint-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,11 +28,16 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm turbo db:generate
 
-      - name: Run Build
-        run: pnpm turbo build
+      - name: Run Lint & Type Check
+        run: pnpm turbo lint check-types
 
-      - name: Run Checks & Tests
-        run: pnpm turbo lint check-types test
+      - name: Run Tests
+        run: pnpm turbo test
 
       - name: Check Format
         run: pnpm turbo format
+
+      - name: Build API
+        run: pnpm turbo build --filter=api
+
+      # Web은 Vercel에서 빌드 및 배포를 처리하므로 여기서는 제외
