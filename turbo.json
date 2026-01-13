@@ -20,7 +20,7 @@
       "env": ["NODE_ENV"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "^db:generate"]
     },
     "dev": {
       "dependsOn": ["^db:generate"],
