@@ -15,7 +15,7 @@ export const getRandomItems = <T>(arr: T[], count: number): T[] => {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
 
-    ;[shuffled[j], shuffled[i]] = [shuffled[i], shuffled[j]]
+    ;[shuffled[j], shuffled[i]] = [shuffled[i]!, shuffled[j]!]
   }
 
   return shuffled.slice(0, count)
