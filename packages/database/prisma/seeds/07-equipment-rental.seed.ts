@@ -26,7 +26,7 @@ const generateSequentialRentals = async (
     const startAt = new Date(
       currentTime.getTime() + breakHours * 60 * 60 * 1000
     )
-    startAt.setMinutes(startAt.getMinutes() + 15)
+    startAt.setMinutes(startAt.getMinutes() + getRandomItem([0, 15, 30]))
 
     if (startAt >= endDate) break
 
