@@ -5,7 +5,8 @@ import {
   seedSessions,
   seedUsers,
   seedEquipment,
-  seedTeam
+  seedTeam,
+  seedEquipmentRental
 } from "./seeds"
 const prisma = new PrismaClient()
 
@@ -17,6 +18,7 @@ const main = async () => {
   await seedPerformance(prisma)
   await seedTeam(prisma)
   await seedEquipment(prisma)
+  await seedEquipmentRental(prisma)
   console.log("Seeding finished.")
 }
 
