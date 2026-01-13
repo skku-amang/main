@@ -82,5 +82,57 @@ const generateSequentialRentals = async (
 }
 
 export const seedEquipmentRental = async (prisma: PrismaClient) => {
-  console.log("Seeding Equipment Rental completed.")
+  const users = await prisma.user.findMany({ where: { isAdmin: false } })
+  if (users.length === 0) {
+    console.log("No users found. Skipping rental seeding.")
+    return
+  }
+
+  const today = new Date()
+  const startDate = new Date(today.getFullYear(), today.getMonth() - 1)
+  const endDate = new Date(today.getFullYear(), today.getMonth() + 2, 1)
+
+  const room = await prisma.equipment.findFirst({
+    where: {
+      category: EquipCategory.ROOM
+    }
+  })
+
+  if (room) {
+    console.log("Seeding Amang Room Rental...")
+    await generateSequentialRentals(
+      prisma,
+      room,
+      users,
+      startDate,
+      endDate,
+      true
+    )
+
+    console.log("Seeding Amang Room completed.")
+  }
+
+  const equipments = await prisma.equipment.findMany({
+    where: {
+      category: EquipCategory.MICROPHONE
+    }
+  })
+
+  if (equipments) {
+    console.log("Seeding Equipment Rental Rental...")
+    await Promise.all(
+      equipments.map((equipment) =>
+        generateSequentialRentals(
+          prisma,
+          equipment,
+          users,
+          startDate,
+          endDate,
+          false
+        )
+      )
+    )
+
+    console.log("Seeding Equipment Rental completed.")
+  }
 }
