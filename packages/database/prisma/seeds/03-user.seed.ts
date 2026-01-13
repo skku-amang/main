@@ -3,8 +3,6 @@ import * as bcrypt from "bcrypt"
 import { getRandomItem } from "./utils"
 
 export const seedUsers = async (prisma: PrismaClient) => {
-  console.log("Seeding users...")
-
   const defaultPassword = process.env.SEED_DEFAULT_PASSWORD
   if (!defaultPassword) {
     console.error("SEED_DEFAULT_PASSWORD is not set.")
@@ -26,7 +24,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
 
   const hashedPassword = await bcrypt.hash(defaultPassword, 10)
 
-  console.log("Seeding Admin Users")
+  console.log("Seeding Admin Users...")
 
   const adminUsers = Array.from({ length: 5 }, (_, index) => {
     const userNumber = index + 1
@@ -60,7 +58,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
   await Promise.all(adminUsers)
   console.log("Seeding Admin Uers completed.")
 
-  console.log("Seeding General Users")
+  console.log("Seeding General Users...")
 
   const generalUsers = Array.from({ length: 20 }, (_, index) => {
     const userNumber = index + 1
