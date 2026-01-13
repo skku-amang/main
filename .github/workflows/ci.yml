@@ -31,13 +31,13 @@ jobs:
       - name: Run Lint & Type Check
         run: pnpm turbo lint check-types
 
-      - name: Run Tests
-        run: pnpm turbo test
-
       - name: Check Format
         run: pnpm turbo format
 
       - name: Build API
         run: pnpm turbo build --filter=api
+
+      - name: Run Tests
+        run: pnpm turbo test
 
       # Web은 Vercel에서 빌드 및 배포를 처리하므로 여기서는 제외
