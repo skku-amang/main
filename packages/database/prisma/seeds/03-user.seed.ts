@@ -13,12 +13,12 @@ export const seedUsers = async (prisma: PrismaClient) => {
   const sessions = await prisma.session.findMany()
 
   if (generations.length === 0) {
-    console.log("No Generation found. Please run generation seeds first.")
+    console.error("No Generation found. Please run generation seeds first.")
     return
   }
 
   if (sessions.length === 0) {
-    console.log("No Session found. Please run session seeds first.")
+    console.error("No Session found. Please run session seeds first.")
     return
   }
 

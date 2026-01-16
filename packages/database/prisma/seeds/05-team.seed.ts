@@ -17,7 +17,7 @@ export const seedTeam = async (prisma: PrismaClient) => {
     performances.length === 0 ||
     sessions.length === 0
   ) {
-    console.log("Need Performances, Users, and Sessions data to seed Teams.")
+    console.error("Need Performances, Users, and Sessions data to seed Teams.")
     return
   }
 

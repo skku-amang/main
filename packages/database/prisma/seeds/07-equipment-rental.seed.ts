@@ -84,7 +84,7 @@ const generateSequentialRentals = async (
 export const seedEquipmentRental = async (prisma: PrismaClient) => {
   const users = await prisma.user.findMany({ where: { isAdmin: false } })
   if (users.length === 0) {
-    console.log("No users found. Skipping rental seeding.")
+    console.error("No users found. Skipping rental seeding.")
     return
   }
 
