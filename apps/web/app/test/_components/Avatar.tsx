@@ -87,7 +87,7 @@ export default function Avatar({
         {/* 이름: 절대 말줄임 금지 */}
         <span
           className={cn(
-            "font-semibold text-slate-900 whitespace-nowrap",
+            "font-semibold text-primary whitespace-nowrap",
             s.nameText
           )}
         >

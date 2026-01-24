@@ -1,5 +1,6 @@
 import { AvatarSlide } from "./Avatar.slide"
 import { BreadcumbSlide } from "./Breadcumb.slide"
+import { CardSlide } from "./Card.slide"
 import { SearchBarSlide } from "./SearchBar.slide"
 
 export type Slide = {
@@ -8,4 +9,4 @@ export type Slide = {
   content: React.ReactNode
 }
 
-export const slides = [SearchBarSlide, AvatarSlide, BreadcumbSlide]
+export const slides = [SearchBarSlide, AvatarSlide, BreadcumbSlide, CardSlide]
