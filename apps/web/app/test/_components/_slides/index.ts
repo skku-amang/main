@@ -1,4 +1,5 @@
 import { AvatarSlide } from "./Avatar.slide"
+import { BadgesSlide } from "./Badges.slide"
 import { BreadcumbSlide } from "./Breadcumb.slide"
 import { CardSlide } from "./Card.slide"
 import { CheckboxSlide } from "./Checkbox.slide"
@@ -23,5 +24,6 @@ export const slides = [
   DropdownSlide,
   InputAreaSlide,
   ToastSlide,
-  VideoSlide
+  VideoSlide,
+  BadgesSlide
 ]
