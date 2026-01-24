@@ -1,11 +1,10 @@
 "use client"
 
 import * as React from "react"
-import SearchBar from "./_components/SearchBar"
-
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { slides as SLIDES } from "./_components/_slides"
 
 type Slide = {
   key: string
@@ -14,65 +13,7 @@ type Slide = {
 }
 
 export default function TestPage() {
-  const slides: Slide[] = React.useMemo(
-    () => [
-      {
-        key: "searchbar",
-        title: "SearchBar",
-        content: (
-          <section className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold"># SearchBar</h2>
-              <p className="text-sm text-muted-foreground">
-                size variants (xs / sm / md / lg) + width is controlled by
-                parent.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="rounded-xl border bg-white p-6 space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
-                  xs
-                </div>
-                <SearchBar size="xs" className="w-64" />
-                <SearchBar size="xs" className="w-80" />
-                <SearchBar size="xs" className="w-full max-w-md" />
-              </div>
-
-              <div className="rounded-xl border bg-white p-6 space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
-                  sm
-                </div>
-                <SearchBar size="sm" className="w-64" />
-                <SearchBar size="sm" className="w-80" />
-                <SearchBar size="sm" className="w-full max-w-md" />
-              </div>
-
-              <div className="rounded-xl border bg-white p-6 space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
-                  md
-                </div>
-                <SearchBar size="md" className="w-64" />
-                <SearchBar size="md" className="w-80" />
-                <SearchBar size="md" className="w-full max-w-md" />
-              </div>
-
-              <div className="rounded-xl border bg-white p-6 space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
-                  lg
-                </div>
-                <SearchBar size="lg" className="w-64" />
-                <SearchBar size="lg" className="w-80" />
-                <SearchBar size="lg" className="w-full max-w-md" />
-              </div>
-            </div>
-          </section>
-        )
-      }
-      // TODO: 여기에 slides 계속 추가
-    ],
-    []
-  )
+  const slides: Slide[] = SLIDES
 
   const [activeIndex, setActiveIndex] = React.useState(0)
   const trackRef = React.useRef<HTMLDivElement | null>(null)
@@ -149,7 +90,6 @@ export default function TestPage() {
         </div>
       </div>
 
-      {/* 상단 네비게이션(탭 스타일) */}
       <Tabs
         value={value}
         onValueChange={(next) => {
@@ -166,14 +106,9 @@ export default function TestPage() {
         </TabsList>
       </Tabs>
 
-      {/* 슬라이더 본문 */}
       <div
         ref={trackRef}
-        className="
-          w-full overflow-x-auto scroll-smooth
-          snap-x snap-mandatory
-          rounded-xl border bg-muted/20
-        "
+        className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory rounded-xl border bg-muted/20"
       >
         <div className="flex w-full">
           {slides.map((s) => (
