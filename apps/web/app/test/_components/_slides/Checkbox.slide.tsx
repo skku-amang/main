@@ -8,7 +8,8 @@ export const CheckboxSlide = {
       <div>
         <h2 className="text-lg font-semibold"># Checkbox</h2>
         <p className="text-sm text-muted-foreground">
-          size variants (xs / sm / md / lg) + width is controlled by parent.
+          size variants (xs / sm / md / lg) + width is controlled by parent or
+          classname.
         </p>
       </div>
 

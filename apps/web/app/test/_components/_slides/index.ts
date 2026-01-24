@@ -5,6 +5,8 @@ import { CheckboxSlide } from "./Checkbox.slide"
 import { DropdownSlide } from "./Dropdown.slide"
 import { InputAreaSlide } from "./InputArea.slide"
 import { SearchBarSlide } from "./SearchBar.slide"
+import { ToastSlide } from "./Toast.slide"
+import { VideoSlide } from "./Video.slide"
 
 export type Slide = {
   key: string
@@ -19,5 +21,7 @@ export const slides = [
   CardSlide,
   CheckboxSlide,
   DropdownSlide,
-  InputAreaSlide
+  InputAreaSlide,
+  ToastSlide,
+  VideoSlide
 ]

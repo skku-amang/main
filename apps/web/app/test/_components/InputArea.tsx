@@ -145,8 +145,11 @@ export default function InputArea({
             "placeholder:transition-opacity placeholder:duration-500",
             "focus:placeholder:opacity-0 focus-visible:ring-0 focus-visible:border-third",
             "disabled:cursor-not-allowed disabled:opacity-60",
+            "transition-[box-shadow,border-color] duration-200 ease-out",
+            "shadow-[0px_1px_2px_0px_rgba(15,23,42,0.06)]",
+            "hover:shadow-[0px_2px_6px_0px_rgba(15,23,42,0.10)]",
             isError && "border-destructive focus-visible:border-destructive",
-            errorMessage && isError && "pr-10",
+            isError && errorMessage && "pr-10",
             s.input,
             inputClassName
           )}

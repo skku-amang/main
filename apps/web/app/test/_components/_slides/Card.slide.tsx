@@ -8,7 +8,8 @@ export const CardSlide = {
       <div>
         <h2 className="text-lg font-semibold"># Card</h2>
         <p className="text-sm text-muted-foreground">
-          single variant · fixed sharp accent · width controlled by parent.
+          single variant · fixed sharp accent · width controlled by parent or
+          classname.
         </p>
       </div>
 
