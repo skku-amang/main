@@ -1,4 +1,5 @@
-import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationField"
+import dayjs from "dayjs"
+import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationSection"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -59,24 +60,15 @@ export function getRepresentativeRelativeTime(date: Date | string) {
   }
 }
 
-export function ReservationSplit(reservation: Reservation) {
-  const date = new Date(reservation.start)
+export function reservationSplit(reservation: Reservation) {
+  const start = dayjs(reservation.start)
+  const end = dayjs(reservation.end)
 
   return {
-    month: date.getMonth() + 1,
-    day: date.getDate(),
-    startTime: `${date.getHours()}:${date.getMinutes()}${date.getMinutes() == 0 ? "0" : ""}`,
-    endTime: `${new Date(reservation.end).getHours()}:${new Date(reservation.end).getMinutes()}`,
-    dayOfTheWeek: dayOfTheWeekList[date.getDay()]
+    month: start.month() + 1,
+    day: start.date(),
+    startTime: start.format("HH:mm"),
+    endTime: end.format("HH:mm"),
+    dayOfTheWeek: start.format("ddd")
   }
-}
-
-const dayOfTheWeekList: { [key: number]: string } = {
-  0: "Mon",
-  1: "Tue",
-  2: "Wed",
-  3: "Thu",
-  4: "Fri",
-  5: "Sat",
-  6: "Sun"
 }

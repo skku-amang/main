@@ -1,6 +1,6 @@
 import { Clock, UserRound } from "lucide-react"
-import { Reservation } from "../MobileReservationField"
-import { ReservationSplit } from "@/lib/utils"
+import { Reservation } from "../MobileReservationSection"
+import { reservationSplit } from "@/lib/utils"
 import dayjs from "dayjs"
 
 interface ReservationCardProps {
@@ -8,7 +8,7 @@ interface ReservationCardProps {
 }
 
 export default function ReservationCard({ reservation }: ReservationCardProps) {
-  const splitedReservation = ReservationSplit(reservation)
+  const splitedReservation = reservationSplit(reservation)
   const startDay = dayjs(reservation.start).format("YYYY-MM-DD")
   const today = dayjs().format("YYYY-MM-DD")
   const isToday = startDay === today
@@ -28,7 +28,9 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
       <div className="flex-1 text-zinc-600 gap-[2px] flex-col justify-center flex pl-5 h-full">
         <div className="flex justify-start gap-2 items-center">
           <Clock size={12} />
-          <span className="text-[10px] font-normal">{`${splitedReservation.startTime} - ${splitedReservation.endTime}`}</span>
+          <span className="text-[10px] font-normal">
+            {splitedReservation.startTime} - {splitedReservation.endTime}
+          </span>
         </div>
         <div className="flex justify-start gap-2 items-center">
           <UserRound size={12} />

@@ -1,4 +1,4 @@
-import { ReservationSplit } from "@/lib/utils"
+import { reservationSplit } from "@/lib/utils"
 import dayjs from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { Reservation } from "."
@@ -10,7 +10,7 @@ interface MobileMyReservationCardProps {
 export default function MobileMyReservationCard({
   reservation
 }: MobileMyReservationCardProps) {
-  const splitedReservation = ReservationSplit(reservation)
+  const splitedReservation = reservationSplit(reservation)
   const startDay = dayjs(reservation.start).format("YYYY-MM-DD")
   const today = dayjs().format("YYYY-MM-DD")
 

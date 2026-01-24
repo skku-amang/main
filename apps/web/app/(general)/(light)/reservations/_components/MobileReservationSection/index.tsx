@@ -3,6 +3,7 @@ import MobileReservationStatusCard from "./MobileReservationStatusCard"
 import MobileMyReservationCard from "./MobileMyReservationCard"
 
 export interface Reservation {
+  id: string
   start: string
   end: string
   user: string
@@ -13,7 +14,7 @@ interface MobileMyReservationFieldProps {
   myReservation: Reservation[]
 }
 
-export default function MobileReservationField({
+export default function MobileReservationSection({
   myReservation
 }: MobileMyReservationFieldProps) {
   return (
@@ -39,8 +40,11 @@ export default function MobileReservationField({
         value="myReservations"
         className="w-full flex flex-col gap-3"
       >
-        {myReservation.map((reservation, i) => (
-          <MobileMyReservationCard key={i} reservation={reservation} />
+        {myReservation.map((reservation) => (
+          <MobileMyReservationCard
+            key={reservation.id}
+            reservation={reservation}
+          />
         ))}
       </TabsContent>
     </Tabs>
