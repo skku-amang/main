@@ -3,6 +3,7 @@ import { BreadcumbSlide } from "./Breadcumb.slide"
 import { CardSlide } from "./Card.slide"
 import { CheckboxSlide } from "./Checkbox.slide"
 import { DropdownSlide } from "./Dropdown.slide"
+import { InputAreaSlide } from "./InputArea.slide"
 import { SearchBarSlide } from "./SearchBar.slide"
 
 export type Slide = {
@@ -17,5 +18,6 @@ export const slides = [
   BreadcumbSlide,
   CardSlide,
   CheckboxSlide,
-  DropdownSlide
+  DropdownSlide,
+  InputAreaSlide
 ]
