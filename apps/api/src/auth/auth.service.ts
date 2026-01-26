@@ -24,7 +24,9 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedRefreshToken, ...userResponse } = user
+    return { ...tokens, user: userResponse }
   }
 
   async login(loginDto: LoginUserDto) {
@@ -66,10 +68,13 @@ export class AuthService {
       name,
       isAdmin
     }
+    const accessTokenExpiresIn = this.configService.get<string>(
+      "ACCESS_TOKEN_EXPIRES_IN"
+    ) as string
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN")
+        expiresIn: accessTokenExpiresIn
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
@@ -77,7 +82,11 @@ export class AuthService {
       })
     ])
 
-    return { accessToken, refreshToken }
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: parseInt(accessTokenExpiresIn)
+    }
   }
 
   async refreshTokens(userId: number, refreshToken: string) {

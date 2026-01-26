@@ -16,10 +16,14 @@ jobs:
       fail-fast: false # 하나 실패해도 다른 것들 계속 실행
       matrix:
         app:
-          - name: web
-            dockerfile: apps/web/Dockerfile.dev
+          # web은 Vercel로 배포하므로 주석 처리
+          # - name: web
+          #   dockerfile: apps/web/Dockerfile
+          #   build-args: |
+          #     NEXT_PUBLIC_API_URL=https://amang-api.json-server.win
           - name: api
             dockerfile: apps/api/Dockerfile
+            build-args: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,10 +46,11 @@ jobs:
         with:
           context: .
           file: ${{ matrix.app.dockerfile }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:latest
+          build-args: ${{ matrix.app.build-args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

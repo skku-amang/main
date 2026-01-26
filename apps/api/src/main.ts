@@ -12,7 +12,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const httpAdapterHost = app.get(HttpAdapterHost)
   app.enableCors({
-    origin: "http://localhost:3000", // 프론트엔드 주소
+    origin: [
+      "http://localhost:3000",
+      "https://amang.json-server.win",
+      "https://amang-staging.json-server.win"
+    ],
     credentials: true
   })
   app.use(cookieParser())

@@ -33,7 +33,8 @@ const ROUTES = {
     DETAIL: (id: number) => `/members/${id}`
   },
   PROFILE: {
-    INDEX: "/profile"
+    INDEX: "/profile",
+    TEAMS: "/profile/teams"
   },
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",

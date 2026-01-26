@@ -6,22 +6,27 @@ import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
+import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
+import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import Loading from "@/app/_(errors)/Loading"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import { useTeam } from "@/hooks/api/useTeam"
+import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/lib/youtube/Player"
 import useTeamApplication from "./_hooks/useTeamApplication"
 
 interface TeamDetailProps {
   params: {
-    id: number
-    teamId: number
+    id: string
+    teamId: string
   }
 }
 
@@ -29,11 +34,17 @@ const TeamDetail = (props: TeamDetailProps) => {
   const session = useSession()
   const router = useRouter()
 
-  const performanceId = props.params.id
-  const id = props.params.teamId
+  const performanceId = Number(props.params.id)
+  const id = Number(props.params.teamId)
 
   const { data: team, isLoading, isError } = useTeam(id)
-  const { selectedSessions } = useTeamApplication(id)
+  const {
+    selectedSessions,
+    isSelected,
+    onAppendSession,
+    onRemoveSession,
+    onSubmit
+  } = useTeamApplication(id)
 
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
@@ -78,13 +89,14 @@ const TeamDetail = (props: TeamDetailProps) => {
 
       {/*수정 및 삭제 (모바일)*/}
       {session.data &&
-        (session.data.isAdmin ||
-          (session.data.id && +session.data.id === team.leaderId)) && (
+        (session.data.user.isAdmin ||
+          (session.data.user.id &&
+            +session.data.user.id === team.leaderId)) && (
           <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
             <DeleteEditButton
               performanceId={performanceId}
               team={team}
-              accessToken={session.data?.access}
+              accessToken={session.data?.accessToken}
             />
           </div>
         )}
@@ -111,31 +123,28 @@ const TeamDetail = (props: TeamDetailProps) => {
         {/* 세션 구성 */}
         <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
           {/* 세션 구성 */}
-          {team.memberSessions && (
+          {team.teamSessions && team.teamSessions.length > 0 && (
             <SessionSetCard
               header="세션구성"
               className="h-fit bg-white shadow-md"
             >
               <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">
-                {team.memberSessions
-                  .sort((a, b) => {
+                {team.teamSessions.map((ts) => {
+                  // capacity만큼의 슬롯을 모두 표시 (1부터 capacity까지)
+                  return Array.from(
+                    { length: ts.capacity },
+                    (_, i) => i + 1
+                  ).map((index) => {
+                    const sessionWithIndex = `${getSessionDisplayName(ts.session.name)}${index}`
                     return (
-                      SessionOrder.indexOf(a.session) -
-                      SessionOrder.indexOf(b.session)
+                      <SessionBadge
+                        key={`${ts.session.id}-${index}`}
+                        session={sessionWithIndex}
+                        className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
+                      />
                     )
                   })
-                  .map((ms) =>
-                    ms.members.map((_, index) => {
-                      const sessionWithIndex = `${ms.session}${index + 1}`
-                      return (
-                        <SessionBadge
-                          key={sessionWithIndex}
-                          session={sessionWithIndex}
-                          className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
-                        />
-                      )
-                    })
-                  )}
+                })}
               </div>
             </SessionSetCard>
           )}
@@ -155,6 +164,24 @@ const TeamDetail = (props: TeamDetailProps) => {
                 </div>
               </div>
               <Separator className="hidden h-[1.5px] w-full bg-slate-200 md:block" />
+              {team.teamSessions?.map((ts) =>
+                ts.members.map((member) => (
+                  <MemberSessionCard
+                    key={`${ts.session.id}-${member.index}`}
+                    teamId={id}
+                    sessionId={ts.session.id}
+                    sessionName={ts.session.name}
+                    sessionIndex={member.index}
+                    user={member.user}
+                    onUnapplySuccess={() => {}}
+                  />
+                ))
+              )}
+              {team.teamSessions?.every((ts) => ts.members.length === 0) && (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  아직 참여한 멤버가 없습니다.
+                </div>
+              )}
             </div>
           </SessionSetCard>
 
@@ -173,6 +200,46 @@ const TeamDetail = (props: TeamDetailProps) => {
                 수 있습니다
               </li>
             </ul>
+
+            {/* 빈 자리 세션 버튼들 */}
+            <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
+              {team.teamSessions?.map((ts) => {
+                const missingIndices = getMissingIndices(ts)
+                return missingIndices.map((index) => {
+                  const selected = isSelected(ts.session.id, index)
+                  return (
+                    <ApplyButton
+                      key={`apply-${ts.session.id}-${index}`}
+                      sessionName={ts.session.name}
+                      sessionIndex={index}
+                      isSelected={selected}
+                      onToggle={() => {
+                        if (selected) {
+                          onRemoveSession(ts.session.id, index)
+                        } else {
+                          onAppendSession(ts.session.id, index)
+                        }
+                      }}
+                    />
+                  )
+                })
+              })}
+            </div>
+
+            {/* 지원하기 버튼 */}
+            {selectedSessions.length > 0 && (
+              <Button className="mt-6 w-full" onClick={onSubmit}>
+                선택한 세션에 지원하기 ({selectedSessions.length}개)
+              </Button>
+            )}
+
+            {team.teamSessions?.every(
+              (ts) => getMissingIndices(ts).length === 0
+            ) && (
+              <div className="py-4 text-center text-sm text-gray-400">
+                모든 세션이 마감되었습니다.
+              </div>
+            )}
           </SessionSetCard>
         </div>
       </div>

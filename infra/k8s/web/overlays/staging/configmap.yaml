@@ -4,4 +4,3 @@ metadata:
   name: web-config
 data:
   NODE_ENV: development
-  NEXT_PUBLIC_DEVELOPMENT_URL: http://api-server.amang-api-development:8000

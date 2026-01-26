@@ -1,5 +1,6 @@
 import { useToast } from "@/components/hooks/use-toast"
-import { useTeamApplication as useTeamApplicationOriginal } from "@/hooks/api/useTeam"
+import { useApplyToTeam } from "@/hooks/api/useTeam"
+import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 type SelectedSessionWithIndex = {
@@ -9,10 +10,28 @@ type SelectedSessionWithIndex = {
 
 const useTeamApplication = (teamId: number) => {
   const { toast } = useToast()
-  const teamApplication = useTeamApplicationOriginal(teamId)
+  const queryClient = useQueryClient()
   const [selectedSessions, setSelectedSessions] = useState<
     SelectedSessionWithIndex[]
   >([])
+
+  const applyMutation = useApplyToTeam({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team", teamId] })
+      toast({
+        title: "지원 완료",
+        description: "팀에 지원이 완료되었습니다."
+      })
+      setSelectedSessions([])
+    },
+    onError: () => {
+      toast({
+        title: "지원 실패",
+        description: "팀 지원 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
 
   const isSelected = (sessionId: number, index: number) => {
     return selectedSessions.some(
@@ -49,12 +68,13 @@ const useTeamApplication = (teamId: number) => {
   }
 
   const onSubmit = async () => {
-    teamApplication.mutateAsync(selectedSessions)
+    await applyMutation.mutateAsync([teamId, selectedSessions])
   }
 
   return {
     selectedSessions,
     setSelectedSessions,
+    isSelected,
     onAppendSession,
     onRemoveSession,
     onSubmit

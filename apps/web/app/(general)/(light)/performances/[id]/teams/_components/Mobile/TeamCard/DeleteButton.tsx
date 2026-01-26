@@ -11,8 +11,9 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import useTeamDelete from "@/hooks/useTeamDelete"
+import { useDeleteTeam } from "@/hooks/api/useTeam"
 import { cn } from "@/lib/utils"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface TeamCardDeleteButtonProps {
   teamId: number
@@ -24,11 +25,14 @@ const TeamCardDeleteButton = ({
   className
 }: TeamCardDeleteButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { deleteTeam } = useTeamDelete()
+  const deleteTeam = useDeleteTeam()
+  const queryClient = useQueryClient()
 
   const onDelete = async () => {
-    const res = await deleteTeam(teamId)
+    const res = await deleteTeam.mutateAsync([teamId])
     if (res) {
+      // 팀 목록 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["teams"] })
       setIsOpen(false)
     }
   }

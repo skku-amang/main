@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, ReactNode, useContext } from "react"
+import { useSession } from "next-auth/react"
+import { createContext, ReactNode, useContext, useEffect } from "react"
 
 import { apiClient } from "@/lib/apiClient"
 import ApiClient from "@repo/api-client"
@@ -9,6 +10,7 @@ const ApiClientContext = createContext<ApiClient | null>(null)
 
 /**
  * 클라이언트 컴포넌트에서 사용
+ * 세션의 accessToken이 자동으로 주입된 ApiClient를 반환합니다.
  */
 export const useApiClient = () => {
   const context = useContext(ApiClientContext)
@@ -19,6 +21,21 @@ export const useApiClient = () => {
 }
 
 export const ApiClientProvider = ({ children }: { children: ReactNode }) => {
+  const { data: session, update } = useSession()
+
+  // 세션의 accessToken이 변경될 때마다 토큰만 업데이트
+  useEffect(() => {
+    apiClient.setAccessToken(session?.accessToken ?? null)
+  }, [session?.accessToken])
+
+  // 토큰 만료 시 세션 갱신 핸들러 설정
+  useEffect(() => {
+    apiClient.setOnTokenExpired(async () => {
+      const newSession = await update()
+      return newSession?.accessToken ?? null
+    })
+  }, [update])
+
   return (
     <ApiClientContext.Provider value={apiClient}>
       {children}

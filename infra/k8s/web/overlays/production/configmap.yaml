@@ -4,4 +4,3 @@ metadata:
   name: web-config
 data:
   NODE_ENV: production
-  NEXT_PUBLIC_DEPLOY_URL: http://api-server.amang-api-production:8000

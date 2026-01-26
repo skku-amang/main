@@ -20,7 +20,7 @@
       "env": ["NODE_ENV"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "^build"]
     },
     "dev": {
       "dependsOn": ["^db:generate"],
@@ -43,5 +43,11 @@
       "env": ["DATABASE_URL", "SEED_DEFAULT_PASSWORD"]
     }
   },
-  "globalEnv": ["NODE_ENV", "PORT", "DATABASE_URL"]
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "DATABASE_URL",
+    "AUTH_SECRET",
+    "NEXT_PUBLIC_API_URL"
+  ]
 }

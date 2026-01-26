@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationSection"
+import { SessionList } from "@repo/shared-types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -71,4 +72,13 @@ export function reservationSplit(reservation: Reservation) {
     endTime: end.format("HH:mm"),
     dayOfTheWeek: start.format("ddd")
   }
+export function getSessionIdBySessionName(
+  sessionName: string,
+  sessions: SessionList
+): number {
+  const session = sessions.find((s) => s.name === sessionName)
+  if (!session) {
+    throw new Error(`세션을 찾을 수 없습니다: ${sessionName}`)
+  }
+  return session.id
 }

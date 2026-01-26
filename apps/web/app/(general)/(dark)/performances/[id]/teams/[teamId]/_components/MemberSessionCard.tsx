@@ -3,18 +3,20 @@ import { useSession } from "next-auth/react"
 
 import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { formatGenerationOrder } from "@/lib/utils"
+import { getSessionDisplayName } from "@/constants/session"
 import { SessionName } from "@repo/database"
-import { Team, User } from "@repo/shared-types"
+import { TeamDetail } from "@repo/shared-types"
+
+type TeamMember = TeamDetail["teamSessions"][number]["members"][number]["user"]
 
 interface MemberSessionCardProps {
   teamId: number
   sessionId: number
   sessionName: SessionName
   sessionIndex: number
-  user: User
+  user: TeamMember
   // eslint-disable-next-line no-unused-vars
-  onUnapplySuccess: (team: Team) => void
+  onUnapplySuccess: (team: TeamDetail) => void
 }
 
 // TODO: Table으로 변경
@@ -37,7 +39,7 @@ const MemberSessionCard = ({
   return (
     <div className="flex py-4">
       <div className="hidden h-[48px] w-[160px] items-center pl-4 md:flex">
-        {sessionName}
+        {getSessionDisplayName(sessionName)}
         {sessionIndex}
       </div>
 
@@ -56,8 +58,7 @@ const MemberSessionCard = ({
             {sessionIndex}
           </div>
           <div className="text-sm font-normal leading-3 text-slate-700 md:text-xl md:font-medium md:leading-relaxed">
-            {/* TODO: Prisma 타입에서 외래 키인 `generation` 타입 추론 가능하게 설정 */}
-            {formatGenerationOrder(user.generationId)}기 {user.name}
+            {user.name}
           </div>
           <div className="hidden text-sm text-gray-400 md:block">
             #{user.nickname}
@@ -65,7 +66,7 @@ const MemberSessionCard = ({
         </div>
 
         {/* 탈퇴 버튼 */}
-        {user.id.toString() === authSession.data?.id && (
+        {user.id.toString() === authSession.data?.user.id && (
           <button
             className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
             onClick={handleUnapply}

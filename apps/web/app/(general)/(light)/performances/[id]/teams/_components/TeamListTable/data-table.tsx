@@ -38,11 +38,12 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import { getSessionDisplayName } from "@/constants/session"
 import {
-  MemberSession,
-  MemberSessionSet,
-  Performance
-} from "@repo/shared-types"
+  getSessionsWithMissingMembers,
+  isTeamSatisfied
+} from "@/lib/team/teamSession"
+import { Performance } from "@repo/shared-types"
 
 import {
   Select,
@@ -130,22 +131,24 @@ const reducer = (state: State, action: Action) => {
   newState.result = state.originalData.filter((team) => {
     return Object.entries(newState.filters).every(
       ([filterKey, filterValues]) => {
-        if (!team.memberSessions) return false
+        if (!team.teamSessions) return false
         switch (filterKey) {
           case "모집상태":
             if (filterValues === "active")
-              return !new MemberSessionSet(team.memberSessions).isSatisfied
+              return !isTeamSatisfied(team.teamSessions)
             if (filterValues === "inactive")
-              return new MemberSessionSet(team.memberSessions).isSatisfied
+              return isTeamSatisfied(team.teamSessions)
             return true
           // eslint-disable-next-line no-fallthrough
           case "필요세션":
             if ((filterValues as Set<string>).size === 0) return true
-            return new MemberSessionSet(team.memberSessions)
-              .getSessionsWithMissingMembers()
-              .some((ms) => {
-                return (filterValues as Set<string>).has(ms.session)
-              })
+            return getSessionsWithMissingMembers(team.teamSessions).some(
+              (ts) => {
+                return (filterValues as Set<string>).has(
+                  getSessionDisplayName(ts.session.name)
+                )
+              }
+            )
           default:
             throw new TypeError(`Invalid action type`)
         }
@@ -300,9 +303,7 @@ export function TeamListDataTable<TValue>({
     }
   })
 
-  const missingMemberSessions = (memberSessions: MemberSession[]) => {
-    return new MemberSessionSet(memberSessions).getSessionsWithMissingMembers()
-  }
+  const missingMemberSessions = getSessionsWithMissingMembers
 
   const sortOptions: {
     id: keyof TeamColumn
@@ -595,8 +596,8 @@ export function TeamListDataTable<TValue>({
                   isSelfMade={row.original.isSelfMade}
                   image={row.original.posterImage}
                   leader={row.original.leader}
-                  memberSessions={missingMemberSessions(
-                    row.original.memberSessions ?? []
+                  missingTeamSessions={missingMemberSessions(
+                    row.original.teamSessions
                   )}
                 />
               </div>

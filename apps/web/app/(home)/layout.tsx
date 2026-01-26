@@ -9,7 +9,7 @@ export default function RootLayout({
     <RootHeaderAndFooterWrapper
       headerMode="transparent"
       mainStyle={{
-        backgroundImage: `url('Music band_pixabay 1.png')`,
+        backgroundImage: `url('/Music band_pixabay 1.png')`,
         backgroundPosition: "center",
         backgroundSize: "cover"
       }}

@@ -6,7 +6,7 @@ import React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { formatGenerationOrder } from "@/lib/utils"
+import { getSessionDisplayName } from "@/constants/session"
 import { Session, User } from "@repo/shared-types"
 
 const SortButton = ({
@@ -29,7 +29,9 @@ const SortButton = ({
 
 const SessionBadge = ({ session }: { session: Session }) => {
   return (
-    <Badge className="rounded-lg bg-slate-200 text-black">{session.name}</Badge>
+    <Badge className="rounded-lg bg-slate-200 text-black">
+      {getSessionDisplayName(session.name)}
+    </Badge>
   )
 }
 
@@ -46,7 +48,7 @@ export const columns: ColumnDef<User>[] = [
     )
   },
   {
-    accessorKey: "generation",
+    accessorKey: "generationId",
     header: ({ column }) => (
       <div className="flex w-full justify-center">
         <SortButton column={column}>기수</SortButton>
@@ -54,7 +56,7 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {formatGenerationOrder(row.original.generation.order)}
+        {row.original.generationId}기
         <br />
       </div>
     )
@@ -72,29 +74,7 @@ export const columns: ColumnDef<User>[] = [
         </div>
       )
     }
-  },
-  {
-    accessorKey: "genre",
-    header: "선호 장르",
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-start gap-1 text-right font-medium">
-          <Badge className="bg-slate-200 p-2 px-3 text-black">
-            {row.original.genre}
-          </Badge>
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "likedArtists",
-    header: "최애 아티스트",
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-start gap-1 text-right font-medium">
-          <div>{row.original.likedArtists}</div>
-        </div>
-      )
-    }
   }
 ]
+
+// TODO: genre와 likedArtists 필드는 User 타입에 추가 후 컬럼 복원 필요
