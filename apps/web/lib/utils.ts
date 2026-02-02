@@ -72,6 +72,8 @@ export function reservationSplit(reservation: Reservation) {
     endTime: end.format("HH:mm"),
     dayOfTheWeek: start.format("ddd")
   }
+}
+
 export function getSessionIdBySessionName(
   sessionName: string,
   sessions: SessionList
