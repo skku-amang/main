@@ -29,6 +29,10 @@ resource "vercel_project" "web" {
   output_directory = ".next"
 
   enable_affected_projects_deployments = false
+
+  vercel_authentication = {
+    deployment_type = "none"
+  }
 }
 
 resource "vercel_project_environment_variable" "api_url_production" {
