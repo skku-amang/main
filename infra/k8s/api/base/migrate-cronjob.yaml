@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-migrate
+  labels:
+    app: api
+    job-type: migrate
+spec:
+  suspend: true
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      backoffLimit: 3
+      template:
+        metadata:
+          labels:
+            app: api
+            job-type: migrate
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: migrate
+              image: ghcr.io/skku-amang/amang-api:latest
+              imagePullPolicy: Always
+              command:
+                - sh
+                - -c
+                - cd packages/database && npx prisma migrate deploy
+              envFrom:
+                - secretRef:
+                    name: api-secrets
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
