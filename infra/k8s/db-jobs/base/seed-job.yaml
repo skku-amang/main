@@ -18,7 +18,7 @@ spec:
       containers:
         - name: seed
           image: ghcr.io/skku-amang/amang-api:latest
-          imagePullPolicy: Always
+          command: ["sh", "-c", "cd packages/database && npx ts-node prisma/seed.ts"]
           command: ["npx", "ts-node", "prisma/seed.ts"]
           env:
             - name: SEED_TYPE
