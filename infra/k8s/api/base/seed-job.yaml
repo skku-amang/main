@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: db-seed
   labels:
-    app: db-jobs
+    app: api
     job-type: seed
 spec:
   ttlSecondsAfterFinished: 300
@@ -11,21 +11,24 @@ spec:
   template:
     metadata:
       labels:
-        app: db-jobs
+        app: api
         job-type: seed
     spec:
       restartPolicy: Never
       containers:
         - name: seed
           image: ghcr.io/skku-amang/amang-api:latest
-          command: ["sh", "-c", "cd packages/database && npx ts-node prisma/seed.ts"]
-          command: ["npx", "ts-node", "prisma/seed.ts"]
+          imagePullPolicy: Always
+          command:
+            - sh
+            - -c
+            - cd packages/database && npx ts-node prisma/seed.ts
           env:
             - name: SEED_TYPE
               value: "test"
           envFrom:
             - secretRef:
-                name: db-job-secrets
+                name: api-secrets
           resources:
             limits:
               cpu: 500m

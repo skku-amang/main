@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: db-migrate
   labels:
-    app: db-jobs
+    app: api
     job-type: migrate
 spec:
   ttlSecondsAfterFinished: 300
@@ -11,18 +11,21 @@ spec:
   template:
     metadata:
       labels:
-        app: db-jobs
+        app: api
         job-type: migrate
     spec:
       restartPolicy: Never
       containers:
         - name: migrate
           image: ghcr.io/skku-amang/amang-api:latest
-          command: ["sh", "-c", "cd packages/database && npx prisma migrate deploy"]
-          command: ["npx", "prisma", "migrate", "deploy"]
+          imagePullPolicy: Always
+          command:
+            - sh
+            - -c
+            - cd packages/database && npx prisma migrate deploy
           envFrom:
             - secretRef:
-                name: db-job-secrets
+                name: api-secrets
           resources:
             limits:
               cpu: 500m

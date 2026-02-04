@@ -7,3 +7,12 @@ resources:
   - ../../base
   - ingress.yaml
   - secret.yaml
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "master"
+    target:
+      kind: Job
+      name: db-seed
