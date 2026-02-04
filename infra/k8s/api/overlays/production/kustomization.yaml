@@ -13,8 +13,8 @@ resources:
 patches:
   - patch: |-
       - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env/0/value
         value: "master"
     target:
-      kind: Job
+      kind: CronJob
       name: db-seed

@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-seed
+  labels:
+    app: api
+    job-type: seed
+spec:
+  suspend: true
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      backoffLimit: 3
+      template:
+        metadata:
+          labels:
+            app: api
+            job-type: seed
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: seed
+              image: ghcr.io/skku-amang/amang-api:latest
+              imagePullPolicy: Always
+              command:
+                - sh
+                - -c
+                - cd packages/database && npx ts-node prisma/seed.ts
+              env:
+                - name: SEED_TYPE
+                  value: "test"
+              envFrom:
+                - secretRef:
+                    name: api-secrets
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
