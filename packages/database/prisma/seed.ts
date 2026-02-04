@@ -10,8 +10,17 @@ import {
 } from "./seeds"
 const prisma = new PrismaClient()
 
-const main = async () => {
-  console.log("Seeding started...")
+type SeedType = "master" | "test"
+
+const seedMasterData = async () => {
+  console.log("Seeding master data...")
+  await seedSessions(prisma)
+  await seedGenerations(prisma)
+  console.log("Master data seeding finished.")
+}
+
+const seedTestData = async () => {
+  console.log("Seeding test data...")
   await seedSessions(prisma)
   await seedGenerations(prisma)
   await seedUsers(prisma)
@@ -19,7 +28,18 @@ const main = async () => {
   await seedTeam(prisma)
   await seedEquipment(prisma)
   await seedEquipmentRental(prisma)
-  console.log("Seeding finished.")
+  console.log("Test data seeding finished.")
+}
+
+const main = async () => {
+  const seedType = (process.env.SEED_TYPE || "test") as SeedType
+  console.log(`Seeding started with type: ${seedType}`)
+
+  if (seedType === "master") {
+    await seedMasterData()
+  } else {
+    await seedTestData()
+  }
 }
 
 main()
