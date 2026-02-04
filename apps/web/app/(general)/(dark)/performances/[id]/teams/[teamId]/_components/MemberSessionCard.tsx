@@ -1,7 +1,9 @@
 import { Minus } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useQueryClient } from "@tanstack/react-query"
 
-import useTeamApplication from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_hooks/useTeamApplication"
+import { useToast } from "@/components/hooks/use-toast"
+import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getSessionDisplayName } from "@/constants/session"
 import { SessionName } from "@repo/database"
@@ -25,15 +27,33 @@ const MemberSessionCard = ({
   sessionId,
   sessionName,
   sessionIndex,
-  user
+  user,
+  onUnapplySuccess
 }: MemberSessionCardProps) => {
   const authSession = useSession()
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
 
-  const { onRemoveSession, onSubmit } = useTeamApplication(teamId)
+  const unapplyMutation = useUnapplyFromTeam({
+    onSuccess: (team) => {
+      queryClient.invalidateQueries({ queryKey: ["team", teamId] })
+      toast({
+        title: "탈퇴 완료",
+        description: "팀에서 탈퇴되었습니다."
+      })
+      onUnapplySuccess(team)
+    },
+    onError: () => {
+      toast({
+        title: "탈퇴 실패",
+        description: "팀 탈퇴 중 오류가 발생했습니다.",
+        variant: "destructive"
+      })
+    }
+  })
 
   function handleUnapply() {
-    onRemoveSession(sessionId, sessionIndex)
-    onSubmit()
+    unapplyMutation.mutate([teamId, [{ sessionId, index: sessionIndex }]])
   }
 
   return (
