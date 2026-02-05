@@ -4,7 +4,7 @@ import { Separator } from "@radix-ui/react-separator"
 import { Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
@@ -24,19 +24,13 @@ import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/lib/youtube/Player"
 import useTeamApplication from "./_hooks/useTeamApplication"
 
-interface TeamDetailProps {
-  params: {
-    id: string
-    teamId: string
-  }
-}
-
-const TeamDetail = (props: TeamDetailProps) => {
+const TeamDetail = () => {
+  const params = useParams()
   const session = useSession()
   const router = useRouter()
 
-  const performanceId = Number(props.params.id)
-  const id = Number(props.params.teamId)
+  const performanceId = Number(params.id)
+  const id = Number(params.teamId)
 
   const { data: team, isLoading, isError } = useTeam(id)
   const { canEdit } = useTeamPermission(team)

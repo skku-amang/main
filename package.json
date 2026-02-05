@@ -20,7 +20,7 @@
   },
   "packageManager": "pnpm@10.13.1",
   "engines": {
-    "node": ">=18"
+    "node": ">=20.9.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
