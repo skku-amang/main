@@ -8,6 +8,7 @@ import ROUTES from "@/constants/routes"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useTeams } from "@/hooks/api/useTeam"
 import { useParams } from "next/navigation"
+import TeamListSkeleton from "./_components/TeamListSkeleton"
 import { columns } from "./_components/TeamListTable/columns"
 import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 
@@ -20,7 +21,7 @@ const TeamList = () => {
     usePerformances()
 
   if (teamsStatus === "pending" || relatedPerformancesStatus === "pending") {
-    return <div>로딩중...</div>
+    return <TeamListSkeleton />
   }
 
   if (
