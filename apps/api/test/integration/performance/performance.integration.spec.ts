@@ -22,13 +22,13 @@ describe("Performance Integration", () => {
 
   afterAll(async () => {
     // clean up any performances we created
-    if (createdIds.length > 0) {
-      for (const id of createdIds) {
+    for (const id of createdIds) {
+      try {
         await withAuth(
           request(app.getHttpServer()).delete(`/performances/${id}`),
           adminTokens
-        ).catch(() => {})
-      }
+        )
+      } catch {}
     }
     await closeTestApp()
   })

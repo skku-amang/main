@@ -4,7 +4,7 @@ import * as path from "path"
 const envPath = path.resolve(__dirname, "../../../.env.test")
 const envContent = fs.readFileSync(envPath, "utf8")
 
-for (const line of envContent.split("\n")) {
+for (const line of envContent.split(/\r?\n/)) {
   const trimmed = line.trim()
   if (!trimmed || trimmed.startsWith("#")) continue
   const eqIndex = trimmed.indexOf("=")

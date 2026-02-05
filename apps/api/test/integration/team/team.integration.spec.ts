@@ -42,16 +42,20 @@ describe("Team Integration", () => {
   afterAll(async () => {
     // clean up teams
     for (const id of createdTeamIds) {
-      await withAuth(
-        request(app.getHttpServer()).delete(`/teams/${id}`),
-        adminTokens
-      ).catch(() => {})
+      try {
+        await withAuth(
+          request(app.getHttpServer()).delete(`/teams/${id}`),
+          adminTokens
+        )
+      } catch {}
     }
     // clean up performance
-    await withAuth(
-      request(app.getHttpServer()).delete(`/performances/${performanceId}`),
-      adminTokens
-    ).catch(() => {})
+    try {
+      await withAuth(
+        request(app.getHttpServer()).delete(`/performances/${performanceId}`),
+        adminTokens
+      )
+    } catch {}
 
     await closeTestApp()
   })
