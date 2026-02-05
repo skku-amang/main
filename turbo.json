@@ -19,6 +19,10 @@
       "persistent": true,
       "env": ["NODE_ENV"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "env": ["NODE_ENV", "DATABASE_URL", "SEED_DEFAULT_PASSWORD"]
+    },
     "check-types": {
       "dependsOn": ["^check-types", "^build"]
     },
