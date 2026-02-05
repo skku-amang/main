@@ -2,7 +2,7 @@
 
 import { ImagePlus, Loader2, X } from "lucide-react"
 import Image from "next/image"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -14,8 +14,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { useGetPresignedUrl } from "@/hooks/api/useUpload"
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@repo/shared-types"
+import { useImageUpload } from "@/hooks/useImageUpload"
+import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
 
 import basicInfoSchema from "./schema"
 
@@ -25,75 +25,28 @@ interface PosterImageDialogProps {
 
 const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
   const [open, setOpen] = useState(false)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const { mutateAsync: getPresignedUrl } = useGetPresignedUrl()
-
   const currentImage = form.watch("posterImage")
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setError(null)
-
-    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      setError("지원하지 않는 파일 형식입니다. (JPEG, PNG, WebP만 가능)")
-      return
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setError("파일 크기는 20MB 이하여야 합니다.")
-      return
-    }
-
-    setSelectedFile(file)
-    setPreview(URL.createObjectURL(file))
-  }
-
-  async function handleUpload() {
-    if (!selectedFile) return
-
-    setIsUploading(true)
-    setError(null)
-
-    try {
-      const { uploadUrl, publicUrl } = await getPresignedUrl([
-        { filename: selectedFile.name, contentType: selectedFile.type }
-      ])
-
-      await fetch(uploadUrl, {
-        method: "PUT",
-        body: selectedFile,
-        headers: { "Content-Type": selectedFile.type }
-      })
-
+  const {
+    file,
+    preview,
+    isUploading,
+    error,
+    inputRef,
+    handleFileSelect,
+    upload,
+    reset
+  } = useImageUpload({
+    onSuccess: (publicUrl) => {
       form.setValue("posterImage", publicUrl)
       setOpen(false)
-      resetState()
-    } catch {
-      setError("업로드 중 오류가 발생했습니다. 다시 시도해주세요.")
-    } finally {
-      setIsUploading(false)
+      reset()
     }
-  }
+  })
 
   function handleRemove() {
     form.setValue("posterImage", "")
-    resetState()
-  }
-
-  function resetState() {
-    setSelectedFile(null)
-    setPreview(null)
-    setError(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    reset()
   }
 
   return (
@@ -101,7 +54,7 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen)
-        if (!isOpen) resetState()
+        if (!isOpen) reset()
       }}
     >
       <DialogTrigger>
@@ -155,7 +108,7 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
           {/* 파일 선택 */}
           <div className="flex items-center gap-x-3">
             <input
-              ref={fileInputRef}
+              ref={inputRef}
               type="file"
               accept={ACCEPTED_IMAGE_TYPES.join(",")}
               onChange={handleFileSelect}
@@ -164,8 +117,8 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
             <Button
               type="button"
               className="bg-secondary"
-              disabled={!selectedFile || isUploading}
-              onClick={handleUpload}
+              disabled={!file || isUploading}
+              onClick={upload}
             >
               {isUploading ? (
                 <Loader2 size={16} className="animate-spin" />
