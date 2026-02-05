@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import ErrorPage from "@/app/_(errors)/Error"
+import Loading from "@/app/_(errors)/Loading"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
@@ -17,8 +18,12 @@ const TeamEditPage = () => {
   const performanceId = Number(params.id)
   const teamId = Number(params.teamId)
 
-  const { data: team, isError } = useTeam(teamId)
+  const { data: team, isLoading, isError } = useTeam(teamId)
   const { canEdit } = useTeamPermission(team)
+
+  if (isLoading) {
+    return <Loading />
+  }
 
   if (isError) {
     return <ErrorPage />
@@ -34,7 +39,7 @@ const TeamEditPage = () => {
       <TeamFormBackground />
 
       <OleoPageHeader
-        title="Create Your Team"
+        title="Edit Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId)}
       />
 
