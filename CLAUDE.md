@@ -45,7 +45,7 @@ cd packages/database && pnpm db:generate  # Prisma 클라이언트 생성
 
 **Apps:**
 
-- `apps/web` - Next.js 14 프론트엔드 (App Router, next-auth v5, TanStack Query)
+- `apps/web` - Next.js 16 프론트엔드 (App Router, Turbopack, next-auth v5, TanStack Query)
 - `apps/api` - NestJS 백엔드 (JWT 인증, Prisma ORM)
 
 **Packages:**
