@@ -19,15 +19,15 @@
     "db:reset": "prisma migrate reset --force --skip-generate && pnpm db:seed"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.1",
+    "@prisma/client": "^6.19.2",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",
-    "@types/node": "^24.1.0",
-    "prisma": "^6.11.1",
+    "@types/node": "^24.10.10",
+    "prisma": "^6.19.2",
     "ts-node": "^10.9.2"
   },
   "prettier": "@repo/eslint-config/prettier.config"
