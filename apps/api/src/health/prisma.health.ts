@@ -4,6 +4,7 @@ import {
   HealthIndicator,
   HealthIndicatorResult
 } from "@nestjs/terminus"
+import { Prisma } from "@repo/database"
 import { PrismaService } from "../prisma/prisma.service"
 
 @Injectable()
@@ -14,7 +15,7 @@ export class PrismaHealthIndicator extends HealthIndicator {
 
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     try {
-      await this.prisma.$queryRawUnsafe("SELECT 1")
+      await this.prisma.$queryRaw(Prisma.sql`SELECT 1`)
       return this.getStatus(key, true)
     } catch (error) {
       throw new HealthCheckError(
