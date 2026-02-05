@@ -9,9 +9,10 @@ import { Observable } from "rxjs"
 import { map } from "rxjs/operators"
 
 @Injectable()
-export class ApiResultInterceptor<T>
-  implements NestInterceptor<T, ApiResult<T>>
-{
+export class ApiResultInterceptor<T> implements NestInterceptor<
+  T,
+  ApiResult<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler
