@@ -94,19 +94,16 @@ const TeamDetail = () => {
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
           <BasicInfo team={team} canEdit={canEdit} />
-          <div className="hidden w-full overflow-clip md:block">
-            {team.posterImage && (
+          {team.posterImage && (
+            <div className="relative hidden aspect-[3/4] w-full overflow-clip rounded-lg md:block">
               <Image
-                className="rounded-lg"
+                className="rounded-lg object-cover"
                 src={team.posterImage}
                 alt="poster"
                 fill
               />
-            )}
-            <div className="absolute bottom-[16px] right-[16px] flex h-11 w-11 animate-pulse items-center justify-center rounded-[10px] bg-gray-600/50 md:hidden">
-              <Maximize2 className="text-white" />
             </div>
-          </div>
+          )}
         </div>
 
         {/* 세션 구성 */}
