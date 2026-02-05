@@ -1,17 +1,18 @@
 import {
-  Injectable,
-  NestInterceptor,
+  CallHandler,
   ExecutionContext,
-  CallHandler
+  Injectable,
+  NestInterceptor
 } from "@nestjs/common"
+import { ApiResult } from "@repo/api-client"
 import { Observable } from "rxjs"
 import { map } from "rxjs/operators"
-import { ApiResult } from "@repo/api-client"
 
 @Injectable()
-export class ApiResultInterceptor<T>
-  implements NestInterceptor<T, ApiResult<T>>
-{
+export class ApiResultInterceptor<T> implements NestInterceptor<
+  T,
+  ApiResult<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler

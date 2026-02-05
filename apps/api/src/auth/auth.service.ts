@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { JwtService } from "@nestjs/jwt"
+import { JwtService, JwtSignOptions } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
@@ -70,15 +70,17 @@ export class AuthService {
     }
     const accessTokenExpiresIn = this.configService.get<string>(
       "ACCESS_TOKEN_EXPIRES_IN"
-    ) as string
+    )!
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: accessTokenExpiresIn
+        expiresIn: accessTokenExpiresIn as JwtSignOptions["expiresIn"]
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
-        expiresIn: this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN")
+        expiresIn: this.configService.get<string>(
+          "REFRESH_TOKEN_EXPIRES_IN"
+        ) as JwtSignOptions["expiresIn"]
       })
     ])
 
