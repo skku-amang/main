@@ -1,6 +1,6 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import ErrorPage from "@/app/_(errors)/Error"
@@ -8,17 +8,25 @@ import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
 import { useTeam } from "@/hooks/api/useTeam"
+import { useTeamPermission } from "@/hooks/useTeamPermission"
 import TeamForm from "../../_components/TeamForm"
 
 const TeamEditPage = () => {
   const params = useParams()
+  const router = useRouter()
   const performanceId = Number(params.id)
   const teamId = Number(params.teamId)
 
   const { data: team, isError } = useTeam(teamId)
+  const { canEdit } = useTeamPermission(team)
 
   if (isError) {
     return <ErrorPage />
+  }
+
+  if (team && !canEdit) {
+    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId))
+    return null
   }
 
   return (

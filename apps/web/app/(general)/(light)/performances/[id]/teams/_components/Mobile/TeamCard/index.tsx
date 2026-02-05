@@ -1,7 +1,6 @@
 "use client"
 
 import { Image, PencilLine, Trash2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
@@ -13,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
+import { useTeamPermission } from "@/hooks/useTeamPermission"
 import {
   getMissingIndices,
   TeamFromList,
@@ -42,8 +42,7 @@ const TeamCard = ({
   leader,
   missingTeamSessions
 }: TeamCardProps) => {
-  const { data: session } = useSession()
-  const user = session?.user
+  const { canEdit } = useTeamPermission({ leaderId: leader.id })
 
   return (
     <div className="rounded-lg bg-white p-5 shadow-md">
@@ -119,7 +118,7 @@ const TeamCard = ({
       </Link>
 
       {/* 액션: 편집, 삭제 */}
-      {user && (user.isAdmin || (user.id && +user.id === leader.id)) && (
+      {canEdit && (
         <div className="mt-3 grid grid-cols-2 gap-x-4">
           <Button
             asChild

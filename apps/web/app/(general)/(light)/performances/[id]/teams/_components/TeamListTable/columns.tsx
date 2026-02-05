@@ -9,11 +9,11 @@ import {
   Pencil,
   Trash2
 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
 
 import DeleteButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
+import { useTeamPermission } from "@/hooks/useTeamPermission"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -55,13 +55,11 @@ const SortButton = ({
 }
 
 const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
-  const { data: session } = useSession()
+  const { canEdit } = useTeamPermission({
+    leaderId: row.original.leader.id
+  })
 
-  if (
-    session?.user &&
-    ((session.user.id && row.original.leader.id === +session.user.id) ||
-      session.user.isAdmin)
-  ) {
+  if (canEdit) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useTeam } from "@/hooks/api/useTeam"
+import { useTeamPermission } from "@/hooks/useTeamPermission"
 import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/lib/youtube/Player"
 import useTeamApplication from "./_hooks/useTeamApplication"
@@ -38,6 +39,7 @@ const TeamDetail = (props: TeamDetailProps) => {
   const id = Number(props.params.teamId)
 
   const { data: team, isLoading, isError } = useTeam(id)
+  const { canEdit } = useTeamPermission(team)
   const {
     selectedSessions,
     isSelected,
@@ -88,31 +90,16 @@ const TeamDetail = (props: TeamDetailProps) => {
       </div>
 
       {/*수정 및 삭제 (모바일)*/}
-      {session.data &&
-        (session.data.user.isAdmin ||
-          (session.data.user.id &&
-            +session.data.user.id === team.leaderId)) && (
-          <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-            <DeleteEditButton
-              performanceId={performanceId}
-              team={team}
-              accessToken={session.data?.accessToken}
-            />
-          </div>
-        )}
+      {canEdit && (
+        <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
+          <DeleteEditButton performanceId={performanceId} team={team} />
+        </div>
+      )}
 
       <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
-          <BasicInfo
-            team={team}
-            canEdit={
-              !!session.data &&
-              (session.data.user.isAdmin ||
-                (!!session.data.user.id &&
-                  +session.data.user.id === team.leaderId))
-            }
-          />
+          <BasicInfo team={team} canEdit={canEdit} />
           <div className="hidden w-full overflow-clip md:block">
             {team.posterImage && (
               <Image
