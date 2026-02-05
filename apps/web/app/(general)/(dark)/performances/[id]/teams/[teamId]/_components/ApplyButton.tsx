@@ -47,7 +47,7 @@ const ApplyButton = ({
   }, [])
 
   return (
-    <button className="relative h-full w-full" onClick={onToggle}>
+    <button className="relative h-full w-full md:w-auto" onClick={onToggle}>
       <div
         className={cn(
           "relative flex h-[100px] w-full items-center overflow-hidden rounded bg-slate-50 max-[470px]:h-[60px] md:h-[160px] md:w-[250px] md:overflow-visible",
