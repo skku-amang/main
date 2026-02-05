@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import ROUTES from "@/constants/routes"
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // If the user is not logged in and is trying to access a protected route
