@@ -33,7 +33,7 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
 
   const { mutateAsync: getPresignedUrl } = useGetPresignedUrl()
 
-  const currentImage = form.getValues("posterImage")
+  const currentImage = form.watch("posterImage")
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
