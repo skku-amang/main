@@ -39,6 +39,7 @@ export class ObjectStorageService implements OnModuleInit {
 
     // Minio 호환: SDK가 자동으로 추가하는 체크섬 헤더 제거
     this.s3.middlewareStack.add(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (next) => async (args: any) => {
         if (args.request?.headers) {
           for (const key of Object.keys(args.request.headers)) {

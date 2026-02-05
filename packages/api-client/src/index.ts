@@ -31,8 +31,6 @@ import {
   RentalList,
   UpdateSession,
   UpdateTeam,
-  UpdateUser,
-  User,
   publicUserList,
   PresignedUrlRequest,
   PresignedUrlResponse
