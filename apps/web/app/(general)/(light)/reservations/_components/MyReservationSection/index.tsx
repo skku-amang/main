@@ -1,21 +1,15 @@
+import dayjs from "dayjs"
+import { Reservation } from "../MobileReservationSection"
 import ReservationCard from "./ReservationCard"
 
-export default function MyReservationField() {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ]
-  const currentMonth = monthNames[new Date().getMonth()]
+interface MyReservationFieldProps {
+  myReservation: Reservation[]
+}
+
+export default function MyReservationSection({
+  myReservation
+}: MyReservationFieldProps) {
+  const currentMonth = dayjs().format("MMMM")
   return (
     <div className="w-full bg-white h-full py-7 px-5 rounded-[12px]">
       <div className="justify-start mb-4 text-Zinc-700 text-xl font-semibold">
@@ -26,7 +20,9 @@ export default function MyReservationField() {
       </span>
       <div className="w-full flex flex-col pt-3 gap-[10px]">
         {/* TODO: API 연결 시, map 함수 도입 */}
-        <ReservationCard />
+        {myReservation.map((reservation) => (
+          <ReservationCard key={reservation.id} reservation={reservation} />
+        ))}
       </div>
     </div>
   )

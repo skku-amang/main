@@ -1,3 +1,5 @@
+import dayjs from "dayjs"
+import { Reservation } from "@/app/(general)/(light)/reservations/_components/MobileReservationSection"
 import { SessionList } from "@repo/shared-types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -56,6 +58,19 @@ export function getRepresentativeRelativeTime(date: Date | string) {
     return `${diffMonths}개월 전`
   } else {
     return `${diffYears}년 전`
+  }
+}
+
+export function reservationSplit(reservation: Reservation) {
+  const start = dayjs(reservation.start)
+  const end = dayjs(reservation.end)
+
+  return {
+    month: start.month() + 1,
+    day: start.date(),
+    startTime: start.format("HH:mm"),
+    endTime: end.format("HH:mm"),
+    dayOfTheWeek: start.format("ddd")
   }
 }
 

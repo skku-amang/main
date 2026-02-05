@@ -8,33 +8,29 @@ interface MonthCalendarFieldProps {
   currentMonday: Dayjs
 }
 
-export default function MonthCalendarField({
+export default function MonthCalendarView({
   currentMonday
 }: MonthCalendarFieldProps) {
-  const WeekLabelList = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  const visibleMonth = currentMonday.startOf("month")
 
-  // 1) 이 달의 첫째 날
-  const currentMonth = currentMonday.startOf("month")
+  const calendarStartDate = visibleMonth.startOf("isoWeek")
+  const calendarEndDate = visibleMonth.endOf("month").endOf("isoWeek")
 
-  // 2) 월간 그리드의 시작/끝 (월~일 기준, ISO 주)
-  const gridStart = currentMonth.startOf("isoWeek")
-  const gridEnd = currentMonth.endOf("month").endOf("isoWeek")
-
-  // 3) 그리드에 들어갈 모든 날짜 생성
-  const daysInGrid: Dayjs[] = []
+  const calendarDates: Dayjs[] = []
   for (
-    let d = gridStart;
-    d.isBefore(gridEnd) || d.isSame(gridEnd, "day");
-    d = d.add(1, "day")
+    let date = calendarStartDate;
+    date.isBefore(calendarEndDate) || date.isSame(calendarEndDate, "day");
+    date = date.add(1, "day")
   ) {
-    daysInGrid.push(d)
+    calendarDates.push(date)
   }
 
   return (
     <div className="w-full mt-7 flex flex-col bg-white">
       {/* 요일 헤더 */}
       <div className="w-full flex">
-        {WeekLabelList.map((label) => (
+        {weekdayLabels.map((label) => (
           <div
             key={label}
             className="flex-1 flex justify-center h-10 border-t border-x border-gray-100 bg-gray-50 text-black text-[13px] font-medium items-center"
@@ -45,7 +41,7 @@ export default function MonthCalendarField({
       </div>
 
       {/* 월간 그리드 */}
-      <MonthBlock days={daysInGrid} currentMonth={currentMonth} />
+      <MonthBlock calendarDates={calendarDates} visibleMonth={visibleMonth} />
     </div>
   )
 }
