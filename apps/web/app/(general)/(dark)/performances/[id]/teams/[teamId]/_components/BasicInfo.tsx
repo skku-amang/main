@@ -8,19 +8,22 @@ import { TeamDetail } from "@repo/shared-types"
 
 interface BasicInfoProps {
   team: TeamDetail
+  canEdit?: boolean
 }
 
-const BasicInfo = ({ team }: BasicInfoProps) => {
+const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
   const isSatisfied = isTeamSatisfied(team.teamSessions ?? [])
 
   return (
     <div className="relative h-fit w-full rounded-2xl bg-white px-10 py-14 text-lg font-semibold shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
       {/* 수정 및 삭제 버튼(데스크탑) */}
-      <DeleteEditButton
-        className="absolute right-[40px] top-[60px] hidden w-[92px]  md:flex"
-        performanceId={team.id}
-        team={team}
-      />
+      {canEdit && (
+        <DeleteEditButton
+          className="absolute right-[40px] top-[60px] hidden w-[92px]  md:flex"
+          performanceId={team.id}
+          team={team}
+        />
+      )}
 
       {/* 신입고정 뱃지 */}
       {team.isFreshmenFixed && (

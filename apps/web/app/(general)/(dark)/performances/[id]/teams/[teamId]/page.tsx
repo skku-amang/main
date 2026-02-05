@@ -104,7 +104,15 @@ const TeamDetail = (props: TeamDetailProps) => {
       <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
-          <BasicInfo team={team} />
+          <BasicInfo
+            team={team}
+            canEdit={
+              !!session.data &&
+              (session.data.user.isAdmin ||
+                (!!session.data.user.id &&
+                  +session.data.user.id === team.leaderId))
+            }
+          />
           <div className="hidden w-full overflow-clip md:block">
             {team.posterImage && (
               <Image
