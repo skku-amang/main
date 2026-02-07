@@ -11,7 +11,7 @@ import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
-import Loading from "@/app/_(errors)/Loading"
+import TeamDetailSkeleton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/TeamDetailSkeleton"
 import NotFoundPage from "@/app/_(errors)/NotFound"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -45,7 +45,7 @@ const TeamDetail = () => {
   if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
   if (isLoading) {
-    return <Loading />
+    return <TeamDetailSkeleton performanceId={performanceId} />
   } else if (isError) {
     return <div>Error</div>
   } else if (!team) {

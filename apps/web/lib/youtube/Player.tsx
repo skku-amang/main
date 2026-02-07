@@ -2,8 +2,7 @@ import React from "react"
 
 import YoutubeVideo from "@/lib/youtube"
 
-interface YoutubePlayerProps
-  extends React.IframeHTMLAttributes<HTMLIFrameElement> {
+interface YoutubePlayerProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   videoUrl: string
 }
 
