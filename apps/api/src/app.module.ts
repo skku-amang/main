@@ -11,6 +11,7 @@ import { TeamModule } from "./team/team.module"
 import { PerformanceModule } from "./performance/performance.module"
 import { EquipmentModule } from "./equipment/equipment.module"
 import { RentalModule } from "./rental/rental.module"
+import { HealthModule } from "./health/health.module"
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RentalModule } from "./rental/rental.module"
       cache: true
     }),
     PrismaModule,
+    HealthModule,
     UsersModule,
     AuthModule,
     GenerationModule,
