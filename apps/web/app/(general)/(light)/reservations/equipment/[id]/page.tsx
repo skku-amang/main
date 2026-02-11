@@ -1,25 +1,33 @@
 "use client"
+
+import { useEffect, useMemo, useState } from "react"
+import { useParams } from "next/navigation"
+import Link from "next/link"
+import dayjs from "dayjs"
+import isoWeek from "dayjs/plugin/isoWeek"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
-import dayjs from "dayjs"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ROUTES from "@/constants/routes"
-import MyReservationField from "../_components/MyReservationField"
-import AddScheduleButton from "../_components/AddScheduleButton"
-import WeekCalendarField from "../_components/WeekCalendarField"
-import { useEffect, useMemo, useState } from "react"
-import isoWeek from "dayjs/plugin/isoWeek"
-import WeekLabel from "../_components/WeekLable"
-import MonthCalendarField from "../_components/MonthCalendarField"
-import MobileCalendarField from "../_components/MobileCalendarField"
+import { useEquipment } from "@/hooks/api/useEquipment"
 import { useRentals } from "@/hooks/api/useRental"
-import { useEquipments } from "@/hooks/api/useEquipment"
+import MyReservationField from "../../_components/MyReservationField"
+import AddScheduleButton from "../../_components/AddScheduleButton"
+import WeekCalendarField from "../../_components/WeekCalendarField"
+import WeekLabel from "../../_components/WeekLable"
+import MonthCalendarField from "../../_components/MonthCalendarField"
+import MobileCalendarField from "../../_components/MobileCalendarField"
+
 dayjs.extend(isoWeek)
 
-const ReservationPage = () => {
-  const getMonday = (date = dayjs()) => date.startOf("isoWeek")
+export default function EquipmentCalendarPage() {
+  const params = useParams()
+  const equipmentId = Number(params.id)
+  const { data: equipmentDetail } = useEquipment(equipmentId)
 
+  const getMonday = (date = dayjs()) => date.startOf("isoWeek")
   const [currentMonday, setCurrentMonday] = useState(getMonday())
   const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
 
@@ -27,7 +35,6 @@ const ReservationPage = () => {
     setCalendarViewMonth(currentMonday)
   }, [currentMonday])
 
-  // 데이터 조회 범위: 현재 보고 있는 달의 시작~끝 (+전후 1주)
   const queryRange = useMemo(() => {
     const monthStart = calendarViewMonth
       .startOf("month")
@@ -38,10 +45,9 @@ const ReservationPage = () => {
   }, [calendarViewMonth])
 
   const { data: rentals } = useRentals({
-    type: "room",
+    equipmentId,
     ...queryRange
   })
-  const { data: equipments } = useEquipments("room")
 
   const weekLabel = `${currentMonday.format("MMM DD")}–${currentMonday.add(6, "day").format("DD, YYYY")}`
   const monthLabel = calendarViewMonth.format("MMMM YYYY")
@@ -51,20 +57,37 @@ const ReservationPage = () => {
   )
 
   const rentalList = rentals ?? []
-  const equipmentList = equipments ?? []
+  const equipmentForSchedule = equipmentDetail ? [equipmentDetail] : []
+
+  const equipmentLabel = equipmentDetail
+    ? `${equipmentDetail.brand} ${equipmentDetail.model}`
+    : "로딩 중..."
 
   return (
     <div>
       <DefaultPageHeader
-        title="동아리방 예약"
+        title="물품 대여"
         routes={[
           { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "예약" },
-          { display: "동아리방 예약" }
+          { display: "물품 대여", href: ROUTES.RESERVATION.EQUIPMENT },
+          { display: equipmentLabel }
         ]}
       />
-      {/* PC 페이지 */}
-      <div className={`w-full min-h-[739px] hidden md:flex gap-5`}>
+
+      {/* Selected equipment header */}
+      <div className="mb-4 flex items-center gap-3">
+        <span className="text-lg font-semibold">선택된 물품</span>
+        <Link
+          href={ROUTES.RESERVATION.EQUIPMENT}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          다른 장비 선택
+        </Link>
+      </div>
+
+      {/* PC layout */}
+      <div className="hidden w-full min-h-[739px] gap-5 md:flex">
         <div className="w-1/4">
           <MyReservationField rentals={rentalList} />
         </div>
@@ -74,7 +97,6 @@ const ReservationPage = () => {
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>
             </TabsList>
-            {/* 주간 캘린더 */}
             <TabsContent className="relative" value="week">
               <WeekCalendarField
                 currentMonday={currentMonday}
@@ -92,10 +114,9 @@ const ReservationPage = () => {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentList}
+                equipments={equipmentForSchedule}
               />
             </TabsContent>
-            {/* 월간 캘린더 */}
             <TabsContent value="month" className="relative">
               <MonthCalendarField
                 currentMonday={currentMonday}
@@ -113,14 +134,15 @@ const ReservationPage = () => {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentList}
+                equipments={equipmentForSchedule}
               />
             </TabsContent>
           </Tabs>
         </div>
       </div>
-      {/* 모바일 페이지 */}
-      <div className="max-w-[400px] relative md:hidden mx-auto pt-6">
+
+      {/* Mobile layout */}
+      <div className="relative mx-auto max-w-[400px] pt-6 md:hidden">
         <MobileCalendarField
           currentMonday={currentMonday}
           rentals={rentalList}
@@ -134,11 +156,9 @@ const ReservationPage = () => {
           monthLabel={monthLabel}
           daysInCalendar={daysInCalendar}
           mode="month"
-          className="top-12 flex justify-between w-full px-5"
+          className="top-12 flex w-full justify-between px-5"
         />
       </div>
     </div>
   )
 }
-
-export default ReservationPage
