@@ -41,6 +41,15 @@
       "cache": false,
       "dependsOn": ["^db:generate", "^db:migrate"],
       "env": ["DATABASE_URL", "SEED_DEFAULT_PASSWORD"]
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"]
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
     }
   },
   "globalEnv": [
