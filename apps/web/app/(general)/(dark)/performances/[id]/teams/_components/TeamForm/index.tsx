@@ -55,7 +55,8 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       songArtist: initialData?.songArtist,
       isSelfMade: initialData?.isSelfMade,
       description: initialData?.description || "",
-      songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl || ""
+      songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl || "",
+      posterImage: initialData?.posterImage || ""
     }
   })
   function onFirstPageValid(formData: z.infer<typeof basicInfoSchema>) {
@@ -209,7 +210,8 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         songArtist: initialData.songArtist,
         isSelfMade: initialData.isSelfMade,
         description: initialData.description || "",
-        songYoutubeVideoUrl: initialData.songYoutubeVideoUrl || ""
+        songYoutubeVideoUrl: initialData.songYoutubeVideoUrl || "",
+        posterImage: initialData.posterImage || ""
       })
       secondPageForm.reset(constructDefaultValues(initialData))
     }
