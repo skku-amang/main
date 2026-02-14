@@ -21,7 +21,7 @@ export class ObjectStorageService implements OnModuleInit {
   private readonly publicUrl: string
 
   constructor(private readonly configService: ConfigService) {
-    const endpoint = this.configService.getOrThrow<string>("S3_ENDPOINT")
+    const endpoint = this.configService.get<string>("S3_ENDPOINT")
     this.bucket = this.configService.getOrThrow<string>("S3_BUCKET")
     this.publicUrl = this.configService.getOrThrow<string>("S3_PUBLIC_URL")
 
@@ -32,27 +32,10 @@ export class ObjectStorageService implements OnModuleInit {
         accessKeyId: this.configService.getOrThrow<string>("S3_ACCESS_KEY"),
         secretAccessKey: this.configService.getOrThrow<string>("S3_SECRET_KEY")
       },
-      forcePathStyle: true,
+      forcePathStyle: endpoint ? true : false,
       requestChecksumCalculation: "WHEN_REQUIRED",
       responseChecksumValidation: "WHEN_REQUIRED"
     })
-
-    // Minio 호환: SDK가 자동으로 추가하는 체크섬 헤더 제거
-    this.s3.middlewareStack.add(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (next) => async (args: any) => {
-        if (args.request?.headers) {
-          for (const key of Object.keys(args.request.headers)) {
-            if (key.startsWith("x-amz-checksum-")) {
-              delete args.request.headers[key]
-            }
-          }
-          delete args.request.headers["x-amz-sdk-checksum-algorithm"]
-        }
-        return next(args)
-      },
-      { step: "build", name: "stripChecksums", priority: "low" }
-    )
   }
 
   async onModuleInit() {
@@ -84,7 +67,7 @@ export class ObjectStorageService implements OnModuleInit {
     })
 
     const uploadUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 })
-    const publicUrl = `${this.publicUrl}/${key}`
+    const publicUrl = this.generatePublicUrl(key)
 
     return { uploadUrl, publicUrl }
   }
@@ -97,6 +80,17 @@ export class ObjectStorageService implements OnModuleInit {
         Key: key
       })
     )
+  }
+
+  private generatePublicUrl(key: string) {
+    const endpoint = this.configService.get<string>("S3_ENDPOINT")
+    const region = this.configService.get<string>("S3_REGION", "ap-northeast-2")
+
+    if (endpoint) {
+      return `${endpoint}/${this.bucket}/${key}`
+    }
+
+    return `https://${this.bucket}.s3.${region}.amazonaws.com/${key}`
   }
 
   private async ensureBucket() {
