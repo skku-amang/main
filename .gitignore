@@ -36,6 +36,9 @@ yarn-error.log*
 # Worktrees
 .worktrees
 
+# MCP config (contains API keys)
+.mcp.json
+
 # Misc
 .DS_Store
 *.pem

@@ -97,3 +97,8 @@ export const useTeam = createQueryHook(
 
 - `DATABASE_URL` - PostgreSQL 연결 문자열
 - `NEXT_PUBLIC_API_URL` - API 서버 URL (기본: <http://localhost:8000>)
+
+### MCP 사용 규칙
+
+- Notion: `amang-notion` MCP 사용 (`plugin:Notion` 아님)
+- Figma: `amang-figma` MCP 사용 (`plugin:figma` 아님)
