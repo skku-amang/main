@@ -3,6 +3,8 @@ import { fn } from "storybook/test"
 
 import { Button } from "./button"
 
+// Testing improved preview comment format
+
 const meta: Meta<typeof Button> = {
   title: "ui/Button",
   component: Button,
