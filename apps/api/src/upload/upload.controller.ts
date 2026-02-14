@@ -11,7 +11,7 @@ export class UploadController {
   @Post("presigned-url")
   async getPresignedUrl(@Body() dto: PresignedUrlRequestDto) {
     return this.objectStorageService.getPresignedUploadUrl(
-      "poster-images",
+      "images",
       dto.filename,
       dto.contentType
     )
