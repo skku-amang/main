@@ -70,6 +70,43 @@ export class ObjectStorageService implements OnModuleInit {
     return { uploadUrl, publicUrl }
   }
 
+  async deleteObject(url: string) {
+    try {
+      const key = this.extractKeyFromUrl(url)
+
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key
+      })
+
+      await this.s3.send(command)
+      this.logger.log(`Object "${key}" deleted successfully`)
+    } catch (error) {
+      this.logger.error(`Failed to delete object "${url}":`, error)
+      throw error
+    }
+  }
+
+  private extractKeyFromUrl(url: string) {
+    try {
+      const parsedUrl = new URL(url)
+      const pathName = parsedUrl.pathname
+
+      const endpoint = this.configService.get("S3_ENDPOINT")
+      if (endpoint) {
+        const bucketPath = `/${this.bucket}/`
+
+        if (pathName.startsWith(bucketPath))
+          return decodeURIComponent(pathName.replace(bucketPath, ""))
+      }
+
+      return decodeURIComponent(pathName.substring(1))
+    } catch (error) {
+      this.logger.error(`Invalid URL format: ${url}`, error)
+      throw error
+    }
+  }
+
   private generatePublicUrl(key: string) {
     const endpoint = this.configService.get<string>("S3_ENDPOINT")
     const region = this.configService.get<string>("S3_REGION", "ap-northeast-2")
