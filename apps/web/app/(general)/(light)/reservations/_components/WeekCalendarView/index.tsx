@@ -5,7 +5,7 @@ interface WeekCalendarFieldProp {
   currentMonday: Dayjs
 }
 
-export default function WeekCalendarField({
+export default function WeekCalendarView({
   currentMonday
 }: WeekCalendarFieldProp) {
   // 현재 시간
