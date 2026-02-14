@@ -18,12 +18,10 @@ export class ObjectStorageService implements OnModuleInit {
   private readonly logger = new Logger(ObjectStorageService.name)
   private readonly s3: S3Client
   private readonly bucket: string
-  private readonly publicUrl: string
 
   constructor(private readonly configService: ConfigService) {
     const endpoint = this.configService.get<string>("S3_ENDPOINT")
     this.bucket = this.configService.getOrThrow<string>("S3_BUCKET")
-    this.publicUrl = this.configService.getOrThrow<string>("S3_PUBLIC_URL")
 
     this.s3 = new S3Client({
       endpoint,
@@ -70,16 +68,6 @@ export class ObjectStorageService implements OnModuleInit {
     const publicUrl = this.generatePublicUrl(key)
 
     return { uploadUrl, publicUrl }
-  }
-
-  async delete(fileUrl: string) {
-    const key = fileUrl.replace(`${this.publicUrl}/`, "")
-    await this.s3.send(
-      new DeleteObjectCommand({
-        Bucket: this.bucket,
-        Key: key
-      })
-    )
   }
 
   private generatePublicUrl(key: string) {
