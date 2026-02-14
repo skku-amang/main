@@ -52,8 +52,19 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const prNumber = context.issue.number;
+            const sha = context.payload.pull_request.head.sha.slice(0, 7);
             const url = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
-            const body = `${marker}\n📖 **Storybook Preview:** ${url}`;
+            const commitUrl = `https://github.com/${owner}/${repo}/commit/${context.payload.pull_request.head.sha}`;
+
+            const body = `${marker}
+## ✅ Storybook Preview
+
+| Name | Link |
+|------|------|
+| 📖 **Latest commit** | [\`${sha}\`](${commitUrl}) |
+| 🔍 **Preview** | [Visit Preview →](${url}) |
+
+<sub>Built with ❤️ by [GitHub Actions](https://github.com/${owner}/${repo}/actions/runs/${context.runId})</sub>`;
 
             const { data: comments } = await github.rest.issues.listComments({
               owner, repo, issue_number: prNumber,
