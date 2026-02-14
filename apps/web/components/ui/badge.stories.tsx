@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react"
 
 import { Badge } from "./badge"
 
+// Testing Vercel-style preview comment
+
 const meta: Meta<typeof Badge> = {
   title: "ui/Badge",
   component: Badge,
