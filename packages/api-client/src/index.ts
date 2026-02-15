@@ -845,7 +845,7 @@ export default class ApiClient {
     return this._request<
       PresignedUrlResponse,
       AuthError | ValidationError | InternalServerError
-    >(`/upload/presigned-url`, "POST", request)
+    >(`/uploads/presigned-url`, "POST", request)
   }
 
   /**
