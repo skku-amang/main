@@ -39,15 +39,26 @@ export class ObjectStorageService implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.ensureBucket()
-      await this.configureBucketPolicy()
-      await this.configureCors()
-      this.logger.log("Object storage initialized successfully")
     } catch (error) {
       this.logger.warn(
-        `Object storage initialization failed: ${error}. ` +
+        `Failed to ensure bucket: ${error}. ` +
           `Create bucket "${this.bucket}" manually via Minio Console (http://localhost:9001) if needed.`
       )
     }
+
+    try {
+      await this.configureBucketPolicy()
+    } catch (error) {
+      this.logger.warn(`Failed to configure bucket policy: ${error}`)
+    }
+
+    try {
+      await this.configureCors()
+    } catch (error) {
+      this.logger.warn(`Failed to configure bucket CORS: ${error}`)
+    }
+
+    this.logger.log("Object storage initialization attempt completed")
   }
 
   async getPresignedUploadUrl(
