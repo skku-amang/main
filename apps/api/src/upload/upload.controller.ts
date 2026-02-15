@@ -3,7 +3,7 @@ import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 import { PresignedUrlRequestDto } from "./dto/presigned-url.dto"
 
-@Controller("upload")
+@Controller("uploads")
 @UseGuards(AccessTokenGuard)
 export class UploadController {
   constructor(private readonly objectStorageService: ObjectStorageService) {}
