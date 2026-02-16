@@ -62,6 +62,8 @@ const ResponsivePagination = React.forwardRef<
   HTMLElement,
   ResponsivePaginationProps
 >(({ currentPage, totalPages, onPageChange, className }, ref) => {
+  if (totalPages < 1) return null
+
   const isFirstPage = currentPage <= 1
   const isLastPage = currentPage >= totalPages
 
@@ -122,7 +124,12 @@ const ResponsivePagination = React.forwardRef<
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => !isFirstPage && onPageChange(currentPage - 1)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (isFirstPage) return
+                onPageChange(currentPage - 1)
+              }}
               className={cn(isFirstPage && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
@@ -135,8 +142,12 @@ const ResponsivePagination = React.forwardRef<
             ) : (
               <PaginationItem key={page}>
                 <PaginationLink
+                  href="#"
                   isActive={page === currentPage}
-                  onClick={() => onPageChange(page)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onPageChange(page)
+                  }}
                 >
                   {page}
                 </PaginationLink>
@@ -146,7 +157,12 @@ const ResponsivePagination = React.forwardRef<
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => !isLastPage && onPageChange(currentPage + 1)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (isLastPage) return
+                onPageChange(currentPage + 1)
+              }}
               className={cn(isLastPage && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
