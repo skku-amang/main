@@ -1,8 +1,26 @@
-# Mobile Components Design: Search Bar & Pagination
+# Mobile Components Design: Header, Search Bar & Pagination
 
-**Issues**: #296 (Search Bar), #297 (Pagination)
+**Issues**: #295 (Header), #296 (Search Bar), #297 (Pagination)
 **Date**: 2026-02-16
 **Approach**: Responsive single component (CSS breakpoint switching)
+
+## Header (#295)
+
+### Current State
+
+- `apps/web/components/Header/index.tsx` — already has mobile header (`md:hidden`)
+- Layout: `← [Logo] [≡]` with mode-dependent background (light/dark/transparent)
+- Sub-components: `MobileBackButton` (ArrowLeftIcon), `Sidebar` (Menu + Sheet)
+- Implementation matches Figma design — no code changes needed
+
+### Change
+
+- Add Storybook stories only (no code changes)
+- Stories: Light mode, Dark mode, Transparent mode, Home page (no back button), Inner page (with back button)
+
+### Files Created
+
+- `apps/web/components/Header/Header.stories.tsx` — new stories file
 
 ## Search Bar (#296)
 
@@ -69,6 +87,7 @@ Internal structure:
 ## Implementation Strategy
 
 - Separate git worktrees per issue
+  - `feat/mobile-header` (#295)
   - `feat/mobile-search-bar` (#296)
   - `feat/mobile-pagination` (#297)
 - Storybook stories for visual verification
