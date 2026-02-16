@@ -25,7 +25,12 @@ const meta: Meta<typeof Header> = {
     }
   },
   parameters: {
-    layout: "fullscreen"
+    layout: "fullscreen",
+    nextjs: {
+      navigation: {
+        pathname: "/"
+      }
+    }
   }
 }
 
