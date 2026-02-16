@@ -57,9 +57,9 @@ export const TransparentMode: Story = {
   ]
 }
 
-export const MobileDarkMode: Story = {
+export const MobileLightMode: Story = {
   args: {
-    mode: "dark"
+    mode: "light"
   },
   parameters: {
     viewport: {
