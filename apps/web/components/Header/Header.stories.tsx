@@ -27,6 +27,7 @@ const meta: Meta<typeof Header> = {
   parameters: {
     layout: "fullscreen",
     nextjs: {
+      appDirectory: true,
       navigation: {
         pathname: "/"
       }
@@ -71,6 +72,7 @@ export const MobileHomePage: Story = {
       defaultViewport: "mobile1"
     },
     nextjs: {
+      appDirectory: true,
       navigation: {
         pathname: "/"
       }
@@ -87,6 +89,7 @@ export const MobileInnerPage: Story = {
       defaultViewport: "mobile1"
     },
     nextjs: {
+      appDirectory: true,
       navigation: {
         pathname: "/performances/1/teams"
       }
