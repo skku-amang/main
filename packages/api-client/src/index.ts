@@ -31,9 +31,9 @@ import {
   RentalList,
   UpdateSession,
   UpdateTeam,
-  UpdateUser,
-  User,
-  publicUserList
+  publicUserList,
+  PresignedUrlRequest,
+  PresignedUrlResponse
 } from "@repo/shared-types"
 import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
@@ -833,6 +833,19 @@ export default class ApiClient {
       "/auth/logout",
       "POST"
     )
+  }
+
+  /**
+   * Presigned URL 요청
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getPresignedUrl(request: PresignedUrlRequest) {
+    return this._request<
+      PresignedUrlResponse,
+      AuthError | ValidationError | InternalServerError
+    >(`/uploads/presigned-url`, "POST", request)
   }
 
   /**

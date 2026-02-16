@@ -1,11 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CircleAlert, Youtube } from "lucide-react"
+import { Check, CircleAlert, ImagePlus, Loader2, Youtube } from "lucide-react"
+import Image from "next/image"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import PosterImageDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/PosterImageDialog"
 import YoutubeDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeDialog"
 import YoutubeSubmitButton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
 import SimpleLabel from "@/components/Form/SimpleLabel"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
@@ -28,6 +32,8 @@ import YoutubeVideo from "@/lib/youtube"
 import YoutubePlayer from "@/lib/youtube/Player"
 
 import { usePerformances } from "@/hooks/api/usePerformance"
+import { useImageUpload } from "@/hooks/useImageUpload"
+import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
 import Description from "../Description"
 import Paginator from "../Paginator"
 import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
@@ -66,6 +72,11 @@ const FirstPage = ({
     form.clearErrors("songYoutubeVideoUrl")
     form.setValue("songYoutubeVideoUrl", formData.songYoutubeVideoUrl)
   }
+
+  // 모바일 포스터 이미지 업로드
+  const poster = useImageUpload({
+    onSuccess: (publicUrl) => form.setValue("posterImage", publicUrl)
+  })
 
   return (
     <div>
@@ -231,15 +242,16 @@ const FirstPage = ({
                   자유롭게 팀을 홍보해주세요(유튜브 링크 첨부 필수)
                 </div>
 
-                {/* 유튜브 링크 데스크톱: 다이얼로그 */}
-                <div className="hidden md:block">
+                {/* 데스크톱: 포스터 이미지 + 유튜브 다이얼로그 */}
+                <div className="hidden md:flex md:items-center md:gap-x-2">
+                  <PosterImageDialog form={form} />
                   <YoutubeDialog form={form} fieldName="songYoutubeVideoUrl" />
-                  {form.formState.errors.songYoutubeVideoUrl && (
-                    <div className="mt-1 text-end text-xs text-destructive">
-                      {form.formState.errors.songYoutubeVideoUrl.message}
-                    </div>
-                  )}
                 </div>
+                {form.formState.errors.songYoutubeVideoUrl && (
+                  <div className="mt-1 hidden text-end text-xs text-destructive md:block">
+                    {form.formState.errors.songYoutubeVideoUrl.message}
+                  </div>
+                )}
               </div>
             </Description>
             <Textarea
@@ -329,7 +341,68 @@ const FirstPage = ({
         </Form>
       </div>
 
-      {/* TODO: 모바일 이미지 업로드 추가 */}
+      {/* 포스터 이미지 모바일: 블록 */}
+      <div className="mt-3 w-full space-y-2 rounded-lg bg-slate-100 p-3 drop-shadow-search md:hidden">
+        <div className="flex items-center gap-x-2">
+          <ImagePlus size={24} strokeWidth={0.85} />
+          <div>
+            <div className="text-md text-gray-600">포스터 이미지</div>
+            <div className="text-xs text-gray-400">
+              팀 포스터 이미지를 업로드해주세요 (선택)
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-x-2">
+          <input
+            ref={poster.inputRef}
+            type="file"
+            accept={ACCEPTED_IMAGE_TYPES.join(",")}
+            onChange={poster.handleFileSelect}
+            className="block w-full text-sm text-slate-500 file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-secondary/90"
+          />
+
+          {poster.error ? (
+            <div className="text-sm text-destructive">Failed</div>
+          ) : poster.isUploaded ? (
+            <div className="flex items-center gap-x-1 text-sm">
+              <Check className="h-4 w-4 text-green-500" />
+              Completed
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="border border-secondary text-sm text-secondary"
+              disabled={!poster.file || poster.isUploading}
+              onClick={poster.upload}
+            >
+              {poster.isUploading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                "Upload"
+              )}
+            </Button>
+          )}
+        </div>
+
+        {/* 미리보기 */}
+        {(poster.preview || form.getValues("posterImage")) && (
+          <div className="relative mt-2 aspect-[3/4] w-full overflow-hidden rounded-lg">
+            <Image
+              src={poster.preview || form.getValues("posterImage") || ""}
+              alt="포스터 미리보기"
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        {/* 에러 메시지 */}
+        {poster.error && (
+          <div className="mt-1 text-xs text-destructive">{poster.error}</div>
+        )}
+      </div>
 
       {/* 페이지 이동 */}
       <Paginator

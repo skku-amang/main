@@ -11,6 +11,8 @@ import { TeamModule } from "./team/team.module"
 import { PerformanceModule } from "./performance/performance.module"
 import { EquipmentModule } from "./equipment/equipment.module"
 import { RentalModule } from "./rental/rental.module"
+import { ObjectStorageModule } from "./object-storage/object-storage.module"
+import { UploadModule } from "./upload/upload.module"
 import { HealthModule } from "./health/health.module"
 
 @Module({
@@ -28,7 +30,9 @@ import { HealthModule } from "./health/health.module"
     TeamModule,
     PerformanceModule,
     EquipmentModule,
-    RentalModule
+    RentalModule,
+    ObjectStorageModule,
+    UploadModule
   ],
   controllers: [AppController],
   providers: [AppService]
