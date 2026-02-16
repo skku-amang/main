@@ -57,22 +57,6 @@ export const TransparentMode: Story = {
   ]
 }
 
-export const MobileLightMode: Story = {
-  args: {
-    mode: "light"
-  },
-  parameters: {
-    viewport: {
-      defaultViewport: "mobile1"
-    },
-    nextjs: {
-      navigation: {
-        pathname: "/performances/1/teams"
-      }
-    }
-  }
-}
-
 export const MobileHomePage: Story = {
   args: {
     mode: "dark"
