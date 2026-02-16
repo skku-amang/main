@@ -1,0 +1,15 @@
+/*
+ * next/font/local은 Storybook에서 실제 폰트를 로드하지 않으므로
+ * 수동으로 @font-face를 정의합니다.
+ */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-display: swap;
+  src: url("/fonts/PretendardVariable.woff2") format("woff2");
+}
+
+:root {
+  --font-pretendard:
+    "Pretendard Variable", system-ui, -apple-system, sans-serif;
+}

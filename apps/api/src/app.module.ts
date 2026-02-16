@@ -13,6 +13,7 @@ import { EquipmentModule } from "./equipment/equipment.module"
 import { RentalModule } from "./rental/rental.module"
 import { ObjectStorageModule } from "./object-storage/object-storage.module"
 import { UploadModule } from "./upload/upload.module"
+import { HealthModule } from "./health/health.module"
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UploadModule } from "./upload/upload.module"
       cache: true
     }),
     PrismaModule,
+    HealthModule,
     UsersModule,
     AuthModule,
     GenerationModule,
