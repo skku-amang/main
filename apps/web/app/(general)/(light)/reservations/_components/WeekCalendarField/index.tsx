@@ -1,12 +1,15 @@
 import { Dayjs } from "dayjs"
+import { RentalDetail } from "@repo/shared-types"
 import WeekColumn from "./WeekColumn"
 
 interface WeekCalendarFieldProp {
   currentMonday: Dayjs
+  rentals: RentalDetail[]
 }
 
 export default function WeekCalendarField({
-  currentMonday
+  currentMonday,
+  rentals
 }: WeekCalendarFieldProp) {
   // 현재 시간
   const currentTime = new Date()
@@ -54,6 +57,7 @@ export default function WeekCalendarField({
             nowTopPx={nowTopPx}
             offset={i}
             currentMonday={currentMonday}
+            rentals={rentals}
             key={i}
           />
         ))}

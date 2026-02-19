@@ -1,12 +1,15 @@
 import { Dayjs } from "dayjs"
+import { RentalDetail } from "@repo/shared-types"
 import MobileMonthBlock from "./MobileMonthBlock"
 
 interface MobileCalendarFieldProps {
   currentMonday: Dayjs
+  rentals: RentalDetail[]
 }
 
 export default function MobileCalendarField({
-  currentMonday
+  currentMonday,
+  rentals
 }: MobileCalendarFieldProps) {
   const DayLabel = ["M", "T", "W", "T", "F", "S", "S"]
 
@@ -32,13 +35,17 @@ export default function MobileCalendarField({
         {DayLabel.map((Day, i) => (
           <div
             className="flex-1 font-medium h-11 flex justify-center items-center text-base text-secondary"
-            key={DayLabel[i]}
+            key={i}
           >
             {Day}
           </div>
         ))}
       </div>
-      <MobileMonthBlock days={daysInGrid} currentMonth={currentMonth} />
+      <MobileMonthBlock
+        days={daysInGrid}
+        currentMonth={currentMonth}
+        rentals={rentals}
+      />
     </div>
   )
 }

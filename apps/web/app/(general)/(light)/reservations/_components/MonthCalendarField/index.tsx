@@ -1,15 +1,18 @@
 import dayjs, { Dayjs } from "dayjs"
 import isoWeek from "dayjs/plugin/isoWeek"
+import { RentalDetail } from "@repo/shared-types"
 import MonthBlock from "./MonthBlock"
 
 dayjs.extend(isoWeek)
 
 interface MonthCalendarFieldProps {
   currentMonday: Dayjs
+  rentals: RentalDetail[]
 }
 
 export default function MonthCalendarField({
-  currentMonday
+  currentMonday,
+  rentals
 }: MonthCalendarFieldProps) {
   const WeekLabelList = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -45,7 +48,11 @@ export default function MonthCalendarField({
       </div>
 
       {/* 월간 그리드 */}
-      <MonthBlock days={daysInGrid} currentMonth={currentMonth} />
+      <MonthBlock
+        days={daysInGrid}
+        currentMonth={currentMonth}
+        rentals={rentals}
+      />
     </div>
   )
 }
