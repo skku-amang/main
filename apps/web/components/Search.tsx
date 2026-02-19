@@ -10,7 +10,7 @@ const Search = React.forwardRef<
   return (
     <div
       className={cn(
-        "flex h-10 w-80 items-center gap-x-2.5 rounded-lg border border-gray-200 bg-white px-[13px] py-2 text-sm ring-offset-background drop-shadow-[0_1px_2px_rgb(64,63,84,0.1)] transition duration-300 focus-within:ring-0 focus-within:ring-offset-0 focus-within:drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]",
+        "flex h-10 w-full items-center gap-x-2.5 rounded-lg border border-gray-200 bg-white px-[13px] py-2 text-sm ring-offset-background drop-shadow-[0_1px_2px_rgb(64,63,84,0.1)] transition duration-300 focus-within:ring-0 focus-within:ring-offset-0 focus-within:drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:w-80",
         className
       )}
     >

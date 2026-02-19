@@ -31,3 +31,18 @@ export const FullWidth: Story = {
     )
   ]
 }
+
+export const MobileView: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: "mobile1"
+    }
+  },
+  decorators: [
+    (Story) => (
+      <div className="w-full px-4">
+        <Story />
+      </div>
+    )
+  ]
+}
