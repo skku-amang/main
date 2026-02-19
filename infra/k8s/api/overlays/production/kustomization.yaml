@@ -12,6 +12,13 @@ resources:
 
 patches:
   - patch: |-
+      - op: add
+        path: /data/S3_ENDPOINT
+        value: "https://s3.json-server.win"
+    target:
+      kind: ConfigMap
+      name: api-config
+  - patch: |-
       - op: replace
         path: /spec/jobTemplate/spec/template/spec/containers/0/env/0/value
         value: "master"

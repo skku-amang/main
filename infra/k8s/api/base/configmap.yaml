@@ -5,3 +5,5 @@ metadata:
 data:
   ACCESS_TOKEN_EXPIRES_IN: 1h
   REFRESH_TOKEN_EXPIRES_IN: 7d
+  S3_REGION: ap-northeast-2
+  S3_BUCKET: amang

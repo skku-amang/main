@@ -25,6 +25,8 @@ spec:
                 name: api-config
             - secretRef:
                 name: api-secrets
+            - secretRef:
+                name: minio-s3-credentials
           livenessProbe:
             httpGet:
               path: /health
