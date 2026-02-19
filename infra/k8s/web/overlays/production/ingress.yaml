@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: web-server-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-dns01
     traefik.ingress.kubernetes.io/redirect-entry-point: https
 spec:
   ingressClassName: traefik
