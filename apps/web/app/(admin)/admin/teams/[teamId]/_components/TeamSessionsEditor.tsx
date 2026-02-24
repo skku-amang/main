@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { getSessionDisplayName } from "@/constants/session"
+import { getSessionDisplayName, SESSION_NAMES } from "@/constants/session"
 import { useSessions } from "@/hooks/api/useSession"
 import { useUsers } from "@/hooks/api/useUser"
 import { TeamDetail } from "@repo/shared-types"
@@ -156,102 +156,121 @@ export function TeamSessionsEditor({
           세션이 없습니다. 세션을 추가해주세요.
         </p>
       ) : (
-        <div className="space-y-4">
-          {memberSessions.map((ms, sessionIndex) => (
-            <div key={ms.sessionId} className="rounded-md border p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="font-medium">
-                    {getSessionName(ms.sessionId)}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() =>
-                        updateCapacity(sessionIndex, ms.capacity - 1)
-                      }
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <Input
-                      type="number"
-                      value={ms.capacity}
-                      onChange={(e) =>
-                        updateCapacity(
-                          sessionIndex,
-                          parseInt(e.target.value) || 1
-                        )
-                      }
-                      className="h-6 w-12 text-center"
-                      min={1}
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() =>
-                        updateCapacity(sessionIndex, ms.capacity + 1)
-                      }
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <Badge variant="secondary">
-                    {ms.members.length}/{ms.capacity}
-                  </Badge>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-red-500"
-                  onClick={() => removeSession(sessionIndex)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* 멤버 목록 */}
-              <div className="flex flex-wrap gap-2">
-                {ms.members
-                  .sort((a, b) => a.index - b.index)
-                  .map((member) => (
-                    <Badge
-                      key={member.userId}
-                      variant="outline"
-                      className="flex items-center gap-1 py-1"
-                    >
-                      <span className="text-neutral-400">{member.index}.</span>
-                      {getUserName(member.userId)}
-                      <button
+        <div className="grid gap-4 lg:grid-cols-2">
+          {[...memberSessions.entries()]
+            .sort(([, a], [, b]) => {
+              const order = Object.values(SESSION_NAMES)
+              const aName =
+                teamDetail.teamSessions.find(
+                  (ts) => ts.sessionId === a.sessionId
+                )?.session.name ??
+                sessions?.find((s) => s.id === a.sessionId)?.name
+              const bName =
+                teamDetail.teamSessions.find(
+                  (ts) => ts.sessionId === b.sessionId
+                )?.session.name ??
+                sessions?.find((s) => s.id === b.sessionId)?.name
+              const aIdx = order.indexOf(aName as (typeof order)[number])
+              const bIdx = order.indexOf(bName as (typeof order)[number])
+              return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx)
+            })
+            .map(([sessionIndex, ms]) => (
+              <div key={ms.sessionId} className="rounded-md border p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium">
+                      {getSessionName(ms.sessionId)}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
                         onClick={() =>
-                          removeMember(sessionIndex, member.userId)
+                          updateCapacity(sessionIndex, ms.capacity - 1)
                         }
-                        className="ml-1 rounded-full hover:bg-neutral-100"
                       >
-                        <X className="h-3 w-3" />
-                      </button>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <Input
+                        type="number"
+                        value={ms.capacity}
+                        onChange={(e) =>
+                          updateCapacity(
+                            sessionIndex,
+                            parseInt(e.target.value) || 1
+                          )
+                        }
+                        className="h-6 w-12 text-center"
+                        min={1}
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() =>
+                          updateCapacity(sessionIndex, ms.capacity + 1)
+                        }
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <Badge variant="outline">
+                      {ms.members.length}/{ms.capacity}
                     </Badge>
-                  ))}
-
-                {ms.members.length < ms.capacity && (
+                  </div>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7"
-                    onClick={() => {
-                      setEditingSessionIndex(sessionIndex)
-                      setMemberDialogOpen(true)
-                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-red-500"
+                    onClick={() => removeSession(sessionIndex)}
                   >
-                    <Plus className="mr-1 h-3 w-3" />
-                    멤버 추가
+                    <X className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
+
+                {/* 멤버 목록 */}
+                <div className="flex flex-wrap gap-2">
+                  {ms.members
+                    .sort((a, b) => a.index - b.index)
+                    .map((member) => (
+                      <Badge
+                        key={member.userId}
+                        variant="outline"
+                        className="flex items-center gap-1 py-1"
+                      >
+                        <span className="text-neutral-400">
+                          {member.index}.
+                        </span>
+                        {getUserName(member.userId)}
+                        <button
+                          onClick={() =>
+                            removeMember(sessionIndex, member.userId)
+                          }
+                          className="ml-1 rounded-full hover:bg-neutral-100"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+
+                  {ms.members.length < ms.capacity && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7"
+                      onClick={() => {
+                        setEditingSessionIndex(sessionIndex)
+                        setMemberDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      멤버 추가
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
 

@@ -4,8 +4,9 @@ import { useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, ExternalLink, Save } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { useUnsavedChanges } from "@/app/(admin)/_components/UnsavedChangesContext"
 import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ export default function TeamDetailAdminPage() {
   const id = parseInt(teamId)
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const { guardNavigation, setDirty } = useUnsavedChanges()
 
   const { data: team, isLoading } = useTeam(id)
   const { data: users } = useUsers()
@@ -69,6 +71,51 @@ export default function TeamDetailAdminPage() {
       )
     }
   }, [team])
+
+  // 변경사항 감지
+  const isDirty = useMemo(() => {
+    if (!team) return false
+    if (name !== team.name) return true
+    if (songName !== team.songName) return true
+    if (songArtist !== team.songArtist) return true
+    if (leaderId !== team.leaderId) return true
+    if (isFreshmenFixed !== team.isFreshmenFixed) return true
+    if (isSelfMade !== team.isSelfMade) return true
+    if ((songYoutubeVideoUrl || "") !== (team.songYoutubeVideoUrl ?? ""))
+      return true
+    const original = team.teamSessions.map((ts) => ({
+      sessionId: ts.sessionId,
+      capacity: ts.capacity,
+      members: ts.members.map((m) => ({ userId: m.userId, index: m.index }))
+    }))
+    return JSON.stringify(memberSessions) !== JSON.stringify(original)
+  }, [
+    team,
+    name,
+    songName,
+    songArtist,
+    leaderId,
+    isFreshmenFixed,
+    isSelfMade,
+    songYoutubeVideoUrl,
+    memberSessions
+  ])
+
+  // 변경사항을 context에 동기화 + 브라우저 닫기/새로고침 방지
+  useEffect(() => {
+    setDirty(isDirty)
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
+  }, [isDirty, setDirty])
+
+  // 언마운트 시 dirty 초기화
+  useEffect(() => {
+    return () => setDirty(false)
+  }, [setDirty])
 
   const handleSave = useCallback(() => {
     const payload: UpdateTeam = {
@@ -129,7 +176,12 @@ export default function TeamDetailAdminPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href={ROUTES.ADMIN.TEAMS}>
+          <Link
+            href={ROUTES.ADMIN.TEAMS}
+            onClick={(e) => {
+              if (guardNavigation(ROUTES.ADMIN.TEAMS)) e.preventDefault()
+            }}
+          >
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -140,6 +192,14 @@ export default function TeamDetailAdminPage() {
           <Button variant="outline" asChild>
             <Link
               href={ROUTES.PERFORMANCE.TEAM.DETAIL(team.performanceId, team.id)}
+              onClick={(e) => {
+                if (
+                  guardNavigation(
+                    ROUTES.PERFORMANCE.TEAM.DETAIL(team.performanceId, team.id)
+                  )
+                )
+                  e.preventDefault()
+              }}
             >
               <ExternalLink className="mr-1 h-4 w-4" />
               바로가기
