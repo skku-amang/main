@@ -40,7 +40,7 @@ const Search = React.forwardRef<
       <input
         {...props}
         placeholder="검색"
-        type="search"
+        type="text"
         ref={(node) => {
           inputRef.current = node
           if (typeof ref === "function") ref(node)
@@ -48,7 +48,7 @@ const Search = React.forwardRef<
         }}
         value={value}
         onChange={handleChange}
-        className="w-full appearance-none placeholder:text-gray-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+        className="w-full placeholder:text-gray-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         style={{ caretColor: "#111827" }}
       />
       {value && (
