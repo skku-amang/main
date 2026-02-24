@@ -1,6 +1,27 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import type { Session } from "next-auth"
+import { SessionProvider } from "next-auth/react"
 
 import Header from "./index"
+
+const mockSession: Session = {
+  user: {
+    id: "1",
+    name: "홍길동",
+    email: "hong@skku.edu",
+    image: null,
+    nickname: "길동",
+    isAdmin: false
+  },
+  accessToken: "mock-token",
+  expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+}
+
+const withSession = (session: Session) => (Story: React.ComponentType) => (
+  <SessionProvider session={session}>
+    <Story />
+  </SessionProvider>
+)
 
 const meta: Meta<typeof Header> = {
   title: "Header",
@@ -84,6 +105,38 @@ export const MobileInnerPage: Story = {
   args: {
     mode: "dark"
   },
+  parameters: {
+    viewport: {
+      defaultViewport: "mobile1"
+    },
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/performances/1/teams"
+      }
+    }
+  }
+}
+
+export const LoggedIn: Story = {
+  args: {
+    mode: "dark"
+  },
+  decorators: [withSession(mockSession)]
+}
+
+export const LoggedInLightMode: Story = {
+  args: {
+    mode: "light"
+  },
+  decorators: [withSession(mockSession)]
+}
+
+export const MobileLoggedIn: Story = {
+  args: {
+    mode: "dark"
+  },
+  decorators: [withSession(mockSession)],
   parameters: {
     viewport: {
       defaultViewport: "mobile1"
