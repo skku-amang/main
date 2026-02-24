@@ -3,7 +3,11 @@
 import { useMemo } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
+import { useGenerations } from "@/hooks/api/useGeneration"
+import { useSessions } from "@/hooks/api/useSession"
 import { useUsers } from "@/hooks/api/useUser"
+import { formatGenerationOrder } from "@/lib/utils"
+import { getSessionDisplayName } from "@/constants/session"
 
 import { getColumns } from "./_components/columns"
 
@@ -15,6 +19,28 @@ import { getColumns } from "./_components/columns"
 
 export default function UsersAdminPage() {
   const { data: users, isLoading } = useUsers()
+  const { data: generations } = useGenerations()
+  const { data: sessions } = useSessions()
+
+  const generationFilters = useMemo(
+    () =>
+      generations
+        ?.sort((a, b) => b.order - a.order)
+        .map((g) => ({
+          label: `${formatGenerationOrder(g.order)}기`,
+          value: String(g.order)
+        })) ?? [],
+    [generations]
+  )
+
+  const sessionFilters = useMemo(
+    () =>
+      sessions?.map((s) => ({
+        label: getSessionDisplayName(s.name),
+        value: s.name
+      })) ?? [],
+    [sessions]
+  )
 
   const columns = useMemo(() => getColumns(), [])
 
@@ -27,9 +53,22 @@ export default function UsersAdminPage() {
         data={users ?? []}
         isLoading={isLoading}
         initialSorting={[{ id: "id", desc: false }]}
-        searchColumn="name"
+        initialColumnVisibility={{ bio: false }}
+        enableGlobalSearch
         searchPlaceholder="이름으로 검색..."
         emptyMessage="등록된 회원이 없습니다."
+        filters={[
+          {
+            columnId: "generation",
+            label: "기수",
+            options: generationFilters
+          },
+          {
+            columnId: "sessions",
+            label: "세션",
+            options: sessionFilters
+          }
+        ]}
       />
     </div>
   )

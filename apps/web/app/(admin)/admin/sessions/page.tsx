@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -13,6 +13,7 @@ import {
   useSessions,
   useUpdateSession
 } from "@/hooks/api/useSession"
+import { useUsers } from "@/hooks/api/useUser"
 import { CreateSession, SessionWithBasicUsers } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
@@ -22,6 +23,15 @@ export default function SessionsAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { data: sessions, isLoading } = useSessions()
+  const { data: users } = useUsers()
+
+  const userOptions = useMemo(
+    () =>
+      (users ?? [])
+        .map((u) => ({ label: u.name, value: String(u.id) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [users]
+  )
 
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -32,19 +42,46 @@ export default function SessionsAdminPage() {
   const updateMutation = useUpdateSession()
   const deleteMutation = useDeleteSession()
 
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      const payload: Record<string, unknown> = {}
+      if (columnId === "leader") {
+        payload.leaderId = Number(value)
+      } else {
+        payload[columnId] = value
+      }
+      try {
+        await updateMutation.mutateAsync([rowId, payload])
+        toast({ title: "세션이 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["sessions"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
+  )
+
   const columns = useMemo(
     () =>
-      getColumns({
-        onEdit: (session) => {
-          setEditing(session)
-          setFormOpen(true)
+      getColumns(
+        {
+          onEdit: (session) => {
+            setEditing(session)
+            setFormOpen(true)
+          },
+          onDelete: (session) => {
+            setDeleting(session)
+            setDeleteOpen(true)
+          }
         },
-        onDelete: (session) => {
-          setDeleting(session)
-          setDeleteOpen(true)
-        }
-      }),
-    []
+        { userOptions }
+      ),
+    [userOptions]
   )
 
   const handleSubmit = (data: CreateSession) => {
@@ -108,6 +145,24 @@ export default function SessionsAdminPage() {
           setFormOpen(true)
         }}
         createLabel="세션 생성"
+        onUpdateCell={handleCellUpdate}
+        onBulkDelete={async (rows) => {
+          const results = await Promise.allSettled(
+            rows.map((r) =>
+              deleteMutation.mutateAsync([(r as SessionWithBasicUsers).id])
+            )
+          )
+          const failed = results.filter((r) => r.status === "rejected").length
+          if (failed > 0) {
+            toast({
+              title: `${rows.length - failed}개 삭제, ${failed}개 실패`,
+              variant: "destructive"
+            })
+          } else {
+            toast({ title: `${rows.length}개 세션이 삭제되었습니다.` })
+          }
+          queryClient.invalidateQueries({ queryKey: ["sessions"] })
+        }}
       />
 
       <SessionFormDialog

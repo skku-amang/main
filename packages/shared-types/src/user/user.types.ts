@@ -3,15 +3,18 @@ import { Prisma } from "@repo/database"
 export const basicUserSelector = {
   id: true,
   name: true,
-  image: true
+  image: true,
+  generation: {
+    select: { id: true, order: true }
+  }
 } satisfies Prisma.UserSelect
 
 export const publicUserSelector = {
   ...basicUserSelector,
   nickname: true,
   bio: true,
-  generation: {
-    select: { order: true }
+  sessions: {
+    select: { id: true, name: true }
   }
 } satisfies Prisma.UserSelect
 

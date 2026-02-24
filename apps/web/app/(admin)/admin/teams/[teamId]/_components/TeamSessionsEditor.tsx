@@ -1,6 +1,5 @@
 "use client"
 
-import { SessionName } from "@repo/database"
 import { Minus, Plus, X } from "lucide-react"
 import { useState } from "react"
 

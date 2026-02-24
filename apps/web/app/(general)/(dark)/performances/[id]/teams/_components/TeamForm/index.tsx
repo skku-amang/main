@@ -15,7 +15,7 @@ import { CreateTeam, TeamDetail, UpdateTeam } from "@repo/shared-types"
 
 import { useSessions } from "@/hooks/api/useSession"
 import { useCreateTeam, useUpdateTeam } from "@/hooks/api/useTeam"
-import { SessionName } from "@repo/database"
+import { SESSION_NAMES } from "@/constants/session"
 import { useQueryClient } from "@tanstack/react-query"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
@@ -79,85 +79,85 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       [key: string]: z.infer<ReturnType<typeof memberSessionRequiredField>>
     } = {
       보컬1: {
-        session: SessionName.VOCAL,
+        session: SESSION_NAMES.VOCAL,
         required: false,
         member: null,
         index: 1
       },
       보컬2: {
-        session: SessionName.VOCAL,
+        session: SESSION_NAMES.VOCAL,
         required: false,
         member: null,
         index: 2
       },
       보컬3: {
-        session: SessionName.VOCAL,
+        session: SESSION_NAMES.VOCAL,
         required: false,
         member: null,
         index: 3
       },
       기타1: {
-        session: SessionName.GUITAR,
+        session: SESSION_NAMES.GUITAR,
         required: false,
         member: null,
         index: 1
       },
       기타2: {
-        session: SessionName.GUITAR,
+        session: SESSION_NAMES.GUITAR,
         required: false,
         member: null,
         index: 2
       },
       기타3: {
-        session: SessionName.GUITAR,
+        session: SESSION_NAMES.GUITAR,
         required: false,
         member: null,
         index: 3
       },
       베이스1: {
-        session: SessionName.BASS,
+        session: SESSION_NAMES.BASS,
         required: false,
         member: null,
         index: 1
       },
       베이스2: {
-        session: SessionName.BASS,
+        session: SESSION_NAMES.BASS,
         required: false,
         member: null,
         index: 2
       },
       드럼1: {
-        session: SessionName.DRUM,
+        session: SESSION_NAMES.DRUM,
         required: false,
         member: null,
         index: 1
       },
       신디1: {
-        session: SessionName.SYNTH,
+        session: SESSION_NAMES.SYNTH,
         required: false,
         member: null,
         index: 1
       },
       신디2: {
-        session: SessionName.SYNTH,
+        session: SESSION_NAMES.SYNTH,
         required: false,
         member: null,
         index: 2
       },
       신디3: {
-        session: SessionName.SYNTH,
+        session: SESSION_NAMES.SYNTH,
         required: false,
         member: null,
         index: 3
       },
       현악기1: {
-        session: SessionName.STRINGS,
+        session: SESSION_NAMES.STRINGS,
         required: false,
         member: null,
         index: 1
       },
       관악기1: {
-        session: SessionName.WINDS,
+        session: SESSION_NAMES.WINDS,
         required: false,
         member: null,
         index: 1

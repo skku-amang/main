@@ -11,11 +11,11 @@ import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { href: ROUTES.ADMIN.USERS, label: "Users", icon: Users },
-  { href: ROUTES.ADMIN.GENERATIONS, label: "Generations", icon: Hash },
-  { href: ROUTES.ADMIN.PERFORMANCES, label: "Performances", icon: Music },
-  { href: ROUTES.ADMIN.TEAMS, label: "Teams", icon: Mic },
-  { href: ROUTES.ADMIN.SESSIONS, label: "Sessions", icon: Guitar }
+  { href: ROUTES.ADMIN.USERS, label: "회원", icon: Users },
+  { href: ROUTES.ADMIN.GENERATIONS, label: "기수", icon: Hash },
+  { href: ROUTES.ADMIN.PERFORMANCES, label: "공연", icon: Music },
+  { href: ROUTES.ADMIN.TEAMS, label: "팀", icon: Mic },
+  { href: ROUTES.ADMIN.SESSIONS, label: "세션", icon: Guitar }
 ]
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

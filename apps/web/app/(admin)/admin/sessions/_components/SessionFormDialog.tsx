@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SessionName } from "@repo/database"
+import { SESSION_NAMES } from "@/constants/session"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
@@ -57,7 +57,7 @@ export function SessionFormDialog({
   const form = useForm<CreateSession>({
     resolver: zodResolver(CreateSessionSchema),
     defaultValues: {
-      name: SessionName.VOCAL,
+      name: SESSION_NAMES.VOCAL,
       leaderId: undefined
     }
   })
@@ -69,7 +69,7 @@ export function SessionFormDialog({
         leaderId: editingSession.leader?.id ?? undefined
       })
     } else if (open) {
-      form.reset({ name: SessionName.VOCAL, leaderId: undefined })
+      form.reset({ name: SESSION_NAMES.VOCAL, leaderId: undefined })
     }
   }, [open, editingSession, form])
 
@@ -103,7 +103,7 @@ export function SessionFormDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(SessionName).map((name) => (
+                      {Object.values(SESSION_NAMES).map((name) => (
                         <SelectItem key={name} value={name}>
                           {getSessionDisplayName(name)}
                         </SelectItem>

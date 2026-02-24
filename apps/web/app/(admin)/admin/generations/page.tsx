@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -12,6 +12,7 @@ import {
   useGenerations,
   useUpdateGeneration
 } from "@/hooks/api/useGeneration"
+import { useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { GenerationWithBasicUsers } from "@repo/shared-types"
 
@@ -22,6 +23,15 @@ export default function GenerationsAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { data: generations, isLoading } = useGenerations()
+  const { data: users } = useUsers()
+
+  const userOptions = useMemo(
+    () =>
+      (users ?? [])
+        .map((u) => ({ label: u.name, value: String(u.id) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [users]
+  )
 
   // 다이얼로그 상태
   const [formOpen, setFormOpen] = useState(false)
@@ -35,19 +45,46 @@ export default function GenerationsAdminPage() {
   const updateMutation = useUpdateGeneration()
   const deleteMutation = useDeleteGeneration()
 
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      const payload: Record<string, unknown> = {}
+      if (columnId === "leader") {
+        payload.leaderId = Number(value)
+      } else {
+        payload[columnId] = value
+      }
+      try {
+        await updateMutation.mutateAsync([rowId, payload])
+        toast({ title: "기수가 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["generations"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
+  )
+
   const columns = useMemo(
     () =>
-      getColumns({
-        onEdit: (gen) => {
-          setEditing(gen)
-          setFormOpen(true)
+      getColumns(
+        {
+          onEdit: (gen) => {
+            setEditing(gen)
+            setFormOpen(true)
+          },
+          onDelete: (gen) => {
+            setDeleting(gen)
+            setDeleteOpen(true)
+          }
         },
-        onDelete: (gen) => {
-          setDeleting(gen)
-          setDeleteOpen(true)
-        }
-      }),
-    []
+        { userOptions }
+      ),
+    [userOptions]
   )
 
   const handleSubmit = (data: { order: number; leaderId?: number }) => {
@@ -109,6 +146,26 @@ export default function GenerationsAdminPage() {
           setFormOpen(true)
         }}
         createLabel="기수 생성"
+        onUpdateCell={handleCellUpdate}
+        enableGlobalSearch
+        searchPlaceholder="기수 검색..."
+        onBulkDelete={async (rows) => {
+          const results = await Promise.allSettled(
+            rows.map((r) =>
+              deleteMutation.mutateAsync([(r as GenerationWithBasicUsers).id])
+            )
+          )
+          const failed = results.filter((r) => r.status === "rejected").length
+          if (failed > 0) {
+            toast({
+              title: `${rows.length - failed}개 삭제, ${failed}개 실패`,
+              variant: "destructive"
+            })
+          } else {
+            toast({ title: `${rows.length}개 기수가 삭제되었습니다.` })
+          }
+          queryClient.invalidateQueries({ queryKey: ["generations"] })
+        }}
       />
 
       <GenerationFormDialog

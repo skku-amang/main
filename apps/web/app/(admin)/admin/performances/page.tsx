@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -30,6 +30,37 @@ export default function PerformancesAdminPage() {
   const createMutation = useCreatePerformance()
   const updateMutation = useUpdatePerformance()
   const deleteMutation = useDeletePerformance()
+
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      const payload: Record<string, unknown> = {}
+      if (columnId === "startAt" || columnId === "endAt") {
+        payload[columnId] = value ? new Date(value as string) : null
+      } else {
+        payload[columnId] = value
+      }
+      try {
+        await updateMutation.mutateAsync([rowId, payload])
+        toast({ title: "수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["performances"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
+  )
+
+  const locationFilters = useMemo(() => {
+    const locations = new Set(
+      performances?.map((p) => p.location).filter(Boolean) as string[]
+    )
+    return [...locations].sort().map((loc) => ({ label: loc, value: loc }))
+  }, [performances])
 
   const columns = useMemo(
     () =>
@@ -113,6 +144,7 @@ export default function PerformancesAdminPage() {
         data={performances ?? []}
         isLoading={isLoading}
         initialSorting={[{ id: "id", desc: true }]}
+        initialColumnVisibility={{ description: false, posterImage: false }}
         searchColumn="name"
         searchPlaceholder="공연 검색..."
         onCreateClick={() => {
@@ -120,6 +152,29 @@ export default function PerformancesAdminPage() {
           setFormOpen(true)
         }}
         createLabel="공연 생성"
+        filters={[
+          {
+            columnId: "location",
+            label: "장소",
+            options: locationFilters
+          }
+        ]}
+        onUpdateCell={handleCellUpdate}
+        onBulkDelete={async (rows) => {
+          const results = await Promise.allSettled(
+            rows.map((r) => deleteMutation.mutateAsync([(r as Performance).id]))
+          )
+          const failed = results.filter((r) => r.status === "rejected").length
+          if (failed > 0) {
+            toast({
+              title: `${rows.length - failed}개 삭제, ${failed}개 실패`,
+              variant: "destructive"
+            })
+          } else {
+            toast({ title: `${rows.length}개 공연이 삭제되었습니다.` })
+          }
+          queryClient.invalidateQueries({ queryKey: ["performances"] })
+        }}
       />
 
       <PerformanceFormDialog

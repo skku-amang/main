@@ -4,8 +4,12 @@ import { ColumnDef } from "@tanstack/react-table"
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 
+import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
+import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
+import { UserCell } from "@/app/(admin)/_components/data-table/UserCell"
 import { formatGenerationOrder } from "@/lib/utils"
+import ROUTES from "@/constants/routes"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import ROUTES from "@/constants/routes"
 import { GenerationWithBasicUsers } from "@repo/shared-types"
 
 interface ColumnActions {
@@ -21,8 +24,13 @@ interface ColumnActions {
   onDelete: (generation: GenerationWithBasicUsers) => void
 }
 
+interface ColumnOptions {
+  userOptions?: { label: string; value: string }[]
+}
+
 export function getColumns(
-  actions: ColumnActions
+  actions: ColumnActions,
+  options?: ColumnOptions
 ): ColumnDef<GenerationWithBasicUsers>[] {
   return [
     {
@@ -30,35 +38,65 @@ export function getColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ID" />
       ),
-      size: 60
+      size: 60,
+      enableHiding: false
     },
     {
       accessorKey: "order",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="기수" />
       ),
-      cell: ({ row }) => `${formatGenerationOrder(row.original.order)}기`
+      meta: {
+        label: "기수",
+        editable: {
+          type: "number",
+          step: 0.5,
+          displayTransform: (v: number) => String(v / 2),
+          saveTransform: (v: number) => v * 2
+        }
+      },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={`${formatGenerationOrder(ctx.row.original.order)}기`}
+        />
+      )
     },
     {
       id: "leader",
-      header: "리더",
-      cell: ({ row }) => {
-        const leader = row.original.leader
-        if (!leader) return "-"
-        return (
-          <Link
-            href={ROUTES.ADMIN.USERS}
-            className="text-blue-600 hover:underline"
-          >
-            {leader.name}
-          </Link>
-        )
-      }
+      accessorFn: (row) => row.leader?.name ?? "",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="기장" />
+      ),
+      meta: {
+        label: "기장",
+        editable: {
+          type: "select",
+          options: options?.userOptions ?? []
+        }
+      },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={<UserCell user={ctx.row.original.leader} />}
+        />
+      )
     },
     {
       id: "memberCount",
-      header: "회원 수",
-      cell: ({ row }) => row.original.users.length
+      accessorFn: (row) => row.users.length,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="회원 수" />
+      ),
+      meta: { label: "회원 수" },
+      cell: ({ row }) => (
+        <Link
+          href={`${ROUTES.ADMIN.USERS}?generation=${row.original.order}`}
+          className="text-blue-600 hover:underline"
+        >
+          {row.original.users.length}명
+        </Link>
+      )
     },
     {
       id: "actions",
@@ -70,6 +108,7 @@ export function getColumns(
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <CopyRowLinkItem rowId={row.original.id} />
             <DropdownMenuItem onClick={() => actions.onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
               편집
@@ -84,7 +123,8 @@ export function getColumns(
           </DropdownMenuContent>
         </DropdownMenu>
       ),
-      size: 50
+      size: 50,
+      enableHiding: false
     }
   ]
 }
