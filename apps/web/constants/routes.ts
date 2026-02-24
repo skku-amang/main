@@ -5,7 +5,13 @@ const ROUTES = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   ADMIN: {
-    INDEX: "/admin"
+    INDEX: "/admin",
+    USERS: "/admin/users",
+    GENERATIONS: "/admin/generations",
+    PERFORMANCES: "/admin/performances",
+    TEAMS: "/admin/teams",
+    TEAM_DETAIL: (teamId: number) => `/admin/teams/${teamId}`,
+    SESSIONS: "/admin/sessions"
   },
   NOTICE: {
     CREATE: "/notices/create",

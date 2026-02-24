@@ -1,6 +1,11 @@
 import { createMutationHook, createQueryHook } from "@/hooks/useCustomQuery"
 import ApiClient from "@repo/api-client"
 
+export const useAllTeams = createQueryHook(ApiClient.prototype.getTeams, () => [
+  "teams",
+  "all"
+])
+
 export const useCreateTeam = createMutationHook(ApiClient.prototype.createTeam)
 
 export const useTeams = createQueryHook(
