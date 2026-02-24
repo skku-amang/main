@@ -12,6 +12,7 @@ import {
   usePerformances,
   useUpdatePerformance
 } from "@/hooks/api/usePerformance"
+import { useAllTeams } from "@/hooks/api/useTeam"
 import { Performance } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
@@ -21,6 +22,15 @@ export default function PerformancesAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { data: performances, isLoading } = usePerformances()
+  const { data: teams } = useAllTeams()
+
+  const teamCountMap = useMemo(() => {
+    const map = new Map<number, number>()
+    for (const team of teams ?? []) {
+      map.set(team.performanceId, (map.get(team.performanceId) ?? 0) + 1)
+    }
+    return map
+  }, [teams])
 
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -64,17 +74,20 @@ export default function PerformancesAdminPage() {
 
   const columns = useMemo(
     () =>
-      getColumns({
-        onEdit: (perf) => {
-          setEditing(perf)
-          setFormOpen(true)
+      getColumns(
+        {
+          onEdit: (perf) => {
+            setEditing(perf)
+            setFormOpen(true)
+          },
+          onDelete: (perf) => {
+            setDeleting(perf)
+            setDeleteOpen(true)
+          }
         },
-        onDelete: (perf) => {
-          setDeleting(perf)
-          setDeleteOpen(true)
-        }
-      }),
-    []
+        teamCountMap
+      ),
+    [teamCountMap]
   )
 
   const handleSubmit = (data: {

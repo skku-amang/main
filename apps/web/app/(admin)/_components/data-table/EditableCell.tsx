@@ -1,9 +1,10 @@
 "use client"
 
 import type { CellContext } from "@tanstack/react-table"
-import { Loader2, Pencil } from "lucide-react"
+import { ImagePlus, Loader2, Pencil } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
@@ -12,7 +13,10 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { useGetPresignedUrl } from "@/hooks/api/useUpload"
+import { useUsers } from "@/hooks/api/useUser"
 import { cn } from "@/lib/utils"
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@repo/shared-types"
 
 import "./types"
 
@@ -124,6 +128,46 @@ function SelectCellEditor({
   )
 }
 
+// --- User select cell editor ---
+
+function UserSelectCellEditor({
+  value,
+  onSelect,
+  onCancel,
+  isPending,
+  allowNone
+}: {
+  value: string
+  onSelect: (value: string) => void
+  onCancel: () => void
+  isPending: boolean
+  allowNone?: boolean
+}) {
+  const { data: users } = useUsers()
+
+  return (
+    <div className="absolute inset-0 z-10 flex items-center px-1">
+      <Select
+        defaultOpen
+        value={value}
+        onValueChange={onSelect}
+        onOpenChange={(open) => {
+          if (!open) onCancel()
+        }}
+        disabled={isPending}
+      >
+        <SelectTrigger className="h-7 text-sm">
+          <SelectValue />
+        </SelectTrigger>
+        <UserSelectContent users={users} allowNone={allowNone} />
+      </Select>
+      {isPending && (
+        <Loader2 className="absolute right-7 top-1/2 h-3 w-3 -translate-y-1/2 animate-spin text-muted-foreground" />
+      )}
+    </div>
+  )
+}
+
 // --- Boolean toggle cell ---
 
 function BooleanCellToggle({
@@ -165,6 +209,79 @@ function BooleanCellToggle({
   )
 }
 
+// --- Image cell editor ---
+
+function ImageCellEditor({
+  currentUrl,
+  rowId,
+  columnId,
+  updateCell
+}: {
+  currentUrl: string | null
+  rowId: number
+  columnId: string
+  updateCell: (rowId: number, columnId: string, value: unknown) => Promise<void>
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isPending, setIsPending] = useState(false)
+  const { mutateAsync: getPresignedUrl } = useGetPresignedUrl()
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) return
+    if (file.size > MAX_FILE_SIZE) return
+
+    setIsPending(true)
+    try {
+      const { uploadUrl, publicUrl } = await getPresignedUrl([
+        { filename: file.name, contentType: file.type }
+      ])
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type }
+      })
+      await updateCell(rowId, columnId, publicUrl)
+    } catch {
+      /* page-level handler shows toast */
+    } finally {
+      setIsPending(false)
+      if (inputRef.current) inputRef.current.value = ""
+    }
+  }
+
+  return (
+    <div
+      className="group/cell -mx-2 -my-2 flex cursor-pointer items-center gap-1.5 rounded px-2 py-2 hover:bg-muted/80"
+      onClick={() => !isPending && inputRef.current?.click()}
+    >
+      {currentUrl ? (
+        <img
+          src={currentUrl}
+          alt=""
+          className="h-10 w-8 rounded object-cover"
+        />
+      ) : (
+        <span className="text-muted-foreground">-</span>
+      )}
+      {isPending ? (
+        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+      ) : (
+        <ImagePlus className="h-3 w-3 shrink-0 text-muted-foreground/0 transition-colors group-hover/cell:text-muted-foreground" />
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED_IMAGE_TYPES.join(",")}
+        className="hidden"
+        onChange={handleFileSelect}
+      />
+    </div>
+  )
+}
+
 // --- Main EditableCell ---
 
 interface EditableCellProps<TData, TValue> {
@@ -192,6 +309,18 @@ export function EditableCell<TData extends { id: number }, TValue>({
     return (
       <BooleanCellToggle
         checked={!!row.getValue(column.id)}
+        rowId={row.original.id}
+        columnId={column.id}
+        updateCell={meta.updateCell}
+      />
+    )
+  }
+
+  // Image — direct file pick + upload, no edit mode needed
+  if (editable.type === "image") {
+    return (
+      <ImageCellEditor
+        currentUrl={(row.getValue(column.id) as string) ?? null}
         rowId={row.original.id}
         columnId={column.id}
         updateCell={meta.updateCell}
@@ -362,6 +491,18 @@ function EditableCellInner({
         onSelect={handleSelectSave}
         onCancel={handleCancel}
         isPending={isPending}
+      />
+    )
+  }
+
+  if (editable.type === "user") {
+    return (
+      <UserSelectCellEditor
+        value={String(rawValue ?? "none")}
+        onSelect={handleSelectSave}
+        onCancel={handleCancel}
+        isPending={isPending}
+        allowNone
       />
     )
   }

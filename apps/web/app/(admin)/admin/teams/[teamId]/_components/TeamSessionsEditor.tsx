@@ -123,9 +123,12 @@ export function TeamSessionsEditor({
     return user ? `${user.name} (${user.nickname})` : `유저 ${userId}`
   }
 
-  // 현재 팀에 이미 배정된 유저 ID 모음 (멤버 중복 배정 방지용)
-  const assignedUserIds = new Set(
-    memberSessions.flatMap((ms) => ms.members.map((m) => m.userId))
+  // 현재 편집 중인 세션에 이미 배정된 유저만 제외 (다른 세션과 중복 허용)
+  const currentSessionUserIds = new Set(
+    editingSessionIndex !== null
+      ? (memberSessions[editingSessionIndex]?.members.map((m) => m.userId) ??
+          [])
+      : []
   )
 
   return (
@@ -260,7 +263,7 @@ export function TeamSessionsEditor({
             addMember(editingSessionIndex, userId)
           }
         }}
-        excludeUserIds={assignedUserIds}
+        excludeUserIds={currentSessionUserIds}
       />
     </div>
   )

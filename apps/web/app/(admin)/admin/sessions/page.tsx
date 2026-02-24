@@ -13,7 +13,6 @@ import {
   useSessions,
   useUpdateSession
 } from "@/hooks/api/useSession"
-import { useUsers } from "@/hooks/api/useUser"
 import { CreateSession, SessionWithBasicUsers } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
@@ -23,15 +22,6 @@ export default function SessionsAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { data: sessions, isLoading } = useSessions()
-  const { data: users } = useUsers()
-
-  const userOptions = useMemo(
-    () =>
-      (users ?? [])
-        .map((u) => ({ label: u.name, value: String(u.id) }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [users]
-  )
 
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -46,7 +36,7 @@ export default function SessionsAdminPage() {
     async (rowId: number, columnId: string, value: unknown) => {
       const payload: Record<string, unknown> = {}
       if (columnId === "leader") {
-        payload.leaderId = Number(value)
+        payload.leaderId = value === "none" ? null : Number(value)
       } else {
         payload[columnId] = value
       }
@@ -68,20 +58,17 @@ export default function SessionsAdminPage() {
 
   const columns = useMemo(
     () =>
-      getColumns(
-        {
-          onEdit: (session) => {
-            setEditing(session)
-            setFormOpen(true)
-          },
-          onDelete: (session) => {
-            setDeleting(session)
-            setDeleteOpen(true)
-          }
+      getColumns({
+        onEdit: (session) => {
+          setEditing(session)
+          setFormOpen(true)
         },
-        { userOptions }
-      ),
-    [userOptions]
+        onDelete: (session) => {
+          setDeleting(session)
+          setDeleteOpen(true)
+        }
+      }),
+    []
   )
 
   const handleSubmit = (data: CreateSession) => {

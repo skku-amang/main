@@ -14,10 +14,16 @@ import {
   SelectValue
 } from "@/components/ui/select"
 
+export interface FilterOption {
+  label: string
+  value: string
+  render?: React.ReactNode
+}
+
 export interface FilterConfig {
   columnId: string
   label: string
-  options: { label: string; value: string }[]
+  options: FilterOption[]
 }
 
 interface DataTableToolbarProps<TData> {
@@ -115,8 +121,12 @@ export function DataTableToolbar<TData>({
             <SelectContent>
               <SelectItem value="__all__">전체 {filter.label}</SelectItem>
               {filter.options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  textValue={opt.label}
+                >
+                  {opt.render ?? opt.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -128,11 +138,12 @@ export function DataTableToolbar<TData>({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            filters.forEach((f) =>
-              table.getColumn(f.columnId)?.setFilterValue(undefined)
+          onClick={() => {
+            const filterIds = new Set(filters.map((f) => f.columnId))
+            table.setColumnFilters((prev) =>
+              prev.filter((f) => !filterIds.has(f.id))
             )
-          }
+          }}
         >
           초기화
           <X className="ml-1 h-3 w-3" />

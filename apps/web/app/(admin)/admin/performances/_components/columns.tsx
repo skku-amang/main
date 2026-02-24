@@ -2,7 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import { EllipsisVertical, ExternalLink, Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
@@ -14,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import ROUTES from "@/constants/routes"
 import { Performance } from "@repo/shared-types"
 
 interface ColumnActions {
@@ -21,7 +23,10 @@ interface ColumnActions {
   onDelete: (performance: Performance) => void
 }
 
-export function getColumns(actions: ColumnActions): ColumnDef<Performance>[] {
+export function getColumns(
+  actions: ColumnActions,
+  teamCountMap?: Map<number, number>
+): ColumnDef<Performance>[] {
   return [
     {
       accessorKey: "id",
@@ -61,18 +66,23 @@ export function getColumns(actions: ColumnActions): ColumnDef<Performance>[] {
     {
       accessorKey: "posterImage",
       header: "포스터",
-      meta: { label: "포스터" },
-      cell: ({ row }) => {
-        const url = row.original.posterImage
-        if (!url) return "-"
-        return (
-          <img
-            src={url}
-            alt="포스터"
-            className="h-10 w-8 rounded object-cover"
-          />
-        )
-      }
+      meta: { label: "포스터", editable: { type: "image" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            ctx.row.original.posterImage ? (
+              <img
+                src={ctx.row.original.posterImage}
+                alt="포스터"
+                className="h-10 w-8 rounded object-cover"
+              />
+            ) : (
+              "-"
+            )
+          }
+        />
+      )
     },
     {
       accessorKey: "location",
@@ -126,6 +136,25 @@ export function getColumns(actions: ColumnActions): ColumnDef<Performance>[] {
       }
     },
     {
+      id: "teamCount",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="팀 수" />
+      ),
+      meta: { label: "팀 수" },
+      accessorFn: (row) => teamCountMap?.get(row.id) ?? 0,
+      cell: ({ row }) => {
+        const count = teamCountMap?.get(row.original.id) ?? 0
+        return (
+          <Link
+            href={`${ROUTES.ADMIN.TEAMS}?performanceId=${row.original.id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {count}팀
+          </Link>
+        )
+      }
+    },
+    {
       id: "actions",
       cell: ({ row }) => (
         <DropdownMenu>
@@ -136,6 +165,12 @@ export function getColumns(actions: ColumnActions): ColumnDef<Performance>[] {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <CopyRowLinkItem rowId={row.original.id} />
+            <DropdownMenuItem asChild>
+              <Link href={ROUTES.PERFORMANCE.DETAIL(row.original.id)}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                바로가기
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => actions.onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
               편집

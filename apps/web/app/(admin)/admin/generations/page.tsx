@@ -12,7 +12,6 @@ import {
   useGenerations,
   useUpdateGeneration
 } from "@/hooks/api/useGeneration"
-import { useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { GenerationWithBasicUsers } from "@repo/shared-types"
 
@@ -23,15 +22,6 @@ export default function GenerationsAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { data: generations, isLoading } = useGenerations()
-  const { data: users } = useUsers()
-
-  const userOptions = useMemo(
-    () =>
-      (users ?? [])
-        .map((u) => ({ label: u.name, value: String(u.id) }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [users]
-  )
 
   // 다이얼로그 상태
   const [formOpen, setFormOpen] = useState(false)
@@ -49,7 +39,7 @@ export default function GenerationsAdminPage() {
     async (rowId: number, columnId: string, value: unknown) => {
       const payload: Record<string, unknown> = {}
       if (columnId === "leader") {
-        payload.leaderId = Number(value)
+        payload.leaderId = value === "none" ? null : Number(value)
       } else {
         payload[columnId] = value
       }
@@ -71,20 +61,17 @@ export default function GenerationsAdminPage() {
 
   const columns = useMemo(
     () =>
-      getColumns(
-        {
-          onEdit: (gen) => {
-            setEditing(gen)
-            setFormOpen(true)
-          },
-          onDelete: (gen) => {
-            setDeleting(gen)
-            setDeleteOpen(true)
-          }
+      getColumns({
+        onEdit: (gen) => {
+          setEditing(gen)
+          setFormOpen(true)
         },
-        { userOptions }
-      ),
-    [userOptions]
+        onDelete: (gen) => {
+          setDeleting(gen)
+          setDeleteOpen(true)
+        }
+      }),
+    []
   )
 
   const handleSubmit = (data: { order: number; leaderId?: number }) => {

@@ -5,9 +5,11 @@ import { useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
+import { formatGenerationOrder } from "@/lib/utils"
 import { TeamList } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
@@ -40,17 +42,29 @@ export default function TeamsAdminPage() {
     [performances]
   )
 
-  const leaderFilters = useMemo(
-    () =>
-      [
-        ...new Map(
-          (teams ?? []).map((t) => [t.leader.id, t.leader.name])
-        ).entries()
-      ]
-        .map(([id, name]) => ({ label: name, value: String(id) }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [teams]
-  )
+  const leaderFilters = useMemo(() => {
+    const leaders = new Map((teams ?? []).map((t) => [t.leader.id, t.leader]))
+    return [...leaders.values()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((leader) => ({
+        label: leader.name,
+        value: String(leader.id),
+        render: (
+          <div className="flex items-center gap-2">
+            <Avatar className="h-5 w-5">
+              <AvatarImage src={leader.image ?? undefined} />
+              <AvatarFallback className="text-[10px]">
+                {leader.name[0]}
+              </AvatarFallback>
+            </Avatar>
+            <span>{leader.name}</span>
+            <span className="text-xs text-muted-foreground">
+              {formatGenerationOrder(leader.generation.order)}기
+            </span>
+          </div>
+        )
+      }))
+  }, [teams])
 
   const artistFilters = useMemo(
     () =>
@@ -82,6 +96,11 @@ export default function TeamsAdminPage() {
     const team = teams?.find((t) => t.id === rowId)
     if (!team) return
 
+    const mapped =
+      columnId === "leader"
+        ? { leaderId: Number(value) }
+        : { [columnId]: value }
+
     const payload = {
       name: team.name,
       description: team.description,
@@ -100,7 +119,7 @@ export default function TeamsAdminPage() {
           index: m.index
         }))
       })),
-      [columnId]: value
+      ...mapped
     }
 
     try {
@@ -163,7 +182,7 @@ export default function TeamsAdminPage() {
           },
           {
             columnId: "leader",
-            label: "리더",
+            label: "팀장",
             options: leaderFilters
           },
           {

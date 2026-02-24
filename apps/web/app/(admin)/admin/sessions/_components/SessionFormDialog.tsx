@@ -21,6 +21,7 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
+import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
 import {
   Select,
   SelectContent,
@@ -132,14 +133,7 @@ export function SessionFormDialog({
                         <SelectValue placeholder="리더 선택 (선택사항)" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">없음</SelectItem>
-                      {users?.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.name} ({user.nickname})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    <UserSelectContent users={users} allowNone />
                   </Select>
                   <FormMessage />
                 </FormItem>

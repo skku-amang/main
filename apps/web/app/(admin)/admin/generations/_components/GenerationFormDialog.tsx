@@ -21,13 +21,8 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import {
@@ -131,14 +126,7 @@ export function GenerationFormDialog({
                         <SelectValue placeholder="리더 선택 (선택사항)" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">없음</SelectItem>
-                      {users?.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.name} ({user.nickname})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    <UserSelectContent users={users} allowNone />
                   </Select>
                   <FormMessage />
                 </FormItem>

@@ -24,13 +24,8 @@ interface ColumnActions {
   onDelete: (generation: GenerationWithBasicUsers) => void
 }
 
-interface ColumnOptions {
-  userOptions?: { label: string; value: string }[]
-}
-
 export function getColumns(
-  actions: ColumnActions,
-  options?: ColumnOptions
+  actions: ColumnActions
 ): ColumnDef<GenerationWithBasicUsers>[] {
   return [
     {
@@ -70,10 +65,7 @@ export function getColumns(
       ),
       meta: {
         label: "기장",
-        editable: {
-          type: "select",
-          options: options?.userOptions ?? []
-        }
+        editable: { type: "user" }
       },
       cell: (ctx) => (
         <EditableCell

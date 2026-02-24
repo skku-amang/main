@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Eye, EllipsisVertical, Trash2 } from "lucide-react"
+import { Eye, EllipsisVertical, ExternalLink, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
@@ -114,13 +114,39 @@ export function getColumns(
         row.original.songArtist === filterValue
     },
     {
+      accessorKey: "posterImage",
+      header: "포스터",
+      meta: { label: "포스터", editable: { type: "image" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            ctx.row.original.posterImage ? (
+              <img
+                src={ctx.row.original.posterImage}
+                alt="포스터"
+                className="h-10 w-8 rounded object-cover"
+              />
+            ) : (
+              "-"
+            )
+          }
+        />
+      )
+    },
+    {
       id: "leader",
       accessorFn: (row) => row.leader.name,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="리더" />
+        <DataTableColumnHeader column={column} title="팀장" />
       ),
-      meta: { label: "리더" },
-      cell: ({ row }) => <UserCell user={row.original.leader} />,
+      meta: { label: "팀장", editable: { type: "user" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={<UserCell user={ctx.row.original.leader} />}
+        />
+      ),
       filterFn: (row, _columnId, filterValue) =>
         String(row.original.leader.id) === filterValue
     },
@@ -192,6 +218,17 @@ export function getColumns(
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <CopyRowLinkItem rowId={row.original.id} />
+            <DropdownMenuItem asChild>
+              <Link
+                href={ROUTES.PERFORMANCE.TEAM.DETAIL(
+                  row.original.performanceId,
+                  row.original.id
+                )}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                바로가기
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href={ROUTES.ADMIN.TEAM_DETAIL(row.original.id)}>
                 <Eye className="mr-2 h-4 w-4" />

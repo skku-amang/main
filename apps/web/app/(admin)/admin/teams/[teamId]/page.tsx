@@ -1,21 +1,16 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, ExternalLink, Save } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
+import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/hooks/use-toast"
@@ -141,10 +136,20 @@ export default function TeamDetailAdminPage() {
           </Link>
           <h1 className="text-2xl font-bold">팀 편집</h1>
         </div>
-        <Button onClick={handleSave} disabled={updateMutation.isPending}>
-          <Save className="mr-1 h-4 w-4" />
-          {updateMutation.isPending ? "저장 중..." : "저장"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" asChild>
+            <Link
+              href={ROUTES.PERFORMANCE.TEAM.DETAIL(team.performanceId, team.id)}
+            >
+              <ExternalLink className="mr-1 h-4 w-4" />
+              바로가기
+            </Link>
+          </Button>
+          <Button onClick={handleSave} disabled={updateMutation.isPending}>
+            <Save className="mr-1 h-4 w-4" />
+            {updateMutation.isPending ? "저장 중..." : "저장"}
+          </Button>
+        </div>
       </div>
 
       {/* 기본 정보 */}
@@ -157,7 +162,7 @@ export default function TeamDetailAdminPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>리더</Label>
+            <Label>팀장</Label>
             <Select
               value={leaderId.toString()}
               onValueChange={(v) => setLeaderId(parseInt(v))}
@@ -165,13 +170,7 @@ export default function TeamDetailAdminPage() {
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                {users?.map((user) => (
-                  <SelectItem key={user.id} value={user.id.toString()}>
-                    {user.name} ({user.nickname})
-                  </SelectItem>
-                ))}
-              </SelectContent>
+              <UserSelectContent users={users} />
             </Select>
           </div>
 

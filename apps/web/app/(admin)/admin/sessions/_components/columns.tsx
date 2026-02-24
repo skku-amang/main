@@ -27,17 +27,12 @@ interface ColumnActions {
   onDelete: (session: SessionWithBasicUsers) => void
 }
 
-interface ColumnOptions {
-  userOptions?: { label: string; value: string }[]
-}
-
 const sessionNameOptions = Object.entries(SESSION_DISPLAY_NAME).map(
   ([value, label]) => ({ label, value })
 )
 
 export function getColumns(
-  actions: ColumnActions,
-  options?: ColumnOptions
+  actions: ColumnActions
 ): ColumnDef<SessionWithBasicUsers>[] {
   return [
     {
@@ -66,14 +61,22 @@ export function getColumns(
     },
     {
       accessorKey: "icon",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="아이콘" />
-      ),
-      meta: { label: "아이콘", editable: { type: "text" } },
+      header: "아이콘",
+      meta: { label: "아이콘", editable: { type: "image" } },
       cell: (ctx) => (
         <EditableCell
           cellContext={ctx}
-          displayValue={ctx.row.original.icon ?? "-"}
+          displayValue={
+            ctx.row.original.icon ? (
+              <img
+                src={ctx.row.original.icon}
+                alt="아이콘"
+                className="h-8 w-8 rounded object-contain"
+              />
+            ) : (
+              "-"
+            )
+          }
         />
       )
     },
@@ -85,10 +88,7 @@ export function getColumns(
       ),
       meta: {
         label: "세션장",
-        editable: {
-          type: "select",
-          options: options?.userOptions ?? []
-        }
+        editable: { type: "user" }
       },
       cell: (ctx) => (
         <EditableCell

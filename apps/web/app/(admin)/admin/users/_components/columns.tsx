@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import { EllipsisVertical, ExternalLink, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
@@ -133,7 +133,12 @@ export function getColumns(): ColumnDef<PublicUser>[] {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <CopyRowLinkItem rowId={row.original.id} />
-            {/* TODO: 백엔드에 PATCH /users/:id, DELETE /users/:id 엔드포인트 추가 후 활성화 */}
+            <DropdownMenuItem asChild>
+              <Link href={ROUTES.MEMBER.DETAIL(row.original.id)}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                바로가기
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem disabled>
               <Pencil className="mr-2 h-4 w-4" />
               편집 (API 미구현)
