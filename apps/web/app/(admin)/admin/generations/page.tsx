@@ -102,6 +102,7 @@ export default function GenerationsAdminPage() {
       <DataTable
         columns={columns}
         data={generations ?? []}
+        initialSorting={[{ id: "order", desc: true }]}
         isLoading={isLoading}
         onCreateClick={() => {
           setEditing(null)

@@ -62,6 +62,7 @@ export default function TeamsAdminPage() {
         columns={columns}
         data={teams ?? []}
         isLoading={isLoading}
+        initialSorting={[{ id: "id", desc: true }]}
         searchColumn="songName"
         searchPlaceholder="곡명으로 검색..."
         emptyMessage="등록된 팀이 없습니다."

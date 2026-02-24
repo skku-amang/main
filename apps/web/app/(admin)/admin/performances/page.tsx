@@ -112,6 +112,7 @@ export default function PerformancesAdminPage() {
         columns={columns}
         data={performances ?? []}
         isLoading={isLoading}
+        initialSorting={[{ id: "id", desc: true }]}
         searchColumn="name"
         searchPlaceholder="공연 검색..."
         onCreateClick={() => {

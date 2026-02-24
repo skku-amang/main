@@ -35,6 +35,14 @@ export function getColumns(actions: ColumnActions): ColumnDef<TeamItem>[] {
       accessorKey: "songName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="곡명" />
+      ),
+      cell: ({ row }) => (
+        <Link
+          href={ROUTES.ADMIN.TEAM_DETAIL(row.original.id)}
+          className="text-blue-600 hover:underline"
+        >
+          {row.original.songName}
+        </Link>
       )
     },
     {
@@ -46,7 +54,14 @@ export function getColumns(actions: ColumnActions): ColumnDef<TeamItem>[] {
     {
       id: "leader",
       header: "리더",
-      cell: ({ row }) => row.original.leader.name
+      cell: ({ row }) => (
+        <Link
+          href={ROUTES.ADMIN.USERS}
+          className="text-blue-600 hover:underline"
+        >
+          {row.original.leader.name}
+        </Link>
+      )
     },
     {
       id: "fillRate",

@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { getSessionDisplayName } from "@/constants/session"
+import ROUTES from "@/constants/routes"
 import { SessionWithBasicUsers } from "@repo/shared-types"
 
 interface ColumnActions {
@@ -40,7 +42,18 @@ export function getColumns(
     {
       id: "leader",
       header: "리더",
-      cell: ({ row }) => row.original.leader?.name ?? "-"
+      cell: ({ row }) => {
+        const leader = row.original.leader
+        if (!leader) return "-"
+        return (
+          <Link
+            href={ROUTES.ADMIN.USERS}
+            className="text-blue-600 hover:underline"
+          >
+            {leader.name}
+          </Link>
+        )
+      }
     },
     {
       id: "memberCount",

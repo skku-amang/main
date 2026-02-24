@@ -100,6 +100,7 @@ export default function SessionsAdminPage() {
         columns={columns}
         data={sessions ?? []}
         isLoading={isLoading}
+        initialSorting={[{ id: "id", desc: false }]}
         searchColumn="name"
         searchPlaceholder="세션 검색..."
         onCreateClick={() => {

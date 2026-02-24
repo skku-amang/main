@@ -2,9 +2,11 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { formatGenerationOrder } from "@/lib/utils"
+import ROUTES from "@/constants/routes"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -62,8 +64,14 @@ export function getColumns(): ColumnDef<PublicUser>[] {
         <DataTableColumnHeader column={column} title="기수" />
       ),
       accessorFn: (row) => row.generation.order,
-      cell: ({ row }) =>
-        `${formatGenerationOrder(row.original.generation.order)}기`
+      cell: ({ row }) => (
+        <Link
+          href={ROUTES.ADMIN.GENERATIONS}
+          className="text-blue-600 hover:underline"
+        >
+          {formatGenerationOrder(row.original.generation.order)}기
+        </Link>
+      )
     },
     {
       id: "actions",

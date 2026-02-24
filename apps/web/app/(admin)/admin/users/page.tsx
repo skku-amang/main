@@ -26,6 +26,7 @@ export default function UsersAdminPage() {
         columns={columns}
         data={users ?? []}
         isLoading={isLoading}
+        initialSorting={[{ id: "id", desc: false }]}
         searchColumn="name"
         searchPlaceholder="이름으로 검색..."
         emptyMessage="등록된 회원이 없습니다."

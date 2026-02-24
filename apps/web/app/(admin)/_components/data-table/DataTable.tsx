@@ -35,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   onCreateClick?: () => void
   createLabel?: string
   emptyMessage?: string
+  initialSorting?: SortingState
 }
 
 export function DataTable<TData, TValue>({
@@ -45,9 +46,10 @@ export function DataTable<TData, TValue>({
   searchPlaceholder,
   onCreateClick,
   createLabel,
-  emptyMessage = "데이터가 없습니다."
+  emptyMessage = "데이터가 없습니다.",
+  initialSorting = []
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>(initialSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const table = useReactTable({
