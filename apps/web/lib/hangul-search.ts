@@ -1,4 +1,28 @@
-import { chosungIncludes, hangulIncludes } from "es-hangul"
+import { disassemble, getChoseong } from "es-hangul"
+
+const CHOSEONGS = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"
+
+function isChoseong(char: string): boolean {
+  return CHOSEONGS.includes(char)
+}
+
+/**
+ * 초성 검색: "ㅂㄷ" → "밴드" 매칭
+ */
+function chosungIncludes(target: string, search: string): boolean {
+  if (!search.split("").every(isChoseong)) return false
+  const targetChosung = getChoseong(target)
+  return targetChosung.includes(search)
+}
+
+/**
+ * 한글 부분 일치: 자모 분해 후 비교하여 조합 중인 글자도 매칭
+ * - "노래" → "노래방" 매칭
+ * - "밴" → "밴드" 매칭
+ */
+function hangulIncludes(target: string, search: string): boolean {
+  return disassemble(target).includes(disassemble(search))
+}
 
 /**
  * 한글 친화적 검색: 초성 검색 + 부분 일치를 모두 지원한다.

@@ -42,7 +42,6 @@ import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
-import { matchesKorean } from "@/lib/hangul-search"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
@@ -338,10 +337,6 @@ export function TeamListDataTable<TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    filterFns: {
-      korean: (row, columnId, filterValue) =>
-        matchesKorean(String(row.getValue(columnId) ?? ""), String(filterValue))
-    },
     initialState: {
       columnVisibility: { createdAt: false },
       pagination: { pageIndex: Math.max(0, pageQuery - 1) },

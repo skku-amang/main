@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
+import { matchesKorean } from "@/lib/hangul-search"
 import {
   getMissingIndices,
   isTeamSatisfied,
@@ -131,7 +132,8 @@ const YoutubeCell = ({ row }: { row: any }) => {
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
-    filterFn: "korean",
+    filterFn: (row, columnId, filterValue) =>
+      matchesKorean(String(row.getValue(columnId) ?? ""), String(filterValue)),
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
       <Link
