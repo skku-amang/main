@@ -354,11 +354,13 @@ export function TeamListDataTable<TValue>({
     { value: "songName-asc", display: "곡명 오름차순" },
     { value: "songName-desc", display: "곡명 내림차순" },
     { value: "createdAt-desc", display: "최신순" },
-    { value: "createdAt-asc", display: "오래된순" }
+    { value: "createdAt-asc", display: "오래된순" },
+    { value: "status-asc", display: "모집중 우선" },
+    { value: "status-desc", display: "모집완료 우선" }
   ]
 
   return (
-    <div className={`overflow-x-hidden ${className ?? ""}`}>
+    <div className={`overflow-x-clip ${className ?? ""}`}>
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
         {/* 헤더 */}

@@ -18,6 +18,7 @@ const useTeamApplication = (teamId: number) => {
   const applyMutation = useApplyToTeam({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["team", teamId] })
+      queryClient.invalidateQueries({ queryKey: ["teams"] })
       toast({
         title: "지원 완료",
         description: "팀에 지원이 완료되었습니다."

@@ -174,9 +174,12 @@ export const columns: ColumnDef<TeamColumn>[] = [
     }
   },
   {
-    accessorKey: "status",
-    header: () => (
-      <div className="flex items-center justify-center">모집상태</div>
+    id: "status",
+    accessorFn: (row) => (isTeamSatisfied(row.teamSessions) ? 1 : 0),
+    header: ({ column }) => (
+      <div className="flex w-full justify-center">
+        <SortButton column={column}>모집상태</SortButton>
+      </div>
     ),
     cell: ({ row }) => {
       const teamSessions = row.original.teamSessions
@@ -194,21 +197,18 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="flex items-center justify-center">영상링크</div>
     ),
     cell: ({ row }) => {
-      const youtubeLink = YoutubeVideo.getURL(
-        row.getValue("songYoutubeVideoUrl")
+      const rawUrl = row.original.songYoutubeVideoUrl
+      if (!rawUrl) return null
+      return (
+        <Link
+          href={YoutubeVideo.getURL(rawUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center"
+        >
+          <Paperclip size={24} />
+        </Link>
       )
-      if (youtubeLink) {
-        return (
-          <Link
-            href={youtubeLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center"
-          >
-            <Paperclip size={24} />
-          </Link>
-        )
-      }
     }
   },
   {
