@@ -75,11 +75,6 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
     handleFileSelect(fakeEvent)
   }
 
-  function handleBrowseClick(): void {
-    // setTimeout to escape Radix Dialog's focus trap
-    setTimeout(() => inputRef.current?.click(), 0)
-  }
-
   return (
     <Dialog
       open={open}
@@ -148,14 +143,14 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
             <ImagePlus size={40} className="text-blue-300" />
             <p className="text-sm text-zinc-500">Drag your file(s)</p>
             <p className="text-xs text-zinc-400">or</p>
-            <button
-              type="button"
-              onClick={handleBrowseClick}
+            <label
+              htmlFor="poster-file-input"
               className="cursor-pointer text-sm font-medium text-secondary hover:underline"
             >
               browse
-            </button>
+            </label>
             <input
+              id="poster-file-input"
               ref={inputRef}
               type="file"
               accept={ACCEPTED_IMAGE_TYPES.join(",")}
