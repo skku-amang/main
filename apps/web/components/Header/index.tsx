@@ -19,7 +19,6 @@ type MenuItem = {
   name: string
   url: string
   active: boolean
-  experimental?: boolean
 }
 
 const Header = ({
@@ -32,25 +31,20 @@ const Header = ({
   mode?: HeaderMode
 }) => {
   const menuItems: MenuItem[] = [
-    { name: "소개", url: ROUTES.HOME, active: false, experimental: true },
-    { name: "신청", url: ROUTES.HOME, active: false, experimental: true },
-    { name: "모집", url: ROUTES.HOME, active: false, experimental: true },
     {
-      name: "예약",
+      name: "팀 모집",
       url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID),
       active: true
     },
     {
-      name: "동방",
+      name: "공간 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
-      active: true,
-      experimental: true
+      active: false
     },
     {
-      name: "장비",
+      name: "물품 대여",
       url: ROUTES.RESERVATION.EQUIPMENT,
-      active: true,
-      experimental: true
+      active: false
     },
     { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true }
   ]
@@ -108,7 +102,6 @@ const Header = ({
                 href={menuItem.url}
                 isActive={menuItem.active}
                 mode={mode}
-                isAdminOnly={menuItem.experimental}
               >
                 {menuItem.name}
               </NavLink>
