@@ -1,7 +1,6 @@
 "use client"
 
 import { ImagePlus, Loader2, X } from "lucide-react"
-import Image from "next/image"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -97,8 +96,8 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-xl">
-        <div className="rounded-xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto rounded-2xl">
+        <div>
           <DialogHeader className="mb-1">
             <DialogTitle className="text-slate-900">Image Upload</DialogTitle>
             <DialogDescription className="text-zinc-500">
@@ -108,12 +107,11 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
 
           {currentImage && !preview && (
             <div className="relative mb-4">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-                <Image
+              <div className="relative max-h-[300px] w-full overflow-hidden rounded-lg">
+                <img
                   src={currentImage}
                   alt="현재 포스터"
-                  fill
-                  className="object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <Button
@@ -165,12 +163,11 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
 
           {preview && (
             <div className="mt-4">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-                <Image
+              <div className="relative max-h-[300px] w-full overflow-hidden rounded-lg">
+                <img
                   src={preview}
                   alt="미리보기"
-                  fill
-                  className="object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <Button

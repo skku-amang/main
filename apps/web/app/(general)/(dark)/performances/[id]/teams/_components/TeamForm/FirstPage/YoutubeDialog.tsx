@@ -67,7 +67,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined} className="rounded-xl">
+      <DialogContent aria-describedby={undefined} className="rounded-2xl">
         <div className="rounded-xl">
           <DialogHeader className="mb-1">
             <DialogTitle className="text-slate-900">Youtube Embed</DialogTitle>
@@ -97,7 +97,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
                 </div>
                 <Button
                   type="submit"
-                  className="bg-secondary"
+                  className="rounded-lg bg-secondary"
                   disabled={!!innerForm.formState.errors.songYoutubeVideoUrl}
                 >
                   Upload
