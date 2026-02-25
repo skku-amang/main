@@ -215,8 +215,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     accessorKey: "createdAt",
     header: () => null,
     cell: () => null,
-    enableHiding: true,
-    meta: { hidden: true }
+    enableHiding: true
   },
   {
     id: "actions",
