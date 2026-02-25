@@ -3,6 +3,8 @@ import type { MetadataRoute } from "next"
 import { SEO } from "@/constants/seo"
 import { apiClient } from "@/lib/apiClient"
 
+export const dynamic = "force-dynamic"
+
 const BASE_URL = SEO.SITE_URL
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
