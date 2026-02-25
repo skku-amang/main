@@ -1,7 +1,5 @@
 "use client"
 
-import { Separator } from "@radix-ui/react-separator"
-import { Maximize2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
@@ -53,7 +51,7 @@ const TeamDetail = () => {
   }
 
   return (
-    <div className="container flex w-full flex-col items-center px-0 pt-16">
+    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-16">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
         className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
@@ -70,7 +68,7 @@ const TeamDetail = () => {
       <OleoPageHeader
         title="Join Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-        className="relative mb-10"
+        className="relative mb-1 md:mb-10"
       />
 
       {/* 유튜브 임베드 */}
@@ -90,9 +88,9 @@ const TeamDetail = () => {
         </div>
       )}
 
-      <div className="relative z-10 flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
+      <div className="relative z-10 flex w-full gap-5 max-md:flex-col max-md:items-center md:flex md:w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}
-        <div className="flex w-full flex-col gap-y-[24px]">
+        <div className="flex w-[93%] flex-col gap-y-5 md:w-[466px] md:shrink-0 md:gap-y-[24px]">
           <BasicInfo team={team} canEdit={canEdit} />
           {team.posterImage && (
             <div className="relative hidden aspect-[3/4] w-full overflow-clip rounded-lg md:block">
@@ -112,9 +110,9 @@ const TeamDetail = () => {
           {team.teamSessions && team.teamSessions.length > 0 && (
             <SessionSetCard
               header="세션구성"
-              className="h-fit bg-white shadow-md"
+              className="h-fit bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
             >
-              <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">
+              <div className="mt-[20px] flex flex-wrap gap-x-2 gap-y-2 md:mt-[40px]">
                 {team.teamSessions.map((ts) => {
                   // capacity만큼의 슬롯을 모두 표시 (1부터 capacity까지)
                   return Array.from(
@@ -138,18 +136,17 @@ const TeamDetail = () => {
           {/* 마감된 세션 */}
           <SessionSetCard
             header="마감된 세션"
-            className="col-span-2 bg-white shadow-md"
+            className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            <div className="grid grid-cols-1 divide-y divide-slate-200">
-              <div className="mt-4 hidden text-sm font-medium leading-normal text-slate-500 md:flex">
-                <div className="flex h-[48px] w-[160px] items-center pl-4">
-                  Session
-                </div>
-                <div className="flex h-[48px] w-[466px] items-center pl-4">
-                  Member
-                </div>
+            <div className="mt-1 hidden text-sm font-medium leading-normal text-slate-500 md:flex">
+              <div className="flex h-[48px] w-[160px] items-center pl-4">
+                Session
               </div>
-              <Separator className="hidden h-[1.5px] w-full bg-slate-200 md:block" />
+              <div className="flex h-[48px] w-[466px] items-center pl-4">
+                Member
+              </div>
+            </div>
+            <div className="mt-1 grid grid-cols-1 divide-y divide-slate-200 md:mt-0">
               {team.teamSessions?.map((ts) =>
                 ts.members.map((member) => (
                   <MemberSessionCard
@@ -179,16 +176,21 @@ const TeamDetail = () => {
                 <span className="hidden md:inline">세션 지원</span>
               </>
             }
-            className="col-span-2 bg-white shadow-md"
+            className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            <ul className="mb-6 w-full pt-[12px] text-sm font-normal leading-6 text-gray-600 md:w-[537px] md:pt-[16px]">
+            <ul className="mb-6 mt-[12px] w-full text-sm font-normal leading-6 text-gray-600 md:mt-[16px] md:w-[537px]">
               <li className="mb-1 md:mb-[10px]">
                 ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                 선착순으로 마감됩니다
               </li>
               <li>
-                ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을 취소할
-                수 있습니다
+                <span className="md:hidden">
+                  ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
+                  취소할 수 있습니다
+                </span>
+                <span className="hidden md:inline">
+                  ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수 있습니다
+                </span>
               </li>
             </ul>
 
@@ -219,7 +221,11 @@ const TeamDetail = () => {
 
             {/* 지원하기 버튼 (모바일) */}
             {selectedSessions.length > 0 && (
-              <Button className="mt-6 w-full md:hidden" onClick={onSubmit}>
+              <Button
+                shape="round"
+                className="mt-6 w-full md:hidden"
+                onClick={onSubmit}
+              >
                 지원하기
               </Button>
             )}
@@ -231,17 +237,25 @@ const TeamDetail = () => {
                 모든 세션이 마감되었습니다.
               </div>
             )}
-          </SessionSetCard>
 
-          {/* 지원하기 버튼 (데스크탑) - 카드 바깥, 우측 정렬 */}
-          {selectedSessions.length > 0 && (
-            <div className="hidden justify-end md:flex">
-              <Button variant="outline" className="gap-1" onClick={onSubmit}>
-                지원하기
-                <span aria-hidden="true">&gt;</span>
-              </Button>
-            </div>
-          )}
+            {/* 지원하기 버튼 (데스크탑) - 카드 안쪽 하단 우측 */}
+            {selectedSessions.length > 0 && (
+              <>
+                <div className="my-4 hidden h-px w-full bg-slate-200 md:block" />
+                <div className="hidden justify-end md:flex">
+                  <Button
+                    variant="outlinePrimary"
+                    shape="round"
+                    className="w-[120px] gap-2"
+                    onClick={onSubmit}
+                  >
+                    지원하기
+                    <span aria-hidden="true">&gt;</span>
+                  </Button>
+                </div>
+              </>
+            )}
+          </SessionSetCard>
         </div>
       </div>
     </div>

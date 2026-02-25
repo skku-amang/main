@@ -6,6 +6,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getSessionDisplayName } from "@/constants/session"
+import { formatGenerationOrder } from "@/lib/utils"
 import { SessionName } from "@repo/database"
 import { TeamDetail } from "@repo/shared-types"
 
@@ -67,17 +68,19 @@ const MemberSessionCard = ({
       <div className="relative flex h-[48px] w-[466px] items-center md:pl-4 ">
         {/* 아바타 */}
         <Avatar className="mr-[12px] md:mr-[24px]">
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={user.image ?? undefined} />
           <AvatarFallback>{user.name?.substring(0, 1)}</AvatarFallback>
         </Avatar>
 
         {/* 설명 */}
         <div>
           <div className="mb-[8px] block text-sm font-semibold md:hidden md:text-lg">
-            {sessionName}
+            {getSessionDisplayName(sessionName)}
             {sessionIndex}
           </div>
           <div className="text-sm font-normal leading-3 text-slate-700 md:text-xl md:font-medium md:leading-relaxed">
+            {user.generation &&
+              `${formatGenerationOrder(user.generation.order)}기 `}
             {user.name}
           </div>
           <div className="hidden text-sm text-gray-400 md:block">

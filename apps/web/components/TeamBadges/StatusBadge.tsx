@@ -8,14 +8,14 @@ interface StatusBadgeProps {
 }
 
 const STATUS_LABEL: Record<StatusBadgeProps["status"], string> = {
-  Active: "모집중",
-  Inactive: "마감",
+  Active: "Active",
+  Inactive: "Closed"
 }
 
 const StatusBadge = ({
   status,
   className,
-  dotClassName = "text-[0.5rem]",
+  dotClassName = "text-[0.5rem]"
 }: StatusBadgeProps) => {
   return (
     <Badge
@@ -24,7 +24,7 @@ const StatusBadge = ({
         status === "Inactive"
           ? "bg-red-100 text-destructive"
           : "bg-green-100 text-green-600",
-        "text-md rounded-full border-none px-4 py-0.5 lg:py-1 font-semibold",
+        "text-md whitespace-nowrap rounded-full border-none px-4 py-0.5 lg:py-1 font-semibold",
         className
       )}
     >
