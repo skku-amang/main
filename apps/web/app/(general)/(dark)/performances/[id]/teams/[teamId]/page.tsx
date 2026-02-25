@@ -51,7 +51,7 @@ const TeamDetail = () => {
   }
 
   return (
-    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-6">
+    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-0">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
         className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
@@ -68,7 +68,7 @@ const TeamDetail = () => {
       <OleoPageHeader
         title="Join Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-        className="relative mb-1 md:mb-10 md:mt-10"
+        className="relative mb-1 md:mb-[78px] md:mt-[78px] md:w-[1152px]"
       />
 
       {/* 유튜브 임베드 */}
