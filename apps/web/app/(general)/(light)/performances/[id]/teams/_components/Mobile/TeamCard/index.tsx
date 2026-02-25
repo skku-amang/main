@@ -50,7 +50,6 @@ const TeamCard = ({
         <div>
           {/* 곡명 & 상태 */}
           <div className="text-md flex items-start justify-between">
-            {/* 곡명 */}
             <div className="flex items-center gap-x-2">
               <h4 className="flex items-center gap-x-1 self-stretch font-bold text-slate-700">
                 {songName}
@@ -62,7 +61,6 @@ const TeamCard = ({
               </h4>
             </div>
 
-            {/* 상태 */}
             <StatusBadge
               status={missingTeamSessions.length > 0 ? "Active" : "Inactive"}
               className="text-xs"
@@ -71,22 +69,17 @@ const TeamCard = ({
 
           {/* 아티스트명 & 태그 */}
           <div className="mt-1 flex items-center justify-between text-xs">
-            {/* 아티스트명 */}
             <h4 className="text-sm text-slate-500">{songArtist}</h4>
 
-            {/* 태그(신입고정, 자작곡) */}
             <div className="flex items-center gap-x-1">
-              {/* 신입고정 */}
               {isFreshmenFixed && <FreshmenFixedBadge size={"small"} />}
-
-              {/* 자작곡 */}
               {isSelfMade && <SelfMadeSongBadge />}
             </div>
           </div>
 
           {/* 팀장 */}
-          <div className="mt-3 flex items-center justify-between text-slate-500">
-            <h4 className="w-20 text-xs">팀장</h4>
+          <div className="mt-3 flex w-full items-center justify-between">
+            <h4 className="text-xs text-slate-500">팀장</h4>
             <div className="flex items-center gap-x-3">
               <Avatar className="h-5 w-5">
                 <AvatarImage src={leader.image ?? undefined} />
@@ -94,21 +87,21 @@ const TeamCard = ({
                   {leader.name.substring(0, 1)}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs">{leader.name}</span>
+              <span className="text-xs text-slate-500">{leader.name}</span>
             </div>
           </div>
 
-          {/* 필요세션 */}
-          <div className="mt-4 flex items-center justify-between text-xs">
-            <h4 className="w-20 text-xs text-neutral-500">필요세션</h4>
-            <div className="gap-x-1 text-right">
+          {/* 모집세션 */}
+          <div className="mt-4 flex items-start justify-between text-xs">
+            <h4 className="text-xs text-neutral-500">모집세션</h4>
+            <div className="flex flex-wrap justify-end gap-1.5">
               {missingTeamSessions?.map((ts) => {
                 const missingIndices = getMissingIndices(ts)
                 return missingIndices.map((index) => (
                   <SessionBadge
                     key={`${ts.session.name}-${index}`}
                     session={`${getSessionDisplayName(ts.session.name)}${index}`}
-                    className="m-0.5 rounded-lg p-1"
+                    className="rounded-[5px]"
                   />
                 ))
               })}

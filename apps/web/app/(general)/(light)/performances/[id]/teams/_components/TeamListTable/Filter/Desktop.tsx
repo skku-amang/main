@@ -15,7 +15,7 @@ const DesktopFilterCheckbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "data-[state=checked]:1 peer h-6 w-6 shrink-0 rounded-sm border border-slate-400 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-primary-foreground",
+      "data-[state=checked]:1 peer h-[18px] w-[18px] shrink-0 rounded border border-slate-300 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-500 data-[state=checked]:bg-sky-500 data-[state=checked]:text-primary-foreground",
       className
     )}
     {...props}
@@ -23,7 +23,7 @@ const DesktopFilterCheckbox = React.forwardRef<
     <CheckboxPrimitive.Indicator
       className={cn("flex items-center justify-center text-current")}
     >
-      <Check className="h-6 w-6 font-extrabold" strokeWidth={4} />
+      <Check className="h-3.5 w-3.5" strokeWidth={3} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ))
@@ -33,35 +33,42 @@ interface DesktopFilterProps {
   className?: string
   header: string
   filterValues: FilterValue[]
+  onSelectAll?: () => void
 }
 
 const DesktopFilter = ({
   className,
   header,
-  filterValues
+  filterValues,
+  onSelectAll
 }: DesktopFilterProps) => {
   return (
     <div className={className}>
-      <div className="mb-6 text-lg text-primary">{header}</div>
-
-      <div
-        className={cn(
-          "grid gap-4",
-          filterValues.length > 4 ? "grid-cols-2" : "grid-cols-1"
+      <div className="mb-4 flex items-center gap-x-3">
+        <div className="text-sm font-semibold text-neutral-700">{header}</div>
+        {onSelectAll && (
+          <button
+            onClick={onSelectAll}
+            className="text-xs text-sky-500 hover:text-sky-600"
+          >
+            모두 선택
+          </button>
         )}
-      >
+      </div>
+
+      <div className="grid grid-cols-5 gap-x-5 gap-y-3">
         {filterValues.map((v) => (
-          <div key={v.label} className="flex w-[184px] items-center gap-x-3">
+          <div key={v.label} className="flex items-center gap-x-2">
             <DesktopFilterCheckbox
-              id={`filter-${v.label}`}
+              id={`desktop-filter-${header}-${v.label}`}
               name={v.label}
               value={v.label}
               checked={v.checked}
               onCheckedChange={(checked) => v.onChecked(!!checked)}
             />
             <Label
-              htmlFor={`filter-${v.label}`}
-              className="text-nowrap text-gray-900"
+              htmlFor={`desktop-filter-${header}-${v.label}`}
+              className="text-nowrap text-sm text-gray-900"
             >
               {v.label}
             </Label>

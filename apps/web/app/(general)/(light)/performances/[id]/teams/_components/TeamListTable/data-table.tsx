@@ -12,8 +12,10 @@ import {
   useReactTable
 } from "@tanstack/react-table"
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { useReducer, useState } from "react"
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
+import { useMemo, useReducer, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
 import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
@@ -29,6 +31,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
+import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -173,7 +176,36 @@ export function TeamListDataTable<TValue>({
   relatedPerformances,
   performanceId
 }: DataTableProps<TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  const { status } = useSession()
+  const visibleColumns = useMemo(
+    () =>
+      status === "authenticated"
+        ? columns
+        : columns.filter((c) => c.id !== "actions"),
+    [status, columns]
+  )
+  // nuqs 쿼리 동기화
+  const [sortQuery, setSortQuery] = useQueryState(
+    "sort",
+    parseAsString.withDefault("")
+  )
+  const [searchQuery, setSearchQuery] = useQueryState(
+    "search",
+    parseAsString.withDefault("")
+  )
+  const [pageQuery, setPageQuery] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(1)
+  )
+
+  // sort query → tanstack SortingState 변환
+  const sorting: SortingState = useMemo(() => {
+    if (!sortQuery) return []
+    const [id, dir] = sortQuery.split("-")
+    if (!id || !dir) return []
+    return [{ id, desc: dir === "desc" }]
+  }, [sortQuery])
+
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const [filterOpen, setFilterOpen] = useState(false)
@@ -290,13 +322,26 @@ export function TeamListDataTable<TValue>({
 
   const table = useReactTable({
     data: state.result,
-    columns,
+    columns: visibleColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: (updater) => {
+      const next = typeof updater === "function" ? updater(sorting) : updater
+      const first = next[0]
+      if (!first) {
+        setSortQuery(null)
+      } else {
+        setSortQuery(`${first.id}-${first.desc ? "desc" : "asc"}`)
+      }
+    },
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    initialState: {
+      columnVisibility: { createdAt: false },
+      pagination: { pageIndex: Math.max(0, pageQuery - 1) },
+      columnFilters: searchQuery ? [{ id: "songName", value: searchQuery }] : []
+    },
     state: {
       sorting,
       columnFilters
@@ -305,16 +350,13 @@ export function TeamListDataTable<TValue>({
 
   const missingMemberSessions = getSessionsWithMissingMembers
 
-  const sortOptions: {
-    id: keyof TeamColumn
-    display: string
-    desc: boolean
-  }[] = [
-    { id: "songName", display: "곡명 오름차순", desc: false },
-    { id: "songArtist", display: "곡명 내림차순", desc: true }
-    // TODO: 최신순 추가
-    // { id: "createdAt", display: "최신순", desc: true },
-    // { id: "createdAt", display: "오래된순", desc: false },
+  const sortOptions = [
+    { value: "songName-asc", display: "곡명 오름차순" },
+    { value: "songName-desc", display: "곡명 내림차순" },
+    { value: "createdAt-desc", display: "최신순" },
+    { value: "createdAt-asc", display: "오래된순" },
+    { value: "status-asc", display: "모집중 우선" },
+    { value: "status-desc", display: "모집완료 우선" }
   ]
 
   return (
@@ -326,12 +368,12 @@ export function TeamListDataTable<TValue>({
           {/* 검색 */}
           <Search
             placeholder="검색"
-            value={
-              (table.getColumn("songName")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("songName")?.setFilterValue(event.target.value)
-            }
+            value={searchQuery}
+            onChange={(event) => {
+              const value = event.target.value
+              setSearchQuery(value || null)
+              table.getColumn("songName")?.setFilterValue(value)
+            }}
             className="max-w-sm"
           />
 
@@ -340,7 +382,7 @@ export function TeamListDataTable<TValue>({
             {/* 생성 버튼 */}
             <Button
               asChild
-              className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
+              className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
             >
               <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
                 <CirclePlus size={24} className="me-[9px]" />
@@ -353,7 +395,7 @@ export function TeamListDataTable<TValue>({
               <PopoverTrigger>
                 <Button
                   asChild
-                  className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
+                  className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
                   onClick={() => setFilterOpen(true)}
                   variant={filterOpen ? "outline" : undefined}
                 >
@@ -366,17 +408,59 @@ export function TeamListDataTable<TValue>({
               <PopoverContent
                 align="end"
                 onInteractOutside={() => setFilterOpen(false)}
-                className="flex gap-6 px-9 py-6 md:h-[256px] md:w-[400px]"
+                className="w-[480px] rounded-[12px] p-0"
               >
-                <TeamListTableFilter
-                  header="필요세션"
-                  filterValues={filterValues.필요세션}
-                />
-                <Separator orientation="vertical" className="h-[216px]" />
-                <TeamListTableFilter
-                  header="모집상태"
-                  filterValues={filterValues.모집상태}
-                />
+                {/* 헤더 */}
+                <div className="flex items-center justify-between px-6 pb-3 pt-5">
+                  <div className="flex items-baseline gap-x-3">
+                    <h3 className="text-xl font-bold">Filter</h3>
+                    <button
+                      onClick={() => {
+                        dispatch({
+                          type: "clearFilter",
+                          payload: { target: "필요세션" }
+                        })
+                        dispatch({
+                          type: "setFilter",
+                          payload: { target: "모집상태", value: "all" }
+                        })
+                      }}
+                      className="text-xs text-sky-500 hover:text-sky-600"
+                    >
+                      초기화
+                    </button>
+                  </div>
+                  <button onClick={() => setFilterOpen(false)}>
+                    <X className="h-4 w-4 text-slate-400" />
+                  </button>
+                </div>
+
+                <Separator />
+
+                {/* 필터 내용 */}
+                <div className="space-y-5 px-6 py-5">
+                  <TeamListTableFilter
+                    header="필요세션"
+                    filterValues={filterValues.필요세션}
+                    onSelectAll={() =>
+                      dispatch({
+                        type: "clearFilter",
+                        payload: { target: "필요세션" }
+                      })
+                    }
+                  />
+                  <Separator />
+                  <TeamListTableFilter
+                    header="모집상태"
+                    filterValues={filterValues.모집상태}
+                    onSelectAll={() =>
+                      dispatch({
+                        type: "setFilter",
+                        payload: { target: "모집상태", value: "all" }
+                      })
+                    }
+                  />
+                </div>
               </PopoverContent>
             </Popover>
           </div>
@@ -391,7 +475,7 @@ export function TeamListDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="bg-zinc-700 py-0 font-bold text-white"
+                      className="border-y border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg first:border-l last:rounded-r-lg last:border-r"
                     >
                       {header.isPlaceholder
                         ? null
@@ -411,10 +495,13 @@ export function TeamListDataTable<TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] transition-all duration-300 hover:drop-shadow-[0_4px_4px_rgb(0,0,0,0.25)]"
+                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] transition-all duration-300 hover:drop-shadow-[2px_2px_4px_rgb(0,0,0,0.06)]"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="bg-transparent">
+                    <TableCell
+                      key={cell.id}
+                      className="bg-transparent first:rounded-l-lg last:rounded-r-lg"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -438,23 +525,15 @@ export function TeamListDataTable<TValue>({
 
         {/* 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
-          <div className="flex items-center justify-center space-x-2 pb-6 pt-14">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+          <div className="pb-6 pt-14">
+            <ResponsivePagination
+              currentPage={table.getState().pagination.pageIndex + 1}
+              totalPages={table.getPageCount()}
+              onPageChange={(page) => {
+                table.setPageIndex(page - 1)
+                setPageQuery(page === 1 ? null : page)
+              }}
+            />
           </div>
         )}
       </div>
@@ -464,24 +543,32 @@ export function TeamListDataTable<TValue>({
         {/* 헤더 */}
         <div className="space-y-3">
           {/* 검색, 필터, 정렬 */}
-          <div className="flex items-center justify-center gap-x-3">
+          <div className="flex items-center gap-x-3">
             {/* 검색 */}
             <Search
               placeholder="검색"
-              value={
-                (table.getColumn("songName")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("songName")?.setFilterValue(event.target.value)
-              }
-              className="h-9 w-full max-w-full border-gray-200 drop-shadow-search"
+              value={searchQuery}
+              onChange={(event) => {
+                const value = event.target.value
+                setSearchQuery(value || null)
+                table.getColumn("songName")?.setFilterValue(value)
+              }}
+              className="h-9 min-w-0 flex-1 border-gray-200 drop-shadow-search"
             />
 
             {/* 필터 */}
             <Drawer>
               <DrawerTrigger>
                 <TeamHeaderButton asChild variant="outline">
-                  <Filter className="text-gray-400" size={16} />
+                  <Filter
+                    className={
+                      state.filters.필요세션.size > 0 ||
+                      state.filters.모집상태 !== "all"
+                        ? "text-primary"
+                        : "text-gray-400"
+                    }
+                    size={16}
+                  />
                 </TeamHeaderButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
@@ -521,31 +608,28 @@ export function TeamListDataTable<TValue>({
             </Drawer>
 
             {/* 정렬 */}
-            {/* TODO: 정렬 기능 구현 */}
-            {/* Table과 완전 분리해서 정렬 로직 구성해야 함 */}
             <Select
-              defaultValue={"null"}
-              // value={sorting[0].id ?? "null"}
-              // onValueChange={(value) => setSorting([value])}
+              value={sortQuery || "none"}
+              onValueChange={(value) =>
+                setSortQuery(value === "none" ? null : value)
+              }
             >
               <SelectTrigger>
                 <TeamHeaderButton asChild variant="outline">
                   <ArrowDownUp
                     strokeWidth={1.75}
-                    className="text-gray-400"
+                    className={sortQuery ? "text-primary" : "text-gray-400"}
                     size={16}
                   />
                 </TeamHeaderButton>
               </SelectTrigger>
               <SelectContent>
                 {sortOptions.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
+                  <SelectItem key={option.value} value={option.value}>
                     {option.display}
                   </SelectItem>
                 ))}
-                <SelectItem value="null" onSelect={() => setSorting([])}>
-                  정렬해제
-                </SelectItem>
+                <SelectItem value="none">정렬해제</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -608,6 +692,20 @@ export function TeamListDataTable<TValue>({
             </div>
           )}
         </div>
+
+        {/* 모바일 페이지네이션 */}
+        {table.getRowModel().rows.length > 0 && (
+          <div className="py-6">
+            <ResponsivePagination
+              currentPage={table.getState().pagination.pageIndex + 1}
+              totalPages={table.getPageCount()}
+              onPageChange={(page) => {
+                table.setPageIndex(page - 1)
+                setPageQuery(page === 1 ? null : page)
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

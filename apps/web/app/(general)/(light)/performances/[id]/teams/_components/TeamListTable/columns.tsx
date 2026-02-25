@@ -12,7 +12,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
-import DeleteButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
+import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
@@ -87,15 +87,20 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
               편집하기
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
-            <DeleteButton
-              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-              teamId={row.original.id}
+          <TeamDeleteButton
+            teamId={row.original.id}
+            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(
+              row.original.performanceId
+            )}
+          >
+            <DropdownMenuItem
+              onSelect={(e) => e.preventDefault()}
+              className="flex items-center justify-center gap-x-2 px-6 py-2 selection:text-slate-700 hover:cursor-pointer"
             >
               <Trash2 />
               삭제하기
-            </DeleteButton>
-          </DropdownMenuItem>
+            </DropdownMenuItem>
+          </TeamDeleteButton>
         </DropdownMenuContent>
       </DropdownMenu>
     )
@@ -119,7 +124,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
           {row.original.songName}
           {!row.original.posterImage && (
             <span>
-              <Image className="h-3 w-3 font-normal text-neutral-500" />
+              <Image size={15} className="text-neutral-800" strokeWidth={1.5} />
             </span>
           )}
         </div>
@@ -150,11 +155,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "requiredSessions",
     header: () => (
-      <div className="flex w-full items-center justify-start">필요 세션</div>
+      <div className="flex w-full items-center justify-start">필요세션</div>
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex justify-start gap-1 text-right font-medium">
+        <div className="flex justify-start gap-2.5 text-right font-medium">
           {row.original.teamSessions.map((ts) => {
             const missingIndices = getMissingIndices(ts)
             return missingIndices.map((index) => (
@@ -169,9 +174,12 @@ export const columns: ColumnDef<TeamColumn>[] = [
     }
   },
   {
-    accessorKey: "status",
-    header: () => (
-      <div className="flex items-center justify-center">모집상태</div>
+    id: "status",
+    accessorFn: (row) => (isTeamSatisfied(row.teamSessions) ? 1 : 0),
+    header: ({ column }) => (
+      <div className="flex w-full justify-center">
+        <SortButton column={column}>모집상태</SortButton>
+      </div>
     ),
     cell: ({ row }) => {
       const teamSessions = row.original.teamSessions
@@ -189,22 +197,25 @@ export const columns: ColumnDef<TeamColumn>[] = [
       <div className="flex items-center justify-center">영상링크</div>
     ),
     cell: ({ row }) => {
-      const youtubeLink = YoutubeVideo.getURL(
-        row.getValue("songYoutubeVideoUrl")
+      const rawUrl = row.original.songYoutubeVideoUrl
+      if (!rawUrl) return null
+      return (
+        <Link
+          href={YoutubeVideo.getURL(rawUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center"
+        >
+          <Paperclip size={24} />
+        </Link>
       )
-      if (youtubeLink) {
-        return (
-          <Link
-            href={youtubeLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center"
-          >
-            <Paperclip size={24} />
-          </Link>
-        )
-      }
     }
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => null,
+    cell: () => null,
+    enableHiding: true
   },
   {
     id: "actions",

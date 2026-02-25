@@ -38,6 +38,7 @@ const MemberSessionCard = ({
   const unapplyMutation = useUnapplyFromTeam({
     onSuccess: (team) => {
       queryClient.invalidateQueries({ queryKey: ["team", teamId] })
+      queryClient.invalidateQueries({ queryKey: ["teams"] })
       toast({
         title: "탈퇴 완료",
         description: "팀에서 탈퇴되었습니다."

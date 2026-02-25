@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 export type DefaultPageHeaderBreadCrumbRoute = {
   display: React.ReactNode
   href?: string
+  dropdownItems?: { label: string; href: string }[]
 }
 
 export const DefaultHomeIcon = () => {

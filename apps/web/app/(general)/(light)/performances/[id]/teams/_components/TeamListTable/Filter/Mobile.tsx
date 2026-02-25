@@ -15,7 +15,7 @@ const MobileFilterCheckbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "data-[state=checked]:1 peer h-3 w-3 shrink-0 rounded-sm border border-slate-400 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-primary-foreground",
+      "data-[state=checked]:1 peer h-[18px] w-[18px] shrink-0 rounded border border-slate-300 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-500 data-[state=checked]:bg-sky-500 data-[state=checked]:text-primary-foreground",
       className
     )}
     {...props}
@@ -23,7 +23,7 @@ const MobileFilterCheckbox = React.forwardRef<
     <CheckboxPrimitive.Indicator
       className={cn("flex items-center justify-center text-current")}
     >
-      <Check className="h-3 w-3 font-extrabold" strokeWidth={4} />
+      <Check className="h-3.5 w-3.5" strokeWidth={3} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ))
@@ -38,12 +38,11 @@ interface MobileProps {
 const MobileFilter = ({ className, header, filterValues }: MobileProps) => {
   return (
     <div className={className}>
-      <div className="mb-4 flex items-center gap-x-3 text-xs">
-        <div className="font-semibold text-neutral-500">{header}</div>
-        {/* <button className="text-third">전체 선택</button> */}
+      <div className="mb-4 flex items-center gap-x-3">
+        <div className="text-sm font-semibold text-neutral-700">{header}</div>
       </div>
 
-      <div className="grid grid-cols-4 gap-x-5 gap-y-4">
+      <div className="grid grid-cols-3 gap-x-5 gap-y-3">
         {filterValues.map((v) => (
           <div
             key={v.label}
@@ -58,7 +57,7 @@ const MobileFilter = ({ className, header, filterValues }: MobileProps) => {
             />
             <Label
               htmlFor={`filter-${v.label}`}
-              className="text-[10px] text-slate-600"
+              className="text-sm text-gray-900"
             >
               {v.label}
             </Label>
