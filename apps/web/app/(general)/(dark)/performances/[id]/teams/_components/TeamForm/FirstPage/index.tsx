@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
   HoverCard,
+  HoverCardArrow,
   HoverCardContent,
   HoverCardTrigger
 } from "@/components/ui/hover-card"
@@ -95,6 +96,7 @@ const FirstPage = ({
                   className="w-[420px] bg-black text-white"
                   side="right"
                 >
+                  <HoverCardArrow className="fill-black" />
                   ・곡명, 아티스트명을 정확히 입력해주세요
                   <br />
                   ・커버곡의 경우 아래의 예시와 같이 작성해주세요
@@ -122,7 +124,7 @@ const FirstPage = ({
                     className={cn(
                       "mt-1 drop-shadow-search",
                       form.formState.errors.performanceId &&
-                        "border-destructive"
+                        "border-destructive focus-visible:ring-destructive"
                     )}
                   >
                     <SelectValue placeholder="공연 선택" />
@@ -160,7 +162,8 @@ const FirstPage = ({
                   {...form.register("songName")}
                   className={cn(
                     "my-1 drop-shadow-search",
-                    form.formState.errors.songName && "border-destructive"
+                    form.formState.errors.songName &&
+                      "border-destructive focus-visible:ring-destructive"
                   )}
                   placeholder="곡명 입력"
                 />
@@ -178,14 +181,14 @@ const FirstPage = ({
                     onCheckedChange={(e) =>
                       form.setValue("isFreshmenFixed", !!e)
                     }
-                    checked={form.getValues("isFreshmenFixed")}
+                    checked={form.watch("isFreshmenFixed")}
                     className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
                     htmlFor="isFreshmenFixedInput"
-                    className="text-xs text-neutral-500"
+                    className="text-sm font-medium text-neutral-500"
                   >
-                    신입고정팀입니다
+                    신입고정곡입니다
                   </Label>
                 </div>
               </div>
@@ -200,7 +203,8 @@ const FirstPage = ({
                   {...form.register("songArtist")}
                   className={cn(
                     "my-1 drop-shadow-search",
-                    form.formState.errors.songArtist && "border-destructive"
+                    form.formState.errors.songArtist &&
+                      "border-destructive focus-visible:ring-destructive"
                   )}
                   placeholder="아티스트명 입력"
                 />
@@ -216,12 +220,12 @@ const FirstPage = ({
                   <Checkbox
                     id="isSelfMadeInput"
                     onCheckedChange={(e) => form.setValue("isSelfMade", !!e)}
-                    checked={form.getValues("isSelfMade")}
+                    checked={form.watch("isSelfMade")}
                     className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
                     htmlFor="isSelfMadeInput"
-                    className="text-xs text-neutral-500 md:text-sm"
+                    className="text-sm font-medium text-neutral-500"
                   >
                     자작곡입니다
                   </Label>
@@ -243,15 +247,20 @@ const FirstPage = ({
                 </div>
 
                 {/* 데스크톱: 포스터 이미지 + 유튜브 다이얼로그 */}
-                <div className="hidden md:flex md:items-center md:gap-x-2">
-                  <PosterImageDialog form={form} />
-                  <YoutubeDialog form={form} fieldName="songYoutubeVideoUrl" />
-                </div>
-                {form.formState.errors.songYoutubeVideoUrl && (
-                  <div className="mt-1 hidden text-end text-xs text-destructive md:block">
-                    {form.formState.errors.songYoutubeVideoUrl.message}
+                <div className="hidden md:block">
+                  <div className="flex items-center gap-x-2">
+                    <YoutubeDialog
+                      form={form}
+                      fieldName="songYoutubeVideoUrl"
+                    />
+                    <PosterImageDialog form={form} />
                   </div>
-                )}
+                  {form.formState.errors.songYoutubeVideoUrl && (
+                    <div className="mt-1 text-end text-xs text-destructive">
+                      {form.formState.errors.songYoutubeVideoUrl.message}
+                    </div>
+                  )}
+                </div>
               </div>
             </Description>
             <Textarea
@@ -294,10 +303,10 @@ const FirstPage = ({
               <Input
                 placeholder="Enter URL"
                 {...youtubeForm.register("songYoutubeVideoUrl")}
-                className={
+                className={cn(
                   form.formState.errors.songYoutubeVideoUrl &&
-                  "border-destructive"
-                }
+                    "border-destructive focus-visible:ring-destructive"
+                )}
                 onChange={(e) => {
                   youtubeForm.clearErrors("songYoutubeVideoUrl")
                   youtubeForm.reset(

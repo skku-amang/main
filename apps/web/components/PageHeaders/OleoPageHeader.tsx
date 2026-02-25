@@ -40,7 +40,7 @@ const OleoPageHeader = ({
         뒤로가기
       </Link>
 
-      <div className="flex text-[40px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:text-[100px]">
+      <div className="flex gap-x-3 text-[40px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:gap-x-5 md:text-[100px]">
         {words.map((word, i) => {
           const firstLetter = word.charAt(0)
           const rest = word.slice(1)

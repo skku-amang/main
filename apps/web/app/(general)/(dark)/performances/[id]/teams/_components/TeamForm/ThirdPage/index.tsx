@@ -43,15 +43,14 @@ const ThirdPage = ({
         {/* 팀원 정보 입력 */}
         <table className="table-auto border-separate border-spacing-2 md:border-spacing-5">
           <tbody>
-            {Object.values(form.getValues()).map((formValue) => {
-              const { session, required, index } = formValue
-              const fieldName = `${session}${index}.member`
+            {Object.entries(form.getValues()).map(([key, formValue]) => {
+              const { required } = formValue
+              const fieldName = `${key}.member`
               if (!required) return
               return (
-                <tr key={`${session}-${index}`} className="my-3">
+                <tr key={key} className="my-3">
                   <td className="text-xs text-gray-900 md:w-32 md:text-base">
-                    {session}
-                    {index}
+                    {key}
                   </td>
                   <td>
                     <UserSelect
