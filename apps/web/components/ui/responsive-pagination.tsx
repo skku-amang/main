@@ -130,6 +130,8 @@ const ResponsivePagination = React.forwardRef<
                 if (isFirstPage) return
                 onPageChange(currentPage - 1)
               }}
+              aria-disabled={isFirstPage}
+              tabIndex={isFirstPage ? -1 : undefined}
               className={cn(isFirstPage && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
@@ -163,6 +165,8 @@ const ResponsivePagination = React.forwardRef<
                 if (isLastPage) return
                 onPageChange(currentPage + 1)
               }}
+              aria-disabled={isLastPage}
+              tabIndex={isLastPage ? -1 : undefined}
               className={cn(isLastPage && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
