@@ -360,7 +360,7 @@ export function TeamListDataTable<TValue>({
   ]
 
   return (
-    <div className={`overflow-x-clip ${className ?? ""}`}>
+    <div className={className}>
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
         {/* 헤더 */}
