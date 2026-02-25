@@ -13,11 +13,14 @@ export class UsersService {
     const { sessions: sessionIds, ...restOfDto } = createUserDto
     const hashedPassword = await bcrypt.hash(restOfDto.password, 10)
 
+    const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(restOfDto.email)}`
+
     try {
       const user = await this.prisma.user.create({
         data: {
           ...restOfDto,
           password: hashedPassword,
+          image,
           sessions: {
             connect: sessionIds.map((id) => ({ id }))
           }

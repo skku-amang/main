@@ -138,7 +138,8 @@ export const columns: ColumnDef<TeamColumn>[] = [
     )
   },
   {
-    accessorKey: "leaderName",
+    id: "leaderName",
+    accessorFn: (row) => row.leader.name,
     header: ({ column }) => (
       <div className="flex w-full justify-center">
         <SortButton column={column}>팀장</SortButton>
@@ -186,7 +187,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
       const status = isTeamSatisfied(teamSessions) ? "Inactive" : "Active"
       return (
         <div className="flex items-center justify-center">
-          <StatusBadge status={status} />
+          <StatusBadge status={status} size="middle" />
         </div>
       )
     }

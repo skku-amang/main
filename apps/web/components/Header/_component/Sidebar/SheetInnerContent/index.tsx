@@ -50,8 +50,13 @@ const SheetInnerContent = ({
         ) : (
           <>
             <Avatar className="h-13 w-16 overflow-hidden rounded-full">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage
+                src={
+                  session.user?.image ??
+                  `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
+                }
+              />
+              <AvatarFallback>A</AvatarFallback>
             </Avatar>
             <div className="w-full">
               <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">

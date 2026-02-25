@@ -53,11 +53,21 @@ const ThirdPage = ({
                     {key}
                   </td>
                   <td>
-                    <UserSelect
-                      users={users || []}
-                      form={form}
-                      fieldName={fieldName}
-                    />
+                    <div className="md:hidden">
+                      <UserSelect
+                        users={users || []}
+                        form={form}
+                        fieldName={fieldName}
+                        size="small"
+                      />
+                    </div>
+                    <div className="hidden md:block">
+                      <UserSelect
+                        users={users || []}
+                        form={form}
+                        fieldName={fieldName}
+                      />
+                    </div>
                   </td>
                 </tr>
               )

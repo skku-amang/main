@@ -115,7 +115,7 @@ const TeamDetail = () => {
                       <SessionBadge
                         key={`${ts.session.id}-${index}`}
                         session={sessionWithIndex}
-                        className="justify-center rounded px-[6px] py-[2px] md:rounded-[20px] md:px-3 md:py-1.5 md:text-base"
+                        size="large"
                       />
                     )
                   })

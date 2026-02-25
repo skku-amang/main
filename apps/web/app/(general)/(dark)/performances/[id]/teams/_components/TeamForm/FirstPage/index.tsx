@@ -1,7 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, CircleAlert, ImagePlus, Loader2, Youtube } from "lucide-react"
+import {
+  Check,
+  CircleAlert,
+  CloudUpload,
+  RotateCw,
+  Trash2,
+  Youtube
+} from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -352,65 +358,116 @@ const FirstPage = ({
 
       {/* 포스터 이미지 모바일: 블록 */}
       <div className="mt-3 w-full space-y-2 rounded-lg bg-slate-100 p-3 drop-shadow-search md:hidden">
-        <div className="flex items-center gap-x-2">
-          <ImagePlus size={24} strokeWidth={0.85} />
-          <div>
-            <div className="text-md text-gray-600">포스터 이미지</div>
-            <div className="text-xs text-gray-400">
-              팀 포스터 이미지를 업로드해주세요 (선택)
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-x-2">
+            <CloudUpload
+              size={24}
+              strokeWidth={0.85}
+              className="text-gray-500"
+            />
+            <div>
+              <div className="text-md text-gray-600">Image Upload</div>
+              {poster.error ? (
+                <span className="text-xs font-medium text-destructive">
+                  Failed
+                </span>
+              ) : poster.isUploaded ? (
+                <span className="flex items-center gap-x-1 text-xs font-medium text-emerald-600">
+                  <Check size={12} strokeWidth={3} />
+                  Completed
+                </span>
+              ) : (
+                <div className="text-xs text-gray-400">
+                  홍보포스터를 업로드하여 주세요
+                </div>
+              )}
             </div>
           </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-x-2">
-          <input
-            ref={poster.inputRef}
-            type="file"
-            accept={ACCEPTED_IMAGE_TYPES.join(",")}
-            onChange={poster.handleFileSelect}
-            className="block w-full text-sm text-slate-500 file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-secondary/90"
-          />
 
           {poster.error ? (
-            <div className="text-sm text-destructive">Failed</div>
-          ) : poster.isUploaded ? (
-            <div className="flex items-center gap-x-1 text-sm">
-              <Check className="h-4 w-4 text-green-500" />
-              Completed
+            <div className="flex items-center gap-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  poster.reset()
+                  form.setValue("posterImage", "")
+                }}
+              >
+                <Trash2 size={18} className="text-gray-400" />
+              </button>
+              <button type="button" onClick={poster.upload}>
+                <RotateCw size={18} className="text-gray-400" />
+              </button>
             </div>
+          ) : poster.isUploading ? (
+            <Button
+              type="button"
+              disabled
+              className="bg-gray-300 text-sm text-white"
+            >
+              Uploading...
+            </Button>
+          ) : poster.isUploaded ? (
+            <button
+              type="button"
+              onClick={() => {
+                poster.reset()
+                form.setValue("posterImage", "")
+              }}
+            >
+              <Trash2 size={18} className="text-gray-400" />
+            </button>
           ) : (
             <Button
               type="button"
               variant="outline"
               className="border border-secondary text-sm text-secondary"
-              disabled={!poster.file || poster.isUploading}
-              onClick={poster.upload}
+              onClick={() => {
+                if (poster.inputRef.current) poster.inputRef.current.value = ""
+                poster.inputRef.current?.click()
+              }}
             >
-              {poster.isUploading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                "Upload"
-              )}
+              Upload
             </Button>
           )}
         </div>
 
-        {/* 미리보기 */}
-        {(poster.preview || form.getValues("posterImage")) && (
-          <div className="relative mt-2 aspect-[3/4] w-full overflow-hidden rounded-lg">
-            <Image
-              src={poster.preview || form.getValues("posterImage") || ""}
-              alt="포스터 미리보기"
-              fill
-              className="object-cover"
-            />
+        {/* Progress bar */}
+        {poster.isUploading && (
+          <div className="flex items-center gap-x-2">
+            <div className="h-1.5 flex-1 rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${poster.progress}%` }}
+              />
+            </div>
+            <span className="text-xs text-gray-400">{poster.progress}%</span>
+            <button type="button" onClick={poster.cancelUpload}>
+              <Trash2 size={14} className="text-gray-400" />
+            </button>
           </div>
         )}
 
-        {/* 에러 메시지 */}
-        {poster.error && (
-          <div className="mt-1 text-xs text-destructive">{poster.error}</div>
-        )}
+        {/* 미리보기 */}
+        {!poster.isUploading &&
+          (poster.preview || form.getValues("posterImage")) && (
+            <div className="relative mt-2 aspect-[3/4] w-full overflow-hidden rounded-lg">
+              <Image
+                src={poster.preview || form.getValues("posterImage") || ""}
+                alt="포스터 미리보기"
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
+
+        <input
+          ref={poster.inputRef}
+          type="file"
+          accept={ACCEPTED_IMAGE_TYPES.join(",")}
+          onChange={poster.selectAndUpload}
+          className="hidden"
+        />
       </div>
 
       {/* 페이지 이동 */}

@@ -63,20 +63,22 @@ const Profile = () => {
   }
 
   const iconSize = 20
-  const RANDOM_PROFILE_IMAGE = "https://picsum.photos/50/50"
+  const profileImage =
+    session.user?.image ??
+    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar>
-          <AvatarImage src={session.user?.image ?? RANDOM_PROFILE_IMAGE} />
+          <AvatarImage src={profileImage} />
           <AvatarFallback>A</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="rounded-lg">
         <DropdownMenuLabel className="flex items-center gap-x-3 py-3">
           <Avatar>
-            <AvatarImage src={session.user?.image ?? RANDOM_PROFILE_IMAGE} />
+            <AvatarImage src={profileImage} />
             <AvatarFallback>A</AvatarFallback>
           </Avatar>
           <div>

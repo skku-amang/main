@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { cn, formatGenerationOrder } from "@/lib/utils"
 
 interface SelectableUser {
   id: number
@@ -31,6 +31,7 @@ interface UserSelectProps<T extends FieldValues> {
   users: SelectableUser[]
   form: UseFormReturn<T>
   fieldName: string
+  size?: "default" | "small"
 }
 
 function getNestedError(
@@ -48,7 +49,8 @@ function getNestedError(
 const UserSelect = <T extends FieldValues>({
   users,
   form,
-  fieldName
+  fieldName,
+  size = "default"
 }: UserSelectProps<T>) => {
   const hasError = !!getNestedError(
     form.formState.errors as Record<string, unknown>,
@@ -62,6 +64,8 @@ const UserSelect = <T extends FieldValues>({
     | undefined
   const selectedUser = users.find((user) => user.id === watchedUserId)
 
+  const isSmall = size === "small"
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -70,17 +74,23 @@ const UserSelect = <T extends FieldValues>({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-52 justify-between md:w-[360px]",
+            "justify-between",
+            isSmall ? "h-8 w-full text-xs" : "w-52 md:w-[360px]",
             hasError && "border-destructive"
           )}
         >
           {selectedUser
-            ? `${selectedUser.generation.order}기 ${selectedUser.name}`
+            ? `${formatGenerationOrder(selectedUser.generation.order)}기 ${selectedUser.name}`
             : "Select"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown
+            className={cn(
+              "shrink-0 opacity-50",
+              isSmall ? "ml-1 h-3 w-3" : "ml-2 h-4 w-4"
+            )}
+          />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[360px] p-0">
+      <PopoverContent className={cn("p-0", isSmall ? "w-52" : "w-[360px]")}>
         <Command>
           <CommandInput placeholder="유저 검색" />
           <CommandList>
@@ -105,18 +115,28 @@ const UserSelect = <T extends FieldValues>({
                       watchedUserId === user.id ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  <div className="flex items-center gap-x-5">
-                    <Avatar>
+                  <div
+                    className={cn(
+                      "flex items-center",
+                      isSmall ? "gap-x-2" : "gap-x-5"
+                    )}
+                  >
+                    <Avatar className={isSmall ? "h-6 w-6" : undefined}>
                       <AvatarImage src={user.image || undefined} />
-                      <AvatarFallback>
+                      <AvatarFallback
+                        className={isSmall ? "text-xs" : undefined}
+                      >
                         {user.name.substring(0, 1)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      {user.generation.order}기 {user.name}
-                      <span className="text-xs">
-                        <br />#{user.nickname}
-                      </span>
+                    <div className={isSmall ? "text-xs" : undefined}>
+                      {formatGenerationOrder(user.generation.order)}기{" "}
+                      {user.name}
+                      {!isSmall && (
+                        <span className="text-xs">
+                          <br />#{user.nickname}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </CommandItem>

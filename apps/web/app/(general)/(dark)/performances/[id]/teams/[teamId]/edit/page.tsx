@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
@@ -21,6 +22,12 @@ const TeamEditPage = () => {
   const { data: team, isLoading, isError } = useTeam(teamId)
   const { canEdit } = useTeamPermission(team)
 
+  useEffect(() => {
+    if (team && !canEdit) {
+      router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId))
+    }
+  }, [team, canEdit, router, performanceId, teamId])
+
   if (isLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
@@ -39,7 +46,6 @@ const TeamEditPage = () => {
   }
 
   if (team && !canEdit) {
-    router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId))
     return null
   }
 
