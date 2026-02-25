@@ -43,7 +43,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
         </div>
         {canEdit && (
           <DeleteEditButton
-            className="hidden md:flex"
+            className="ml-auto hidden md:flex"
             performanceId={team.performanceId}
             team={team}
           />
@@ -53,7 +53,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
       {/* 곡 정보 */}
       <div className="space-y-0.5">
         <div className="flex items-center justify-between gap-x-[12px] md:gap-x-3">
-          <h3 className="text-xl font-semibold leading-none text-slate-800 md:text-3xl">
+          <h3 className="text-xl font-semibold leading-none text-slate-800 md:text-4xl">
             {team.songName}
           </h3>
           <StatusBadge

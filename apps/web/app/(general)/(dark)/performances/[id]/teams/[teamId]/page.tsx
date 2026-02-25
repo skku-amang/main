@@ -1,13 +1,13 @@
 "use client"
 
 import { useSession } from "next-auth/react"
-import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
+import PosterImage from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/PosterImage"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import TeamDetailSkeleton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/TeamDetailSkeleton"
 import NotFoundPage from "@/app/_(errors)/NotFound"
@@ -51,7 +51,7 @@ const TeamDetail = () => {
   }
 
   return (
-    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-16">
+    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-6">
       {/* 기울어진 배경 - 슬레이트 */}
       <div
         className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
@@ -68,7 +68,7 @@ const TeamDetail = () => {
       <OleoPageHeader
         title="Join Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-        className="relative mb-1 md:mb-10"
+        className="relative mb-1 md:mb-10 md:mt-10"
       />
 
       {/* 유튜브 임베드 */}
@@ -92,16 +92,7 @@ const TeamDetail = () => {
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-[93%] flex-col gap-y-5 md:w-[466px] md:shrink-0 md:gap-y-[24px]">
           <BasicInfo team={team} canEdit={canEdit} />
-          {team.posterImage && (
-            <div className="relative hidden aspect-[3/4] w-full overflow-clip rounded-lg md:block">
-              <Image
-                className="rounded-lg object-cover"
-                src={team.posterImage}
-                alt="poster"
-                fill
-              />
-            </div>
-          )}
+          {team.posterImage && <PosterImage src={team.posterImage} />}
         </div>
 
         {/* 세션 구성 */}
@@ -146,7 +137,7 @@ const TeamDetail = () => {
                 Member
               </div>
             </div>
-            <div className="mt-1 grid grid-cols-1 divide-y divide-slate-200 md:mt-0">
+            <div className="mt-1 grid grid-cols-1 divide-y divide-slate-200 md:mt-0 md:border-y md:border-slate-200">
               {team.teamSessions?.map((ts) =>
                 ts.members.map((member) => (
                   <MemberSessionCard
