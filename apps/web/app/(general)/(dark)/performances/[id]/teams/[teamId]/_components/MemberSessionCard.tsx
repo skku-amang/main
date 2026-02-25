@@ -65,7 +65,7 @@ const MemberSessionCard = ({
       </div>
 
       {/* 유저 정보 */}
-      <div className="relative flex h-[48px] w-[466px] items-center md:pl-4 ">
+      <div className="relative flex h-[48px] w-full items-center md:w-[466px] md:pl-4">
         {/* 아바타 */}
         <Avatar className="mr-[12px] md:mr-[24px]">
           <AvatarImage src={user.image ?? undefined} />
