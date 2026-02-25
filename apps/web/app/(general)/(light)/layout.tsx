@@ -1,3 +1,4 @@
+import { MiniPlayer, MiniPlayerProvider } from "@/components/MiniPlayer"
 import RootHeaderAndFooterWrapper from "@/components/RootHeaderAndFooterWrapper"
 
 export default function RootLayout({
@@ -5,5 +6,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <RootHeaderAndFooterWrapper>{children}</RootHeaderAndFooterWrapper>
+  return (
+    <MiniPlayerProvider>
+      <RootHeaderAndFooterWrapper>{children}</RootHeaderAndFooterWrapper>
+      <MiniPlayer />
+    </MiniPlayerProvider>
+  )
 }

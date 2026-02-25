@@ -12,6 +12,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
+import { useMiniPlayer } from "@/components/MiniPlayer"
 import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
@@ -108,6 +109,25 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
   return null
 }
 
+const YoutubeCell = ({ row }: { row: any }) => {
+  const { play } = useMiniPlayer()
+  const rawUrl = row.original.songYoutubeVideoUrl
+  if (!rawUrl) return null
+
+  const videoId = YoutubeVideo.getValidVideoIdOrNull(rawUrl) ?? rawUrl
+
+  return (
+    <button
+      onClick={() =>
+        play(videoId, `${row.original.songName} - ${row.original.songArtist}`)
+      }
+      className="flex w-full items-center justify-center"
+    >
+      <Paperclip size={24} />
+    </button>
+  )
+}
+
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
@@ -197,20 +217,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     header: () => (
       <div className="flex items-center justify-center">영상링크</div>
     ),
-    cell: ({ row }) => {
-      const rawUrl = row.original.songYoutubeVideoUrl
-      if (!rawUrl) return null
-      return (
-        <Link
-          href={YoutubeVideo.getURL(rawUrl)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex w-full items-center justify-center"
-        >
-          <Paperclip size={24} />
-        </Link>
-      )
-    }
+    cell: ({ row }) => <YoutubeCell row={row} />
   },
   {
     accessorKey: "createdAt",
