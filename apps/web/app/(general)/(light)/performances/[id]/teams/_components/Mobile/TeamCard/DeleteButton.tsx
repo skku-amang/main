@@ -31,8 +31,8 @@ const TeamCardDeleteButton = ({
   const onDelete = async () => {
     const res = await deleteTeam.mutateAsync([teamId])
     if (res) {
-      // 팀 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
+      await queryClient.invalidateQueries({ queryKey: ["teams"] })
+      queryClient.removeQueries({ queryKey: ["team", teamId] })
       setIsOpen(false)
     }
   }
