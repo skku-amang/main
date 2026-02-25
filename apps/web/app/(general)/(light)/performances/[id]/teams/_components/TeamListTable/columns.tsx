@@ -150,7 +150,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "requiredSessions",
     header: () => (
-      <div className="flex w-full items-center justify-start">필요 세션</div>
+      <div className="flex w-full items-center justify-start">필요세션</div>
     ),
     cell: ({ row }) => {
       return (

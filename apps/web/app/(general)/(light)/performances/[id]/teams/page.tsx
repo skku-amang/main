@@ -33,6 +33,10 @@ const TeamList = () => {
     return <div>오류가 발생했습니다.</div>
   }
 
+  const currentPerformance = relatedPerformances.find(
+    (p) => p.id === performanceId
+  )
+
   return (
     <div>
       {/* 팀 배너 */}
@@ -45,6 +49,10 @@ const TeamList = () => {
           },
           {
             display: "모집"
+          },
+          {
+            display: currentPerformance?.name ?? "공연",
+            href: ROUTES.PERFORMANCE.DETAIL(performanceId)
           },
           {
             display: "공연팀 목록",

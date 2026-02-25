@@ -340,7 +340,7 @@ export function TeamListDataTable<TValue>({
             {/* 생성 버튼 */}
             <Button
               asChild
-              className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
+              className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
             >
               <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
                 <CirclePlus size={24} className="me-[9px]" />
@@ -353,7 +353,7 @@ export function TeamListDataTable<TValue>({
               <PopoverTrigger>
                 <Button
                   asChild
-                  className="h-10 w-[136px] rounded-[6px] text-[20px] font-semibold"
+                  className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
                   onClick={() => setFilterOpen(true)}
                   variant={filterOpen ? "outline" : undefined}
                 >
@@ -391,7 +391,7 @@ export function TeamListDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="bg-zinc-700 py-0 font-bold text-white"
+                      className="border border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg last:rounded-r-lg"
                     >
                       {header.isPlaceholder
                         ? null
