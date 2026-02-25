@@ -35,7 +35,7 @@ const SelectView = ({
       }
     >
       <SelectTrigger className="flex-row-reverse gap-x-2 text-gray-500">
-        <SelectValue>Performances</SelectValue>
+        <SelectValue placeholder={currentPerformance?.name} />
       </SelectTrigger>
       <SelectContent>
         {performanceOptions.map((p) => (

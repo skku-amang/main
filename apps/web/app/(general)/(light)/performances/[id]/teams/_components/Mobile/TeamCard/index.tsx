@@ -45,7 +45,7 @@ const TeamCard = ({
   const { canEdit } = useTeamPermission({ leaderId: leader.id })
 
   return (
-    <div className="border-b border-gray-200 bg-white px-1 py-4">
+    <div className="rounded-lg bg-white p-5 shadow-md">
       <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}>
         <div>
           {/* 곡명 & 상태 */}
@@ -109,6 +109,38 @@ const TeamCard = ({
           </div>
         </div>
       </Link>
+
+      {/* 액션: 편집, 삭제 */}
+      {canEdit && (
+        <div className="mt-3 grid grid-cols-2 gap-x-4">
+          <Button
+            asChild
+            className="flex h-9 w-full items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
+            variant="outline"
+          >
+            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
+              <PencilLine size={14} strokeWidth={2} className="font-bold" />
+              편집하기
+            </Link>
+          </Button>
+          <TeamDeleteButton
+            teamId={id}
+            className="w-full"
+            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
+          >
+            <Button
+              asChild
+              className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
+              variant="destructive"
+            >
+              <div>
+                <Trash2 size={14} strokeWidth={2} className="font-bold" />
+                삭제하기
+              </div>
+            </Button>
+          </TeamDeleteButton>
+        </div>
+      )}
     </div>
   )
 }

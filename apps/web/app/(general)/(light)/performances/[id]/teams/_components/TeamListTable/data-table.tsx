@@ -11,15 +11,7 @@ import {
   SortingState,
   useReactTable
 } from "@tanstack/react-table"
-import {
-  ArrowDownUp,
-  ChevronLeft,
-  ChevronRight,
-  CirclePlus,
-  Filter,
-  Plus,
-  X
-} from "lucide-react"
+import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useMemo, useReducer, useState } from "react"
@@ -38,6 +30,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
+import { DataTablePagination } from "@/components/DataTable/Pagination"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -628,40 +621,8 @@ export function TeamListDataTable<TValue>({
 
         {/* 모바일 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
-          <div className="flex items-center justify-center gap-2 py-6">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground">Page</span>
-            <select
-              className="h-8 rounded-md border border-input bg-background px-2 text-sm"
-              value={table.getState().pagination.pageIndex}
-              onChange={(e) => table.setPageIndex(Number(e.target.value))}
-            >
-              {Array.from({ length: table.getPageCount() }, (_, i) => (
-                <option key={i} value={i}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
-            <span className="text-sm text-muted-foreground">
-              of {table.getPageCount()}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="py-6">
+            <DataTablePagination table={table} />
           </div>
         )}
       </div>
