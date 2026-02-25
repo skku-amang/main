@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useQueryState, parseAsInteger } from "nuqs"
+import { useEffect } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import Loading from "@/app/_(errors)/Loading"
 import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
 import { cn, getSessionIdBySessionName } from "@/lib/utils"
@@ -24,6 +24,7 @@ import {
   memberSessionRequiredBaseSchema,
   memberSessionRequiredField
 } from "./SecondPage/schema"
+import TeamFormSkeleton from "./TeamFormSkeleton"
 import ThirdPage from "./ThirdPage"
 
 interface TeamCreateFormProps {
@@ -32,7 +33,10 @@ interface TeamCreateFormProps {
 }
 
 const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useQueryState(
+    "step",
+    parseAsInteger.withDefault(1)
+  )
   const session = useSession()
   const router = useRouter()
   const { toast } = useToast()
@@ -368,7 +372,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     console.warn("FormInvalid:", errors)
   }
 
-  if (session.status === "loading") return <Loading />
+  if (session.status === "loading") return <TeamFormSkeleton />
   if (!session.data) router.push(ROUTES.HOME)
 
   return (

@@ -124,7 +124,7 @@ const FirstPage = ({
                     className={cn(
                       "mt-1 drop-shadow-search",
                       form.formState.errors.performanceId &&
-                        "border-destructive"
+                        "border-destructive focus-visible:ring-destructive"
                     )}
                   >
                     <SelectValue placeholder="공연 선택" />
@@ -162,7 +162,8 @@ const FirstPage = ({
                   {...form.register("songName")}
                   className={cn(
                     "my-1 drop-shadow-search",
-                    form.formState.errors.songName && "border-destructive"
+                    form.formState.errors.songName &&
+                      "border-destructive focus-visible:ring-destructive"
                   )}
                   placeholder="곡명 입력"
                 />
@@ -185,7 +186,7 @@ const FirstPage = ({
                   />
                   <Label
                     htmlFor="isFreshmenFixedInput"
-                    className="text-xs text-neutral-500"
+                    className="text-sm font-medium text-neutral-500"
                   >
                     신입고정곡입니다
                   </Label>
@@ -202,7 +203,8 @@ const FirstPage = ({
                   {...form.register("songArtist")}
                   className={cn(
                     "my-1 drop-shadow-search",
-                    form.formState.errors.songArtist && "border-destructive"
+                    form.formState.errors.songArtist &&
+                      "border-destructive focus-visible:ring-destructive"
                   )}
                   placeholder="아티스트명 입력"
                 />
@@ -223,7 +225,7 @@ const FirstPage = ({
                   />
                   <Label
                     htmlFor="isSelfMadeInput"
-                    className="text-xs text-neutral-500 md:text-sm"
+                    className="text-sm font-medium text-neutral-500"
                   >
                     자작곡입니다
                   </Label>
@@ -245,15 +247,20 @@ const FirstPage = ({
                 </div>
 
                 {/* 데스크톱: 포스터 이미지 + 유튜브 다이얼로그 */}
-                <div className="hidden md:flex md:items-center md:gap-x-2">
-                  <PosterImageDialog form={form} />
-                  <YoutubeDialog form={form} fieldName="songYoutubeVideoUrl" />
-                </div>
-                {form.formState.errors.songYoutubeVideoUrl && (
-                  <div className="mt-1 hidden text-end text-xs text-destructive md:block">
-                    {form.formState.errors.songYoutubeVideoUrl.message}
+                <div className="hidden md:block">
+                  <div className="flex items-center gap-x-2">
+                    <YoutubeDialog
+                      form={form}
+                      fieldName="songYoutubeVideoUrl"
+                    />
+                    <PosterImageDialog form={form} />
                   </div>
-                )}
+                  {form.formState.errors.songYoutubeVideoUrl && (
+                    <div className="mt-1 text-end text-xs text-destructive">
+                      {form.formState.errors.songYoutubeVideoUrl.message}
+                    </div>
+                  )}
+                </div>
               </div>
             </Description>
             <Textarea
@@ -296,10 +303,10 @@ const FirstPage = ({
               <Input
                 placeholder="Enter URL"
                 {...youtubeForm.register("songYoutubeVideoUrl")}
-                className={
+                className={cn(
                   form.formState.errors.songYoutubeVideoUrl &&
-                  "border-destructive"
-                }
+                    "border-destructive focus-visible:ring-destructive"
+                )}
                 onChange={(e) => {
                   youtubeForm.clearErrors("songYoutubeVideoUrl")
                   youtubeForm.reset(

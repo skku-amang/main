@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
+import TeamFormSkeleton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/TeamFormSkeleton"
 import ErrorPage from "@/app/_(errors)/Error"
-import Loading from "@/app/_(errors)/Loading"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 
@@ -22,7 +22,16 @@ const TeamEditPage = () => {
   const { canEdit } = useTeamPermission(team)
 
   if (isLoading) {
-    return <Loading />
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <TeamFormBackground />
+        <OleoPageHeader
+          title="Edit Your Team"
+          goBackHref={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId)}
+        />
+        <TeamFormSkeleton />
+      </div>
+    )
   }
 
   if (isError) {

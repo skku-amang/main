@@ -1,6 +1,7 @@
 "use client"
 
 import { SessionProvider, signOut, useSession } from "next-auth/react"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { useEffect } from "react"
 import { ApiClientProvider } from "./api-client-provider"
 import ReactQueryProvider from "./react-query-provider"
@@ -21,9 +22,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <SessionGuard>
-        <ApiClientProvider>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </ApiClientProvider>
+        <NuqsAdapter>
+          <ApiClientProvider>
+            <ReactQueryProvider>{children}</ReactQueryProvider>
+          </ApiClientProvider>
+        </NuqsAdapter>
       </SessionGuard>
     </SessionProvider>
   )

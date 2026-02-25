@@ -90,7 +90,8 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
                     className={cn(
                       "pl-10",
                       innerForm.formState.errors["songYoutubeVideoUrl"]
-                        ?.message && "border-destructive"
+                        ?.message &&
+                        "border-destructive focus-visible:ring-destructive"
                     )}
                     placeholder="Enter URL"
                   />
