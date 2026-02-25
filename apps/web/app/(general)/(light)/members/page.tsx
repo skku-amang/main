@@ -1,5 +1,13 @@
+import type { Metadata } from "next"
+
 import { columns } from "@/app/(general)/(light)/members/_components/MemberListTable/columns"
 import { MemberListDataTable } from "@/app/(general)/(light)/members/_components/MemberListTable/data-table"
+
+export const metadata: Metadata = {
+  title: "부원 목록",
+  description: "AMANG 동아리 부원 목록",
+  alternates: { canonical: "/members" }
+}
 
 const MemberListPage = () => {
   return (
