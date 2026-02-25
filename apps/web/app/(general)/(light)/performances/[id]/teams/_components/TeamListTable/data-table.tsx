@@ -406,7 +406,7 @@ export function TeamListDataTable<TValue>({
               <PopoverContent
                 align="end"
                 onInteractOutside={() => setFilterOpen(false)}
-                className="w-[480px] p-0"
+                className="w-[480px] rounded-[12px] p-0"
               >
                 {/* 헤더 */}
                 <div className="flex items-center justify-between px-6 pb-3 pt-5">
