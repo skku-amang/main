@@ -1,3 +1,17 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@swc/core'
+  - bcrypt
+  - core-js-pure
+  - esbuild
+  - msw
+  - sharp
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
