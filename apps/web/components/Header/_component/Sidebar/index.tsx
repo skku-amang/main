@@ -11,11 +11,26 @@ import { SheetTitle } from "@/components/ui/sheet"
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <button type="button">
+        <Menu className="h-6 w-6 text-white" />
+      </button>
+    )
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger>
-        <Menu className="h-6 w-6 text-white" />
+      <SheetTrigger asChild>
+        <button type="button">
+          <Menu className="h-6 w-6 text-white" />
+        </button>
       </SheetTrigger>
       <SheetContent>
         <SheetTitle className="hidden">메뉴</SheetTitle>

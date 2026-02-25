@@ -8,10 +8,10 @@ import { useEffect, useState } from "react"
 import { getSessionDisplayName } from "@/constants/session"
 import SESSIONIMAGE from "@/constants/sessionimage"
 import { cn } from "@/lib/utils"
-import { type SessionName } from "@repo/database"
+import type { SessionNameValue } from "@/constants/session"
 
 interface ApplyButtonProps {
-  sessionName: SessionName
+  sessionName: SessionNameValue
   sessionIndex: number
   isSelected: boolean
   onToggle: () => void

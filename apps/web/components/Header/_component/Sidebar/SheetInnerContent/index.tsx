@@ -2,12 +2,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import {
-  FileText,
-  ImageIcon,
+  Archive,
+  Building2,
   Instagram,
   LogIn,
-  Megaphone,
-  Music4,
+  Package,
+  Users,
   Youtube
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
@@ -33,7 +33,7 @@ const SheetInnerContent = ({
   const { data: session } = useSession()
 
   return (
-    <div className="items-between flex h-full flex-col justify-center">
+    <div className="flex h-full flex-col justify-between">
       <Link
         href={!session ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
         className="flex w-full items-center justify-start py-3"
@@ -57,7 +57,7 @@ const SheetInnerContent = ({
               <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">
                 {session.user?.name}
               </div>
-              <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400">
+              <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400 underline">
                 <span>&gt;</span> 마이페이지
               </div>
             </div>
@@ -67,44 +67,38 @@ const SheetInnerContent = ({
       <Separator />
       <div className="flex-auto ">
         {/* Main */}
-        <div className="my-5">
-          <NavLinkHeader className="mb-3">MAIN</NavLinkHeader>
+        <div className="my-6">
+          <NavLinkHeader className="mb-4">MAIN</NavLinkHeader>
 
           <div className="space-y-7">
             <NavLink
-              href={ROUTES.NOTICE.LIST}
-              icon={<Megaphone size={iconSize} className={iconcolor} />}
+              href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
+              icon={<Users size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              공지사항
+              팀 모집
             </NavLink>
+            <span className="flex w-full cursor-not-allowed items-center gap-x-4 text-gray-300">
+              <Building2 size={iconSize} />
+              <span className="text-lg font-medium">공간 대여</span>
+            </span>
+            <span className="flex w-full cursor-not-allowed items-center gap-x-4 text-gray-300">
+              <Package size={iconSize} />
+              <span className="text-lg font-medium">물품 대여</span>
+            </span>
             <NavLink
               href={ROUTES.PERFORMANCE.LIST}
-              icon={<Music4 size={iconSize} className={iconcolor} />}
+              icon={<Archive size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              공연목록
-            </NavLink>
-            <NavLink
-              href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
-              icon={<FileText size={iconSize} className={iconcolor} />}
-              onClick={() => setIsOpen(false)}
-            >
-              세션지원
-            </NavLink>
-            <NavLink
-              href={ROUTES.MEMBER.LIST}
-              icon={<ImageIcon size={iconSize} className={iconcolor} />}
-              onClick={() => setIsOpen(false)}
-            >
-              멤버목록
+              아카이브
             </NavLink>
           </div>
         </div>
         <Separator />
         {/* Links */}
-        <div className="my-5">
-          <NavLinkHeader className="mb-3">LINKS</NavLinkHeader>
+        <div className="my-6">
+          <NavLinkHeader className="mb-4">LINKS</NavLinkHeader>
 
           <div className="space-y-7">
             <NavLink
@@ -140,19 +134,14 @@ const SheetInnerContent = ({
             </Link>
           </>
         ) : (
-          <>
-            <LogIn
-              onClick={() => signOut()}
-              size={iconSize}
-              className="cursor-pointer text-red-600"
-            />
-            <div
-              className="cursor-pointer text-xl font-medium text-red-600"
-              onClick={() => signOut()}
-            >
-              Logout Account
-            </div>
-          </>
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-4 text-red-600"
+            onClick={() => signOut()}
+          >
+            <LogIn size={iconSize} />
+            <span className="text-xl font-medium">Logout Account</span>
+          </button>
         )}
       </div>
     </div>

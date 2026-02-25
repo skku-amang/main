@@ -1,5 +1,7 @@
 import type { Preview } from "@storybook/react"
 import { withThemeByClassName } from "@storybook/addon-themes"
+import { SessionProvider } from "next-auth/react"
+import React from "react"
 
 import "./fonts.css"
 import "../app/globals.css"
@@ -22,7 +24,12 @@ const preview: Preview = {
         dark: "dark"
       },
       defaultTheme: "light"
-    })
+    }),
+    (Story) => (
+      <SessionProvider session={null}>
+        <Story />
+      </SessionProvider>
+    )
   ]
 }
 

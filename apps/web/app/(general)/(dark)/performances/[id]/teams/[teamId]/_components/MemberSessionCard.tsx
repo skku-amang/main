@@ -7,7 +7,7 @@ import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getSessionDisplayName } from "@/constants/session"
 import { formatGenerationOrder } from "@/lib/utils"
-import { SessionName } from "@repo/database"
+import type { SessionNameValue } from "@/constants/session"
 import { TeamDetail } from "@repo/shared-types"
 
 type TeamMember = TeamDetail["teamSessions"][number]["members"][number]["user"]
@@ -15,7 +15,7 @@ type TeamMember = TeamDetail["teamSessions"][number]["members"][number]["user"]
 interface MemberSessionCardProps {
   teamId: number
   sessionId: number
-  sessionName: SessionName
+  sessionName: SessionNameValue
   sessionIndex: number
   user: TeamMember
   // eslint-disable-next-line no-unused-vars
