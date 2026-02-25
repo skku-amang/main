@@ -10,11 +10,13 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
 import { useImageUpload } from "@/hooks/useImageUpload"
+import { cn } from "@/lib/utils"
 import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
 
 import basicInfoSchema from "./schema"
@@ -23,8 +25,9 @@ interface PosterImageDialogProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
 }
 
-const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
+function PosterImageDialog({ form }: PosterImageDialogProps) {
   const [open, setOpen] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const currentImage = form.watch("posterImage")
 
   const {
@@ -44,9 +47,36 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
     }
   })
 
-  function handleRemove() {
+  function handleRemove(): void {
     form.setValue("posterImage", "")
     reset()
+  }
+
+  function handleDragOver(e: React.DragEvent): void {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent): void {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  function handleDrop(e: React.DragEvent): void {
+    e.preventDefault()
+    setIsDragging(false)
+
+    const droppedFile = e.dataTransfer.files[0]
+    if (!droppedFile) return
+
+    const fakeEvent = {
+      target: { files: [droppedFile] }
+    } as unknown as React.ChangeEvent<HTMLInputElement>
+    handleFileSelect(fakeEvent)
+  }
+
+  function handleBrowseClick(): void {
+    inputRef.current?.click()
   }
 
   return (
@@ -67,21 +97,19 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
         >
           <div className="flex items-center justify-center gap-x-2.5">
             <ImagePlus size={24} />
-            포스터 이미지
+            Image Upload
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined} className="rounded-xl">
+      <DialogContent className="rounded-xl">
         <div className="rounded-xl">
           <DialogHeader className="mb-1">
-            <DialogTitle className="text-slate-900">포스터 이미지</DialogTitle>
+            <DialogTitle className="text-slate-900">Image Upload</DialogTitle>
+            <DialogDescription className="text-zinc-500">
+              홍보 포스터를 업로드하여 주세요
+            </DialogDescription>
           </DialogHeader>
 
-          <p className="mb-4 text-sm text-zinc-500">
-            팀 포스터 이미지를 업로드해주세요. (선택사항)
-          </p>
-
-          {/* 현재 업로드된 이미지 표시 */}
           {currentImage && !preview && (
             <div className="relative mb-4">
               <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
@@ -105,43 +133,62 @@ const PosterImageDialog = ({ form }: PosterImageDialogProps) => {
             </div>
           )}
 
-          {/* 파일 선택 */}
-          <div className="flex items-center gap-x-3">
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              "flex flex-col items-center justify-center gap-y-2 rounded-lg border-2 border-dashed px-6 py-10 transition-colors",
+              isDragging
+                ? "border-secondary bg-secondary/5"
+                : "border-blue-300 bg-slate-50"
+            )}
+          >
+            <ImagePlus size={40} className="text-blue-300" />
+            <p className="text-sm text-zinc-500">Drag your file(s)</p>
+            <p className="text-xs text-zinc-400">or</p>
+            <button
+              type="button"
+              onClick={handleBrowseClick}
+              className="cursor-pointer text-sm font-medium text-secondary hover:underline"
+            >
+              browse
+            </button>
             <input
               ref={inputRef}
               type="file"
               accept={ACCEPTED_IMAGE_TYPES.join(",")}
               onChange={handleFileSelect}
-              className="block w-full text-sm text-slate-500 file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-secondary/90"
+              className="hidden"
             />
-            <Button
-              type="button"
-              className="bg-secondary"
-              disabled={!file || isUploading}
-              onClick={upload}
-            >
-              {isUploading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                "Upload"
-              )}
-            </Button>
           </div>
 
-          {/* 에러 메시지 */}
           {error && (
-            <div className="mt-1 text-xs text-destructive">{error}</div>
+            <div className="mt-2 text-xs text-destructive">{error}</div>
           )}
 
-          {/* 미리보기 */}
           {preview && (
-            <div className="relative mt-4 aspect-[3/4] w-full overflow-hidden rounded-lg">
-              <Image
-                src={preview}
-                alt="미리보기"
-                fill
-                className="object-cover"
-              />
+            <div className="mt-4">
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
+                <Image
+                  src={preview}
+                  alt="미리보기"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <Button
+                type="button"
+                className="mt-3 w-full bg-secondary"
+                disabled={!file || isUploading}
+                onClick={upload}
+              >
+                {isUploading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  "Upload"
+                )}
+              </Button>
             </div>
           )}
         </div>

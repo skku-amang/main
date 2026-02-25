@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Youtube } from "lucide-react"
+import { Link, Youtube } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -83,14 +83,18 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
               )}
             >
               <div className="flex items-center gap-x-3">
-                <Input
-                  {...innerForm.register("songYoutubeVideoUrl")}
-                  className={cn(
-                    innerForm.formState.errors["songYoutubeVideoUrl"]
-                      ?.message && "border-destructive"
-                  )}
-                  placeholder="Enter URL"
-                />
+                <div className="relative flex-1">
+                  <Link className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    {...innerForm.register("songYoutubeVideoUrl")}
+                    className={cn(
+                      "pl-10",
+                      innerForm.formState.errors["songYoutubeVideoUrl"]
+                        ?.message && "border-destructive"
+                    )}
+                    placeholder="Enter URL"
+                  />
+                </div>
                 <Button
                   type="submit"
                   className="bg-secondary"

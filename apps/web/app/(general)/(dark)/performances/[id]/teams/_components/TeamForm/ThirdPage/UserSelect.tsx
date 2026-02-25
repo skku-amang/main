@@ -23,6 +23,8 @@ interface SelectableUser {
   id: number
   name: string
   nickname: string
+  image: string | null
+  generation: { order: number }
 }
 
 interface UserSelectProps<T extends FieldValues> {
@@ -52,16 +54,13 @@ const UserSelect = <T extends FieldValues>({
     form.formState.errors as Record<string, unknown>,
     fieldName
   )
-  const initialUserId = form.getValues(fieldName as Path<T>) as
-    | number
-    | undefined
 
   const [open, setOpen] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<number | undefined>(
-    initialUserId
-  )
-
-  const selectedUser = users.find((user) => user.id === selectedUserId)
+  const watchedUserId = form.watch(fieldName as Path<T>) as
+    | number
+    | null
+    | undefined
+  const selectedUser = users.find((user) => user.id === watchedUserId)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -75,7 +74,9 @@ const UserSelect = <T extends FieldValues>({
             hasError && "border-destructive"
           )}
         >
-          {selectedUser?.name ?? "미정"}
+          {selectedUser
+            ? `${selectedUser.generation.order}기 ${selectedUser.name}`
+            : "Select"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -95,27 +96,26 @@ const UserSelect = <T extends FieldValues>({
                       user.id as PathValue<T, Path<T>>
                     )
                     form.clearErrors(fieldName as Path<T>)
-                    setSelectedUserId(user.id)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      selectedUserId === user.id ? "opacity-100" : "opacity-0"
+                      watchedUserId === user.id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div className="flex items-center gap-x-5">
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarImage src={user.image || undefined} />
                       <AvatarFallback>
                         {user.name.substring(0, 1)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      {user.name}
+                      {user.generation.order}기 {user.name}
                       <span className="text-xs">
-                        <br /># {user.nickname}
+                        <br />#{user.nickname}
                       </span>
                     </div>
                   </div>

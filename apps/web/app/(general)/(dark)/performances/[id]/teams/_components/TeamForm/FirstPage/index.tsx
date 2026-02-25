@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
 import {
   HoverCard,
+  HoverCardArrow,
   HoverCardContent,
   HoverCardTrigger
 } from "@/components/ui/hover-card"
@@ -95,6 +96,7 @@ const FirstPage = ({
                   className="w-[420px] bg-black text-white"
                   side="right"
                 >
+                  <HoverCardArrow className="fill-black" />
                   ・곡명, 아티스트명을 정확히 입력해주세요
                   <br />
                   ・커버곡의 경우 아래의 예시와 같이 작성해주세요
@@ -185,7 +187,7 @@ const FirstPage = ({
                     htmlFor="isFreshmenFixedInput"
                     className="text-xs text-neutral-500"
                   >
-                    신입고정팀입니다
+                    신입고정곡입니다
                   </Label>
                 </div>
               </div>

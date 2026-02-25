@@ -25,7 +25,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
       <TeamFormBackground />
 
       <OleoPageHeader
-        title="Create Your Team"
+        title="Create New Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
       />
 
