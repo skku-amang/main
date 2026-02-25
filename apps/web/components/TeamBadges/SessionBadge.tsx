@@ -10,7 +10,7 @@ const SessionBadge = ({ session, className }: SessionBadgeProps) => {
   return (
     <Badge
       className={cn(
-        "h-5 rounded bg-slate-200 hover:bg-slate-200 text-xs font-normal text-neutral-600 text-nowrap px-2 select-none",
+        "rounded bg-slate-200 hover:bg-slate-200 text-[13px] font-normal leading-none text-slate-700 text-nowrap px-2 select-none",
         className
       )}
     >

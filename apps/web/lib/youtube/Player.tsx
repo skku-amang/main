@@ -13,6 +13,7 @@ const YoutubePlayer: React.FC<YoutubePlayerProps> = ({
   return (
     <iframe
       src={`https://www.youtube.com/embed/${YoutubeVideo.getValidVideoIdOrNull(videoUrl)}`}
+      allowFullScreen
       {...iframeProps}
     />
   )

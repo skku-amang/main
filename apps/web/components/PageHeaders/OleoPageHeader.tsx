@@ -22,7 +22,7 @@ const OleoPageHeader = ({
   return (
     <div
       className={cn(
-        "my-2.5 flex h-[70px] w-full items-end justify-center md:mb-[54px] md:mt-[100px] md:items-center md:justify-between",
+        "flex h-auto w-full items-center justify-center md:mb-[54px] md:mt-[100px] md:h-[70px] md:items-center md:justify-between",
         className
       )}
     >
