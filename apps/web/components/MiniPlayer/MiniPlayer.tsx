@@ -15,14 +15,6 @@ const MiniPlayer = () => {
   const dragging = useRef(false)
   const offset = useRef({ x: 0, y: 0 })
 
-  // Reset position when a new video starts
-  useEffect(() => {
-    if (current) {
-      setPosition({ x: 0, y: 0 })
-      setInitialized(false)
-    }
-  }, [current?.videoId])
-
   // Set initial position after first render
   useEffect(() => {
     if (current && containerRef.current && !initialized) {

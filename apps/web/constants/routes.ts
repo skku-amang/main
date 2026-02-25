@@ -39,6 +39,7 @@ const ROUTES = {
   },
   PROFILE: {
     INDEX: "/profile",
+    EDIT: "/profile/edit",
     TEAMS: "/profile/teams"
   },
   RESERVATION: {

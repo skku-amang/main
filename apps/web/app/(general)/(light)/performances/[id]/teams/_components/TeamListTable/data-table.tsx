@@ -31,7 +31,6 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
-import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -39,6 +38,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
+import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
@@ -571,8 +571,8 @@ export function TeamListDataTable<TValue>({
                   />
                 </TeamHeaderButton>
               </DrawerTrigger>
-              <DrawerContent className="px-0 pb-10">
-                <DrawerHeader className="flex items-center justify-between px-7 py-0">
+              <DrawerContent className="px-0 pb-40">
+                <DrawerHeader className="flex shrink-0 items-center justify-between px-7 py-0">
                   <DrawerTitle className="mb-3 mt-5 flex h-5 items-baseline gap-x-[15px] ">
                     <div className="h-full text-left text-[14px] font-semibold">
                       Property Filter
@@ -592,7 +592,7 @@ export function TeamListDataTable<TValue>({
                   className="w-full bg-slate-100 drop-shadow-table"
                 />
 
-                <div className="space-y-7 px-7 pt-4">
+                <div className="space-y-7 px-7 pt-4 pb-6">
                   {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="필요세션"
