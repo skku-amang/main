@@ -103,7 +103,7 @@ const TeamDetail = () => {
               header="세션구성"
               className="h-fit bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
             >
-              <div className="mt-[20px] flex flex-wrap gap-x-2 gap-y-2 md:mt-[40px]">
+              <div className="mt-[20px] flex flex-wrap gap-[10px] md:mt-[40px]">
                 {team.teamSessions.map((ts) => {
                   // capacity만큼의 슬롯을 모두 표시 (1부터 capacity까지)
                   return Array.from(
@@ -115,7 +115,7 @@ const TeamDetail = () => {
                       <SessionBadge
                         key={`${ts.session.id}-${index}`}
                         session={sessionWithIndex}
-                        className="h-[22px] w-[56px] justify-center rounded bg-slate-200 px-[5px] py-[6px] text-xs hover:bg-slate-300 md:h-[34px] md:w-[74px] md:rounded-[20px] md:text-base"
+                        className="justify-center rounded px-[6px] py-[2px] md:rounded-[20px] md:px-3 md:py-1.5 md:text-base"
                       />
                     )
                   })
@@ -169,7 +169,7 @@ const TeamDetail = () => {
             }
             className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            <ul className="mb-6 mt-[12px] w-full text-sm font-normal leading-6 text-gray-600 md:mt-[16px] md:w-[537px]">
+            <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
               <li className="mb-1 md:mb-[10px]">
                 ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                 선착순으로 마감됩니다

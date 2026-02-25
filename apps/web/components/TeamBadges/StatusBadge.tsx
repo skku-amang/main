@@ -24,7 +24,7 @@ const StatusBadge = ({
         status === "Inactive"
           ? "bg-red-100 text-destructive"
           : "bg-green-100 text-green-600",
-        "text-md whitespace-nowrap rounded-full border-none px-4 py-0.5 lg:py-1 font-semibold",
+        "whitespace-nowrap rounded-full border-none px-4 py-0.5 text-[10px] font-semibold leading-none tracking-[0.05em] lg:py-1",
         className
       )}
     >
