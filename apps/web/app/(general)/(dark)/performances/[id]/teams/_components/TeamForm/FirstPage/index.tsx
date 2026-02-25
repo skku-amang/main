@@ -180,7 +180,7 @@ const FirstPage = ({
                     onCheckedChange={(e) =>
                       form.setValue("isFreshmenFixed", !!e)
                     }
-                    checked={form.getValues("isFreshmenFixed")}
+                    checked={form.watch("isFreshmenFixed")}
                     className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
@@ -218,7 +218,7 @@ const FirstPage = ({
                   <Checkbox
                     id="isSelfMadeInput"
                     onCheckedChange={(e) => form.setValue("isSelfMade", !!e)}
-                    checked={form.getValues("isSelfMade")}
+                    checked={form.watch("isSelfMade")}
                     className="h-4 w-4 rounded-md border border-gray-400"
                   />
                   <Label
