@@ -494,7 +494,7 @@ export function TeamListDataTable<TValue>({
       </div>
 
       {/* 모바일: 카드 보기 */}
-      <div className="md:hidden">
+      <div className="px-4 md:hidden">
         {/* 헤더 */}
         <div className="space-y-3">
           {/* 검색, 필터, 정렬 */}
@@ -515,7 +515,15 @@ export function TeamListDataTable<TValue>({
             <Drawer>
               <DrawerTrigger>
                 <TeamHeaderButton asChild variant="outline">
-                  <Filter className="text-gray-400" size={16} />
+                  <Filter
+                    className={
+                      state.filters.필요세션.size > 0 ||
+                      state.filters.모집상태 !== "all"
+                        ? "text-primary"
+                        : "text-gray-400"
+                    }
+                    size={16}
+                  />
                 </TeamHeaderButton>
               </DrawerTrigger>
               <DrawerContent className="px-0 pb-10">
@@ -565,7 +573,7 @@ export function TeamListDataTable<TValue>({
                 <TeamHeaderButton asChild variant="outline">
                   <ArrowDownUp
                     strokeWidth={1.75}
-                    className="text-gray-400"
+                    className={sortQuery ? "text-primary" : "text-gray-400"}
                     size={16}
                   />
                 </TeamHeaderButton>
