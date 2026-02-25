@@ -52,7 +52,11 @@ const TeamList = () => {
           },
           {
             display: currentPerformance?.name ?? "공연",
-            href: ROUTES.PERFORMANCE.DETAIL(performanceId)
+            href: ROUTES.PERFORMANCE.TEAM.LIST(performanceId),
+            dropdownItems: relatedPerformances.map((p) => ({
+              label: p.name,
+              href: ROUTES.PERFORMANCE.TEAM.LIST(p.id)
+            }))
           },
           {
             display: "공연팀 목록",

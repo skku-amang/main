@@ -119,7 +119,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
           {row.original.songName}
           {!row.original.posterImage && (
             <span>
-              <Image className="h-3 w-3 font-normal text-neutral-500" />
+              <Image size={15} className="text-neutral-800" strokeWidth={1.5} />
             </span>
           )}
         </div>
@@ -154,7 +154,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex justify-start gap-1 text-right font-medium">
+        <div className="flex justify-start gap-2.5 text-right font-medium">
           {row.original.teamSessions.map((ts) => {
             const missingIndices = getMissingIndices(ts)
             return missingIndices.map((index) => (

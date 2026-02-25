@@ -12,8 +12,9 @@ import {
   useReactTable
 } from "@tanstack/react-table"
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { useReducer, useState } from "react"
+import { useMemo, useReducer, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
 import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
@@ -173,6 +174,11 @@ export function TeamListDataTable<TValue>({
   relatedPerformances,
   performanceId
 }: DataTableProps<TValue>) {
+  const { data: session } = useSession()
+  const visibleColumns = useMemo(
+    () => (session ? columns : columns.filter((c) => c.id !== "actions")),
+    [session, columns]
+  )
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -290,7 +296,7 @@ export function TeamListDataTable<TValue>({
 
   const table = useReactTable({
     data: state.result,
-    columns,
+    columns: visibleColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -391,7 +397,7 @@ export function TeamListDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="border border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg last:rounded-r-lg"
+                      className="border-y border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg first:border-l last:rounded-r-lg last:border-r"
                     >
                       {header.isPlaceholder
                         ? null
