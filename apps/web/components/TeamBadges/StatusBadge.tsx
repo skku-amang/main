@@ -4,9 +4,19 @@ import { cn } from "@/lib/utils"
 interface StatusBadgeProps {
   status: "Inactive" | "Active"
   className?: string
+  dotClassName?: string
 }
 
-const StatusBadge = ({ status, className }: StatusBadgeProps) => {
+const STATUS_LABEL: Record<StatusBadgeProps["status"], string> = {
+  Active: "모집중",
+  Inactive: "마감",
+}
+
+const StatusBadge = ({
+  status,
+  className,
+  dotClassName = "text-[0.5rem]",
+}: StatusBadgeProps) => {
   return (
     <Badge
       variant="outline"
@@ -18,8 +28,8 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
         className
       )}
     >
-      <span className="me-2 text-[0.5rem]">●</span>
-      {status}
+      <span className={cn("me-2", dotClassName)}>●</span>
+      {STATUS_LABEL[status]}
     </Badge>
   )
 }

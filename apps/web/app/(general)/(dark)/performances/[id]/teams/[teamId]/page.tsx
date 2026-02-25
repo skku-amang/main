@@ -85,12 +85,12 @@ const TeamDetail = () => {
 
       {/*수정 및 삭제 (모바일)*/}
       {canEdit && (
-        <div className="block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
+        <div className="relative z-10 block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
           <DeleteEditButton performanceId={performanceId} team={team} />
         </div>
       )}
 
-      <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
+      <div className="relative z-10 flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-[24px]">
           <BasicInfo team={team} canEdit={canEdit} />
@@ -140,7 +140,7 @@ const TeamDetail = () => {
             header="마감된 세션"
             className="col-span-2 bg-white shadow-md"
           >
-            <div className="grid grid-cols-1">
+            <div className="grid grid-cols-1 divide-y divide-slate-200">
               <div className="mt-4 hidden text-sm font-medium leading-normal text-slate-500 md:flex">
                 <div className="flex h-[48px] w-[160px] items-center pl-4">
                   Session
@@ -176,7 +176,7 @@ const TeamDetail = () => {
             header="세션 지원"
             className="col-span-2 bg-white shadow-md"
           >
-            <ul className="mb-6 w-full pt-[12px] text-xs font-normal leading-normal text-gray-600 md:w-[537px] md:pt-[16px]">
+            <ul className="mb-6 w-full pt-[12px] text-sm font-normal leading-6 text-gray-600 md:w-[537px] md:pt-[16px]">
               <li className="mb-1 md:mb-[10px]">
                 ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                 선착순으로 마감됩니다
@@ -214,7 +214,7 @@ const TeamDetail = () => {
 
             {/* 지원하기 버튼 */}
             {selectedSessions.length > 0 && (
-              <Button className="mt-6 w-full" onClick={onSubmit}>
+              <Button variant="outline" className="mt-6 w-full" onClick={onSubmit}>
                 선택한 세션에 지원하기 ({selectedSessions.length}개)
               </Button>
             )}

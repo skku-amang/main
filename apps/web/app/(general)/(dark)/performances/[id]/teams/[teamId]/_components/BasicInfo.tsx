@@ -56,6 +56,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           <StatusBadge
             status={isSatisfied ? "Inactive" : "Active"}
             className="mb-1 h-5 w-20 justify-center max-sm:text-xs md:h-[32px] md:w-[130px]"
+            dotClassName="text-xs"
           />
         </div>
         <h4 className="h-[34px] text-sm font-normal text-gray-500 md:text-2xl">
