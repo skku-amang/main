@@ -15,7 +15,7 @@ const DesktopFilterCheckbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "data-[state=checked]:1 peer h-6 w-6 shrink-0 rounded-sm border border-slate-400 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-700 data-[state=checked]:bg-sky-700 data-[state=checked]:text-primary-foreground",
+      "data-[state=checked]:1 peer h-[18px] w-[18px] shrink-0 rounded border border-slate-300 ring-offset-background hover:shadow-checkbox focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-sky-500 data-[state=checked]:bg-sky-500 data-[state=checked]:text-primary-foreground",
       className
     )}
     {...props}
@@ -23,7 +23,7 @@ const DesktopFilterCheckbox = React.forwardRef<
     <CheckboxPrimitive.Indicator
       className={cn("flex items-center justify-center text-current")}
     >
-      <Check className="h-6 w-6 font-extrabold" strokeWidth={4} />
+      <Check className="h-3.5 w-3.5" strokeWidth={3} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ))
@@ -56,7 +56,7 @@ const DesktopFilter = ({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-x-5 gap-y-3">
+      <div className="grid grid-cols-5 gap-x-5 gap-y-3">
         {filterValues.map((v) => (
           <div key={v.label} className="flex items-center gap-x-2">
             <DesktopFilterCheckbox
