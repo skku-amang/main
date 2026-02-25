@@ -14,6 +14,7 @@ import {
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
 import { useMemo, useReducer, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
@@ -30,7 +31,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
-import { DataTablePagination } from "@/components/DataTable/Pagination"
+import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -175,12 +176,36 @@ export function TeamListDataTable<TValue>({
   relatedPerformances,
   performanceId
 }: DataTableProps<TValue>) {
-  const { data: session } = useSession()
+  const { status } = useSession()
   const visibleColumns = useMemo(
-    () => (session ? columns : columns.filter((c) => c.id !== "actions")),
-    [session, columns]
+    () =>
+      status === "authenticated"
+        ? columns
+        : columns.filter((c) => c.id !== "actions"),
+    [status, columns]
   )
-  const [sorting, setSorting] = useState<SortingState>([])
+  // nuqs 쿼리 동기화
+  const [sortQuery, setSortQuery] = useQueryState(
+    "sort",
+    parseAsString.withDefault("")
+  )
+  const [searchQuery, setSearchQuery] = useQueryState(
+    "search",
+    parseAsString.withDefault("")
+  )
+  const [pageQuery, setPageQuery] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(1)
+  )
+
+  // sort query → tanstack SortingState 변환
+  const sorting: SortingState = useMemo(() => {
+    if (!sortQuery) return []
+    const [id, dir] = sortQuery.split("-")
+    if (!id || !dir) return []
+    return [{ id, desc: dir === "desc" }]
+  }, [sortQuery])
+
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const [filterOpen, setFilterOpen] = useState(false)
@@ -300,10 +325,22 @@ export function TeamListDataTable<TValue>({
     columns: visibleColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: (updater) => {
+      const next = typeof updater === "function" ? updater(sorting) : updater
+      if (next.length === 0) {
+        setSortQuery(null)
+      } else {
+        setSortQuery(`${next[0].id}-${next[0].desc ? "desc" : "asc"}`)
+      }
+    },
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    initialState: {
+      columnVisibility: { createdAt: false },
+      pagination: { pageIndex: Math.max(0, pageQuery - 1) },
+      columnFilters: searchQuery ? [{ id: "songName", value: searchQuery }] : []
+    },
     state: {
       sorting,
       columnFilters
@@ -312,16 +349,11 @@ export function TeamListDataTable<TValue>({
 
   const missingMemberSessions = getSessionsWithMissingMembers
 
-  const sortOptions: {
-    id: keyof TeamColumn
-    display: string
-    desc: boolean
-  }[] = [
-    { id: "songName", display: "곡명 오름차순", desc: false },
-    { id: "songArtist", display: "곡명 내림차순", desc: true }
-    // TODO: 최신순 추가
-    // { id: "createdAt", display: "최신순", desc: true },
-    // { id: "createdAt", display: "오래된순", desc: false },
+  const sortOptions = [
+    { value: "songName-asc", display: "곡명 오름차순" },
+    { value: "songName-desc", display: "곡명 내림차순" },
+    { value: "createdAt-desc", display: "최신순" },
+    { value: "createdAt-asc", display: "오래된순" }
   ]
 
   return (
@@ -333,12 +365,12 @@ export function TeamListDataTable<TValue>({
           {/* 검색 */}
           <Search
             placeholder="검색"
-            value={
-              (table.getColumn("songName")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("songName")?.setFilterValue(event.target.value)
-            }
+            value={searchQuery}
+            onChange={(event) => {
+              const value = event.target.value
+              setSearchQuery(value || null)
+              table.getColumn("songName")?.setFilterValue(value)
+            }}
             className="max-w-sm"
           />
 
@@ -448,23 +480,15 @@ export function TeamListDataTable<TValue>({
 
         {/* 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
-          <div className="flex items-center justify-center space-x-2 pb-6 pt-14">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+          <div className="pb-6 pt-14">
+            <ResponsivePagination
+              currentPage={table.getState().pagination.pageIndex + 1}
+              totalPages={table.getPageCount()}
+              onPageChange={(page) => {
+                table.setPageIndex(page - 1)
+                setPageQuery(page === 1 ? null : page)
+              }}
+            />
           </div>
         )}
       </div>
@@ -478,12 +502,12 @@ export function TeamListDataTable<TValue>({
             {/* 검색 */}
             <Search
               placeholder="검색"
-              value={
-                (table.getColumn("songName")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("songName")?.setFilterValue(event.target.value)
-              }
+              value={searchQuery}
+              onChange={(event) => {
+                const value = event.target.value
+                setSearchQuery(value || null)
+                table.getColumn("songName")?.setFilterValue(value)
+              }}
               className="h-9 w-full max-w-full border-gray-200 drop-shadow-search"
             />
 
@@ -531,12 +555,11 @@ export function TeamListDataTable<TValue>({
             </Drawer>
 
             {/* 정렬 */}
-            {/* TODO: 정렬 기능 구현 */}
-            {/* Table과 완전 분리해서 정렬 로직 구성해야 함 */}
             <Select
-              defaultValue={"null"}
-              // value={sorting[0].id ?? "null"}
-              // onValueChange={(value) => setSorting([value])}
+              value={sortQuery || "none"}
+              onValueChange={(value) =>
+                setSortQuery(value === "none" ? null : value)
+              }
             >
               <SelectTrigger>
                 <TeamHeaderButton asChild variant="outline">
@@ -549,13 +572,11 @@ export function TeamListDataTable<TValue>({
               </SelectTrigger>
               <SelectContent>
                 {sortOptions.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
+                  <SelectItem key={option.value} value={option.value}>
                     {option.display}
                   </SelectItem>
                 ))}
-                <SelectItem value="null" onSelect={() => setSorting([])}>
-                  정렬해제
-                </SelectItem>
+                <SelectItem value="none">정렬해제</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -622,7 +643,14 @@ export function TeamListDataTable<TValue>({
         {/* 모바일 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
           <div className="py-6">
-            <DataTablePagination table={table} />
+            <ResponsivePagination
+              currentPage={table.getState().pagination.pageIndex + 1}
+              totalPages={table.getPageCount()}
+              onPageChange={(page) => {
+                table.setPageIndex(page - 1)
+                setPageQuery(page === 1 ? null : page)
+              }}
+            />
           </div>
         )}
       </div>

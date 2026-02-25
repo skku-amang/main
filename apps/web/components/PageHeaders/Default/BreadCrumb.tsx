@@ -28,7 +28,7 @@ const DefaultPageHeaderBreadCrumb = ({
   const router = useRouter()
 
   return (
-    <div className="flex items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
+    <div className="hidden items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:flex md:gap-x-1.5 md:text-base">
       {routes.map((route, index) => (
         <React.Fragment key={index}>
           {route.dropdownItems ? (

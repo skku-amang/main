@@ -12,7 +12,7 @@ import {
 import Link from "next/link"
 import React from "react"
 
-import DeleteButton from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/DeleteButton"
+import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
@@ -87,15 +87,20 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
               편집하기
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
-            <DeleteButton
-              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-              teamId={row.original.id}
+          <TeamDeleteButton
+            teamId={row.original.id}
+            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(
+              row.original.performanceId
+            )}
+          >
+            <DropdownMenuItem
+              onSelect={(e) => e.preventDefault()}
+              className="flex items-center justify-center gap-x-2 px-6 py-2 selection:text-slate-700 hover:cursor-pointer"
             >
               <Trash2 />
               삭제하기
-            </DeleteButton>
-          </DropdownMenuItem>
+            </DropdownMenuItem>
+          </TeamDeleteButton>
         </DropdownMenuContent>
       </DropdownMenu>
     )
@@ -205,6 +210,13 @@ export const columns: ColumnDef<TeamColumn>[] = [
         )
       }
     }
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => null,
+    cell: () => null,
+    enableHiding: true,
+    meta: { hidden: true }
   },
   {
     id: "actions",
