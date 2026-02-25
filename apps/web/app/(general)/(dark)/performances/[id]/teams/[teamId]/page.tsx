@@ -173,7 +173,12 @@ const TeamDetail = () => {
 
           {/* 팀 참여 신청 */}
           <SessionSetCard
-            header="참여 신청"
+            header={
+              <>
+                <span className="md:hidden">참여 신청</span>
+                <span className="hidden md:inline">세션 지원</span>
+              </>
+            }
             className="col-span-2 bg-white shadow-md"
           >
             <ul className="mb-6 w-full pt-[12px] text-sm font-normal leading-6 text-gray-600 md:w-[537px] md:pt-[16px]">
@@ -212,9 +217,9 @@ const TeamDetail = () => {
               })}
             </div>
 
-            {/* 지원하기 버튼 */}
+            {/* 지원하기 버튼 (모바일) */}
             {selectedSessions.length > 0 && (
-              <Button className="mt-6 w-full" onClick={onSubmit}>
+              <Button className="mt-6 w-full md:hidden" onClick={onSubmit}>
                 지원하기
               </Button>
             )}
@@ -227,6 +232,16 @@ const TeamDetail = () => {
               </div>
             )}
           </SessionSetCard>
+
+          {/* 지원하기 버튼 (데스크탑) - 카드 바깥, 우측 정렬 */}
+          {selectedSessions.length > 0 && (
+            <div className="hidden justify-end md:flex">
+              <Button variant="outline" className="gap-1" onClick={onSubmit}>
+                지원하기
+                <span aria-hidden="true">&gt;</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
