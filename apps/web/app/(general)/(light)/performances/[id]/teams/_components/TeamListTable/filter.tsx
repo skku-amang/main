@@ -12,12 +12,14 @@ interface TeamListTableFilterProps {
   className?: string
   header: string
   filterValues: FilterValue[]
+  onSelectAll?: () => void
 }
 
 const TeamListTableFilter = ({
   className,
   header,
-  filterValues
+  filterValues,
+  onSelectAll
 }: TeamListTableFilterProps) => {
   return (
     <div className={className}>
@@ -25,6 +27,7 @@ const TeamListTableFilter = ({
         className="hidden lg:block"
         header={header}
         filterValues={filterValues}
+        onSelectAll={onSelectAll}
       />
       <MobileFilter
         className="lg:hidden"

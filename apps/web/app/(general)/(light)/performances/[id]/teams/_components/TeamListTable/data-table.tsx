@@ -406,17 +406,59 @@ export function TeamListDataTable<TValue>({
               <PopoverContent
                 align="end"
                 onInteractOutside={() => setFilterOpen(false)}
-                className="flex gap-6 px-9 py-6 md:h-[256px] md:w-[400px]"
+                className="w-[480px] p-0"
               >
-                <TeamListTableFilter
-                  header="필요세션"
-                  filterValues={filterValues.필요세션}
-                />
-                <Separator orientation="vertical" className="h-[216px]" />
-                <TeamListTableFilter
-                  header="모집상태"
-                  filterValues={filterValues.모집상태}
-                />
+                {/* 헤더 */}
+                <div className="flex items-center justify-between px-6 pb-3 pt-5">
+                  <div className="flex items-baseline gap-x-3">
+                    <h3 className="text-xl font-bold">Filter</h3>
+                    <button
+                      onClick={() => {
+                        dispatch({
+                          type: "clearFilter",
+                          payload: { target: "필요세션" }
+                        })
+                        dispatch({
+                          type: "setFilter",
+                          payload: { target: "모집상태", value: "all" }
+                        })
+                      }}
+                      className="text-xs text-sky-500 hover:text-sky-600"
+                    >
+                      초기화
+                    </button>
+                  </div>
+                  <button onClick={() => setFilterOpen(false)}>
+                    <X className="h-4 w-4 text-slate-400" />
+                  </button>
+                </div>
+
+                <Separator />
+
+                {/* 필터 내용 */}
+                <div className="space-y-5 px-6 py-5">
+                  <TeamListTableFilter
+                    header="필요세션"
+                    filterValues={filterValues.필요세션}
+                    onSelectAll={() =>
+                      dispatch({
+                        type: "clearFilter",
+                        payload: { target: "필요세션" }
+                      })
+                    }
+                  />
+                  <Separator />
+                  <TeamListTableFilter
+                    header="모집상태"
+                    filterValues={filterValues.모집상태}
+                    onSelectAll={() =>
+                      dispatch({
+                        type: "setFilter",
+                        payload: { target: "모집상태", value: "all" }
+                      })
+                    }
+                  />
+                </div>
               </PopoverContent>
             </Popover>
           </div>

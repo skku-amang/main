@@ -33,35 +33,42 @@ interface DesktopFilterProps {
   className?: string
   header: string
   filterValues: FilterValue[]
+  onSelectAll?: () => void
 }
 
 const DesktopFilter = ({
   className,
   header,
-  filterValues
+  filterValues,
+  onSelectAll
 }: DesktopFilterProps) => {
   return (
     <div className={className}>
-      <div className="mb-6 text-lg text-primary">{header}</div>
-
-      <div
-        className={cn(
-          "grid gap-4",
-          filterValues.length > 4 ? "grid-cols-2" : "grid-cols-1"
+      <div className="mb-4 flex items-center gap-x-3">
+        <div className="text-sm font-semibold text-neutral-700">{header}</div>
+        {onSelectAll && (
+          <button
+            onClick={onSelectAll}
+            className="text-xs text-sky-500 hover:text-sky-600"
+          >
+            모두 선택
+          </button>
         )}
-      >
+      </div>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-3">
         {filterValues.map((v) => (
-          <div key={v.label} className="flex w-[184px] items-center gap-x-3">
+          <div key={v.label} className="flex items-center gap-x-2">
             <DesktopFilterCheckbox
-              id={`filter-${v.label}`}
+              id={`desktop-filter-${header}-${v.label}`}
               name={v.label}
               value={v.label}
               checked={v.checked}
               onCheckedChange={(checked) => v.onChecked(!!checked)}
             />
             <Label
-              htmlFor={`filter-${v.label}`}
-              className="text-nowrap text-gray-900"
+              htmlFor={`desktop-filter-${header}-${v.label}`}
+              className="text-nowrap text-sm text-gray-900"
             >
               {v.label}
             </Label>
