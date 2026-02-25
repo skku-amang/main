@@ -1,6 +1,6 @@
 "use client"
 
-import { LoaderCircle, LogOut, User, Users } from "lucide-react"
+import { LoaderCircle, LogOut, Settings, User, Users } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -92,6 +92,18 @@ const Profile = () => {
         <MenuItem icon={<Users size={iconSize} />} href={ROUTES.PROFILE.TEAMS}>
           참여 중인 팀
         </MenuItem>
+
+        {session.user?.isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <MenuItem
+              icon={<Settings size={iconSize} />}
+              href={ROUTES.ADMIN.INDEX}
+            >
+              관리자
+            </MenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
         <DropdownMenuItem
