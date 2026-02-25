@@ -20,7 +20,6 @@ const ROUTES = {
     EDIT: (id: number) => `/notices/${id}/edit`
   },
   PERFORMANCE: {
-    CREATE: "/performances/create",
     LIST: "/performances",
     DETAIL: (id: number) => `/performances/${id}`,
     TEAM: {

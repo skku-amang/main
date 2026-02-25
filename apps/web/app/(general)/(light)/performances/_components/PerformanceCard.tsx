@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { IoLocationSharp } from "react-icons/io5"
+import { LuMusic } from "react-icons/lu"
 
 import {
   Card,
@@ -25,25 +26,19 @@ interface PerformanceCardProp {
   className?: string
 }
 
-const PosterImage = ({
-  alt,
-  src,
-  width,
-  height
-}: {
-  alt: string
-  src?: string
-  width: number
-  height: number
-}) => {
+const PosterImage = ({ alt, src }: { alt: string; src?: string }) => {
+  if (!src) {
+    return (
+      <div className="flex aspect-[3/2] w-full items-center justify-center bg-slate-100">
+        <LuMusic className="size-12 text-slate-300" />
+      </div>
+    )
+  }
+
   return (
-    <Image
-      alt={alt}
-      src={src || "/images/placeholder.png"} // TODO: 대체 이미지 추가
-      width={width}
-      height={height}
-      className="overflow-hidden"
-    />
+    <div className="relative aspect-[3/2] w-full overflow-hidden">
+      <Image alt={alt} src={src} fill className="object-cover" />
+    </div>
   )
 }
 
@@ -56,34 +51,24 @@ const PerformanceCard = ({
   startAt,
   className
 }: PerformanceCardProp) => {
-  const width = 300
-  const height = 200
+  const image = (
+    <PosterImage alt={`${name} 이미지`} src={posterSrc || undefined} />
+  )
 
-  return (
-    <Card style={{ width }} className={cn("overflow-hidden", className)}>
-      {id ? (
-        <Link href={ROUTES.PERFORMANCE.DETAIL(id)}>
-          <PosterImage
-            alt={`${name} 이미지`}
-            src={posterSrc || undefined}
-            width={width}
-            height={height}
-          />
-        </Link>
-      ) : (
-        <PosterImage
-          alt={`${name} 이미지`}
-          src={posterSrc || undefined}
-          width={width}
-          height={height}
-        />
+  const card = (
+    <Card
+      className={cn(
+        "overflow-hidden transition-shadow duration-200 hover:shadow-lg",
+        className
       )}
+    >
+      {image}
 
       <CardHeader className="pb-0">
-        <CardTitle>{name}</CardTitle>
+        <CardTitle className="truncate">{name}</CardTitle>
         <CardDescription>
           {startAt
-            ? `${startAt.getFullYear()}년 ${startAt.getMonth()}월 ${startAt.getDate()}일`
+            ? `${startAt.getFullYear()}년 ${startAt.getMonth() + 1}월 ${startAt.getDate()}일`
             : "미정"}
         </CardDescription>
       </CardHeader>
@@ -99,6 +84,12 @@ const PerformanceCard = ({
       </CardFooter>
     </Card>
   )
+
+  if (id) {
+    return <Link href={ROUTES.PERFORMANCE.DETAIL(id)}>{card}</Link>
+  }
+
+  return card
 }
 
 export default PerformanceCard

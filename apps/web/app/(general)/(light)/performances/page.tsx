@@ -1,7 +1,7 @@
 "use client"
 
+import { CirclePlus } from "lucide-react"
 import Link from "next/link"
-import { CiCirclePlus } from "react-icons/ci"
 
 import PerformanceCard from "@/app/(general)/(light)/performances/_components/PerformanceCard"
 import DefaultPageHeader, {
@@ -29,10 +29,13 @@ const PerformanceList = () => {
       {/* 도구 모음 */}
       <div className="mb-3 flex justify-between gap-x-2">
         <Search />
-        <Button asChild className="flex items-center">
-          <Link href={ROUTES.PERFORMANCE.CREATE}>
-            <CiCirclePlus size={20} />
-            &nbsp;추가
+        <Button
+          asChild
+          className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
+        >
+          <Link href={ROUTES.ADMIN.PERFORMANCES}>
+            <CirclePlus size={24} className="me-[9px]" />
+            Create
           </Link>
         </Button>
       </div>
