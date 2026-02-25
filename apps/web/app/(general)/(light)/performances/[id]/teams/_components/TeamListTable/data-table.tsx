@@ -357,7 +357,7 @@ export function TeamListDataTable<TValue>({
   ]
 
   return (
-    <div className={className}>
+    <div className={`overflow-x-hidden ${className ?? ""}`}>
       {/* 데스크톱: 테이블 보기 */}
       <div className="hidden md:block">
         {/* 헤더 */}
