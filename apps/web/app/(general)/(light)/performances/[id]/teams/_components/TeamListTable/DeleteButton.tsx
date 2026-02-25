@@ -17,8 +17,8 @@ const DeleteButton = ({ children, className, teamId }: DeleteButtonProps) => {
   const onDelete = async () => {
     try {
       await mutateAsync([teamId])
-      // 팀 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ["teams"] })
+      await queryClient.invalidateQueries({ queryKey: ["teams"] })
+      queryClient.removeQueries({ queryKey: ["team", teamId] })
       alert("팀이 삭제되었습니다.")
     } catch (err) {
       console.error("팀 삭제 오류:", err)
