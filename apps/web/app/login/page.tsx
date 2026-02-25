@@ -60,7 +60,7 @@ const Login = () => {
 
   return (
     <div className="flex h-full w-full items-center justify-center px-6 lg:px-0">
-      <div className="flex w-full max-w-md flex-col items-center justify-center overflow-hidden rounded-2xl bg-white lg:relative lg:h-[653px] lg:max-w-none lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
+      <div className="flex w-full max-w-md flex-col items-center justify-center rounded-2xl bg-white lg:relative lg:h-[653px] lg:max-w-none lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
         <Image
           width="680"
           height="753"
