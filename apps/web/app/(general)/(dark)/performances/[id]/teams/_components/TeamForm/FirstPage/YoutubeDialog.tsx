@@ -100,7 +100,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
                   className="rounded-lg bg-secondary"
                   disabled={!!innerForm.formState.errors.songYoutubeVideoUrl}
                 >
-                  Upload
+                  업로드
                 </Button>
               </div>
               {innerForm.formState.errors.songYoutubeVideoUrl && (

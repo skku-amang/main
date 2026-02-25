@@ -127,42 +127,8 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
             </div>
           )}
 
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={cn(
-              "flex flex-col items-center justify-center gap-y-2 rounded-lg border-2 border-dashed px-6 py-10 transition-colors",
-              isDragging
-                ? "border-secondary bg-secondary/5"
-                : "border-blue-300 bg-slate-50"
-            )}
-          >
-            <ImagePlus size={40} className="text-blue-300" />
-            <p className="text-sm text-zinc-500">Drag your file(s)</p>
-            <p className="text-xs text-zinc-400">or</p>
-            <label
-              htmlFor="poster-file-input"
-              className="cursor-pointer text-sm font-medium text-secondary hover:underline"
-            >
-              browse
-            </label>
-            <input
-              id="poster-file-input"
-              ref={inputRef}
-              type="file"
-              accept={ACCEPTED_IMAGE_TYPES.join(",")}
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-          </div>
-
-          {error && (
-            <div className="mt-2 text-xs text-destructive">{error}</div>
-          )}
-
-          {preview && (
-            <div className="mt-4">
+          {preview ? (
+            <div>
               <div className="relative max-h-[300px] w-full overflow-hidden rounded-lg">
                 <img
                   src={preview}
@@ -170,19 +136,60 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
                   className="h-full w-full object-contain"
                 />
               </div>
-              <Button
-                type="button"
-                className="mt-3 w-full bg-secondary"
-                disabled={!file || isUploading}
-                onClick={upload}
-              >
-                {isUploading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  "Upload"
-                )}
-              </Button>
+              <div className="mt-3 flex gap-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => reset()}
+                >
+                  다시 선택
+                </Button>
+                <Button
+                  type="button"
+                  className="flex-1 bg-secondary"
+                  disabled={!file || isUploading}
+                  onClick={upload}
+                >
+                  {isUploading ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    "업로드"
+                  )}
+                </Button>
+              </div>
             </div>
+          ) : (
+            <label
+              htmlFor="poster-file-input"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={cn(
+                "flex cursor-pointer flex-col items-center justify-center gap-y-2 rounded-lg border-2 border-dashed px-6 py-10 transition-colors",
+                isDragging
+                  ? "border-secondary bg-secondary/5"
+                  : "border-blue-300 bg-slate-50"
+              )}
+            >
+              <ImagePlus size={40} className="text-blue-300" />
+              <p className="text-sm text-zinc-500">
+                파일을 드래그하거나{" "}
+                <span className="font-medium text-secondary">찾아보기</span>
+              </p>
+              <input
+                id="poster-file-input"
+                ref={inputRef}
+                type="file"
+                accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            </label>
+          )}
+
+          {error && (
+            <div className="mt-2 text-xs text-destructive">{error}</div>
           )}
         </div>
       </DialogContent>
