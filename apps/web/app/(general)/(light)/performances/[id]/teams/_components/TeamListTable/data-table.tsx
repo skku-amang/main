@@ -327,10 +327,11 @@ export function TeamListDataTable<TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: (updater) => {
       const next = typeof updater === "function" ? updater(sorting) : updater
-      if (next.length === 0) {
+      const first = next[0]
+      if (!first) {
         setSortQuery(null)
       } else {
-        setSortQuery(`${next[0].id}-${next[0].desc ? "desc" : "asc"}`)
+        setSortQuery(`${first.id}-${first.desc ? "desc" : "asc"}`)
       }
     },
     getSortedRowModel: getSortedRowModel(),
@@ -494,11 +495,11 @@ export function TeamListDataTable<TValue>({
       </div>
 
       {/* 모바일: 카드 보기 */}
-      <div className="px-4 md:hidden">
+      <div className="md:hidden">
         {/* 헤더 */}
         <div className="space-y-3">
           {/* 검색, 필터, 정렬 */}
-          <div className="flex items-center justify-center gap-x-3">
+          <div className="flex items-center gap-x-3">
             {/* 검색 */}
             <Search
               placeholder="검색"
@@ -508,7 +509,7 @@ export function TeamListDataTable<TValue>({
                 setSearchQuery(value || null)
                 table.getColumn("songName")?.setFilterValue(value)
               }}
-              className="h-9 w-full max-w-full border-gray-200 drop-shadow-search"
+              className="h-9 min-w-0 flex-1 border-gray-200 drop-shadow-search"
             />
 
             {/* 필터 */}
