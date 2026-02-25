@@ -59,8 +59,8 @@ const Login = () => {
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="flex h-[653px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-white lg:relative lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
+    <div className="flex h-full w-full items-center justify-center px-6 lg:px-0">
+      <div className="flex w-full max-w-md flex-col items-center justify-center overflow-hidden rounded-2xl bg-white lg:relative lg:h-[653px] lg:max-w-none lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
         <Image
           width="680"
           height="753"
@@ -93,17 +93,17 @@ const Login = () => {
             Log in and join the rhythm
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center lg:absolute lg:right-20 lg:top-[8.5rem] xl:right-32">
-          <h3 className="mb-2 text-2xl font-bold text-slate-900">로그인</h3>
-          <h5 className="mb-8 text-sm font-medium text-slate-500">
+        <div className="flex w-full flex-col items-center justify-center py-8 lg:absolute lg:right-20 lg:top-[8.5rem] lg:w-auto lg:py-0 xl:right-32">
+          <h3 className="mb-2 text-2xl font-medium text-slate-900">로그인</h3>
+          <h5 className="mb-8 text-sm font-normal text-slate-400">
             계속하려면 로그인해주세요
           </h5>
           {/* 일반 로그인 */}
           <form
-            className="flex flex-col items-center"
+            className="flex w-full flex-col items-center"
             onSubmit={handleSubmit(onValid)}
           >
-            <div className="grid w-full max-w-sm items-center gap-1.5">
+            <div className="grid w-full items-center gap-1.5 lg:max-w-sm">
               <Label htmlFor="email" className="font-semibold">
                 아이디
               </Label>
@@ -115,7 +115,7 @@ const Login = () => {
               />
             </div>
             <div className="mb-6 text-destructive">{errors.email?.message}</div>
-            <div className="grid w-full max-w-sm items-center gap-1.5">
+            <div className="grid w-full items-center gap-1.5 lg:max-w-sm">
               <Label htmlFor="password" className="font-semibold">
                 비밀번호
               </Label>
@@ -130,10 +130,10 @@ const Login = () => {
             <div className="text-destructive">{errors.password?.message}</div>
             <Button
               type="submit"
-              className="mt-8 h-12 w-full rounded-lg bg-[#4A8AF4] text-base font-semibold text-white hover:bg-[#3b7ae5] lg:w-80"
+              className="mt-8 h-[52px] w-full rounded-lg bg-[#4A8AF4] text-base font-semibold text-white hover:bg-[#3b7ae5] lg:w-[300px]"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Login on Progress..." : "로그인"}
+              {isSubmitting ? "로그인 중..." : "로그인"}
             </Button>
             <div className="flex justify-center pt-4">
               <div className="pr-2 text-sm font-medium text-slate-900">
