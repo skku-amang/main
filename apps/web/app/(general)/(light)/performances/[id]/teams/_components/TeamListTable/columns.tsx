@@ -131,6 +131,7 @@ const YoutubeCell = ({ row }: { row: any }) => {
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
+    filterFn: "korean",
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
       <Link

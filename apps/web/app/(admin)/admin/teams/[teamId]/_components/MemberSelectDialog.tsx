@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { getSessionDisplayName } from "@/constants/session"
 import { useUsers } from "@/hooks/api/useUser"
+import { matchesKorean } from "@/lib/hangul-search"
 import { formatGenerationOrder } from "@/lib/utils"
 
 interface MemberSelectDialogProps {
@@ -37,8 +38,8 @@ export function MemberSelectDialog({
       .filter(
         (u) =>
           !search ||
-          u.name.toLowerCase().includes(search.toLowerCase()) ||
-          u.nickname.toLowerCase().includes(search.toLowerCase())
+          matchesKorean(u.name, search) ||
+          matchesKorean(u.nickname, search)
       ) ?? []
 
   return (

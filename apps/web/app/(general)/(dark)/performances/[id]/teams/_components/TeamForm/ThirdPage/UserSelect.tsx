@@ -12,6 +12,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
+import { koreanCommandFilter } from "@/lib/hangul-search"
 import {
   Popover,
   PopoverContent,
@@ -91,7 +92,7 @@ const UserSelect = <T extends FieldValues>({
         </Button>
       </PopoverTrigger>
       <PopoverContent className={cn("p-0", isSmall ? "w-52" : "w-[360px]")}>
-        <Command>
+        <Command filter={koreanCommandFilter}>
           <CommandInput placeholder="유저 검색" />
           <CommandList>
             <CommandEmpty>결과 없음</CommandEmpty>
