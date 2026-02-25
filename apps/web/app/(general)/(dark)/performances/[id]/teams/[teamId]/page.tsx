@@ -173,7 +173,7 @@ const TeamDetail = () => {
 
           {/* 팀 참여 신청 */}
           <SessionSetCard
-            header="세션 지원"
+            header="참여 신청"
             className="col-span-2 bg-white shadow-md"
           >
             <ul className="mb-6 w-full pt-[12px] text-sm font-normal leading-6 text-gray-600 md:w-[537px] md:pt-[16px]">
@@ -214,8 +214,8 @@ const TeamDetail = () => {
 
             {/* 지원하기 버튼 */}
             {selectedSessions.length > 0 && (
-              <Button variant="outline" className="mt-6 w-full" onClick={onSubmit}>
-                선택한 세션에 지원하기 ({selectedSessions.length}개)
+              <Button className="mt-6 w-full" onClick={onSubmit}>
+                지원하기
               </Button>
             )}
 
