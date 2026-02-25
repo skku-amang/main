@@ -13,7 +13,7 @@ async function bootstrap() {
   const httpAdapterHost = app.get(HttpAdapterHost)
   app.enableCors({
     origin: [
-      "http://localhost:3000",
+      /^http:\/\/localhost:\d+$/,
       "https://amang.json-server.win",
       "https://amang-staging.json-server.win",
       /\.vercel\.app$/
