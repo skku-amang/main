@@ -1,256 +1,38 @@
-"use client"
+import type { Metadata } from "next"
 
-import { useSession } from "next-auth/react"
-import { useParams, useRouter } from "next/navigation"
+import { SEO } from "@/constants/seo"
+import { apiClient } from "@/lib/apiClient"
 
-import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
-import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
-import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
-import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
-import PosterImage from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/PosterImage"
-import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
-import TeamDetailSkeleton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/TeamDetailSkeleton"
-import NotFoundPage from "@/app/_(errors)/NotFound"
-import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
-import SessionBadge from "@/components/TeamBadges/SessionBadge"
-import { Button } from "@/components/ui/button"
-import ROUTES from "@/constants/routes"
-import { getSessionDisplayName } from "@/constants/session"
-import { useTeam } from "@/hooks/api/useTeam"
-import { useTeamPermission } from "@/hooks/useTeamPermission"
-import { getMissingIndices } from "@/lib/team/teamSession"
-import YoutubePlayer from "@/lib/youtube/Player"
-import useTeamApplication from "./_hooks/useTeamApplication"
+import TeamDetailClient from "./_components/TeamDetailClient"
 
-const TeamDetail = () => {
-  const params = useParams()
-  const session = useSession()
-  const router = useRouter()
+type Props = { params: Promise<{ id: string; teamId: string }> }
 
-  const performanceId = Number(params.id)
-  const id = Number(params.teamId)
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id, teamId } = await params
+  try {
+    const team = await apiClient.getTeamById(Number(teamId))
+    const title = `${team.songArtist} - ${team.songName}`
+    const description = `${team.name} | ${team.songArtist} - ${team.songName}`
 
-  const { data: team, isLoading, isError } = useTeam(id)
-  const { canEdit } = useTeamPermission(team)
-  const {
-    selectedSessions,
-    isSelected,
-    onAppendSession,
-    onRemoveSession,
-    onSubmit
-  } = useTeamApplication(id)
-
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
-
-  if (isLoading) {
-    return <TeamDetailSkeleton performanceId={performanceId} />
-  } else if (isError) {
-    return <div>Error</div>
-  } else if (!team) {
-    return <NotFoundPage />
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: `/performances/${id}/teams/${teamId}`
+      },
+      openGraph: {
+        title: `${title} | AMANG`,
+        description,
+        images: team.posterImage
+          ? [{ url: team.posterImage, alt: title }]
+          : [{ url: SEO.DEFAULT_OG_IMAGE, alt: SEO.SITE_NAME }]
+      }
+    }
+  } catch {
+    return { title: "팀 정보" }
   }
-
-  return (
-    <div className="container flex w-full flex-col items-center px-0 pb-10 pt-2 md:pt-0">
-      {/* 기울어진 배경 - 슬레이트 */}
-      <div
-        className="absolute left-0 top-0 z-0 h-[283px] w-full bg-slate-300 md:h-[600px]"
-        style={{ clipPath: "polygon(0 0%, 80% 0, 180% 65%, 0% 100%)" }}
-      />
-
-      {/* 기울어진 배경 - 프라이머리 */}
-      <div
-        className="absolute left-0 top-0 h-[283px] w-full bg-primary md:h-[600px]"
-        style={{ clipPath: "polygon(0 0, 100% 0, 100% 60%, 0% 100%)" }}
-      />
-
-      {/* 페이지 헤더 */}
-      <OleoPageHeader
-        title="Join Your Team"
-        goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-        className="relative mb-1 md:mb-[78px] md:mt-[78px] md:w-[1152px]"
-      />
-
-      {/* 유튜브 임베드 */}
-      <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
-        {team.songYoutubeVideoUrl && (
-          <YoutubePlayer
-            videoUrl={team.songYoutubeVideoUrl}
-            className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
-          />
-        )}
-      </div>
-
-      {/*수정 및 삭제 (모바일)*/}
-      {canEdit && (
-        <div className="relative z-10 block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-          <DeleteEditButton performanceId={performanceId} team={team} />
-        </div>
-      )}
-
-      <div className="relative z-10 flex w-full gap-5 max-md:flex-col max-md:items-center md:flex md:w-[1152px] md:gap-[24px]">
-        {/* 기본 정보 및 포스터*/}
-        <div className="flex w-[93%] flex-col gap-y-5 md:w-[466px] md:shrink-0 md:gap-y-[24px]">
-          <BasicInfo team={team} canEdit={canEdit} />
-          {team.posterImage && <PosterImage src={team.posterImage} />}
-        </div>
-
-        {/* 세션 구성 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
-          {/* 세션 구성 */}
-          {team.teamSessions && team.teamSessions.length > 0 && (
-            <SessionSetCard
-              header="세션구성"
-              className="h-fit bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
-            >
-              <div className="mt-[20px] flex flex-wrap gap-[10px] md:mt-[40px]">
-                {team.teamSessions.map((ts) => {
-                  // capacity만큼의 슬롯을 모두 표시 (1부터 capacity까지)
-                  return Array.from(
-                    { length: ts.capacity },
-                    (_, i) => i + 1
-                  ).map((index) => {
-                    const sessionWithIndex = `${getSessionDisplayName(ts.session.name)}${index}`
-                    return (
-                      <SessionBadge
-                        key={`${ts.session.id}-${index}`}
-                        session={sessionWithIndex}
-                        size="large"
-                      />
-                    )
-                  })
-                })}
-              </div>
-            </SessionSetCard>
-          )}
-
-          {/* 마감된 세션 */}
-          <SessionSetCard
-            header="마감된 세션"
-            className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
-          >
-            <div className="mt-1 hidden text-sm font-medium leading-normal text-slate-500 md:flex">
-              <div className="flex h-[48px] w-[160px] items-center pl-4">
-                Session
-              </div>
-              <div className="flex h-[48px] w-[466px] items-center pl-4">
-                Member
-              </div>
-            </div>
-            <div className="mt-1 grid grid-cols-1 divide-y divide-slate-200 md:mt-0 md:border-y md:border-slate-200">
-              {team.teamSessions?.map((ts) =>
-                ts.members.map((member) => (
-                  <MemberSessionCard
-                    key={`${ts.session.id}-${member.index}`}
-                    teamId={id}
-                    sessionId={ts.session.id}
-                    sessionName={ts.session.name}
-                    sessionIndex={member.index}
-                    user={member.user}
-                    onUnapplySuccess={() => {}}
-                  />
-                ))
-              )}
-              {team.teamSessions?.every((ts) => ts.members.length === 0) && (
-                <div className="py-4 text-center text-sm text-gray-400">
-                  아직 참여한 멤버가 없습니다.
-                </div>
-              )}
-            </div>
-          </SessionSetCard>
-
-          {/* 팀 참여 신청 */}
-          <SessionSetCard
-            header={
-              <>
-                <span className="md:hidden">참여 신청</span>
-                <span className="hidden md:inline">세션 지원</span>
-              </>
-            }
-            className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
-          >
-            <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
-              <li className="mb-1 md:mb-[10px]">
-                ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
-                선착순으로 마감됩니다
-              </li>
-              <li>
-                <span className="md:hidden">
-                  ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
-                  취소할 수 있습니다
-                </span>
-                <span className="hidden md:inline">
-                  ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수 있습니다
-                </span>
-              </li>
-            </ul>
-
-            {/* 빈 자리 세션 버튼들 */}
-            <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
-              {team.teamSessions?.map((ts) => {
-                const missingIndices = getMissingIndices(ts)
-                return missingIndices.map((index) => {
-                  const selected = isSelected(ts.session.id, index)
-                  return (
-                    <ApplyButton
-                      key={`apply-${ts.session.id}-${index}`}
-                      sessionName={ts.session.name}
-                      sessionIndex={index}
-                      isSelected={selected}
-                      onToggle={() => {
-                        if (selected) {
-                          onRemoveSession(ts.session.id, index)
-                        } else {
-                          onAppendSession(ts.session.id, index)
-                        }
-                      }}
-                    />
-                  )
-                })
-              })}
-            </div>
-
-            {/* 지원하기 버튼 (모바일) */}
-            {selectedSessions.length > 0 && (
-              <Button
-                shape="round"
-                className="mt-6 w-full md:hidden"
-                onClick={onSubmit}
-              >
-                지원하기
-              </Button>
-            )}
-
-            {team.teamSessions?.every(
-              (ts) => getMissingIndices(ts).length === 0
-            ) && (
-              <div className="py-4 text-center text-sm text-gray-400">
-                모든 세션이 마감되었습니다.
-              </div>
-            )}
-
-            {/* 지원하기 버튼 (데스크탑) - 카드 안쪽 하단 우측 */}
-            {selectedSessions.length > 0 && (
-              <>
-                <div className="my-4 hidden h-px w-full bg-slate-200 md:block" />
-                <div className="hidden justify-end md:flex">
-                  <Button
-                    variant="outlinePrimary"
-                    shape="round"
-                    className="w-[120px] gap-2"
-                    onClick={onSubmit}
-                  >
-                    지원하기
-                    <span aria-hidden="true">&gt;</span>
-                  </Button>
-                </div>
-              </>
-            )}
-          </SessionSetCard>
-        </div>
-      </div>
-    </div>
-  )
 }
 
-export default TeamDetail
+export default function TeamDetailPage() {
+  return <TeamDetailClient />
+}
