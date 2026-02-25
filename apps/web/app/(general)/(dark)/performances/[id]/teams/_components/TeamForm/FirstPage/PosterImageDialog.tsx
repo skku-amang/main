@@ -76,7 +76,8 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
   }
 
   function handleBrowseClick(): void {
-    inputRef.current?.click()
+    // setTimeout to escape Radix Dialog's focus trap
+    setTimeout(() => inputRef.current?.click(), 0)
   }
 
   return (
