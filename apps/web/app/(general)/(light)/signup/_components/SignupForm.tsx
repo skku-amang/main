@@ -272,7 +272,7 @@ const SignupForm = () => {
                   세션
                 </SimpleLabel>
                 <FormDescription>
-                  연주 가능한 세션을 선택해주세요.
+                  자신의 세션을 선택해주세요(중복체크가능)
                 </FormDescription>
               </div>
               {sessionsStatus !== "success" ? (
@@ -316,7 +316,21 @@ const SignupForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">회원가입</Button>
+        <div className="flex justify-center gap-4 pt-8">
+          <Button
+            type="button"
+            className="h-11 w-36 rounded-full bg-slate-200 font-semibold text-slate-600 hover:bg-slate-300"
+            onClick={() => router.back()}
+          >
+            취소하기
+          </Button>
+          <Button
+            type="submit"
+            className="h-11 w-36 rounded-full bg-[#023664] font-semibold text-white hover:bg-[#012a50]"
+          >
+            회원가입
+          </Button>
+        </div>
       </form>
     </Form>
   )

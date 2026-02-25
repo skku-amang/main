@@ -20,14 +20,14 @@ function SessionGuard({ children }: { children: React.ReactNode }) {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
-      <SessionGuard>
-        <NuqsAdapter>
+    <NuqsAdapter>
+      <SessionProvider>
+        <SessionGuard>
           <ApiClientProvider>
             <ReactQueryProvider>{children}</ReactQueryProvider>
           </ApiClientProvider>
-        </NuqsAdapter>
-      </SessionGuard>
-    </SessionProvider>
+        </SessionGuard>
+      </SessionProvider>
+    </NuqsAdapter>
   )
 }
