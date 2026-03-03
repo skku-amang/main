@@ -54,6 +54,18 @@ export class UsersService {
     return users
   }
 
+  async findOne(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: publicUserSelector
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    return user
+  }
+
   async updateRefreshToken(userId: number, refreshToken: string | null) {
     const hashedRefreshToken = refreshToken
       ? await bcrypt.hash(refreshToken, 10)
@@ -91,11 +103,12 @@ export class UsersService {
       updateData.sessions = { set: sessionIds.map((id) => ({ id })) }
 
     try {
-      await this.prisma.user.update({
+      return await this.prisma.user.update({
         where: {
           id: userId
         },
-        data: updateData
+        data: updateData,
+        select: publicUserSelector
       })
     } catch (error) {
       if (

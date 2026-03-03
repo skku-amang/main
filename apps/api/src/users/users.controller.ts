@@ -26,6 +26,12 @@ export class UsersController {
     return this.userService.findAll()
   }
 
+  @Get(":id")
+  @Public()
+  async findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.userService.findOne(id)
+  }
+
   @Post()
   @UseGuards(AdminGuard)
   async create(@Body() createUserDto: CreateUserDto) {
