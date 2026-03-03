@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common"
-import { ConflictError } from "@repo/api-client"
+import { ConflictError, NotFoundError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector } from "@repo/shared-types"
+import { UpdateUserDto } from "./dto/update-user.dto"
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -61,6 +62,55 @@ export class UsersService {
       where: { id: userId },
       data: { hashedRefreshToken: hashedRefreshToken }
     })
+  }
+
+  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
+    const userExists = await this.prisma.user.count({
+      where: { id: userId }
+    })
+
+    if (!userExists)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    const {
+      sessions: sessionIds,
+      generationId,
+      password,
+      ...restOfDto
+    } = updateUserDto
+
+    const updateData: Prisma.UserUpdateInput = {
+      ...restOfDto
+    }
+
+    if (password) updateData.password = await bcrypt.hash(password, 10)
+
+    if (generationId) updateData.generation = { connect: { id: generationId } }
+
+    if (sessionIds !== undefined)
+      updateData.sessions = { set: sessionIds.map((id) => ({ id })) }
+
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: updateData
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const target = (error.meta?.target as string[]) || []
+        if (target.includes("email"))
+          throw new ConflictError("이미 사용중인 이메일입니다.")
+        if (target.includes("nickname"))
+          throw new ConflictError("이미 사용중인 닉네임입니다.")
+      }
+
+      throw error
+    }
   }
 
   async findOneByEmail(email: string) {
