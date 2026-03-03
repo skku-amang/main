@@ -32,6 +32,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const email = `admin${userNumber}@g.skku.edu`
     const generation = getRandomItem(generations)
     const session = getRandomItem(sessions)
+    const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
     return prisma.user.create({
       data: {
@@ -40,6 +41,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
         name: nickname,
         nickname: nickname,
         bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+        image,
         isAdmin: true,
         generation: {
           connect: {
@@ -66,6 +68,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const email = `user${userNumber}@g.skku.edu`
     const generation = getRandomItem(generations)
     const session = getRandomItem(sessions)
+    const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
     return prisma.user.create({
       data: {
@@ -74,6 +77,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
         name: nickname,
         nickname: nickname,
         bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+        image,
         isAdmin: false,
         generation: {
           connect: {
