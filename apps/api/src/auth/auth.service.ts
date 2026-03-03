@@ -68,26 +68,31 @@ export class AuthService {
       name,
       isAdmin
     }
-    const accessTokenExpiresIn = this.configService.get<string>(
-      "ACCESS_TOKEN_EXPIRES_IN"
-    )!
+
+    const accessTokenExpiresIn = parseInt(
+      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN")!,
+      10
+    )
+    const refreshTokenExpiresIn = parseInt(
+      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN")!,
+      10
+    )
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: accessTokenExpiresIn as JwtSignOptions["expiresIn"]
+        expiresIn: accessTokenExpiresIn
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
-        expiresIn: this.configService.get<string>(
-          "REFRESH_TOKEN_EXPIRES_IN"
-        ) as JwtSignOptions["expiresIn"]
+        expiresIn: refreshTokenExpiresIn
       })
     ])
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: parseInt(accessTokenExpiresIn)
+      expiresIn: accessTokenExpiresIn
     }
   }
 
