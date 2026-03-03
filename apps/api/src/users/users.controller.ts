@@ -6,7 +6,8 @@ import {
   Body,
   UseGuards,
   Param,
-  ParseIntPipe
+  ParseIntPipe,
+  Delete
 } from "@nestjs/common"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { UsersService } from "./users.service"
@@ -45,5 +46,11 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto
   ) {
     return this.userService.updateUser(id, updateUserDto)
+  }
+
+  @Delete(":id")
+  @UseGuards(AdminGuard)
+  async deleteUser(@Param("id", ParseIntPipe) id: number) {
+    return this.userService.deleteUser(id)
   }
 }

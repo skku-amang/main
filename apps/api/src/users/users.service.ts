@@ -126,6 +126,23 @@ export class UsersService {
     }
   }
 
+  async deleteUser(userId: number) {
+    try {
+      await this.prisma.user.delete({ where: { id: userId } })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2025")
+          throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+        if (error.code === "P2003")
+          throw new ConflictError(
+            "팀의 리더를 맡고 있는 사용자는 삭제할 수 없습니다. 먼저 팀 리더를 변경해주세요."
+          )
+      }
+      throw error
+    }
+  }
+
   async findOneByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } })
   }
