@@ -27,6 +27,7 @@ import {
   UpdateGeneration,
   UpdatePerformance,
   UpdateRental,
+  UpdateUser,
   RentalDetail,
   RentalList,
   UpdateSession,
@@ -810,11 +811,11 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public createUser() {
+  public createUser(userData: CreateUser) {
     return this._request<
       publicUser,
       ValidationError | ForbiddenError | InternalServerError
-    >(`/users`, "POST")
+    >(`/users`, "POST", userData)
   }
 
   /**
@@ -825,11 +826,11 @@ export default class ApiClient {
    * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public updateUser(id: number) {
+  public updateUser(id: number, userData: UpdateUser) {
     return this._request<
       publicUser,
       ValidationError | ForbiddenError | InternalServerError
-    >(`/users/${id}`, "PATCH")
+    >(`/users/${id}`, "PATCH", userData)
   }
 
   /**
