@@ -7,6 +7,8 @@ import {
   CreateSession,
   CreateTeam,
   CreateUser,
+  DetailedUser,
+  DetailedUserList,
   Equipment,
   EquipmentWithRentalLog,
   GenerationDetail,
@@ -793,6 +795,18 @@ export default class ApiClient {
   }
 
   /**
+   * 유저 목록 조회 (기존 유저 목록 조회 API 보다 상세한 정보를 포함하여 반환합니다.)
+   * @throws {ForbiddenError} 전체 유저 확인 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getUsersForAdmin() {
+    return this._request<DetailedUserList, InternalServerError>(
+      `/users/admin`,
+      "GET"
+    )
+  }
+
+  /**
    * 특정 유저 조회
    * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
    * @throws {InternalServerError} 서버 오류 발생 시
@@ -813,7 +827,7 @@ export default class ApiClient {
    */
   public createUser(userData: CreateUser) {
     return this._request<
-      publicUser,
+      DetailedUser,
       ValidationError | ForbiddenError | InternalServerError
     >(`/users`, "POST", userData)
   }
@@ -828,7 +842,7 @@ export default class ApiClient {
    */
   public updateUser(id: number, userData: UpdateUser) {
     return this._request<
-      publicUser,
+      DetailedUser,
       ValidationError | ForbiddenError | InternalServerError
     >(`/users/${id}`, "PATCH", userData)
   }
