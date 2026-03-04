@@ -113,7 +113,7 @@ export class UsersService {
           id: userId
         },
         data: updateData,
-        select: publicUserSelector
+        select: detailedUserSelector
       })
     } catch (error) {
       if (
