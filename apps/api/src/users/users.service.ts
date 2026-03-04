@@ -4,7 +4,7 @@ import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
-import { publicUserSelector, userForAdminSelector } from "@repo/shared-types"
+import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { UpdateUserDto } from "./dto/update-user.dto"
 @Injectable()
 export class UsersService {
@@ -26,7 +26,7 @@ export class UsersService {
             connect: sessionIds.map((id) => ({ id }))
           }
         },
-        select: userForAdminSelector
+        select: detailedUserSelector
       })
 
       return user
@@ -150,7 +150,7 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { email },
       select: {
-        ...userForAdminSelector,
+        ...detailedUserSelector,
         password: true
       }
     })
