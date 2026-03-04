@@ -53,6 +53,12 @@ export class UsersService {
     return users
   }
 
+  async findAllForAdmin() {
+    return this.prisma.user.findMany({
+      select: detailedUserSelector
+    })
+  }
+
   async findOne(userId: number) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

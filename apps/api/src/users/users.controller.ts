@@ -27,6 +27,12 @@ export class UsersController {
     return this.userService.findAll()
   }
 
+  @Get("admin")
+  @UseGuards(AdminGuard)
+  findAllForAdmin() {
+    return this.userService.findAllForAdmin()
+  }
+
   @Get(":id")
   @Public()
   async findOne(@Param("id", ParseIntPipe) id: number) {
