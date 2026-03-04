@@ -18,7 +18,7 @@ export const publicUserSelector = {
   }
 } satisfies Prisma.UserSelect
 
-export const fullUserSelector = {
+export const userForAdminSelector = {
   ...publicUserSelector,
   isAdmin: true,
   email: true
@@ -29,7 +29,7 @@ export type publicUser = Prisma.UserGetPayload<{
 }>
 export type publicUserList = publicUser[]
 
-export type fullUser = Prisma.UserGetPayload<{
-  select: typeof fullUserSelector
+export type userForAdmin = Prisma.UserGetPayload<{
+  select: typeof userForAdminSelector
 }>
-export type fullUserList = fullUser[]
+export type userListForAdmin = userForAdmin[]
