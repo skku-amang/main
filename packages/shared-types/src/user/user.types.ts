@@ -13,12 +13,14 @@ export const publicUserSelector = {
   ...basicUserSelector,
   nickname: true,
   bio: true,
+  isAdmin: true,
+  email: true,
   sessions: {
     select: { id: true, name: true }
   }
 } satisfies Prisma.UserSelect
 
-type publicUser = Prisma.UserGetPayload<{
+export type publicUser = Prisma.UserGetPayload<{
   select: typeof publicUserSelector
 }>
 
