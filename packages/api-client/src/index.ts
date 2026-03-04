@@ -31,6 +31,7 @@ import {
   RentalList,
   UpdateSession,
   UpdateTeam,
+  publicUser,
   publicUserList,
   PresignedUrlRequest,
   PresignedUrlResponse
@@ -784,14 +785,35 @@ export default class ApiClient {
 
   /**
    * 유저 목록 조회
-   * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUsers() {
+    return this._request<publicUserList, InternalServerError>(`/users`, "GET")
+  }
+
+  /**
+   * 특정 유저 조회
+   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getUserById(id: number) {
+    return this._request<publicUser, NotFoundError | InternalServerError>(
+      `/users/${id}`,
+      "GET"
+    )
+  }
+
+  /**
+   * 유저 생성 (관리자용 API)
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ForbiddenError} 유저 생성 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public createUser() {
     return this._request<
-      publicUserList,
-      AuthError | ForbiddenError | InternalServerError
-    >(`/users`, "GET")
+      publicUser,
+      ValidationError | ForbiddenError | InternalServerError
+    >(`/users`, "POST")
   }
 
   /**
