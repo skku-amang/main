@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { JwtService, JwtSignOptions } from "@nestjs/jwt"
+import { JwtService } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
@@ -24,9 +24,7 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { hashedRefreshToken, ...userResponse } = user
-    return { ...tokens, user: userResponse }
+    return { ...tokens, user }
   }
 
   async login(loginDto: LoginUserDto) {

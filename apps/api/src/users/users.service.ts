@@ -25,12 +25,11 @@ export class UsersService {
           sessions: {
             connect: sessionIds.map((id) => ({ id }))
           }
-        }
+        },
+        select: publicUserSelector
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user
-      return result
+      return user
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
