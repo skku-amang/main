@@ -7,8 +7,6 @@ import {
   CreateSession,
   CreateTeam,
   CreateUser,
-  DetailedUser,
-  DetailedUserList,
   Equipment,
   EquipmentWithRentalLog,
   GenerationDetail,
@@ -29,12 +27,10 @@ import {
   UpdateGeneration,
   UpdatePerformance,
   UpdateRental,
-  UpdateUser,
   RentalDetail,
   RentalList,
   UpdateSession,
   UpdateTeam,
-  publicUser,
   publicUserList,
   PresignedUrlRequest,
   PresignedUrlResponse
@@ -788,82 +784,14 @@ export default class ApiClient {
 
   /**
    * 유저 목록 조회
+   * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUsers() {
-    return this._request<publicUserList, InternalServerError>(`/users`, "GET")
-  }
-
-  /**
-   * 유저 목록 조회 (기존 유저 목록 조회 API 보다 상세한 정보를 포함하여 반환합니다.)
-   * @throws {ForbiddenError} 전체 유저 확인 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public getUsersForAdmin() {
-    return this._request<DetailedUserList, InternalServerError>(
-      `/users/admin`,
-      "GET"
-    )
-  }
-
-  /**
-   * 특정 유저 조회
-   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public getUserById(id: number) {
-    return this._request<publicUser, NotFoundError | InternalServerError>(
-      `/users/${id}`,
-      "GET"
-    )
-  }
-
-  /**
-   * 유저 생성 (관리자용 API)
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {ForbiddenError} 유저 생성 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
-   * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public createUser(userData: CreateUser) {
     return this._request<
-      DetailedUser,
-      ValidationError | ForbiddenError | InternalServerError
-    >(`/users`, "POST", userData)
-  }
-
-  /**
-   * 유저 업데이트 (관리자용 API)
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
-   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
-   * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public updateUser(id: number, userData: UpdateUser) {
-    return this._request<
-      DetailedUser,
-      ValidationError | ForbiddenError | InternalServerError
-    >(`/users/${id}`, "PATCH", userData)
-  }
-
-  /**
-   * 유저 삭제 (관리자용 API)
-   * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
-   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
-   * @throws {ConflictError} 팀에서 리더를 맡고 있는 사용자를 삭제하려고 할 때 발생합니다.
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public deleteUser(id: number) {
-    return this._request<
-      null,
-      | ValidationError
-      | ForbiddenError
-      | NotFoundError
-      | ConflictError
-      | InternalServerError
-    >(`/users/${id}`, "DELETE")
+      publicUserList,
+      AuthError | ForbiddenError | InternalServerError
+    >(`/users`, "GET")
   }
 
   /**

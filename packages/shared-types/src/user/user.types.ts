@@ -18,18 +18,8 @@ export const publicUserSelector = {
   }
 } satisfies Prisma.UserSelect
 
-export const detailedUserSelector = {
-  ...publicUserSelector,
-  isAdmin: true,
-  email: true
-} satisfies Prisma.UserSelect
-
-export type publicUser = Prisma.UserGetPayload<{
+type publicUser = Prisma.UserGetPayload<{
   select: typeof publicUserSelector
 }>
-export type publicUserList = publicUser[]
 
-export type DetailedUser = Prisma.UserGetPayload<{
-  select: typeof detailedUserSelector
-}>
-export type DetailedUserList = DetailedUser[]
+export type publicUserList = publicUser[]
