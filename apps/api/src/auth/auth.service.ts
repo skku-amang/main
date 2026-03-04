@@ -68,11 +68,11 @@ export class AuthService {
     }
 
     const accessTokenExpiresIn = parseInt(
-      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN")!,
+      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN_SECONDS")!,
       10
     )
     const refreshTokenExpiresIn = parseInt(
-      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN")!,
+      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN_SECONDS")!,
       10
     )
 
