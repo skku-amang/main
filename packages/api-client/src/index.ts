@@ -807,6 +807,7 @@ export default class ApiClient {
    * 유저 생성 (관리자용 API)
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {ForbiddenError} 유저 생성 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
+   * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public createUser() {
@@ -814,6 +815,40 @@ export default class ApiClient {
       publicUser,
       ValidationError | ForbiddenError | InternalServerError
     >(`/users`, "POST")
+  }
+
+  /**
+   * 유저 업데이트 (관리자용 API)
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
+   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
+   * @throws {ConflictError} 이미 사용중인 이메일, 닉네임을 입력했을 때 발생합니다.
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateUser(id: number) {
+    return this._request<
+      publicUser,
+      ValidationError | ForbiddenError | InternalServerError
+    >(`/users/${id}`, "PATCH")
+  }
+
+  /**
+   * 유저 삭제 (관리자용 API)
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ForbiddenError} 유저 수정 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
+   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
+   * @throws {ConflictError} 팀에서 리더를 맡고 있는 사용자를 삭제하려고 할 때 발생합니다.
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public deleteUser(id: number) {
+    return this._request<
+      null,
+      | ValidationError
+      | ForbiddenError
+      | NotFoundError
+      | ConflictError
+      | InternalServerError
+    >(`/users/${id}`, "DELETE")
   }
 
   /**
