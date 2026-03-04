@@ -13,8 +13,6 @@ export const publicUserSelector = {
   ...basicUserSelector,
   nickname: true,
   bio: true,
-  isAdmin: true,
-  email: true,
   sessions: {
     select: { id: true, name: true }
   }
