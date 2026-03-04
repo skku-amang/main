@@ -46,7 +46,7 @@ export class AuthService {
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, hashedRefreshToken, ...userResponse } = user
+    const { password, ...userResponse } = user
     return { ...tokens, user: userResponse }
   }
 
