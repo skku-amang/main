@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { JwtService, JwtSignOptions } from "@nestjs/jwt"
+import { JwtService } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
@@ -24,9 +24,7 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { hashedRefreshToken, ...userResponse } = user
-    return { ...tokens, user: userResponse }
+    return { ...tokens, user }
   }
 
   async login(loginDto: LoginUserDto) {
@@ -48,7 +46,7 @@ export class AuthService {
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, hashedRefreshToken, ...userResponse } = user
+    const { password, ...userResponse } = user
     return { ...tokens, user: userResponse }
   }
 
@@ -68,26 +66,31 @@ export class AuthService {
       name,
       isAdmin
     }
-    const accessTokenExpiresIn = this.configService.get<string>(
-      "ACCESS_TOKEN_EXPIRES_IN"
-    )!
+
+    const accessTokenExpiresIn = parseInt(
+      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN_SECONDS")!,
+      10
+    )
+    const refreshTokenExpiresIn = parseInt(
+      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN_SECONDS")!,
+      10
+    )
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: accessTokenExpiresIn as JwtSignOptions["expiresIn"]
+        expiresIn: accessTokenExpiresIn
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
-        expiresIn: this.configService.get<string>(
-          "REFRESH_TOKEN_EXPIRES_IN"
-        ) as JwtSignOptions["expiresIn"]
+        expiresIn: refreshTokenExpiresIn
       })
     ])
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: parseInt(accessTokenExpiresIn)
+      expiresIn: accessTokenExpiresIn
     }
   }
 

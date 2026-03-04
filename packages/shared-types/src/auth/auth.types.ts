@@ -1,6 +1,4 @@
-import { User } from "@repo/database"
-
-type AuthUser = Omit<User, "password" | "hashedRefreshToken">
+import { DetailedUser } from "../user/user.types"
 
 /**
  * 인증 응답(RFC 6749 기준)
@@ -11,7 +9,7 @@ export type AuthResponse = {
   accessToken: string
   refreshToken: string
   expiresIn: number
-  user: AuthUser // 비표준, 편의를 위해 추가된 필드
+  user: DetailedUser // 비표준, 편의를 위해 추가된 필드
 }
 
 export type RefreshTokenResponse = {
