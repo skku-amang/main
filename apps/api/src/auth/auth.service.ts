@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { JwtService } from "@nestjs/jwt"
+import { JwtService, JwtSignOptions } from "@nestjs/jwt"
 import { AuthError, ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
@@ -24,7 +24,9 @@ export class AuthService {
       user.isAdmin
     )
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedRefreshToken, ...userResponse } = user
+    return { ...tokens, user: userResponse }
   }
 
   async login(loginDto: LoginUserDto) {
@@ -46,7 +48,7 @@ export class AuthService {
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userResponse } = user
+    const { password, hashedRefreshToken, ...userResponse } = user
     return { ...tokens, user: userResponse }
   }
 
@@ -66,31 +68,26 @@ export class AuthService {
       name,
       isAdmin
     }
-
-    const accessTokenExpiresIn = parseInt(
-      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN_SECONDS")!,
-      10
-    )
-    const refreshTokenExpiresIn = parseInt(
-      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN_SECONDS")!,
-      10
-    )
-
+    const accessTokenExpiresIn = this.configService.get<string>(
+      "ACCESS_TOKEN_EXPIRES_IN"
+    )!
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
-        expiresIn: accessTokenExpiresIn
+        expiresIn: accessTokenExpiresIn as JwtSignOptions["expiresIn"]
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
-        expiresIn: refreshTokenExpiresIn
+        expiresIn: this.configService.get<string>(
+          "REFRESH_TOKEN_EXPIRES_IN"
+        ) as JwtSignOptions["expiresIn"]
       })
     ])
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: accessTokenExpiresIn
+      expiresIn: parseInt(accessTokenExpiresIn)
     }
   }
 
