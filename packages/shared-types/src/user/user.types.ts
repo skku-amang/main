@@ -29,7 +29,7 @@ export type publicUser = Prisma.UserGetPayload<{
 }>
 export type publicUserList = publicUser[]
 
-export type userForAdmin = Prisma.UserGetPayload<{
+export type UserForAdmin = Prisma.UserGetPayload<{
   select: typeof userForAdminSelector
 }>
-export type userListForAdmin = userForAdmin[]
+export type UserListForAdmin = UserForAdmin[]
