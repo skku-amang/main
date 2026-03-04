@@ -12,7 +12,7 @@ import {
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { UsersService } from "./users.service"
 import { Public } from "../auth/decorators/public.decorator"
-import { AdminGuard } from "src/auth/guards/admin.guard"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { UpdateUserDto } from "./dto/update-user.dto"
 
