@@ -133,10 +133,14 @@ export class UsersService {
         if (error.code === "P2025")
           throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
-        if (error.code === "P2003")
-          throw new ConflictError(
-            "팀의 리더를 맡고 있는 사용자는 삭제할 수 없습니다. 먼저 팀 리더를 변경해주세요."
-          )
+        if (error.code === "P2003") {
+          const constraint = error.meta?.constraint as string
+
+          if (constraint === "teams_leaderId_fkey")
+            throw new ConflictError(
+              "팀의 리더를 맡고 있는 사용자는 삭제할 수 없습니다. 먼저 팀 리더를 변경해주세요."
+            )
+        }
       }
       throw error
     }
