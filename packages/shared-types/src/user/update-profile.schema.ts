@@ -9,7 +9,8 @@ export const UpdateProfileSchema = z.object({
     .optional(),
   sessions: z
     .array(z.number().int({ message: "세션 ID는 정수여야 합니다." }))
-    .min(1, { message: "최소 하나의 세션을 선택해야 합니다." }),
+    .min(1, { message: "최소 하나의 세션을 선택해야 합니다." })
+    .optional(),
   image: z
     .string()
     .url({ message: "유효한 이미지 주소(URL)를 입력해 주세요." })
