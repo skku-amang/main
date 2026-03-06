@@ -13,15 +13,17 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { sessions: sessionIds, ...restOfDto } = createUserDto
-    const hashedPassword = await bcrypt.hash(restOfDto.password, 10)
+    const { sessions: sessionIds, ...userData } = createUserDto
+    const hashedPassword = await bcrypt.hash(userData.password, 10)
 
-    const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(restOfDto.email)}`
+    let image = userData.image
+    if (!image)
+      image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(userData.email)}`
 
     try {
       const user = await this.prisma.user.create({
         data: {
-          ...restOfDto,
+          ...userData,
           password: hashedPassword,
           image,
           sessions: {
