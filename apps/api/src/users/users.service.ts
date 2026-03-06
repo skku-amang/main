@@ -7,6 +7,7 @@ import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { UpdateUserDto } from "./dto/update-user.dto"
 import { UpdatePasswordDto } from "./dto/update-password.dto"
+import { UpdateProfileDto } from "./dto/update-profile.dto"
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -124,6 +125,45 @@ export class UsersService {
         const target = (error.meta?.target as string[]) || []
         if (target.includes("email"))
           throw new ConflictError("이미 사용중인 이메일입니다.")
+        if (target.includes("nickname"))
+          throw new ConflictError("이미 사용중인 닉네임입니다.")
+      }
+
+      throw error
+    }
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.user.count({
+      where: { id: userId }
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    const { sessions: sessionIds, ...userData } = updateProfileDto
+
+    const updateData: Prisma.UserUpdateInput = {
+      ...userData
+    }
+
+    if (sessionIds)
+      updateData.sessions = {
+        set: sessionIds.map((id) => ({ id }))
+      }
+
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: detailedUserSelector
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const target = (error.meta?.target as string[]) || []
         if (target.includes("nickname"))
           throw new ConflictError("이미 사용중인 닉네임입니다.")
       }
