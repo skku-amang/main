@@ -7,7 +7,8 @@ import {
   UseGuards,
   Param,
   ParseIntPipe,
-  Delete
+  Delete,
+  Req
 } from "@nestjs/common"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { UsersService } from "./users.service"
@@ -15,6 +16,9 @@ import { Public } from "../auth/decorators/public.decorator"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { UpdateUserDto } from "./dto/update-user.dto"
+import { Request } from "express"
+import { JwtPayload } from "@repo/shared-types"
+import { UpdatePasswordDto } from "./dto/update-password.dto"
 
 @Controller("users")
 @UseGuards(AccessTokenGuard)
@@ -43,6 +47,17 @@ export class UsersController {
   @UseGuards(AdminGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
+  }
+
+  @Patch("me/password")
+  async updatePassword(
+    @Req() req: Request,
+    @Body() updatePasswordDto: UpdatePasswordDto
+  ) {
+    const user = req.user as JwtPayload
+    const { sub: userId } = user
+
+    return this.userService.updatePassword(userId, updatePasswordDto)
   }
 
   @Patch(":id")

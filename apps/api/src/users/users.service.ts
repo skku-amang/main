@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common"
-import { ConflictError, NotFoundError } from "@repo/api-client"
+import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { UpdateUserDto } from "./dto/update-user.dto"
+import { UpdatePasswordDto } from "./dto/update-password.dto"
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -129,6 +130,43 @@ export class UsersService {
 
       throw error
     }
+  }
+
+  async updatePassword(userId: number, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        password: true
+      }
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    const isMatch = await bcrypt.compare(
+      updatePasswordDto.currentPassword,
+      user.password
+    )
+
+    if (!isMatch)
+      throw new ValidationError("기존 비밀번호가 일치하지 않습니다.")
+
+    if (updatePasswordDto.currentPassword === updatePasswordDto.newPassword)
+      throw new ValidationError(
+        "새로운 비밀번호는 기존 비밀번호와 달라야 합니다."
+      )
+
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10)
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword
+      },
+      select: detailedUserSelector
+    })
   }
 
   async deleteUser(userId: number) {
