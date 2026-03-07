@@ -5,6 +5,7 @@ import { ArrowLeft, KeyRound, Save } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { UpdatePasswordSchema } from "@repo/shared-types"
 
 import DefaultPageHeader, {
   DefaultHomeIcon
@@ -32,16 +33,12 @@ const ProfileFormSchema = z.object({
   bio: z.string().optional()
 })
 
-const PasswordFormSchema = z
-  .object({
-    currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요"),
-    newPassword: z.string().min(6, "6자 이상 입력해주세요"),
-    confirmPassword: z.string().min(1, "비밀번호 확인을 입력해주세요")
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "비밀번호가 일치하지 않습니다",
-    path: ["confirmPassword"]
-  })
+const PasswordFormSchema = UpdatePasswordSchema.extend({
+  confirmPassword: z.string().min(1, "새 비밀번호를 다시 한번 입력해주세요.")
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "새 비밀번호가 일치하지 않습니다.",
+  path: ["confirmPassword"]
+})
 
 type ProfileFormValues = z.infer<typeof ProfileFormSchema>
 type PasswordFormValues = z.infer<typeof PasswordFormSchema>
@@ -225,7 +222,7 @@ const ProfileEditPage = () => {
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
-                    <FormDescription>6자 이상 입력해주세요.</FormDescription>
+                    <FormDescription>8자 이상 입력해주세요.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

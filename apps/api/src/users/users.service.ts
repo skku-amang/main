@@ -1,25 +1,29 @@
 import { Injectable } from "@nestjs/common"
-import { ConflictError, NotFoundError } from "@repo/api-client"
+import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { UpdateUserDto } from "./dto/update-user.dto"
+import { UpdatePasswordDto } from "./dto/update-password.dto"
+import { UpdateProfileDto } from "./dto/update-profile.dto"
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { sessions: sessionIds, ...restOfDto } = createUserDto
-    const hashedPassword = await bcrypt.hash(restOfDto.password, 10)
+    const { sessions: sessionIds, ...userData } = createUserDto
+    const hashedPassword = await bcrypt.hash(userData.password, 10)
 
-    const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(restOfDto.email)}`
+    let image = userData.image
+    if (!image)
+      image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(userData.email)}`
 
     try {
       const user = await this.prisma.user.create({
         data: {
-          ...restOfDto,
+          ...userData,
           password: hashedPassword,
           image,
           sessions: {
@@ -129,6 +133,82 @@ export class UsersService {
 
       throw error
     }
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.user.count({
+      where: { id: userId }
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    const { sessions: sessionIds, ...userData } = updateProfileDto
+
+    const updateData: Prisma.UserUpdateInput = {
+      ...userData
+    }
+
+    if (sessionIds)
+      updateData.sessions = {
+        set: sessionIds.map((id) => ({ id }))
+      }
+
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: detailedUserSelector
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const target = (error.meta?.target as string[]) || []
+        if (target.includes("nickname"))
+          throw new ConflictError("이미 사용중인 닉네임입니다.")
+      }
+
+      throw error
+    }
+  }
+
+  async updatePassword(userId: number, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        password: true
+      }
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    const isMatch = await bcrypt.compare(
+      updatePasswordDto.currentPassword,
+      user.password
+    )
+
+    if (!isMatch)
+      throw new ValidationError("기존 비밀번호가 일치하지 않습니다.")
+
+    if (updatePasswordDto.currentPassword === updatePasswordDto.newPassword)
+      throw new ValidationError(
+        "새로운 비밀번호는 기존 비밀번호와 달라야 합니다."
+      )
+
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10)
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword
+      },
+      select: detailedUserSelector
+    })
   }
 
   async deleteUser(userId: number) {
