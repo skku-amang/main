@@ -46,10 +46,7 @@ export const metadata: Metadata = {
     ]
   },
   twitter: {
-    card: "summary_large_image",
-    title: SEO.SITE_NAME,
-    description: SEO.SITE_DESCRIPTION,
-    images: [SEO.DEFAULT_OG_IMAGE]
+    card: "summary_large_image"
   },
   robots: {
     index: true,
