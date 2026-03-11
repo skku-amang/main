@@ -20,7 +20,7 @@ jobs:
           # - name: web
           #   dockerfile: apps/web/Dockerfile
           #   build-args: |
-          #     NEXT_PUBLIC_API_URL=https://amang-api.json-server.win
+          #     NEXT_PUBLIC_API_URL=https://api.amang.json-server.win
           - name: api
             dockerfile: apps/api/Dockerfile
             build-args: ""

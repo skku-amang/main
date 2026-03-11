@@ -39,7 +39,7 @@ resource "vercel_project_environment_variable" "api_url_production" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
   key        = "NEXT_PUBLIC_API_URL"
-  value      = "https://amang-api.json-server.win"
+  value      = "https://api.amang.json-server.win"
   target     = ["production"]
 }
 
@@ -47,7 +47,7 @@ resource "vercel_project_environment_variable" "api_url_preview" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
   key        = "NEXT_PUBLIC_API_URL"
-  value      = "https://amang-api-staging.json-server.win"
+  value      = "https://api.amang.staging.json-server.win"
   target     = ["preview", "development"]
 }
 
