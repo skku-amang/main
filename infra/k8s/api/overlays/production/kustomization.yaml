@@ -14,7 +14,7 @@ patches:
   - patch: |-
       - op: add
         path: /data/S3_ENDPOINT
-        value: "https://s3.json-server.win"
+        value: "https://s3.amang.json-server.win"
     target:
       kind: ConfigMap
       name: api-config

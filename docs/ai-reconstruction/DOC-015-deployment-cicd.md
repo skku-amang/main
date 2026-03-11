@@ -412,7 +412,7 @@ docker exec amang-api npx prisma migrate deploy
 | 항목     | 값                                |
 | -------- | --------------------------------- |
 | Web URL  | https://amang.vercel.app          |
-| API URL  | https://amang-api.json-server.win |
+| API URL  | https://api.amang.json-server.win |
 | Database | 클라우드 PostgreSQL               |
 
 ---
