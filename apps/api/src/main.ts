@@ -15,7 +15,7 @@ async function bootstrap() {
     origin: [
       /^http:\/\/localhost:\d+$/,
       "https://amang.json-server.win",
-      "https://amang-staging.json-server.win",
+      "https://amang.staging.json-server.win",
       /\.vercel\.app$/
     ],
     credentials: true

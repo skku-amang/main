@@ -9,10 +9,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - amang-api.json-server.win
+        - api.amang.json-server.win
       secretName: api-server-tls
   rules:
-    - host: amang-api.json-server.win
+    - host: api.amang.json-server.win
       http:
         paths:
           - path: /
