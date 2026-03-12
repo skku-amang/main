@@ -3,6 +3,7 @@ import NextAuth, { NextAuthConfig, User } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
 import { apiClient } from "@/lib/apiClient"
+import { InvalidSigninCredentialsError } from "@/lib/auth/errors"
 import {
   CreateUser,
   CreateUserSchema,
@@ -178,7 +179,7 @@ async function login({ email, password }: LoginUser) {
     } as User
   } catch (error) {
     console.error("[auth] login error:", error)
-    throw error
+    throw new InvalidSigninCredentialsError()
   }
 }
 

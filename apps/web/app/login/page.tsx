@@ -14,7 +14,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
-import { InvalidSigninErrorCode } from "@/lib/auth/errors"
+import {
+  InvalidSigninCredentialsErrorCode,
+  InvalidSigninErrorCode
+} from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
 
@@ -39,6 +42,7 @@ const Login = () => {
 
     switch (res.code) {
       case InvalidSigninErrorCode:
+      case InvalidSigninCredentialsErrorCode:
         setError("email", {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
