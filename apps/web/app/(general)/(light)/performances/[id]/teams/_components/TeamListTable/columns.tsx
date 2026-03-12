@@ -179,7 +179,9 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "requiredSessions",
     header: () => (
-      <div className="flex w-full items-center justify-start">필요세션</div>
+      <div className="flex w-full items-center justify-start font-medium">
+        필요세션
+      </div>
     ),
     cell: ({ row }) => {
       return (
@@ -218,7 +220,9 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songYoutubeVideoUrl",
     header: () => (
-      <div className="flex items-center justify-center">영상링크</div>
+      <div className="flex items-center justify-center font-medium">
+        영상링크
+      </div>
     ),
     cell: ({ row }) => <YoutubeCell row={row} />
   },
