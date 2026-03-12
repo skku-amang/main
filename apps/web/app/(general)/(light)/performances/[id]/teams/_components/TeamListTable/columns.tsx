@@ -145,7 +145,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
         {/* 곡명 */}
         <div className="flex items-center gap-x-1">
           {row.original.songName}
-          {!row.original.posterImage && (
+          {row.original.posterImage && (
             <span>
               <Image size={15} className="text-neutral-800" strokeWidth={1.5} />
             </span>
