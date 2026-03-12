@@ -12,6 +12,7 @@ import { useDeleteUser, useUpdateUser, useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { getSessionDisplayName } from "@/constants/session"
 import { publicUser } from "@repo/shared-types"
+import { ApiError } from "@repo/api-client"
 
 import { getColumns } from "./_components/columns"
 import { UserFormDialog } from "./_components/UserFormDialog"
@@ -60,7 +61,10 @@ export default function UsersAdminPage() {
       } catch (error) {
         toast({
           title: "수정에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
         throw error
@@ -103,7 +107,10 @@ export default function UsersAdminPage() {
       .catch((error) => {
         toast({
           title: "수정에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
       })
@@ -123,7 +130,10 @@ export default function UsersAdminPage() {
       .catch((error) => {
         toast({
           title: "삭제에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
       })
