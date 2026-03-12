@@ -54,6 +54,8 @@ export const seedTeam = async (prisma: PrismaClient) => {
             : `Original Artist ${teamNumber}`,
           isFreshmenFixed: getRandomBoolean(0.3),
           isSelfMade: isSelfMade,
+          // 손열음 - 라흐마니노프 피아노 협주곡 3번 3악장
+          songYoutubeVideoUrl: "https://youtu.be/l0IoPQM1HlU",
           Performance: {
             connect: {
               id: performance.id
