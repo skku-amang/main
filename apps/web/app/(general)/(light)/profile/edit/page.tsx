@@ -1,15 +1,17 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, KeyRound, Save } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { UpdatePasswordSchema } from "@repo/shared-types"
+import { UpdatePasswordSchema, UpdateProfileSchema } from "@repo/shared-types"
 
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import { useToast } from "@/components/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,12 +27,13 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
+import { useUpdatePassword, useUpdateProfile } from "@/hooks/api/useUser"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 
-const ProfileFormSchema = z.object({
-  name: z.string().min(1, "이름을 입력해주세요"),
-  nickname: z.string().min(1, "닉네임을 입력해주세요"),
-  bio: z.string().optional()
+const ProfileFormSchema = UpdateProfileSchema.pick({
+  name: true,
+  nickname: true,
+  bio: true
 })
 
 const PasswordFormSchema = UpdatePasswordSchema.extend({
@@ -55,6 +58,10 @@ const EditSkeleton = () => (
 
 const ProfileEditPage = () => {
   const { session, user, isLoading, isAuthenticated } = useCurrentUser()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
+  const updateProfileMutation = useUpdateProfile()
+  const updatePasswordMutation = useUpdatePassword()
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(ProfileFormSchema),
@@ -73,6 +80,39 @@ const ProfileEditPage = () => {
       confirmPassword: ""
     }
   })
+
+  const handleProfileSubmit = (data: ProfileFormValues) => {
+    updateProfileMutation
+      .mutateAsync([data])
+      .then(() => {
+        toast({ title: "프로필이 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["users"] })
+      })
+      .catch((error) => {
+        toast({
+          title: "프로필 수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      })
+  }
+
+  const handlePasswordSubmit = (data: PasswordFormValues) => {
+    const { confirmPassword, ...payload } = data
+    updatePasswordMutation
+      .mutateAsync([payload])
+      .then(() => {
+        toast({ title: "비밀번호가 변경되었습니다." })
+        passwordForm.reset()
+      })
+      .catch((error) => {
+        toast({
+          title: "비밀번호 변경에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      })
+  }
 
   if (isLoading) return <EditSkeleton />
 
@@ -129,7 +169,10 @@ const ProfileEditPage = () => {
           </div>
 
           <Form {...profileForm}>
-            <form className="space-y-5">
+            <form
+              onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
+              className="space-y-5"
+            >
               <FormField
                 control={profileForm.control}
                 name="name"
@@ -181,9 +224,13 @@ const ProfileEditPage = () => {
               />
 
               <div className="flex justify-end">
-                <Button type="submit" disabled className="rounded-full">
+                <Button
+                  type="submit"
+                  disabled={updateProfileMutation.isPending}
+                  className="rounded-full"
+                >
                   <Save className="mr-1.5 size-4" />
-                  저장
+                  {updateProfileMutation.isPending ? "저장 중..." : "저장"}
                 </Button>
               </div>
             </form>
@@ -198,7 +245,10 @@ const ProfileEditPage = () => {
           </h3>
 
           <Form {...passwordForm}>
-            <form className="space-y-5">
+            <form
+              onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}
+              className="space-y-5"
+            >
               <FormField
                 control={passwordForm.control}
                 name="currentPassword"
@@ -222,7 +272,9 @@ const ProfileEditPage = () => {
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
-                    <FormDescription>8자 이상 입력해주세요.</FormDescription>
+                    <FormDescription>
+                      영문, 숫자, 특수문자를 각각 1개 이상 포함한 8자 이상
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -245,12 +297,12 @@ const ProfileEditPage = () => {
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled
+                  disabled={updatePasswordMutation.isPending}
                   variant="outline"
                   className="rounded-full"
                 >
                   <KeyRound className="mr-1.5 size-4" />
-                  변경
+                  {updatePasswordMutation.isPending ? "변경 중..." : "변경"}
                 </Button>
               </div>
             </form>
