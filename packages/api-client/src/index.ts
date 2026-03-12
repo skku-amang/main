@@ -29,6 +29,8 @@ import {
   UpdateGeneration,
   UpdatePerformance,
   UpdateRental,
+  UpdatePassword,
+  UpdateProfile,
   UpdateUser,
   RentalDetail,
   RentalList,
@@ -830,6 +832,32 @@ export default class ApiClient {
       DetailedUser,
       ValidationError | ForbiddenError | InternalServerError
     >(`/users`, "POST", userData)
+  }
+
+  /**
+   * 내 프로필 수정
+   * @throws {ValidationError} 입력값이 올바르지 않은 경우
+   * @throws {ConflictError} 이미 사용중인 닉네임을 입력했을 때
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateProfile(data: UpdateProfile) {
+    return this._request<
+      DetailedUser,
+      ValidationError | ConflictError | InternalServerError
+    >(`/users/me`, "PATCH", data)
+  }
+
+  /**
+   * 비밀번호 변경
+   * @throws {ValidationError} 비밀번호 검증 실패 (형식 불일치, 기존 비밀번호 틀림, 새 비밀번호 동일)
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updatePassword(data: UpdatePassword) {
+    return this._request<DetailedUser, ValidationError | InternalServerError>(
+      `/users/me/password`,
+      "PATCH",
+      data
+    )
   }
 
   /**
