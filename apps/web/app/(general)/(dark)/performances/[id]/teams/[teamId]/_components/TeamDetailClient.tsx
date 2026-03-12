@@ -1,7 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
@@ -25,7 +25,6 @@ import useTeamApplication from "../_hooks/useTeamApplication"
 const TeamDetailClient = () => {
   const params = useParams()
   const session = useSession()
-  const router = useRouter()
 
   const performanceId = Number(params.id)
   const id = Number(params.teamId)
@@ -39,8 +38,6 @@ const TeamDetailClient = () => {
     onRemoveSession,
     onSubmit
   } = useTeamApplication(id)
-
-  if (session.status === "unauthenticated") router.push(ROUTES.LOGIN)
 
   if (isLoading) {
     return <TeamDetailSkeleton performanceId={performanceId} />
