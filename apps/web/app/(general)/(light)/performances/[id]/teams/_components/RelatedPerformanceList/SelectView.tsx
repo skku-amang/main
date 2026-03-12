@@ -34,7 +34,7 @@ const SelectView = ({
         router.push(ROUTES.PERFORMANCE.TEAM.LIST(+performanceId))
       }
     >
-      <SelectTrigger className="flex-row-reverse gap-x-2 text-gray-500">
+      <SelectTrigger className="flex-row-reverse justify-center gap-x-2 text-gray-500">
         <SelectValue placeholder={currentPerformance?.name} />
       </SelectTrigger>
       <SelectContent>
