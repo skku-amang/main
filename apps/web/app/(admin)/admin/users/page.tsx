@@ -1,26 +1,35 @@
 "use client"
 
-import { useMemo } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
+import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
+import { useToast } from "@/components/hooks/use-toast"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
-import { useUsers } from "@/hooks/api/useUser"
+import { useDeleteUser, useUpdateUser, useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { getSessionDisplayName } from "@/constants/session"
+import { publicUser } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
-
-// TODO: 백엔드에 다음 API 추가 필요:
-// - GET /users/admin (email, isAdmin, sessions 포함한 admin용 응답)
-// - PATCH /users/:id (AdminGuard)
-// - DELETE /users/:id (AdminGuard)
-// 위 API 추가 후 UserFormDialog, 편집/삭제 기능 구현
+import { UserFormDialog } from "./_components/UserFormDialog"
 
 export default function UsersAdminPage() {
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
   const { data: users, isLoading } = useUsers()
   const { data: generations } = useGenerations()
   const { data: sessions } = useSessions()
+
+  const [formOpen, setFormOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [editing, setEditing] = useState<publicUser | null>(null)
+  const [deleting, setDeleting] = useState<publicUser | null>(null)
+
+  const updateMutation = useUpdateUser()
+  const deleteMutation = useDeleteUser()
 
   const generationFilters = useMemo(
     () =>
@@ -42,7 +51,65 @@ export default function UsersAdminPage() {
     [sessions]
   )
 
-  const columns = useMemo(() => getColumns(), [])
+  const columns = useMemo(
+    () =>
+      getColumns({
+        onEdit: (user) => {
+          setEditing(user)
+          setFormOpen(true)
+        },
+        onDelete: (user) => {
+          setDeleting(user)
+          setDeleteOpen(true)
+        }
+      }),
+    []
+  )
+
+  const handleSubmit = (data: {
+    name: string
+    nickname: string
+    bio?: string
+    sessions: number[]
+  }) => {
+    if (!editing) return
+
+    updateMutation
+      .mutateAsync([editing.id, data])
+      .then(() => {
+        toast({ title: "회원 정보가 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["users"] })
+        setFormOpen(false)
+        setEditing(null)
+      })
+      .catch((error) => {
+        toast({
+          title: "수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      })
+  }
+
+  const handleDelete = () => {
+    if (!deleting) return
+
+    deleteMutation
+      .mutateAsync([deleting.id])
+      .then(() => {
+        toast({ title: `${deleting.name} 회원이 삭제되었습니다.` })
+        queryClient.invalidateQueries({ queryKey: ["users"] })
+        setDeleteOpen(false)
+        setDeleting(null)
+      })
+      .catch((error) => {
+        toast({
+          title: "삭제에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+      })
+  }
 
   return (
     <div>
@@ -69,6 +136,32 @@ export default function UsersAdminPage() {
             options: sessionFilters
           }
         ]}
+      />
+
+      <UserFormDialog
+        open={formOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open)
+          if (!open) setEditing(null)
+        }}
+        onSubmit={handleSubmit}
+        editingUser={editing}
+        isPending={updateMutation.isPending}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(open) => {
+          setDeleteOpen(open)
+          if (!open) setDeleting(null)
+        }}
+        onConfirm={handleDelete}
+        description={
+          deleting
+            ? `${deleting.name} 회원을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`
+            : undefined
+        }
+        isPending={deleteMutation.isPending}
       />
     </div>
   )
