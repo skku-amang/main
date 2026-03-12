@@ -68,7 +68,7 @@ const Profile = () => {
     `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
 
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar>
           <AvatarImage src={profileImage} />
