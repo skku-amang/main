@@ -1,6 +1,7 @@
 "use client"
 
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Plus } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -8,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
@@ -52,8 +54,10 @@ const headerColorClass = ({
 
 const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const { data: performances } = usePerformances()
   const isCurrentPathname = pathname.includes("/performances/")
+  const isEmpty = !performances || performances.length === 0
 
   return (
     <DropdownMenu>
@@ -67,11 +71,31 @@ const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
         <ChevronDown className="h-4 w-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        {performances?.map((p) => (
-          <DropdownMenuItem key={p.id} asChild className="cursor-pointer">
-            <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>{p.name}</Link>
-          </DropdownMenuItem>
-        ))}
+        {isEmpty ? (
+          <div className="px-3 py-2 text-sm text-muted-foreground">
+            모집 중인 공연이 없습니다
+          </div>
+        ) : (
+          performances.map((p) => (
+            <DropdownMenuItem key={p.id} asChild className="cursor-pointer">
+              <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>{p.name}</Link>
+            </DropdownMenuItem>
+          ))
+        )}
+        {session?.user?.isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link
+                href={ROUTES.ADMIN.PERFORMANCES}
+                className="flex items-center gap-x-2"
+              >
+                <Plus className="h-4 w-4" />
+                공연 관리
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
