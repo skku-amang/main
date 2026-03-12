@@ -5,11 +5,12 @@ import Link from "next/link"
 
 import MobileBackButton from "@/components/Header/_component/MobileBackButton"
 import Sidebar from "@/components/Header/_component/Sidebar"
-import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 import NavLink from "../NavLink"
 import Profile from "./_component/Profile"
+import TeamRecruitDropdown from "./_component/TeamRecruitDropdown"
 
 const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
 
@@ -30,11 +31,6 @@ const Header = ({
   mode?: HeaderMode
 }) => {
   const menuItems: MenuItem[] = [
-    {
-      name: "팀 모집",
-      url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID),
-      active: true
-    },
     {
       name: "공간 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
@@ -97,6 +93,7 @@ const Header = ({
         <div className="flex items-center justify-end gap-x-[35px]">
           {/* MenuItems */}
           <div className="flex h-full justify-center gap-x-9">
+            <TeamRecruitDropdown mode={mode} />
             {menuItems.map((menuItem) => (
               <NavLink
                 key={menuItem.name}
