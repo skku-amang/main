@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -49,6 +49,24 @@ export default function UsersAdminPage() {
         value: s.name
       })) ?? [],
     [sessions]
+  )
+
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      try {
+        await updateMutation.mutateAsync([rowId, { [columnId]: value }])
+        toast({ title: "회원 정보가 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["users"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description: (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
   )
 
   const columns = useMemo(
@@ -123,6 +141,7 @@ export default function UsersAdminPage() {
         initialColumnVisibility={{ bio: false }}
         enableGlobalSearch
         searchPlaceholder="이름으로 검색..."
+        onUpdateCell={handleCellUpdate}
         emptyMessage="등록된 회원이 없습니다."
         filters={[
           {
