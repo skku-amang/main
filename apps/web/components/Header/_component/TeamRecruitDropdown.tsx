@@ -63,7 +63,7 @@ const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "flex items-center gap-x-1 text-lg font-semibold outline-none",
+          "flex cursor-pointer items-center gap-x-1 text-lg font-semibold outline-none",
           headerColorClass({ mode, isCurrentPathname })
         )}
       >
