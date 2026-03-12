@@ -391,12 +391,11 @@ export function TeamListDataTable<TValue>({
             </Button>
 
             {/* 필터 */}
-            <Popover open={filterOpen}>
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger>
                 <Button
                   asChild
                   className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
-                  onClick={() => setFilterOpen(true)}
                   variant={filterOpen ? "outline" : undefined}
                 >
                   <div>
@@ -407,7 +406,6 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                onInteractOutside={() => setFilterOpen(false)}
                 className="w-[480px] rounded-[12px] p-0"
               >
                 {/* 헤더 */}
