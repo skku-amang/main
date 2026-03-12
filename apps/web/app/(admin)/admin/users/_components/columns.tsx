@@ -18,18 +18,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { publicUser } from "@repo/shared-types"
 
-interface PublicUser {
-  id: number
-  name: string
-  image: string | null
-  nickname: string
-  bio: string | null
-  generation: { id: number; order: number }
-  sessions: { id: number; name: string }[]
+interface ColumnCallbacks {
+  onEdit: (user: publicUser) => void
+  onDelete: (user: publicUser) => void
 }
 
-export function getColumns(): ColumnDef<PublicUser>[] {
+export function getColumns({
+  onEdit,
+  onDelete
+}: ColumnCallbacks): ColumnDef<publicUser>[] {
   return [
     {
       accessorKey: "id",
@@ -139,13 +138,16 @@ export function getColumns(): ColumnDef<PublicUser>[] {
                 바로가기
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem disabled>
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
-              편집 (API 미구현)
+              편집
             </DropdownMenuItem>
-            <DropdownMenuItem disabled className="text-red-600">
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => onDelete(row.original)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
-              삭제 (API 미구현)
+              삭제
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
