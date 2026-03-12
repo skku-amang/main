@@ -71,11 +71,11 @@
   }
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Hide scrollbar while keeping scroll functionality */
+html {
+  scrollbar-width: none; /* Firefox */
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.5);
+::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }

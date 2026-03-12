@@ -63,7 +63,7 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
 
   if (canEdit) {
     return (
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
