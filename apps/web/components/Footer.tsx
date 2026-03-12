@@ -34,14 +34,20 @@ export const FooterInner = ({
           target="_blank"
           rel="noopener noreferrer"
         >
-          <FaYoutube size={30} style={{ color: "#BEBEBE" }} />
+          <FaYoutube
+            size={30}
+            className="text-[#BEBEBE] transition-colors hover:text-[#FF0000]"
+          />
         </Link>
         <Link
           href={SOCIAL.Instagram.url}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <FaInstagram size={30} style={{ color: "#BEBEBE" }} />
+          <FaInstagram
+            size={30}
+            className="text-[#BEBEBE] transition-colors hover:text-[#E4405F]"
+          />
         </Link>
       </div>
     </div>
