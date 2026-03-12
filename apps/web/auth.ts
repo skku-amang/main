@@ -84,7 +84,15 @@ const authOptions: NextAuthConfig = {
      * @token 이전 JWT 토큰 (처음에는 빈 객체)
      * @user `authorize` 함수에서 반환한 유저 객체 (처음 로그인 시에만 존재)
      */
-    jwt: async ({ token, user }) => {
+    jwt: async ({ token, user, trigger, session }) => {
+      // 클라이언트에서 update()를 호출한 경우 세션 데이터 갱신
+      if (trigger === "update" && session) {
+        return {
+          ...token,
+          ...session
+        }
+      }
+
       // 최초 로그인 시 user 존재
       if (user) {
         return {

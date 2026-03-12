@@ -3,6 +3,7 @@ import Link from "next/link"
 import { FaInstagram } from "react-icons/fa"
 import { FaYoutube } from "react-icons/fa"
 
+import SOCIAL from "@/constants/social"
 import { cn } from "../lib/utils"
 
 export const FooterInner = ({
@@ -28,10 +29,18 @@ export const FooterInner = ({
       </p>
 
       <div className="flex gap-x-5">
-        <Link href="/">
+        <Link
+          href={SOCIAL.Youtube.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <FaYoutube size={30} style={{ color: "#BEBEBE" }} />
         </Link>
-        <Link href="/">
+        <Link
+          href={SOCIAL.Instagram.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <FaInstagram size={30} style={{ color: "#BEBEBE" }} />
         </Link>
       </div>

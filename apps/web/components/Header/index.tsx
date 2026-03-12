@@ -55,7 +55,7 @@ const Header = ({
         position,
         "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
         {
-          "bg-white": mode === "light",
+          "bg-primary md:bg-white": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }
@@ -67,8 +67,7 @@ const Header = ({
         className={cn(
           "visible relative flex h-full w-full items-center justify-between px-10 py-2 md:hidden",
           {
-            "bg-white": mode === "light",
-            "bg-primary": mode === "dark",
+            "bg-primary": mode === "light" || mode === "dark",
             "bg-transparent": mode === "transparent"
           }
         )}

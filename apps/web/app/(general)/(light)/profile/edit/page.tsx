@@ -27,6 +27,8 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
+import { useSession } from "next-auth/react"
+
 import { useUpdatePassword, useUpdateProfile } from "@/hooks/api/useUser"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 
@@ -58,6 +60,7 @@ const EditSkeleton = () => (
 
 const ProfileEditPage = () => {
   const { session, user, isLoading, isAuthenticated } = useCurrentUser()
+  const { update } = useSession()
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const updateProfileMutation = useUpdateProfile()
@@ -84,9 +87,10 @@ const ProfileEditPage = () => {
   const handleProfileSubmit = (data: ProfileFormValues) => {
     updateProfileMutation
       .mutateAsync([data])
-      .then(() => {
-        toast({ title: "프로필이 수정되었습니다." })
+      .then(async () => {
+        await update({ name: data.name, nickname: data.nickname })
         queryClient.invalidateQueries({ queryKey: ["users"] })
+        toast({ title: "프로필이 수정되었습니다." })
       })
       .catch((error) => {
         toast({
