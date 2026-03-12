@@ -1,7 +1,6 @@
 "use client"
 
 import { Knewave } from "next/font/google"
-import Image from "next/image"
 import Link from "next/link"
 
 import MobileBackButton from "@/components/Header/_component/MobileBackButton"
@@ -73,8 +72,11 @@ const Header = ({
         )}
       >
         <MobileBackButton />
-        <Link href={ROUTES.HOME}>
-          <Image src="/Logo.png" alt="logo" width={32} height={32} />
+        <Link
+          href={ROUTES.HOME}
+          className={cn("text-2xl", knewave.className, "text-white")}
+        >
+          Amang
         </Link>
         <Sidebar />
       </nav>
