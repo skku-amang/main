@@ -51,6 +51,7 @@ pnpm install
 ```bash
 cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
+cp packages/database/.env.example packages/database/.env
 ```
 
 기본값이 로컬 개발에 맞게 설정되어 있으므로 그대로 사용해도 됩니다.
@@ -69,7 +70,9 @@ PostgreSQL(포트 5433)과 MinIO(포트 9000/9001)가 실행됩니다.
 ```bash
 # 프로젝트 루트에서
 pnpm db:deploy                          # 마이그레이션 적용
-cd packages/database && pnpm db:seed    # 시드 데이터 삽입
+cd packages/database
+pnpm db:generate                        # Prisma 클라이언트 생성
+pnpm db:seed                            # 시드 데이터 삽입
 ```
 
 ### 5. 개발 서버 실행
