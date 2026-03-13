@@ -136,8 +136,9 @@ export class UsersService {
   }
 
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
-    const user = await this.prisma.user.count({
-      where: { id: userId }
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
     })
 
     if (!user)
