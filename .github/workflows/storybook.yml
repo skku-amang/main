@@ -37,7 +37,7 @@ jobs:
         run: pnpm install
 
       - name: Build Storybook
-        run: pnpm --filter web build-storybook
+        run: pnpm turbo build-storybook --filter=web
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
