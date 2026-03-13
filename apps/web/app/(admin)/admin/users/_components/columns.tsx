@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
+import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
 import { formatGenerationOrder } from "@/lib/utils"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
@@ -18,18 +19,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { publicUser } from "@repo/shared-types"
 
-interface PublicUser {
-  id: number
-  name: string
-  image: string | null
-  nickname: string
-  bio: string | null
-  generation: { id: number; order: number }
-  sessions: { id: number; name: string }[]
+interface ColumnCallbacks {
+  onEdit: (user: publicUser) => void
+  onDelete: (user: publicUser) => void
 }
 
-export function getColumns(): ColumnDef<PublicUser>[] {
+export function getColumns({
+  onEdit,
+  onDelete
+}: ColumnCallbacks): ColumnDef<publicUser>[] {
   return [
     {
       accessorKey: "id",
@@ -56,25 +56,42 @@ export function getColumns(): ColumnDef<PublicUser>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="이름" />
       ),
-      meta: { label: "이름" }
+      meta: { label: "이름", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
+      )
     },
     {
       accessorKey: "nickname",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="닉네임" />
       ),
-      meta: { label: "닉네임" }
+      meta: { label: "닉네임", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
+      )
     },
     {
       accessorKey: "bio",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="소개" />
       ),
-      meta: { label: "소개" },
-      cell: ({ row }) => (
-        <span className="max-w-[200px] truncate">
-          {row.original.bio ?? "-"}
-        </span>
+      meta: { label: "소개", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            <span className="max-w-[200px] truncate">
+              {ctx.row.original.bio ?? "-"}
+            </span>
+          }
+        />
       )
     },
     {
@@ -139,13 +156,16 @@ export function getColumns(): ColumnDef<PublicUser>[] {
                 바로가기
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem disabled>
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
-              편집 (API 미구현)
+              편집
             </DropdownMenuItem>
-            <DropdownMenuItem disabled className="text-red-600">
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => onDelete(row.original)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
-              삭제 (API 미구현)
+              삭제
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
