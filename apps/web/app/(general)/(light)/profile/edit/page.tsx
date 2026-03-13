@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, KeyRound, Save } from "lucide-react"
+import { ArrowLeft, Camera, KeyRound, Loader2, Save } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -27,13 +27,17 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
+import { useSession } from "next-auth/react"
+
 import { useUpdatePassword, useUpdateProfile } from "@/hooks/api/useUser"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useImageUpload } from "@/hooks/useImageUpload"
 
 const ProfileFormSchema = UpdateProfileSchema.pick({
   name: true,
   nickname: true,
-  bio: true
+  bio: true,
+  image: true
 })
 
 const PasswordFormSchema = UpdatePasswordSchema.extend({
@@ -58,17 +62,24 @@ const EditSkeleton = () => (
 
 const ProfileEditPage = () => {
   const { session, user, isLoading, isAuthenticated } = useCurrentUser()
+  const { update } = useSession()
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const updateProfileMutation = useUpdateProfile()
   const updatePasswordMutation = useUpdatePassword()
+  const imageUpload = useImageUpload({
+    onSuccess: (publicUrl) => {
+      profileForm.setValue("image", publicUrl)
+    }
+  })
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(ProfileFormSchema),
     values: {
       name: session?.user?.name ?? "",
       nickname: session?.user?.nickname ?? "",
-      bio: user?.bio ?? ""
+      bio: user?.bio ?? "",
+      image: session?.user?.image ?? undefined
     }
   })
 
@@ -84,9 +95,14 @@ const ProfileEditPage = () => {
   const handleProfileSubmit = (data: ProfileFormValues) => {
     updateProfileMutation
       .mutateAsync([data])
-      .then(() => {
-        toast({ title: "프로필이 수정되었습니다." })
+      .then(async () => {
+        await update({
+          name: data.name,
+          nickname: data.nickname,
+          image: data.image ?? null
+        })
         queryClient.invalidateQueries({ queryKey: ["users"] })
+        toast({ title: "프로필이 수정되었습니다." })
       })
       .catch((error) => {
         toast({
@@ -127,8 +143,10 @@ const ProfileEditPage = () => {
     )
   }
 
+  const currentImage = profileForm.watch("image")
   const profileImage =
-    session.user?.image ??
+    imageUpload.preview ??
+    currentImage ??
     `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
 
   return (
@@ -155,16 +173,40 @@ const ProfileEditPage = () => {
         <div className="rounded-xl bg-white p-6 shadow-sm md:p-8">
           <h3 className="mb-6 text-lg font-semibold">기본 정보</h3>
 
-          {/* 아바타 미리보기 */}
+          {/* 아바타 업로드 */}
           <div className="mb-6 flex items-center gap-4">
-            <Avatar className="size-16 border-2 border-slate-100">
-              <AvatarImage src={profileImage} />
-              <AvatarFallback className="text-xl">
-                {session.user?.name?.[0]}
-              </AvatarFallback>
-            </Avatar>
+            <button
+              type="button"
+              className="group relative"
+              onClick={() => imageUpload.inputRef.current?.click()}
+              disabled={imageUpload.isUploading}
+            >
+              <Avatar className="size-16 border-2 border-slate-100">
+                <AvatarImage src={profileImage} />
+                <AvatarFallback className="text-xl">
+                  {session.user?.name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                {imageUpload.isUploading ? (
+                  <Loader2 className="size-5 animate-spin text-white" />
+                ) : (
+                  <Camera className="size-5 text-white" />
+                )}
+              </div>
+            </button>
+            <input
+              ref={imageUpload.inputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={imageUpload.selectAndUpload}
+            />
             <div className="text-sm text-slate-500">
-              프로필 이미지 변경은 준비 중입니다.
+              {imageUpload.isUploading
+                ? `업로드 중... ${imageUpload.progress}%`
+                : (imageUpload.error ??
+                  "클릭하여 프로필 이미지를 변경할 수 있습니다.")}
             </div>
           </div>
 

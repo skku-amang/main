@@ -1,6 +1,6 @@
 "use client"
 
-import { LoaderCircle, LogOut, Settings, User, Users } from "lucide-react"
+import { LoaderCircle, LogOut, Settings, Users } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -76,21 +76,20 @@ const Profile = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="rounded-lg">
-        <DropdownMenuLabel className="flex items-center gap-x-3 py-3">
-          <Avatar>
-            <AvatarImage src={profileImage} />
-            <AvatarFallback>A</AvatarFallback>
-          </Avatar>
-          <div>
-            <div>{session.user?.name}</div>
-            <div className="font-normal">{session.user?.email}</div>
-          </div>
-        </DropdownMenuLabel>
+        <Link href={ROUTES.PROFILE.INDEX}>
+          <DropdownMenuLabel className="flex cursor-pointer items-center gap-x-3 rounded-sm py-3 hover:bg-accent">
+            <Avatar>
+              <AvatarImage src={profileImage} />
+              <AvatarFallback>A</AvatarFallback>
+            </Avatar>
+            <div>
+              <div>{session.user?.name}</div>
+              <div className="font-normal">{session.user?.email}</div>
+            </div>
+          </DropdownMenuLabel>
+        </Link>
 
         <DropdownMenuSeparator />
-        <MenuItem icon={<User size={iconSize} />} href={ROUTES.PROFILE.INDEX}>
-          내 프로필
-        </MenuItem>
         <MenuItem icon={<Users size={iconSize} />} href={ROUTES.PROFILE.TEAMS}>
           참여 중인 팀
         </MenuItem>

@@ -37,6 +37,7 @@ const SheetInnerContent = ({
       <Link
         href={!session ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
         className="flex w-full items-center justify-start py-3"
+        onClick={() => setIsOpen(false)}
       >
         {!session ? (
           <>
@@ -134,6 +135,7 @@ const SheetInnerContent = ({
             <Link
               href={ROUTES.LOGIN}
               className="text-xl font-medium text-primary"
+              onClick={() => setIsOpen(false)}
             >
               Login Account
             </Link>

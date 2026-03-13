@@ -391,12 +391,11 @@ export function TeamListDataTable<TValue>({
             </Button>
 
             {/* 필터 */}
-            <Popover open={filterOpen}>
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger>
                 <Button
                   asChild
                   className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
-                  onClick={() => setFilterOpen(true)}
                   variant={filterOpen ? "outline" : undefined}
                 >
                   <div>
@@ -407,7 +406,6 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                onInteractOutside={() => setFilterOpen(false)}
                 className="w-[480px] rounded-[12px] p-0"
               >
                 {/* 헤더 */}
@@ -577,8 +575,19 @@ export function TeamListDataTable<TValue>({
                     <div className="h-full text-left text-[14px] font-semibold">
                       Property Filter
                     </div>
-                    {/* TODO: 초기화 기능 추가 */}
-                    <button className="h-full text-[10px] font-normal text-third">
+                    <button
+                      className="h-full text-[10px] font-normal text-third"
+                      onClick={() => {
+                        dispatch({
+                          type: "clearFilter",
+                          payload: { target: "필요세션" }
+                        })
+                        dispatch({
+                          type: "setFilter",
+                          payload: { target: "모집상태", value: "all" }
+                        })
+                      }}
+                    >
                       초기화
                     </button>
                   </DrawerTitle>
@@ -593,12 +602,10 @@ export function TeamListDataTable<TValue>({
                 />
 
                 <div className="space-y-7 px-7 pt-4 pb-6">
-                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
                   />
-                  {/* TODO: 초기화 버튼 및 기능 추가 */}
                   <TeamListTableFilter
                     header="모집상태"
                     filterValues={filterValues.모집상태}

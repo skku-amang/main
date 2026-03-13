@@ -46,13 +46,13 @@ const SortButton = ({
   children: React.ReactNode
 }) => {
   return (
-    <Button
-      variant="ghost"
+    <div
+      className="flex cursor-pointer items-center"
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       {children}
       <ArrowUpDown className="ml-2 h-4 w-4" />
-    </Button>
+    </div>
   )
 }
 
@@ -145,7 +145,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
         {/* 곡명 */}
         <div className="flex items-center gap-x-1">
           {row.original.songName}
-          {!row.original.posterImage && (
+          {row.original.posterImage && (
             <span>
               <Image size={15} className="text-neutral-800" strokeWidth={1.5} />
             </span>

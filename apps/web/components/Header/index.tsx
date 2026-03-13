@@ -1,16 +1,16 @@
 "use client"
 
 import { Knewave } from "next/font/google"
-import Image from "next/image"
 import Link from "next/link"
 
 import MobileBackButton from "@/components/Header/_component/MobileBackButton"
 import Sidebar from "@/components/Header/_component/Sidebar"
-import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 import NavLink from "../NavLink"
 import Profile from "./_component/Profile"
+import TeamRecruitDropdown from "./_component/TeamRecruitDropdown"
 
 const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
 
@@ -32,11 +32,6 @@ const Header = ({
 }) => {
   const menuItems: MenuItem[] = [
     {
-      name: "팀 모집",
-      url: ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID),
-      active: true
-    },
-    {
       name: "공간 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
       active: false
@@ -55,7 +50,7 @@ const Header = ({
         position,
         "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
         {
-          "bg-white": mode === "light",
+          "bg-primary md:bg-white": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }
@@ -67,15 +62,17 @@ const Header = ({
         className={cn(
           "visible relative flex h-full w-full items-center justify-between px-10 py-2 md:hidden",
           {
-            "bg-white": mode === "light",
-            "bg-primary": mode === "dark",
+            "bg-primary": mode === "light" || mode === "dark",
             "bg-transparent": mode === "transparent"
           }
         )}
       >
         <MobileBackButton />
-        <Link href={ROUTES.HOME}>
-          <Image src="/Logo.png" alt="logo" width={32} height={32} />
+        <Link
+          href={ROUTES.HOME}
+          className={cn("text-2xl", knewave.className, "text-white")}
+        >
+          Amang
         </Link>
         <Sidebar />
       </nav>
@@ -96,6 +93,7 @@ const Header = ({
         <div className="flex items-center justify-end gap-x-[35px]">
           {/* MenuItems */}
           <div className="flex h-full justify-center gap-x-9">
+            <TeamRecruitDropdown mode={mode} />
             {menuItems.map((menuItem) => (
               <NavLink
                 key={menuItem.name}
