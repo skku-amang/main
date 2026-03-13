@@ -41,7 +41,6 @@ import {
   PresignedUrlRequest,
   PresignedUrlResponse
 } from "@repo/shared-types"
-import { URLSearchParams } from "url"
 import { ApiResult } from "./api-result"
 import {
   AccessTokenExpiredError,
