@@ -12,7 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
@@ -42,6 +41,7 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
 }
 
 const Profile = () => {
+  const router = useRouter()
   const { status, data: session } = useSession()
 
   if (!session) {
@@ -76,18 +76,19 @@ const Profile = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="rounded-lg">
-        <Link href={ROUTES.PROFILE.INDEX}>
-          <DropdownMenuLabel className="flex cursor-pointer items-center gap-x-3 rounded-sm py-3 hover:bg-accent">
-            <Avatar>
-              <AvatarImage src={profileImage} />
-              <AvatarFallback>A</AvatarFallback>
-            </Avatar>
-            <div>
-              <div>{session.user?.name}</div>
-              <div className="font-normal">{session.user?.email}</div>
-            </div>
-          </DropdownMenuLabel>
-        </Link>
+        <DropdownMenuItem
+          className="flex cursor-pointer items-center gap-x-3 rounded-sm py-3 hover:bg-accent"
+          onSelect={() => router.push(ROUTES.PROFILE.INDEX)}
+        >
+          <Avatar>
+            <AvatarImage src={profileImage} />
+            <AvatarFallback>A</AvatarFallback>
+          </Avatar>
+          <div>
+            <div>{session.user?.name}</div>
+            <div className="font-normal">{session.user?.email}</div>
+          </div>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <MenuItem icon={<Users size={iconSize} />} href={ROUTES.PROFILE.TEAMS}>

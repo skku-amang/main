@@ -3,11 +3,12 @@ import { z } from "zod"
 import YoutubeVideo from "@/lib/youtube"
 
 export const songYoutubeVideoUrlSchema = z
-  .string({ required_error: "필수 항목" })
-  .min(5, { message: "최소 5자 이상" })
-  .refine((value) => YoutubeVideo.isUrlValid(value), {
-    message: "유효한 URL이 아닙니다"
-  })
+  .string()
+  .optional()
+  .refine(
+    (value) => !value || (value.length >= 5 && YoutubeVideo.isUrlValid(value)),
+    { message: "유효한 YouTube URL을 입력해주세요" }
+  )
 const basicInfoSchema = z.object({
   performanceId: z.number({ required_error: "필수 항목" }),
   isFreshmenFixed: z.boolean().default(false).optional(),
