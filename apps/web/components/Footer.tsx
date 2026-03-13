@@ -1,7 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { FaInstagram } from "react-icons/fa"
-import { FaYoutube } from "react-icons/fa"
+import { FaInstagram, FaYoutube } from "react-icons/fa"
 
 import SOCIAL from "@/constants/social"
 import { cn } from "../lib/utils"
