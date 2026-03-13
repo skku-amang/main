@@ -26,9 +26,10 @@ export const PerformanceObjectSchema = z.object({
 
 export const PartialPerformanceObjectSchema = PerformanceObjectSchema.partial()
 
-export const dateValidationRefine = (
-  data: z.infer<typeof PartialPerformanceObjectSchema>
-) => {
+export const dateValidationRefine = (data: {
+  startAt?: Date | null
+  endAt?: Date | null
+}) => {
   if (data.startAt && data.endAt) {
     return data.endAt >= data.startAt
   }

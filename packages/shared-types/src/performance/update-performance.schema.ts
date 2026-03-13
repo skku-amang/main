@@ -19,10 +19,12 @@ export type UpdatePerformance = zod.infer<typeof UpdatePerformanceSchema>
 
 /**
  * @description API 요청용 공연 업데이트 Zod 스키마
+ * posterImage는 File이 아닌 string URL (presigned URL 업로드 후 전달)
  */
-export const UpdatePerformanceApiSchema = PartialPerformanceObjectSchema.refine(
-  dateValidationRefine,
-  {
+export const UpdatePerformanceApiSchema = PartialPerformanceObjectSchema.omit({
+  posterImage: true
+})
+  .extend({ posterImage: zod.string().nullable().optional() })
+  .refine(dateValidationRefine, {
     message: "종료 일시는 시작 일시보다 이후여야 합니다."
-  }
-)
+  })
