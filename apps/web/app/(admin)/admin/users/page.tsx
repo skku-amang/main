@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -12,6 +12,7 @@ import { useDeleteUser, useUpdateUser, useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { getSessionDisplayName } from "@/constants/session"
 import { publicUser } from "@repo/shared-types"
+import { ApiError } from "@repo/api-client"
 
 import { getColumns } from "./_components/columns"
 import { UserFormDialog } from "./_components/UserFormDialog"
@@ -51,6 +52,27 @@ export default function UsersAdminPage() {
     [sessions]
   )
 
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      try {
+        await updateMutation.mutateAsync([rowId, { [columnId]: value }])
+        toast({ title: "회원 정보가 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["users"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
+  )
+
   const columns = useMemo(
     () =>
       getColumns({
@@ -85,7 +107,10 @@ export default function UsersAdminPage() {
       .catch((error) => {
         toast({
           title: "수정에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
       })
@@ -105,7 +130,10 @@ export default function UsersAdminPage() {
       .catch((error) => {
         toast({
           title: "삭제에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
       })
@@ -123,6 +151,7 @@ export default function UsersAdminPage() {
         initialColumnVisibility={{ bio: false }}
         enableGlobalSearch
         searchPlaceholder="이름으로 검색..."
+        onUpdateCell={handleCellUpdate}
         emptyMessage="등록된 회원이 없습니다."
         filters={[
           {

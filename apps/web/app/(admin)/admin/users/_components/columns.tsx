@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
+import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
 import { formatGenerationOrder } from "@/lib/utils"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
@@ -55,25 +56,42 @@ export function getColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="이름" />
       ),
-      meta: { label: "이름" }
+      meta: { label: "이름", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
+      )
     },
     {
       accessorKey: "nickname",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="닉네임" />
       ),
-      meta: { label: "닉네임" }
+      meta: { label: "닉네임", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
+      )
     },
     {
       accessorKey: "bio",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="소개" />
       ),
-      meta: { label: "소개" },
-      cell: ({ row }) => (
-        <span className="max-w-[200px] truncate">
-          {row.original.bio ?? "-"}
-        </span>
+      meta: { label: "소개", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            <span className="max-w-[200px] truncate">
+              {ctx.row.original.bio ?? "-"}
+            </span>
+          }
+        />
       )
     },
     {
