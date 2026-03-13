@@ -114,7 +114,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
           {innerForm.getValues("songYoutubeVideoUrl") && (
             <div className="aspect-video overflow-visible">
               <YoutubePlayer
-                videoUrl={innerForm.getValues("songYoutubeVideoUrl")}
+                videoUrl={innerForm.getValues("songYoutubeVideoUrl")!}
                 className="mt-4 h-full w-full"
                 allowFullScreen
               />
