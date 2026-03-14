@@ -29,7 +29,7 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.8.16",
     "@types/node": "^22.19.8",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1"
+    "@types/react": "^19.2.11",
+    "@types/react-dom": "^19.2.3"
   }
 }

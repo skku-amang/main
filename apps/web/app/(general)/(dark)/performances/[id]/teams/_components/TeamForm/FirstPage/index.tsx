@@ -249,7 +249,7 @@ const FirstPage = ({
               <div className="flex w-full flex-col items-start justify-between md:flex-row">
                 <div className="flex items-center justify-between gap-x-2">
                   <CircleAlert className="h-2.5 w-2.5 text-gray-600 md:h-4 md:w-4" />
-                  자유롭게 팀을 홍보해주세요(유튜브 링크 첨부 필수)
+                  자유롭게 팀을 홍보해주세요(유튜브 링크 첨부 선택)
                 </div>
 
                 {/* 데스크톱: 포스터 이미지 + 유튜브 다이얼로그 */}
@@ -341,7 +341,7 @@ const FirstPage = ({
             {/* 유튜브 플레이어 */}
             {youtubeForm.getValues("songYoutubeVideoUrl") && (
               <YoutubePlayer
-                videoUrl={youtubeForm.getValues("songYoutubeVideoUrl")}
+                videoUrl={youtubeForm.getValues("songYoutubeVideoUrl")!}
                 className="mt-3 w-full"
               />
             )}
