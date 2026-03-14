@@ -3,6 +3,8 @@ import { withThemeByClassName } from "@storybook/addon-themes"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
+import { ApiClientProvider } from "@/lib/providers/api-client-provider"
+
 import "./fonts.css"
 import "../app/globals.css"
 
@@ -27,7 +29,9 @@ const preview: Preview = {
     }),
     (Story) => (
       <SessionProvider session={null}>
-        <Story />
+        <ApiClientProvider>
+          <Story />
+        </ApiClientProvider>
       </SessionProvider>
     )
   ]
