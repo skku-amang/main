@@ -1,9 +1,14 @@
 import type { Preview } from "@storybook/react"
 import { withThemeByClassName } from "@storybook/addon-themes"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { SessionProvider } from "next-auth/react"
 import React from "react"
 
 import { ApiClientProvider } from "@/lib/providers/api-client-provider"
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } }
+})
 
 import "./fonts.css"
 import "../app/globals.css"
@@ -28,11 +33,13 @@ const preview: Preview = {
       defaultTheme: "light"
     }),
     (Story) => (
-      <SessionProvider session={null}>
-        <ApiClientProvider>
-          <Story />
-        </ApiClientProvider>
-      </SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider session={null}>
+          <ApiClientProvider>
+            <Story />
+          </ApiClientProvider>
+        </SessionProvider>
+      </QueryClientProvider>
     )
   ]
 }
