@@ -24,7 +24,7 @@ const withSession = (session: Session) => (Story: React.ComponentType) => (
 )
 
 const meta: Meta<typeof Header> = {
-  title: "Header",
+  title: "Components/Header",
   component: Header,
   tags: ["autodocs"],
   args: {
