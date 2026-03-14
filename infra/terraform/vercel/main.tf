@@ -30,6 +30,8 @@ resource "vercel_project" "web" {
 
   enable_affected_projects_deployments = false
 
+  ignore_command = "[ \"$VERCEL_GIT_COMMIT_REF\" = \"gh-pages\" ]"
+
   vercel_authentication = {
     deployment_type = "none"
   }
