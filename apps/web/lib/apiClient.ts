@@ -1,4 +1,4 @@
-import { ApiClient } from "@repo/api-client"
+import ApiClient from "@repo/api-client"
 
 /**
  * 서버 컴포넌트에서 사용

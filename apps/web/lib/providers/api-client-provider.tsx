@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react"
 import { createContext, ReactNode, useContext, useEffect } from "react"
 
 import { apiClient } from "@/lib/apiClient"
-import { ApiClient } from "@repo/api-client"
+import ApiClient from "@repo/api-client"
 
 const ApiClientContext = createContext<ApiClient | null>(null)
 

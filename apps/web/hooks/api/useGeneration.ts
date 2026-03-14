@@ -1,5 +1,5 @@
 import { createMutationHook, createQueryHook } from "@/hooks/useCustomQuery"
-import { ApiClient } from "@repo/api-client"
+import ApiClient from "@repo/api-client"
 
 export const useCreateGeneration = createMutationHook(
   ApiClient.prototype.createGeneration

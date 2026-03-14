@@ -125,7 +125,7 @@ export type PromiseWithError<T, TError> = Promise<T> & {
   __errorType?: TError
 }
 
-export class ApiClient {
+export default class ApiClient {
   private static instance: ApiClient | null = null
   private accessToken: string | null = null
   private onTokenExpired: (() => Promise<string | null>) | null = null
