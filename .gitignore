@@ -21,6 +21,13 @@ coverage
 # Vercel
 .vercel
 
+# Terraform
+*.tfvars
+*.tfvars.json
+.terraform/
+*.tfstate
+*.tfstate.backup
+
 # Build Outputs
 .next/
 out/
