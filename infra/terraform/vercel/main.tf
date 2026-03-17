@@ -4,6 +4,17 @@ terraform {
       source  = "vercel/vercel"
       version = "~> 2.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+
+  # S3 backend - credentials via AWS_PROFILE=homelab (.envrc)
+  backend "s3" {
+    bucket = "homelab-tfstate-361769566809"
+    key    = "amang/vercel/terraform.tfstate"
+    region = "ap-northeast-2"
   }
 }
 
@@ -30,6 +41,8 @@ resource "vercel_project" "web" {
 
   enable_affected_projects_deployments = false
 
+  ignore_command = "[ \"$VERCEL_GIT_COMMIT_REF\" = \"gh-pages\" ]"
+
   vercel_authentication = {
     deployment_type = "none"
   }
@@ -51,11 +64,15 @@ resource "vercel_project_environment_variable" "api_url_preview" {
   target     = ["preview", "development"]
 }
 
+resource "random_bytes" "auth_secret" {
+  length = 32
+}
+
 resource "vercel_project_environment_variable" "auth_secret" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
   key        = "AUTH_SECRET"
-  value      = var.auth_secret
+  value      = random_bytes.auth_secret.base64
   target     = ["production", "preview"]
   sensitive  = true
 }

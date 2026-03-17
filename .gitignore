@@ -21,6 +21,13 @@ coverage
 # Vercel
 .vercel
 
+# Terraform
+*.tfvars
+*.tfvars.json
+.terraform/
+*.tfstate
+*.tfstate.backup
+
 # Build Outputs
 .next/
 out/
@@ -43,3 +50,4 @@ yarn-error.log*
 
 # Storybook
 storybook-static
+.env*.local
