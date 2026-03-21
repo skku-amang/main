@@ -50,7 +50,7 @@ const Header = ({
         position,
         "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
         {
-          "bg-primary md:bg-white": mode === "light",
+          "bg-primary md:bg-slate-50": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }

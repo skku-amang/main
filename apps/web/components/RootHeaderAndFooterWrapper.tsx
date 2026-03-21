@@ -37,7 +37,7 @@ const RootHeaderAndFooterWrapper = ({
   useHeader = true,
   headerMode = useHeader ? "light" : undefined
 }: RootHeaderAndFooterWrapperProps) => {
-  const headerHeightPiexel = 48
+  const headerHeightPiexel = 82
   const footerHeightPiexl = 120
 
   const toPixelString = (value: number) => `${value}px`
