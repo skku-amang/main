@@ -1,5 +1,13 @@
 # Contributing
 
+## 팀
+
+| GitHub ID                                          | 역할                    |
+| -------------------------------------------------- | ----------------------- |
+| [@manamana32321](https://github.com/manamana32321) | 프로젝트 총괄 (전 분야) |
+| [@nhjbest22](https://github.com/nhjbest22)         | 백엔드                  |
+| [@ssukim12](https://github.com/ssukim12)           | 디자인, 프론트엔드      |
+
 ## 이슈 컨벤션
 
 GitHub Issues 탭에서 이슈 템플릿을 선택하여 작성합니다. 라벨은 템플릿에서 자동으로 설정됩니다.
