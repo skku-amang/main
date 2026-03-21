@@ -28,7 +28,6 @@ export const CreateEquipmentSchema = z.object({
       message: `파일 확장자는 ${ACCEPTED_IMAGE_TYPES.map((t) => t.replace("image/", "")).join(", ")} 만 가능합니다.`
     })
     .nullable()
-    .optional()
 })
 
 /**
