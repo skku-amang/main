@@ -8,6 +8,10 @@
 | [@nhjbest22](https://github.com/nhjbest22)         | 백엔드                  |
 | [@ssukim12](https://github.com/ssukim12)           | 디자인, 프론트엔드      |
 
+## 라벨
+
+`type:` (작업 종류) + `scope:` (영역) 2축 체계를 사용합니다. 이슈/PR에 각 축에서 1개씩 지정합니다.
+
 ## 이슈 컨벤션
 
 GitHub Issues 탭에서 이슈 템플릿을 선택하여 작성합니다. 라벨은 템플릿에서 자동으로 설정됩니다.
