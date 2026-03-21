@@ -4,10 +4,12 @@
 
 GitHub Issues 탭에서 이슈 템플릿을 선택하여 작성합니다. 라벨은 템플릿에서 자동으로 설정됩니다.
 
-| 템플릿                                                       | 제목 prefix | 용도         |
-| ------------------------------------------------------------ | ----------- | ------------ |
-| [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)           | `[BUG]`     | 버그 제보    |
-| [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md) | `[FEAT]`    | 새 기능 제안 |
+| 템플릿                                                       | 용도         |
+| ------------------------------------------------------------ | ------------ |
+| [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)           | 버그 제보    |
+| [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md) | 새 기능 제안 |
+
+- **Assignee**: 직접 작업할 경우 본인을 assignee로 지정합니다.
 
 ## 브랜치 컨벤션
 
