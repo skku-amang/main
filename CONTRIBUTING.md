@@ -28,6 +28,8 @@ chore/upgrade-dependencies
 
 - PR 제목은 커밋과 동일한 Conventional Commits 형식을 따릅니다.
 - PR 본문은 [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) 템플릿을 따릅니다.
+- **Label**: 적절한 라벨을 1개 이상 추가합니다.
+- **Assignee**: PR 작성자를 assignee로 지정합니다.
 
 ## 커밋 컨벤션
 
