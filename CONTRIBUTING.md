@@ -18,6 +18,7 @@ GitHub Issues 탭에서 이슈 템플릿을 선택하여 작성합니다. 라벨
 | [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md) | 새 기능 제안 |
 
 - **Assignee**: 직접 작업할 경우 본인을 assignee로 지정합니다.
+- **Assignee (배정)**: 담당 분야에 맞는 팀원을 assignee로 지정합니다 (팀 섹션 참고).
 
 ## 브랜치 컨벤션
 
@@ -40,6 +41,7 @@ chore/upgrade-dependencies
 - PR 본문은 [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) 템플릿을 따릅니다.
 - **Label**: 적절한 라벨을 1개 이상 추가합니다.
 - **Assignee**: PR 작성자를 assignee로 지정합니다.
+- **Reviewer**: 변경 분야에 맞는 팀원을 reviewer로 지정합니다 (팀 섹션 참고).
 
 ## 커밋 컨벤션
 
