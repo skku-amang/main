@@ -220,12 +220,6 @@ export function TeamListDataTable<TValue>({
   const filterValues: Record<keyof State["filters"], FilterValue[]> = {
     필요세션: [
       {
-        label: "모두",
-        onChecked: () =>
-          dispatch({ type: "clearFilter", payload: { target: "필요세션" } }),
-        checked: state.filters.필요세션.size === 0
-      },
-      {
         label: "보컬",
         onChecked: (checked) =>
           dispatch({
@@ -290,15 +284,6 @@ export function TeamListDataTable<TValue>({
       }
     ],
     모집상태: [
-      {
-        label: "모두",
-        onChecked: () =>
-          dispatch({
-            type: "setFilter",
-            payload: { target: "모집상태", value: "all" }
-          }),
-        checked: state.filters.모집상태 === "all"
-      },
       {
         label: "Active",
         onChecked: (checked) =>
@@ -406,11 +391,11 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-[480px] rounded-[12px] p-0"
+                className="w-[526px] min-h-[408px] rounded-[12px] p-0"
               >
                 {/* 헤더 */}
-                <div className="flex items-center justify-between px-6 pb-3 pt-5">
-                  <div className="flex items-baseline gap-x-3">
+                <div className="flex items-center justify-between px-6 py-4">
+                  <div className="flex items-center gap-x-3">
                     <h3 className="text-xl font-bold">Filter</h3>
                     <button
                       onClick={() => {
@@ -423,13 +408,13 @@ export function TeamListDataTable<TValue>({
                           payload: { target: "모집상태", value: "all" }
                         })
                       }}
-                      className="text-xs text-sky-500 hover:text-sky-600"
+                      className="text-xs text-blue-500 hover:text-blue-600"
                     >
                       초기화
                     </button>
                   </div>
                   <button onClick={() => setFilterOpen(false)}>
-                    <X className="h-4 w-4 text-slate-400" />
+                    <X className="h-6 w-6 text-gray-500" />
                   </button>
                 </div>
 
