@@ -65,20 +65,27 @@ export default function EquipmentListPage() {
     null
   )
 
-  // Client-side filtering
+  // Client-side filtering + sorting (brand+model 알파벳순)
   const filtered = useMemo(() => {
     if (!equipments) return []
-    return equipments.filter((eq) => {
-      const matchesCategory = selectedCategories.includes(
-        eq.category as EquipCategory
+    return equipments
+      .filter((eq) => {
+        const matchesCategory = selectedCategories.includes(
+          eq.category as EquipCategory
+        )
+        const matchesSearch =
+          search === "" ||
+          `${eq.brand} ${eq.model} ${eq.description ?? ""}`
+            .toLowerCase()
+            .includes(search.toLowerCase())
+        return matchesCategory && matchesSearch
+      })
+      .sort(
+        (a, b) =>
+          a.category.localeCompare(b.category) ||
+          a.brand.localeCompare(b.brand) ||
+          a.model.localeCompare(b.model)
       )
-      const matchesSearch =
-        search === "" ||
-        `${eq.brand} ${eq.model} ${eq.description ?? ""}`
-          .toLowerCase()
-          .includes(search.toLowerCase())
-      return matchesCategory && matchesSearch
-    })
   }, [equipments, selectedCategories, search])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
