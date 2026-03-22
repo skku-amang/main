@@ -52,5 +52,5 @@ const RENTAL_COLORS = [
 
 /** rental.id를 해시해서 일관된 색상 반환 */
 export function getRentalColor(rentalId: number) {
-  return RENTAL_COLORS[rentalId % RENTAL_COLORS.length]
+  return RENTAL_COLORS[rentalId % RENTAL_COLORS.length]!
 }
