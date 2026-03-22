@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import dayjs from "dayjs"
-import isoWeek from "dayjs/plugin/isoWeek"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import DefaultPageHeader, {
@@ -20,15 +19,13 @@ import WeekLabel from "../../_components/WeekLable"
 import MonthCalendarField from "../../_components/MonthCalendarField"
 import MobileCalendarField from "../../_components/MobileCalendarField"
 
-dayjs.extend(isoWeek)
-
 export default function EquipmentCalendarPage() {
   const params = useParams()
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
 
-  const getMonday = (date = dayjs()) => date.startOf("isoWeek")
-  const [currentMonday, setCurrentMonday] = useState(getMonday())
+  const getWeekStart = (date = dayjs()) => date.startOf("week")
+  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
   const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
 
   useEffect(() => {
@@ -38,9 +35,9 @@ export default function EquipmentCalendarPage() {
   const queryRange = useMemo(() => {
     const monthStart = calendarViewMonth
       .startOf("month")
-      .startOf("isoWeek")
+      .startOf("week")
       .toDate()
-    const monthEnd = calendarViewMonth.endOf("month").endOf("isoWeek").toDate()
+    const monthEnd = calendarViewMonth.endOf("month").endOf("week").toDate()
     return { from: monthStart, to: monthEnd }
   }, [calendarViewMonth])
 
@@ -50,8 +47,8 @@ export default function EquipmentCalendarPage() {
   })
 
   const weekLabel = `${currentMonday.format("MMM DD")}–${currentMonday.add(6, "day").format("DD, YYYY")}`
-  const monthLabel = calendarViewMonth.format("MMMM YYYY")
-  const calendarStart = calendarViewMonth.startOf("month").startOf("isoWeek")
+  const monthLabel = calendarViewMonth.format("MMMM, YYYY")
+  const calendarStart = calendarViewMonth.startOf("month").startOf("week")
   const daysInCalendar = Array.from({ length: 42 }, (_, i) =>
     calendarStart.add(i, "day")
   )

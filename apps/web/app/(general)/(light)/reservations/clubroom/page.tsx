@@ -9,18 +9,16 @@ import MyReservationField from "../_components/MyReservationField"
 import AddScheduleButton from "../_components/AddScheduleButton"
 import WeekCalendarField from "../_components/WeekCalendarField"
 import { useEffect, useMemo, useState } from "react"
-import isoWeek from "dayjs/plugin/isoWeek"
 import WeekLabel from "../_components/WeekLable"
 import MonthCalendarField from "../_components/MonthCalendarField"
 import MobileCalendarField from "../_components/MobileCalendarField"
 import { useRentals } from "@/hooks/api/useRental"
 import { useEquipments } from "@/hooks/api/useEquipment"
-dayjs.extend(isoWeek)
 
 const ReservationPage = () => {
-  const getMonday = (date = dayjs()) => date.startOf("isoWeek")
+  const getWeekStart = (date = dayjs()) => date.startOf("week")
 
-  const [currentMonday, setCurrentMonday] = useState(getMonday())
+  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
   const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
 
   useEffect(() => {
@@ -31,9 +29,9 @@ const ReservationPage = () => {
   const queryRange = useMemo(() => {
     const monthStart = calendarViewMonth
       .startOf("month")
-      .startOf("isoWeek")
+      .startOf("week")
       .toDate()
-    const monthEnd = calendarViewMonth.endOf("month").endOf("isoWeek").toDate()
+    const monthEnd = calendarViewMonth.endOf("month").endOf("week").toDate()
     return { from: monthStart, to: monthEnd }
   }, [calendarViewMonth])
 
@@ -44,8 +42,8 @@ const ReservationPage = () => {
   const { data: equipments } = useEquipments("room")
 
   const weekLabel = `${currentMonday.format("MMM DD")}–${currentMonday.add(6, "day").format("DD, YYYY")}`
-  const monthLabel = calendarViewMonth.format("MMMM YYYY")
-  const calendarStart = calendarViewMonth.startOf("month").startOf("isoWeek")
+  const monthLabel = calendarViewMonth.format("MMMM, YYYY")
+  const calendarStart = calendarViewMonth.startOf("month").startOf("week")
   const daysInCalendar = Array.from({ length: 42 }, (_, i) =>
     calendarStart.add(i, "day")
   )

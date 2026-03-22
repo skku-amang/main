@@ -5,9 +5,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import dayjs, { Dayjs } from "dayjs"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import isoWeek from "dayjs/plugin/isoWeek"
-
-dayjs.extend(isoWeek)
 
 interface SmallCalendarProp {
   setCalendarViewMonth: React.Dispatch<React.SetStateAction<Dayjs>>
@@ -26,7 +23,7 @@ export default function SmallCalendar({
   setCurrentMonday,
   calendarViewMonth
 }: SmallCalendarProp) {
-  const dayList = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+  const dayList = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   return (
     <DropdownMenuContent className="mt-3 border-zinc-200 shadow-sm border-[1.5px] w-[278px]">
       <DropdownMenuLabel>
@@ -71,11 +68,11 @@ export default function SmallCalendar({
           {daysInCalendar.map((date, i) => {
             const isCurrentMonth = date.month() === calendarViewMonth.month()
             const isToday = date.isSame(dayjs(), "day")
-            const isViewedWeek = date.isSame(currentMonday, "isoWeek")
+            const isViewedWeek = date.isSame(currentMonday, "week")
             return (
               <div
                 key={i}
-                onClick={() => setCurrentMonday(date.startOf("isoWeek"))}
+                onClick={() => setCurrentMonday(date.startOf("week"))}
                 className={`h-9 text-sm flex justify-center items-center rounded-sm cursor-pointer duration-150 transition-colors
                 ${isCurrentMonth ? "text-zinc-950" : "text-zinc-300"} 
                 ${isViewedWeek && !isToday ? "bg-sky-50 rounded-none" : ""} ${isToday ? "bg-third rounded-lg text-zinc-50 hover:bg-third" : ""}

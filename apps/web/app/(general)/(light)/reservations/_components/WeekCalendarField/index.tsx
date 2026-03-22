@@ -14,10 +14,10 @@ export default function WeekCalendarField({
   // 현재 시간
   const currentTime = new Date()
 
-  // 현재 시간 표시용 계산 (07:00 시작, 15시간 표시)
-  const START_HOUR = 7
+  // 현재 시간 표시용 계산 (06:00 시작, 16시간 표시)
+  const START_HOUR = 6
   const ROW_H = 42 // px per hour
-  const TOTAL_MIN = 15 * 60
+  const TOTAL_MIN = 16 * 60
 
   const h = currentTime.getHours()
   const m = currentTime.getMinutes()

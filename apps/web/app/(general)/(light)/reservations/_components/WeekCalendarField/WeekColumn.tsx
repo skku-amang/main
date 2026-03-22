@@ -8,7 +8,7 @@ interface WeekColumnProp {
   rentals: RentalDetail[]
 }
 
-const START_HOUR = 7
+const START_HOUR = 6
 const PX_PER_HOUR = 42
 const HEADER_PX = 42
 
@@ -40,7 +40,7 @@ export default function WeekColumn({
       </div>
 
       {/* 시간 구간 */}
-      {Array.from({ length: 15 }).map((_, i) => (
+      {Array.from({ length: 16 }).map((_, i) => (
         <div
           key={i}
           className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"

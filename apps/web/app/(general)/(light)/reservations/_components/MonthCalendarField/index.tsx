@@ -1,9 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
-import isoWeek from "dayjs/plugin/isoWeek"
 import { RentalDetail } from "@repo/shared-types"
 import MonthBlock from "./MonthBlock"
-
-dayjs.extend(isoWeek)
 
 interface MonthCalendarFieldProps {
   currentMonday: Dayjs
@@ -14,14 +11,14 @@ export default function MonthCalendarField({
   currentMonday,
   rentals
 }: MonthCalendarFieldProps) {
-  const WeekLabelList = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  const WeekLabelList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
   // 1) 이 달의 첫째 날
   const currentMonth = currentMonday.startOf("month")
 
-  // 2) 월간 그리드의 시작/끝 (월~일 기준, ISO 주)
-  const gridStart = currentMonth.startOf("isoWeek")
-  const gridEnd = currentMonth.endOf("month").endOf("isoWeek")
+  // 2) 월간 그리드의 시작/끝 (일~토 기준)
+  const gridStart = currentMonth.startOf("week")
+  const gridEnd = currentMonth.endOf("month").endOf("week")
 
   // 3) 그리드에 들어갈 모든 날짜 생성
   const daysInGrid: Dayjs[] = []
