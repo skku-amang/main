@@ -40,7 +40,7 @@ export default function RentalDetailModal({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-muted-foreground" />
-            <div className="text-center">
+            <div className="text-left">
               <p className="text-xl font-semibold">{start.format("HH:mm")}</p>
               <p className="text-xs text-muted-foreground">
                 {start.format("dddd, MMMM DD, YYYY")}
@@ -48,7 +48,7 @@ export default function RentalDetailModal({
             </div>
           </div>
           <ArrowRight size={18} className="text-muted-foreground" />
-          <div className="text-center">
+          <div className="text-left">
             <p className="text-xl font-semibold">{end.format("HH:mm")}</p>
             <p className="text-xs text-muted-foreground">
               {end.format("dddd, MMMM DD, YYYY")}
