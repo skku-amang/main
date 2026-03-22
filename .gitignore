@@ -45,6 +45,11 @@ yarn-error.log*
 
 # MCP config (contains API keys)
 .mcp.json
+# Playwright MCP
+.playwright-mcp/
+
+# Temp
+tmp/
 
 # Misc
 .DS_Store
