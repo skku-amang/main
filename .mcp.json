@@ -21,6 +21,21 @@
         "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
         "SLACK_TEAM_ID": "T07LTTU4WSZ"
       }
+    },
+    "vercel": {
+      "type": "url",
+      "url": "https://mcp.vercel.com"
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-kubernetes"],
+      "env": {
+        "KUBECONFIG": "${KUBECONFIG}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
     }
   }
 }
