@@ -75,12 +75,12 @@ export default function WeekColumn({
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
           >
-            <p className={`text-[10px] font-semibold ${color.text} truncate`}>
+            <p className={`text-xs font-semibold ${color.text} truncate`}>
               {rental.title}
             </p>
             {heightPx > 30 && (
-              <p className={`text-[8px] ${color.text} opacity-70`}>
-                {start.format("h:mm")} - {end.format("h:mm")}
+              <p className={`text-[10px] ${color.text} opacity-70`}>
+                {start.format("h:mmA")} - {end.format("h:mmA")}
               </p>
             )}
           </div>

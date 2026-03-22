@@ -1,6 +1,5 @@
 import {
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
 import dayjs, { Dayjs } from "dayjs"
@@ -55,7 +54,7 @@ export default function SmallCalendar({
           </div>
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuItem className="p-0 px-2">
+      <div className="p-0 px-2">
         <div className="w-full pt-3 grid grid-cols-7">
           {Array.from({ length: 7 }).map((_, i) => (
             <div
@@ -83,7 +82,7 @@ export default function SmallCalendar({
             )
           })}
         </div>
-      </DropdownMenuItem>
+      </div>
     </DropdownMenuContent>
   )
 }

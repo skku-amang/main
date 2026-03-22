@@ -6,13 +6,17 @@ interface ReservationCardProps {
   startAt: Date
   endAt: Date
   users: { id: number; name: string }[]
+  isToday?: boolean
+  onClick?: () => void
 }
 
 export default function ReservationCard({
   title,
   startAt,
   endAt,
-  users
+  users,
+  isToday,
+  onClick
 }: ReservationCardProps) {
   const start = dayjs(startAt)
   const timeRange = `${start.format("h:mmA")} - ${dayjs(endAt).format("h:mmA")}`
@@ -22,12 +26,19 @@ export default function ReservationCard({
       : `${users[0]?.name} 외 ${users.length - 1}명`
 
   return (
-    <div className="w-full h-20 flex items-center bg-neutral-50 rounded-md">
-      <div className="w-[74px] text-zinc-700 flex flex-col items-center justify-center h-full">
-        <span className="text-base font-semibold leading-tight">
+    <div
+      className={`w-full h-20 flex items-center bg-neutral-50 rounded-md transition-colors ${onClick ? "cursor-pointer hover:bg-neutral-100" : ""}`}
+      onClick={onClick}
+    >
+      <div className="w-[74px] flex flex-col items-center justify-center h-full">
+        <span
+          className={`text-base font-semibold leading-tight ${isToday ? "text-primary" : "text-zinc-700"}`}
+        >
           {start.format("ddd")}
         </span>
-        <span className="text-2xl font-semibold leading-8">
+        <span
+          className={`text-2xl font-semibold leading-8 ${isToday ? "text-primary" : "text-zinc-700"}`}
+        >
           {start.format("DD")}
         </span>
       </div>

@@ -76,7 +76,10 @@ export default function ClubroomReservationPage() {
       {/* PC 페이지 */}
       <div className={`w-full min-h-[739px] hidden md:flex gap-5`}>
         <div className="w-1/4">
-          <MyReservationField rentals={rentalList} />
+          <MyReservationField
+            rentals={rentalList}
+            onRentalClick={setSelectedRental}
+          />
         </div>
         <div className="w-3/4">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>

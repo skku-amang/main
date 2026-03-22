@@ -1,15 +1,18 @@
 "use client"
 
+import dayjs from "dayjs"
 import { useSession } from "next-auth/react"
 import { RentalDetail } from "@repo/shared-types"
 import ReservationCard from "./ReservationCard"
 
 interface MyReservationFieldProps {
   rentals: RentalDetail[]
+  onRentalClick?: (rental: RentalDetail) => void
 }
 
 export default function MyReservationField({
-  rentals
+  rentals,
+  onRentalClick
 }: MyReservationFieldProps) {
   const { data: session } = useSession()
   const userId = session?.user?.id ? Number(session.user.id) : null
@@ -51,6 +54,8 @@ export default function MyReservationField({
               startAt={rental.startAt}
               endAt={rental.endAt}
               users={rental.users}
+              isToday={dayjs(rental.startAt).isSame(dayjs(), "day")}
+              onClick={onRentalClick ? () => onRentalClick(rental) : undefined}
             />
           ))
         ) : (

@@ -98,7 +98,10 @@ export default function EquipmentCalendarPage() {
       {/* PC layout */}
       <div className="hidden w-full min-h-[739px] gap-5 md:flex">
         <div className="w-1/4">
-          <MyReservationField rentals={rentalList} />
+          <MyReservationField
+            rentals={rentalList}
+            onRentalClick={setSelectedRental}
+          />
         </div>
         <div className="w-3/4">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
