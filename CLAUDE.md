@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance), 팀(Team), 세션(Session), 장비(Equipment) 관리 및 예약 기능 제공.
 
+## Conventions
+
+- **이슈, 브랜치, PR, 커밋**: [CONTRIBUTING.md](CONTRIBUTING.md)의 컨벤션을 따른다.
+
 ## Commands
 
 ```bash
