@@ -57,7 +57,7 @@ export default function AddScheduleButton({
 
   // Form state
   const [equipmentId, setEquipmentId] = useState<number | null>(
-    equipments.length === 1 ? equipments[0].id : null
+    equipments.length === 1 ? (equipments[0]?.id ?? null) : null
   )
   const [title, setTitle] = useState("")
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
@@ -73,7 +73,7 @@ export default function AddScheduleButton({
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const resetForm = () => {
-    setEquipmentId(equipments.length === 1 ? equipments[0].id : null)
+    setEquipmentId(equipments.length === 1 ? (equipments[0]?.id ?? null) : null)
     setTitle("")
     setStartDate(undefined)
     setEndDate(undefined)

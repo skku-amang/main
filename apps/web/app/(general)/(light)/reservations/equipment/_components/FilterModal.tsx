@@ -51,10 +51,6 @@ export default function FilterModal({
     onCategoriesChange(FILTER_CATEGORIES.map((c) => c.value))
   }
 
-  const reset = () => {
-    onCategoriesChange(FILTER_CATEGORIES.map((c) => c.value))
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
@@ -62,7 +58,7 @@ export default function FilterModal({
           <div className="flex items-center gap-3">
             <DialogTitle className="text-lg font-bold">Filter</DialogTitle>
             <button
-              onClick={reset}
+              onClick={selectAll}
               className="text-sm text-primary hover:underline"
             >
               초기화
