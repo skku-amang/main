@@ -84,14 +84,20 @@ const SheetInnerContent = ({
             >
               팀 모집
             </NavLink>
-            <span className="flex w-full cursor-not-allowed items-center gap-x-4 text-gray-300">
-              <Building2 size={iconSize} />
-              <span className="text-lg font-medium">공간 대여</span>
-            </span>
-            <span className="flex w-full cursor-not-allowed items-center gap-x-4 text-gray-300">
-              <Package size={iconSize} />
-              <span className="text-lg font-medium">물품 대여</span>
-            </span>
+            <NavLink
+              href={ROUTES.RESERVATION.CLUBROOM}
+              icon={<Building2 size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
+            >
+              공간 대여
+            </NavLink>
+            <NavLink
+              href={ROUTES.RESERVATION.EQUIPMENT}
+              icon={<Package size={iconSize} className={iconcolor} />}
+              onClick={() => setIsOpen(false)}
+            >
+              물품 대여
+            </NavLink>
             <NavLink
               href={ROUTES.PERFORMANCE.LIST}
               icon={<Archive size={iconSize} className={iconcolor} />}

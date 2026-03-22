@@ -34,12 +34,12 @@ const Header = ({
     {
       name: "공간 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
-      active: false
+      active: true
     },
     {
       name: "물품 대여",
       url: ROUTES.RESERVATION.EQUIPMENT,
-      active: false
+      active: true
     },
     { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true }
   ]
