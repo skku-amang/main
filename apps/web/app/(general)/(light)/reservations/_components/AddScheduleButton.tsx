@@ -273,6 +273,9 @@ export default function AddScheduleButton({
                   selected={startDate}
                   onSelect={setStartDate}
                   className="rounded-md border p-1"
+                  classNames={{
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
+                  }}
                 />
                 {errors.startDate && (
                   <p className="text-sm text-destructive">{errors.startDate}</p>
@@ -287,6 +290,9 @@ export default function AddScheduleButton({
                   selected={endDate}
                   onSelect={setEndDate}
                   className="rounded-md border p-1"
+                  classNames={{
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
+                  }}
                 />
                 {errors.endDate && (
                   <p className="text-sm text-destructive">{errors.endDate}</p>
