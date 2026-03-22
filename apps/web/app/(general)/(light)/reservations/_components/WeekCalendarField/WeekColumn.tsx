@@ -26,7 +26,7 @@ export default function WeekColumn({
   const dayRentals = rentals.filter((r) => dayjs(r.startAt).isSame(date, "day"))
 
   return (
-    <div className="w-[14.28%] relative border-x-[1.5px] border-gray-100">
+    <div className="w-[14.28%] relative overflow-hidden border-x-[1.5px] border-gray-100">
       {/* 헤더: 요일 + 날짜 */}
       <div className="w-full bg-gray-50 h-[42px] border-t-[1.5px] border-gray-100 text-xs text-black font-medium flex justify-center items-center gap-1">
         <span>{dayName}</span>
@@ -51,8 +51,15 @@ export default function WeekColumn({
       {dayRentals.map((rental) => {
         const start = dayjs(rental.startAt)
         const end = dayjs(rental.endAt)
-        const startMin = (start.hour() - START_HOUR) * 60 + start.minute()
-        const endMin = (end.hour() - START_HOUR) * 60 + end.minute()
+        const totalMin = 16 * 60 // 6AM~10PM
+        const startMin = Math.max(
+          0,
+          (start.hour() - START_HOUR) * 60 + start.minute()
+        )
+        const endMin = end.isSame(date, "day")
+          ? Math.min(totalMin, (end.hour() - START_HOUR) * 60 + end.minute())
+          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지 표시
+        if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
 
