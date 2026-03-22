@@ -24,7 +24,7 @@
     },
     "vercel": {
       "type": "http",
-      "url": "https://mcp.vercel.com/mcp"
+      "url": "https://mcp.vercel.com"
     },
     "kubernetes": {
       "command": "npx",
