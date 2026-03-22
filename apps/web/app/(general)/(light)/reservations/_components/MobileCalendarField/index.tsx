@@ -1,21 +1,24 @@
 import { Dayjs } from "dayjs"
+import { RentalDetail } from "@repo/shared-types"
 import MobileMonthBlock from "./MobileMonthBlock"
 
 interface MobileCalendarFieldProps {
   currentMonday: Dayjs
+  rentals: RentalDetail[]
 }
 
 export default function MobileCalendarField({
-  currentMonday
+  currentMonday,
+  rentals
 }: MobileCalendarFieldProps) {
-  const DayLabel = ["M", "T", "W", "T", "F", "S", "S"]
+  const DayLabel = ["S", "M", "T", "W", "T", "F", "S"]
 
   // 1) 이 달의 첫째 날
   const currentMonth = currentMonday.startOf("month")
 
-  // 2) 월간 그리드의 시작/끝 (월~일 기준, ISO 주)
-  const gridStart = currentMonth.startOf("isoWeek")
-  const gridEnd = currentMonth.endOf("month").endOf("isoWeek")
+  // 2) 월간 그리드의 시작/끝 (일~토 기준)
+  const gridStart = currentMonth.startOf("week")
+  const gridEnd = currentMonth.endOf("month").endOf("week")
 
   // 3) 그리드에 들어갈 모든 날짜 생성
   const daysInGrid: Dayjs[] = []
@@ -32,13 +35,17 @@ export default function MobileCalendarField({
         {DayLabel.map((Day, i) => (
           <div
             className="flex-1 font-medium h-11 flex justify-center items-center text-base text-secondary"
-            key={DayLabel[i]}
+            key={i}
           >
             {Day}
           </div>
         ))}
       </div>
-      <MobileMonthBlock days={daysInGrid} currentMonth={currentMonth} />
+      <MobileMonthBlock
+        days={daysInGrid}
+        currentMonth={currentMonth}
+        rentals={rentals}
+      />
     </div>
   )
 }

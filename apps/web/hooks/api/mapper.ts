@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Performance, Session, User } from "@repo/shared-types"
+import {
+  Equipment,
+  EquipmentRental,
+  EquipmentWithRentalLog,
+  Performance,
+  RentalDetail,
+  Session,
+  User
+} from "@repo/shared-types"
 
 /**
  * 필드별 변환 함수 타입 정의
@@ -109,6 +117,18 @@ export const TRANSFORM_CONFIGS = {
   },
 
   session: {
+    createdAt: FIELD_TRANSFORMERS.toDate,
+    updatedAt: FIELD_TRANSFORMERS.toDate
+  },
+
+  equipment: {
+    createdAt: FIELD_TRANSFORMERS.toDate,
+    updatedAt: FIELD_TRANSFORMERS.toDate
+  },
+
+  rentalLog: {
+    startAt: FIELD_TRANSFORMERS.toDate,
+    endAt: FIELD_TRANSFORMERS.toDate,
     createdAt: FIELD_TRANSFORMERS.toDate,
     updatedAt: FIELD_TRANSFORMERS.toDate
   }
@@ -233,6 +253,50 @@ export const mapSessions = createArrayConfigBasedMapper<
   Session,
   typeof TRANSFORM_CONFIGS.session
 >(TRANSFORM_CONFIGS.session)
+
+// Equipment 매퍼
+export const mapEquipment = createConfigBasedMapper<
+  Equipment,
+  typeof TRANSFORM_CONFIGS.equipment
+>(TRANSFORM_CONFIGS.equipment)
+
+export const mapEquipments = createArrayConfigBasedMapper<
+  Equipment,
+  typeof TRANSFORM_CONFIGS.equipment
+>(TRANSFORM_CONFIGS.equipment)
+
+// RentalLog (EquipmentRental 원본 - 중첩용)
+const mapRentalLog = createConfigBasedMapper<
+  EquipmentRental,
+  typeof TRANSFORM_CONFIGS.rentalLog
+>(TRANSFORM_CONFIGS.rentalLog)
+
+// EquipmentWithRentalLog 매퍼
+const equipmentWithRentalLogConfig = {
+  ...TRANSFORM_CONFIGS.equipment,
+  rentalLogs: FIELD_TRANSFORMERS.mapNestedArray(mapRentalLog)
+}
+
+export const mapEquipmentWithRentalLog = createConfigBasedMapper<
+  EquipmentWithRentalLog,
+  typeof equipmentWithRentalLogConfig
+>(equipmentWithRentalLogConfig)
+
+// Rental (RentalDetail = RentalLogWithUsers) 매퍼
+const rentalConfig = {
+  ...TRANSFORM_CONFIGS.rentalLog,
+  equipment: FIELD_TRANSFORMERS.mapNested(mapEquipment)
+}
+
+export const mapRental = createConfigBasedMapper<
+  RentalDetail,
+  typeof rentalConfig
+>(rentalConfig)
+
+export const mapRentals = createArrayConfigBasedMapper<
+  RentalDetail,
+  typeof rentalConfig
+>(rentalConfig)
 
 // 타입 테스트 (개발 시 확인용)
 type TestPerformance = MapperResult<

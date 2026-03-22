@@ -43,6 +43,8 @@ yarn-error.log*
 # Worktrees
 .worktrees
 
+# MCP config (contains API keys)
+.mcp.json
 # Playwright MCP
 .playwright-mcp/
 

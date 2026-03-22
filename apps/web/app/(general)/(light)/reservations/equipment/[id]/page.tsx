@@ -1,10 +1,10 @@
 import { Suspense } from "react"
-import ClubroomReservationPage from "./_components/ClubroomReservationPage"
+import EquipmentCalendarPage from "./_components/EquipmentCalendarPage"
 
 export default function Page() {
   return (
     <Suspense>
-      <ClubroomReservationPage />
+      <EquipmentCalendarPage />
     </Suspense>
   )
 }

@@ -1,13 +1,9 @@
 import {
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
 import dayjs, { Dayjs } from "dayjs"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import isoWeek from "dayjs/plugin/isoWeek"
-
-dayjs.extend(isoWeek)
 
 interface SmallCalendarProp {
   setCalendarViewMonth: React.Dispatch<React.SetStateAction<Dayjs>>
@@ -26,13 +22,16 @@ export default function SmallCalendar({
   setCurrentMonday,
   calendarViewMonth
 }: SmallCalendarProp) {
-  const dayList = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+  const dayList = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   return (
     <DropdownMenuContent className="mt-3 border-zinc-200 shadow-sm border-[1.5px] w-[278px]">
       <DropdownMenuLabel>
         <div className="w-full items-center text-zinc-950 font-medium text-sm flex justify-between">
           {/* 왼쪽 화살표: 전달로 이동 */}
           <div
+            role="button"
+            aria-label="이전 달로 이동"
+            tabIndex={0}
             onClick={() =>
               setCalendarViewMonth((prev) => prev.subtract(1, "month"))
             }
@@ -45,6 +44,9 @@ export default function SmallCalendar({
 
           {/* 오른쪽 화살표: 다음달로 이동 */}
           <div
+            role="button"
+            aria-label="다음 달로 이동"
+            tabIndex={0}
             onClick={() => setCalendarViewMonth((prev) => prev.add(1, "month"))}
             className="flex justify-center items-center size-7 rounded-sm border-[1px] border-zinc-200 cursor-pointer hover:bg-zinc-100"
           >
@@ -52,7 +54,7 @@ export default function SmallCalendar({
           </div>
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuItem className="p-0 px-2">
+      <div className="p-0 px-2">
         <div className="w-full pt-3 grid grid-cols-7">
           {Array.from({ length: 7 }).map((_, i) => (
             <div
@@ -65,11 +67,11 @@ export default function SmallCalendar({
           {daysInCalendar.map((date, i) => {
             const isCurrentMonth = date.month() === calendarViewMonth.month()
             const isToday = date.isSame(dayjs(), "day")
-            const isViewedWeek = date.isSame(currentMonday, "isoWeek")
+            const isViewedWeek = date.isSame(currentMonday, "week")
             return (
               <div
                 key={i}
-                onClick={() => setCurrentMonday(date.startOf("isoWeek"))}
+                onClick={() => setCurrentMonday(date.startOf("week"))}
                 className={`h-9 text-sm flex justify-center items-center rounded-sm cursor-pointer duration-150 transition-colors
                 ${isCurrentMonth ? "text-zinc-950" : "text-zinc-300"} 
                 ${isViewedWeek && !isToday ? "bg-sky-50 rounded-none" : ""} ${isToday ? "bg-third rounded-lg text-zinc-50 hover:bg-third" : ""}
@@ -80,7 +82,7 @@ export default function SmallCalendar({
             )
           })}
         </div>
-      </DropdownMenuItem>
+      </div>
     </DropdownMenuContent>
   )
 }

@@ -1,6 +1,26 @@
+"use client"
+
+import dayjs from "dayjs"
+import { useSession } from "next-auth/react"
+import { RentalDetail } from "@repo/shared-types"
 import ReservationCard from "./ReservationCard"
 
-export default function MyReservationField() {
+interface MyReservationFieldProps {
+  rentals: RentalDetail[]
+  onRentalClick?: (rental: RentalDetail) => void
+}
+
+export default function MyReservationField({
+  rentals,
+  onRentalClick
+}: MyReservationFieldProps) {
+  const { data: session } = useSession()
+  const userId = session?.user?.id ? Number(session.user.id) : null
+
+  const myRentals = userId
+    ? rentals.filter((r) => r.users.some((u) => u.id === userId))
+    : []
+
   const monthNames = [
     "January",
     "February",
@@ -16,6 +36,7 @@ export default function MyReservationField() {
     "December"
   ]
   const currentMonth = monthNames[new Date().getMonth()]
+
   return (
     <div className="w-full bg-white h-full py-7 px-5 rounded-[12px]">
       <div className="justify-start mb-4 text-Zinc-700 text-xl font-semibold">
@@ -25,8 +46,23 @@ export default function MyReservationField() {
         {currentMonth}
       </span>
       <div className="w-full flex flex-col pt-3 gap-[10px]">
-        {/* TODO: API 연결 시, map 함수 도입 */}
-        <ReservationCard />
+        {myRentals.length > 0 ? (
+          myRentals.map((rental) => (
+            <ReservationCard
+              key={rental.id}
+              title={rental.title}
+              startAt={rental.startAt}
+              endAt={rental.endAt}
+              users={rental.users}
+              isToday={dayjs(rental.startAt).isSame(dayjs(), "day")}
+              onClick={onRentalClick ? () => onRentalClick(rental) : undefined}
+            />
+          ))
+        ) : (
+          <p className="text-sm text-gray-400 text-center py-4">
+            예약이 없습니다
+          </p>
+        )}
       </div>
     </div>
   )
