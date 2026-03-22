@@ -51,3 +51,4 @@ yarn-error.log*
 # Storybook
 storybook-static
 .env*.local
+.envrc.local

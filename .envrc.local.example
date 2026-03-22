@@ -1,0 +1,12 @@
+# Claude Code MCP 토큰 설정
+# 이 파일을 .envrc.local로 복사한 후 토큰을 채워주세요.
+# cp .envrc.local.example .envrc.local
+
+# Notion: https://www.notion.so/profile/integrations 에서 아망 워크스페이스 Internal Integration 생성
+export NOTION_TOKEN=ntn_xxx
+
+# Figma: https://www.figma.com/developers/api#access-tokens 에서 Personal Access Token 생성
+export FIGMA_API_KEY=figd_xxx
+
+# Slack: 팀 공용 봇 토큰 — 장수에게 문의
+export SLACK_BOT_TOKEN=xoxb-xxx
