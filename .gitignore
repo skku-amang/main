@@ -43,6 +43,12 @@ yarn-error.log*
 # Worktrees
 .worktrees
 
+# Playwright MCP
+.playwright-mcp/
+
+# Temp
+tmp/
+
 # Misc
 .DS_Store
 *.pem
