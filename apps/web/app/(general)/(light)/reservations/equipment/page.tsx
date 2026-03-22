@@ -164,7 +164,7 @@ export default function EquipmentListPage() {
               setSearch(e.target.value)
               setPage(1)
             }}
-            className="pl-9"
+            className="pl-9 rounded-full"
           />
         </div>
       </div>

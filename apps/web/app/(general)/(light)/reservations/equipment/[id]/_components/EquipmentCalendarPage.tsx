@@ -19,6 +19,8 @@ import WeekCalendarField from "../../../_components/WeekCalendarField"
 import WeekLabel from "../../../_components/WeekLable"
 import MonthCalendarField from "../../../_components/MonthCalendarField"
 import MobileCalendarField from "../../../_components/MobileCalendarField"
+import RentalDetailModal from "../../../_components/RentalDetailModal"
+import { RentalDetail } from "@repo/shared-types"
 
 const viewOptions = ["week", "month"] as const
 
@@ -26,6 +28,9 @@ export default function EquipmentCalendarPage() {
   const [view, setView] = useQueryState(
     "view",
     parseAsStringLiteral(viewOptions).withDefault("week")
+  )
+  const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
+    null
   )
   const params = useParams()
   const equipmentId = Number(params.id)
@@ -105,6 +110,7 @@ export default function EquipmentCalendarPage() {
               <WeekCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -163,6 +169,14 @@ export default function EquipmentCalendarPage() {
           className="top-12 flex w-full justify-between px-5"
         />
       </div>
+
+      <RentalDetailModal
+        rental={selectedRental}
+        open={!!selectedRental}
+        onOpenChange={(open) => {
+          if (!open) setSelectedRental(null)
+        }}
+      />
     </div>
   )
 }

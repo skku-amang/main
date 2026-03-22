@@ -15,6 +15,8 @@ import MonthCalendarField from "../../_components/MonthCalendarField"
 import MobileCalendarField from "../../_components/MobileCalendarField"
 import { useRentals } from "@/hooks/api/useRental"
 import { useEquipments } from "@/hooks/api/useEquipment"
+import { RentalDetail } from "@repo/shared-types"
+import RentalDetailModal from "../../_components/RentalDetailModal"
 
 const viewOptions = ["week", "month"] as const
 
@@ -22,6 +24,9 @@ export default function ClubroomReservationPage() {
   const [view, setView] = useQueryState(
     "view",
     parseAsStringLiteral(viewOptions).withDefault("week")
+  )
+  const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
+    null
   )
   const getWeekStart = (date = dayjs()) => date.startOf("week")
 
@@ -84,6 +89,7 @@ export default function ClubroomReservationPage() {
               <WeekCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -142,6 +148,14 @@ export default function ClubroomReservationPage() {
           className="top-12 flex justify-between w-full px-5"
         />
       </div>
+
+      <RentalDetailModal
+        rental={selectedRental}
+        open={!!selectedRental}
+        onOpenChange={(open) => {
+          if (!open) setSelectedRental(null)
+        }}
+      />
     </div>
   )
 }

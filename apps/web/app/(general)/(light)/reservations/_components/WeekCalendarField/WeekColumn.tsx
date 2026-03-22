@@ -6,6 +6,7 @@ interface WeekColumnProp {
   offset: number
   nowTopPx: number
   rentals: RentalDetail[]
+  onRentalClick?: (rental: RentalDetail) => void
 }
 
 const START_HOUR = 6
@@ -16,7 +17,8 @@ export default function WeekColumn({
   currentMonday,
   nowTopPx,
   offset,
-  rentals
+  rentals,
+  onRentalClick
 }: WeekColumnProp) {
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
@@ -69,6 +71,7 @@ export default function WeekColumn({
             className="absolute left-0.5 right-0.5 bg-primary/20 border-l-2 border-primary rounded-r-sm px-1 overflow-hidden cursor-pointer hover:bg-primary/30 transition-colors"
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
+            onClick={() => onRentalClick?.(rental)}
           >
             <p className="text-[10px] font-semibold text-primary truncate">
               {rental.title}

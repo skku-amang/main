@@ -5,11 +5,13 @@ import WeekColumn from "./WeekColumn"
 interface WeekCalendarFieldProp {
   currentMonday: Dayjs
   rentals: RentalDetail[]
+  onRentalClick?: (rental: RentalDetail) => void
 }
 
 export default function WeekCalendarField({
   currentMonday,
-  rentals
+  rentals,
+  onRentalClick
 }: WeekCalendarFieldProp) {
   // 현재 시간
   const currentTime = new Date()
@@ -58,6 +60,7 @@ export default function WeekCalendarField({
             offset={i}
             currentMonday={currentMonday}
             rentals={rentals}
+            onRentalClick={onRentalClick}
             key={i}
           />
         ))}
