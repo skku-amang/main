@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
+import { getRentalColor } from "../rentalColors"
 
 interface WeekColumnProp {
   currentMonday: Dayjs
@@ -64,20 +65,21 @@ export default function WeekColumn({
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
+        const color = getRentalColor(rental.id)
 
         return (
           <div
             key={rental.id}
-            className="absolute left-0.5 right-0.5 bg-primary/20 border-l-2 border-primary rounded-r-sm px-1 overflow-hidden cursor-pointer hover:bg-primary/30 transition-colors"
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm px-1 overflow-hidden cursor-pointer ${color.hoverBg} transition-colors`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
           >
-            <p className="text-[10px] font-semibold text-primary truncate">
+            <p className={`text-[10px] font-semibold ${color.text} truncate`}>
               {rental.title}
             </p>
             {heightPx > 30 && (
-              <p className="text-[8px] text-primary/70">
+              <p className={`text-[8px] ${color.text} opacity-70`}>
                 {start.format("h:mm")} - {end.format("h:mm")}
               </p>
             )}

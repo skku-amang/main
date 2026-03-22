@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
+import { getRentalColor } from "../rentalColors"
 
 interface MonthBlockProps {
   days: Dayjs[]
@@ -31,14 +32,17 @@ export default function MonthBlock({
               {d.date()}
             </div>
 
-            {dayRentals.slice(0, 3).map((rental) => (
-              <div
-                key={rental.id}
-                className="mt-1 text-[9px] leading-tight bg-primary/10 text-primary rounded px-1 py-0.5 truncate"
-              >
-                {rental.title}
-              </div>
-            ))}
+            {dayRentals.slice(0, 3).map((rental) => {
+              const color = getRentalColor(rental.id)
+              return (
+                <div
+                  key={rental.id}
+                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-0.5 truncate`}
+                >
+                  {rental.title}
+                </div>
+              )
+            })}
             {dayRentals.length > 3 && (
               <div className="mt-0.5 text-[9px] text-gray-400 text-center">
                 +{dayRentals.length - 3}
