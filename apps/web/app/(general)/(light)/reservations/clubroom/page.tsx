@@ -9,13 +9,20 @@ import MyReservationField from "../_components/MyReservationField"
 import AddScheduleButton from "../_components/AddScheduleButton"
 import WeekCalendarField from "../_components/WeekCalendarField"
 import { useEffect, useMemo, useState } from "react"
+import { useQueryState, parseAsStringLiteral } from "nuqs"
 import WeekLabel from "../_components/WeekLable"
 import MonthCalendarField from "../_components/MonthCalendarField"
 import MobileCalendarField from "../_components/MobileCalendarField"
 import { useRentals } from "@/hooks/api/useRental"
 import { useEquipments } from "@/hooks/api/useEquipment"
 
+const viewOptions = ["week", "month"] as const
+
 const ReservationPage = () => {
+  const [view, setView] = useQueryState(
+    "view",
+    parseAsStringLiteral(viewOptions).withDefault("week")
+  )
   const getWeekStart = (date = dayjs()) => date.startOf("week")
 
   const [currentMonday, setCurrentMonday] = useState(getWeekStart())
@@ -67,7 +74,7 @@ const ReservationPage = () => {
           <MyReservationField rentals={rentalList} />
         </div>
         <div className="w-3/4">
-          <Tabs defaultValue="week">
+          <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
             <TabsList>
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>

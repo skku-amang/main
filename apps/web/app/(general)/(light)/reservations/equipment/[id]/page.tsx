@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useQueryState, parseAsStringLiteral } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import dayjs from "dayjs"
@@ -19,7 +20,13 @@ import WeekLabel from "../../_components/WeekLable"
 import MonthCalendarField from "../../_components/MonthCalendarField"
 import MobileCalendarField from "../../_components/MobileCalendarField"
 
+const viewOptions = ["week", "month"] as const
+
 export default function EquipmentCalendarPage() {
+  const [view, setView] = useQueryState(
+    "view",
+    parseAsStringLiteral(viewOptions).withDefault("week")
+  )
   const params = useParams()
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
@@ -89,7 +96,7 @@ export default function EquipmentCalendarPage() {
           <MyReservationField rentals={rentalList} />
         </div>
         <div className="w-3/4">
-          <Tabs defaultValue="week">
+          <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
             <TabsList>
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>
