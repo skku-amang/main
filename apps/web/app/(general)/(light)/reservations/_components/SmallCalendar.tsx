@@ -33,6 +33,9 @@ export default function SmallCalendar({
         <div className="w-full items-center text-zinc-950 font-medium text-sm flex justify-between">
           {/* 왼쪽 화살표: 전달로 이동 */}
           <div
+            role="button"
+            aria-label="이전 달로 이동"
+            tabIndex={0}
             onClick={() =>
               setCalendarViewMonth((prev) => prev.subtract(1, "month"))
             }
@@ -45,6 +48,9 @@ export default function SmallCalendar({
 
           {/* 오른쪽 화살표: 다음달로 이동 */}
           <div
+            role="button"
+            aria-label="다음 달로 이동"
+            tabIndex={0}
             onClick={() => setCalendarViewMonth((prev) => prev.add(1, "month"))}
             className="flex justify-center items-center size-7 rounded-sm border-[1px] border-zinc-200 cursor-pointer hover:bg-zinc-100"
           >

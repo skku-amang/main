@@ -81,7 +81,7 @@ export default function FilterModal({
             {FILTER_CATEGORIES.map(({ value, label }) => (
               <label
                 key={value}
-                className="flex cursor-pointer items-center gap-1.5"
+                className="flex items-center gap-2 cursor-pointer"
               >
                 <Checkbox
                   checked={selectedCategories.includes(value)}

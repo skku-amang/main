@@ -25,6 +25,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useToast } from "@/components/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
@@ -52,6 +53,7 @@ export default function AddScheduleButton({
   const { data: users } = useUsers()
   const createRental = useCreateRental()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   const currentUserId = session?.user?.id ? Number(session.user.id) : null
 
@@ -147,6 +149,16 @@ export default function AddScheduleButton({
           queryClient.invalidateQueries({ queryKey: ["rentals"] })
           setOpen(false)
           resetForm()
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: "예약 실패",
+            description:
+              error instanceof Error
+                ? error.message
+                : "예약을 추가하지 못했습니다."
+          })
         }
       }
     )

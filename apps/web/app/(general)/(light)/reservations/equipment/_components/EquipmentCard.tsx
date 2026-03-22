@@ -57,7 +57,11 @@ export default function EquipmentCard({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+            <div
+              role="img"
+              aria-label="이미지 없음"
+              className="flex h-full w-full items-center justify-center text-muted-foreground"
+            >
               <Search size={20} className="opacity-50" />
             </div>
           )}

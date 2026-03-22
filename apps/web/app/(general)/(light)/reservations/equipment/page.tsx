@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { EquipCategory } from "@repo/database"
 import { Equipment } from "@repo/shared-types"
-import { Filter, Plus, Search } from "lucide-react"
+import { Filter, Plus, Search, RefreshCw, PackageSearch } from "lucide-react"
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,8 +18,10 @@ import DefaultPageHeader, {
 } from "@/components/PageHeaders/Default"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { useEquipments, useDeleteEquipment } from "@/hooks/api/useEquipment"
+import { useToast } from "@/components/hooks/use-toast"
 
 import EquipmentCard from "./_components/EquipmentCard"
 import FilterModal, { FILTER_CATEGORIES } from "./_components/FilterModal"
@@ -33,6 +35,10 @@ export default function EquipmentListPage() {
   const { data: equipments, isLoading, isError, error } = useEquipments("item")
   const deleteEquipment = useDeleteEquipment()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  // Delete optimistic feedback
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   // Search & Filter state
   const [search, setSearch] = useState("")
@@ -85,9 +91,22 @@ export default function EquipmentListPage() {
       )
     )
       return
+    setDeletingId(equipment.id)
     deleteEquipment.mutate([equipment.id], {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["equipments"] })
+        setDeletingId(null)
+      },
+      onError: (err) => {
+        setDeletingId(null)
+        toast({
+          variant: "destructive",
+          title: "장비 삭제 실패",
+          description:
+            err instanceof Error
+              ? err.message
+              : "알 수 없는 오류가 발생했습니다."
+        })
       }
     })
   }
@@ -152,30 +171,75 @@ export default function EquipmentListPage() {
 
       {/* Equipment Grid */}
       {isError ? (
-        <div className="py-16 text-center text-destructive">
-          장비 목록을 불러오지 못했습니다:{" "}
-          {error instanceof Error ? error.message : "알 수 없는 오류"}
+        <div className="flex flex-col items-center gap-4 py-16">
+          <p className="text-destructive">
+            장비 목록을 불러오지 못했습니다:{" "}
+            {error instanceof Error ? error.message : "알 수 없는 오류"}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["equipments"] })
+            }
+          >
+            <RefreshCw size={16} />
+            &nbsp;다시 시도
+          </Button>
         </div>
       ) : isLoading ? (
-        <div className="py-16 text-center text-muted-foreground">
-          로딩 중...
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="rounded-lg border bg-card p-4">
+              <Skeleton className="mb-4 h-24 w-full rounded-md" />
+              <Skeleton className="mb-2 h-4 w-3/4" />
+              <Skeleton className="mb-2 h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+            </div>
+          ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-muted-foreground">
-          {search || selectedCategories.length < FILTER_CATEGORIES.length
-            ? "검색 결과가 없습니다."
-            : "등록된 장비가 없습니다."}
+        <div className="flex flex-col items-center gap-4 py-16 text-muted-foreground">
+          {search || selectedCategories.length < FILTER_CATEGORIES.length ? (
+            <p>검색 결과가 없습니다.</p>
+          ) : (
+            <>
+              <PackageSearch size={48} strokeWidth={1.5} />
+              <p>등록된 장비가 없습니다.</p>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditingEquipment(null)
+                    setFormOpen(true)
+                  }}
+                >
+                  <Plus size={16} />
+                  &nbsp;장비 추가
+                </Button>
+              )}
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {paged.map((eq) => (
-            <EquipmentCard
+            <div
               key={eq.id}
-              equipment={eq}
-              isAdmin={isAdmin}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+              className={
+                deletingId === eq.id
+                  ? "opacity-50 pointer-events-none"
+                  : undefined
+              }
+            >
+              <EquipmentCard
+                equipment={eq}
+                isAdmin={isAdmin}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </div>
           ))}
         </div>
       )}
