@@ -29,7 +29,7 @@ export default function RentalDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md rounded-2xl border-0 bg-primary/10 p-6">
+      <DialogContent className="max-w-md rounded-2xl border-0 bg-green-50 p-6">
         <DialogHeader className="flex-row items-start justify-between">
           <DialogTitle className="text-lg font-bold text-foreground">
             {rental.title}
