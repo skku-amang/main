@@ -153,7 +153,8 @@ export default function EquipmentListPage() {
       {/* Equipment Grid */}
       {isError ? (
         <div className="py-16 text-center text-destructive">
-          장비 목록을 불러오지 못했습니다: {error?.message ?? "알 수 없는 오류"}
+          장비 목록을 불러오지 못했습니다:{" "}
+          {error instanceof Error ? error.message : "알 수 없는 오류"}
         </div>
       ) : isLoading ? (
         <div className="py-16 text-center text-muted-foreground">
