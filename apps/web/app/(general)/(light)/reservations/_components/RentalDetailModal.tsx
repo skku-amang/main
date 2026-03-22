@@ -1,7 +1,7 @@
 "use client"
 
 import dayjs from "dayjs"
-import { ArrowRight, Clock, X } from "lucide-react"
+import { ArrowRight, Clock } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -30,16 +30,10 @@ export default function RentalDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl border-0 bg-green-50 p-6">
-        <DialogHeader className="flex-row items-start justify-between">
+        <DialogHeader>
           <DialogTitle className="text-lg font-bold text-foreground">
             {rental.title}
           </DialogTitle>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </DialogHeader>
 
         {/* Time */}
