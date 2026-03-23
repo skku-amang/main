@@ -59,6 +59,9 @@ export default function EquipmentListPage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
+  // Mobile search toggle
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+
   // Equipment form modal state
   const [formOpen, setFormOpen] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
@@ -133,7 +136,7 @@ export default function EquipmentListPage() {
   }
 
   return (
-    <div>
+    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="물품 대여"
         routes={[
@@ -144,7 +147,8 @@ export default function EquipmentListPage() {
       />
 
       {/* Toolbar: Filter + Admin Add + Search */}
-      <div className="mb-6 flex items-center justify-between gap-4">
+      {/* Desktop toolbar */}
+      <div className="mb-6 hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -171,7 +175,7 @@ export default function EquipmentListPage() {
         <div className="relative w-full max-w-xs">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <Input
             placeholder="검색"
@@ -180,9 +184,55 @@ export default function EquipmentListPage() {
               setSearch(e.target.value || null)
               setPage(1)
             }}
-            className="pl-9 rounded-full"
+            className="h-11 pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
           />
         </div>
+      </div>
+      {/* Mobile toolbar — icon-only buttons right-aligned */}
+      <div className="mb-4 flex items-center justify-end gap-2 sm:hidden">
+        {mobileSearchOpen ? (
+          <div className="relative flex-1 min-w-0">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <Input
+              autoFocus
+              placeholder="검색"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value || null)
+                setPage(1)
+              }}
+              onBlur={() => {
+                if (!search) setMobileSearchOpen(false)
+              }}
+              className="h-9 w-full pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
+            />
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={() => setMobileSearchOpen(true)}
+          >
+            <Search size={18} />
+          </Button>
+        )}
+        {isAdmin && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={() => {
+              setEditingEquipment(null)
+              setFormOpen(true)
+            }}
+          >
+            <Plus size={18} />
+          </Button>
+        )}
       </div>
 
       {/* Equipment Grid */}
@@ -260,9 +310,9 @@ export default function EquipmentListPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Desktop Pagination — numbered buttons */}
       {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-1">
+        <div className="mt-8 hidden items-center justify-center gap-1 sm:flex">
           <Button
             variant="ghost"
             size="icon"
@@ -330,6 +380,33 @@ export default function EquipmentListPage() {
             onClick={() => setPage(totalPages)}
           >
             <ChevronsRight size={16} />
+          </Button>
+        </div>
+      )}
+
+      {/* Mobile Pagination — simple "< Page X of Y >" */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3 sm:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            disabled={currentPage === 1}
+            onClick={() => setPage(Math.max(1, currentPage - 1))}
+          >
+            <ChevronLeft size={16} />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page&nbsp;&nbsp;{currentPage}&nbsp;&nbsp;of {totalPages}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            disabled={currentPage === totalPages}
+            onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+          >
+            <ChevronRight size={16} />
           </Button>
         </div>
       )}

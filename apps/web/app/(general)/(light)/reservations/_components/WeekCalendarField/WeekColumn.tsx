@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from "dayjs"
+import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
 
@@ -26,7 +27,15 @@ export default function WeekColumn({
   const dayNumber = date.format("D")
   const isToday = date.isSame(new Date(), "day")
 
-  const dayRentals = rentals.filter((r) => dayjs(r.startAt).isSame(date, "day"))
+  // 해당 날짜에 걸치는 모든 이벤트 (당일 시작 + 전날 시작~오늘 종료)
+  const dayRentals = rentals.filter((r) => {
+    const s = dayjs(r.startAt)
+    const e = dayjs(r.endAt)
+    return (
+      s.isSame(date, "day") ||
+      (s.isBefore(date, "day") && e.isAfter(date.startOf("day")))
+    )
+  })
 
   return (
     <div className="w-[14.28%] relative overflow-hidden border-x-[1.5px] border-gray-100">
@@ -55,13 +64,14 @@ export default function WeekColumn({
         const start = dayjs(rental.startAt)
         const end = dayjs(rental.endAt)
         const totalMin = 16 * 60 // 6AM~10PM
-        const startMin = Math.max(
-          0,
-          (start.hour() - START_HOUR) * 60 + start.minute()
-        )
-        const endMin = end.isSame(date, "day")
-          ? Math.min(totalMin, (end.hour() - START_HOUR) * 60 + end.minute())
-          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지 표시
+        const rawStartMin = start.isSame(date, "day")
+          ? (start.hour() - START_HOUR) * 60 + start.minute()
+          : 0 // 전날부터 이어지는 이벤트는 하루 시작부터
+        const startMin = Math.max(0, rawStartMin)
+        const rawEndMin = end.isSame(date, "day")
+          ? (end.hour() - START_HOUR) * 60 + end.minute()
+          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지
+        const endMin = Math.max(0, Math.min(totalMin, rawEndMin))
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
@@ -75,14 +85,31 @@ export default function WeekColumn({
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
           >
+            {heightPx > 30 && (
+              <div
+                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
+              >
+                <Clock size={10} className="shrink-0" />
+                <span>
+                  {start.format("h:mmA")} - {end.format("h:mmA")}
+                </span>
+              </div>
+            )}
+            {heightPx > 45 && rental.users.length > 0 && (
+              <div
+                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
+              >
+                <UserRound size={10} className="shrink-0" />
+                <span className="truncate">
+                  {rental.users.length <= 1
+                    ? (rental.users[0]?.name ?? "")
+                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`}
+                </span>
+              </div>
+            )}
             <p className={`text-xs font-semibold ${color.text} truncate`}>
               {rental.title}
             </p>
-            {heightPx > 30 && (
-              <p className={`text-[10px] ${color.text} opacity-70`}>
-                {start.format("h:mmA")} - {end.format("h:mmA")}
-              </p>
-            )}
           </div>
         )
       })}

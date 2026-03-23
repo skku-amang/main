@@ -138,15 +138,15 @@ export default function EquipmentFormModal({
         onOpenChange(value)
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold">
+          <DialogTitle className="text-xl font-bold">
             {isEditing ? "장비 수정" : "장비 추가"}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "수정할 장비의 정보를 입력해주세요"
-              : "추가할 장비의 정보를 입력해주세요"}
+              ? "수정할 장비의 정보를 입력해 주세요"
+              : "추가할 장비의 정보를 입력해 주세요"}
           </DialogDescription>
         </DialogHeader>
 
@@ -224,16 +224,18 @@ export default function EquipmentFormModal({
 
             {/* TODO: 장비 이미지 업로드 (백엔드 이미지 업로드 구현 후) */}
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-center gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
+                className="w-28"
                 onClick={() => onOpenChange(false)}
               >
                 취소
               </Button>
               <Button
                 type="submit"
+                className="w-28"
                 disabled={
                   createEquipment.isPending || updateEquipment.isPending
                 }

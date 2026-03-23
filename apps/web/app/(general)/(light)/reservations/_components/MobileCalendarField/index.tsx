@@ -5,11 +5,15 @@ import MobileMonthBlock from "./MobileMonthBlock"
 interface MobileCalendarFieldProps {
   currentMonday: Dayjs
   rentals: RentalDetail[]
+  onDateSelect?: (date: Dayjs) => void
+  selectedDate?: Dayjs | null
 }
 
 export default function MobileCalendarField({
   currentMonday,
-  rentals
+  rentals,
+  onDateSelect,
+  selectedDate
 }: MobileCalendarFieldProps) {
   const DayLabel = ["S", "M", "T", "W", "T", "F", "S"]
 
@@ -30,11 +34,11 @@ export default function MobileCalendarField({
     daysInGrid.push(d)
   }
   return (
-    <div className="w-full h-auto px-2 relative flex flex-col mx-auto bg-white pt-16 pb-5">
-      <div className="w-full flex">
+    <div className="relative mx-auto flex w-full flex-col bg-white px-4 pb-4 pt-20">
+      <div className="flex w-full">
         {DayLabel.map((Day, i) => (
           <div
-            className="flex-1 font-medium h-11 flex justify-center items-center text-base text-secondary"
+            className="flex h-10 flex-1 items-center justify-center text-[15px] font-semibold text-blue-600"
             key={i}
           >
             {Day}
@@ -45,6 +49,8 @@ export default function MobileCalendarField({
         days={daysInGrid}
         currentMonth={currentMonth}
         rentals={rentals}
+        onSelect={onDateSelect}
+        selectedDate={selectedDate}
       />
     </div>
   )

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import dayjs from "dayjs"
+import dayjs, { Dayjs } from "dayjs"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import DefaultPageHeader, {
@@ -19,19 +19,27 @@ import WeekCalendarField from "../../../_components/WeekCalendarField"
 import WeekLabel from "../../../_components/WeekLable"
 import MonthCalendarField from "../../../_components/MonthCalendarField"
 import MobileCalendarField from "../../../_components/MobileCalendarField"
+import MobileTimeSlots from "../../../_components/MobileCalendarField/MobileTimeSlots"
+import MobileMyReservations from "../../../_components/MobileCalendarField/MobileMyReservations"
 import RentalDetailModal from "../../../_components/RentalDetailModal"
 import { RentalDetail } from "@repo/shared-types"
 
 const viewOptions = ["week", "month"] as const
+const mobileTabOptions = ["schedule", "my"] as const
 
 export default function EquipmentCalendarPage() {
   const [view, setView] = useQueryState(
     "view",
     parseAsStringLiteral(viewOptions).withDefault("week")
   )
+  const [mobileTab, setMobileTab] = useQueryState(
+    "tab",
+    parseAsStringLiteral(mobileTabOptions).withDefault("schedule")
+  )
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
   const params = useParams()
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
@@ -73,7 +81,7 @@ export default function EquipmentCalendarPage() {
     : "로딩 중..."
 
   return (
-    <div>
+    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="물품 대여"
         routes={[
@@ -97,13 +105,13 @@ export default function EquipmentCalendarPage() {
 
       {/* PC layout */}
       <div className="hidden w-full min-h-[739px] gap-5 md:flex">
-        <div className="w-1/4">
+        <div className="w-[280px] shrink-0">
           <MyReservationField
             rentals={rentalList}
             onRentalClick={setSelectedRental}
           />
         </div>
-        <div className="w-3/4">
+        <div className="flex-1 min-w-0">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
             <TabsList>
               <TabsTrigger value="week">Week</TabsTrigger>
@@ -155,10 +163,12 @@ export default function EquipmentCalendarPage() {
       </div>
 
       {/* Mobile layout */}
-      <div className="relative mx-auto max-w-[400px] pt-6 md:hidden">
+      <div className="relative mx-auto max-w-[400px] md:hidden">
         <MobileCalendarField
           currentMonday={currentMonday}
           rentals={rentalList}
+          onDateSelect={setSelectedDate}
+          selectedDate={selectedDate}
         />
         <WeekLabel
           weekLabel={weekLabel}
@@ -171,6 +181,46 @@ export default function EquipmentCalendarPage() {
           mode="month"
           className="top-12 flex w-full justify-between px-5"
         />
+
+        {/* Mobile tabs */}
+        <div className="flex gap-2 px-4 py-4">
+          <button
+            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+              mobileTab === "schedule"
+                ? "bg-primary text-primary-foreground"
+                : "bg-white text-gray-400"
+            }`}
+            onClick={() => setMobileTab("schedule")}
+          >
+            예약 현황
+          </button>
+          <button
+            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+              mobileTab === "my"
+                ? "bg-primary text-primary-foreground"
+                : "bg-white text-gray-400"
+            }`}
+            onClick={() => setMobileTab("my")}
+          >
+            나의 예약
+          </button>
+        </div>
+
+        {/* Mobile tab content */}
+        <div className="bg-white px-3 pb-20">
+          {mobileTab === "schedule" ? (
+            <MobileTimeSlots
+              selectedDate={selectedDate}
+              rentals={rentalList}
+              onRentalClick={setSelectedRental}
+            />
+          ) : (
+            <MobileMyReservations
+              rentals={rentalList}
+              onRentalClick={setSelectedRental}
+            />
+          )}
+        </div>
       </div>
 
       <RentalDetailModal

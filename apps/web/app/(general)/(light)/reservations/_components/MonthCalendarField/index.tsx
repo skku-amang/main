@@ -31,7 +31,7 @@ export default function MonthCalendarField({
   }
 
   return (
-    <div className="w-full mt-7 flex flex-col bg-white">
+    <div className="w-full mt-7 flex flex-col bg-white rounded-xl overflow-hidden">
       {/* 요일 헤더 */}
       <div className="w-full flex">
         {WeekLabelList.map((label) => (
