@@ -81,3 +81,24 @@ resource "vercel_project_domain" "main" {
   project_id = vercel_project.web.id
   domain     = "amang.json-server.win"
 }
+
+resource "vercel_project_domain" "staging" {
+  project_id = vercel_project.web.id
+  domain     = "amang.staging.json-server.win"
+}
+
+resource "vercel_project_environment_variable" "site_url_production" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_SITE_URL"
+  value      = "https://amang.json-server.win"
+  target     = ["production"]
+}
+
+resource "vercel_project_environment_variable" "site_url_preview" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_SITE_URL"
+  value      = "https://amang.staging.json-server.win"
+  target     = ["preview", "development"]
+}
