@@ -59,6 +59,9 @@ export default function EquipmentListPage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
+  // Mobile search toggle
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+
   // Equipment form modal state
   const [formOpen, setFormOpen] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
@@ -185,46 +188,51 @@ export default function EquipmentListPage() {
           />
         </div>
       </div>
-      {/* Mobile toolbar */}
-      <div className="mb-4 flex flex-col gap-2 sm:hidden">
-        <div className="flex items-center gap-2">
+      {/* Mobile toolbar — icon-only buttons right-aligned */}
+      <div className="mb-4 flex items-center justify-end gap-2 sm:hidden">
+        {mobileSearchOpen ? (
+          <div className="relative flex-1 min-w-0">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <Input
+              autoFocus
+              placeholder="검색"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value || null)
+                setPage(1)
+              }}
+              onBlur={() => {
+                if (!search) setMobileSearchOpen(false)
+              }}
+              className="h-9 w-full pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
+            />
+          </div>
+        ) : (
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="h-9 w-9 shrink-0"
-            onClick={() => setFilterOpen(true)}
+            onClick={() => setMobileSearchOpen(true)}
           >
-            <Filter size={16} />
+            <Search size={18} />
           </Button>
-          {isAdmin && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 shrink-0"
-              onClick={() => {
-                setEditingEquipment(null)
-                setFormOpen(true)
-              }}
-            >
-              <Plus size={16} />
-            </Button>
-          )}
-        </div>
-        <div className="relative w-full">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <Input
-            placeholder="검색"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value || null)
-              setPage(1)
+        )}
+        {isAdmin && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={() => {
+              setEditingEquipment(null)
+              setFormOpen(true)
             }}
-            className="h-11 w-full pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
-          />
-        </div>
+          >
+            <Plus size={18} />
+          </Button>
+        )}
       </div>
 
       {/* Equipment Grid */}
@@ -302,9 +310,9 @@ export default function EquipmentListPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Desktop Pagination — numbered buttons */}
       {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-1">
+        <div className="mt-8 hidden items-center justify-center gap-1 sm:flex">
           <Button
             variant="ghost"
             size="icon"
@@ -327,10 +335,7 @@ export default function EquipmentListPage() {
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .filter((p) => {
               if (p === 1 || p === totalPages) return true
-              // Show fewer page numbers on mobile (±1) vs desktop (±2)
-              const range =
-                typeof window !== "undefined" && window.innerWidth < 640 ? 1 : 2
-              return Math.abs(p - currentPage) <= range
+              return Math.abs(p - currentPage) <= 2
             })
             .reduce<(number | "...")[]>((acc, p, i, arr) => {
               if (i > 0 && p - (arr[i - 1] ?? 0) > 1) acc.push("...")
@@ -375,6 +380,33 @@ export default function EquipmentListPage() {
             onClick={() => setPage(totalPages)}
           >
             <ChevronsRight size={16} />
+          </Button>
+        </div>
+      )}
+
+      {/* Mobile Pagination — simple "< Page X of Y >" */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3 sm:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            disabled={currentPage === 1}
+            onClick={() => setPage(Math.max(1, currentPage - 1))}
+          >
+            <ChevronLeft size={16} />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page&nbsp;&nbsp;{currentPage}&nbsp;&nbsp;of {totalPages}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            disabled={currentPage === totalPages}
+            onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+          >
+            <ChevronRight size={16} />
           </Button>
         </div>
       )}

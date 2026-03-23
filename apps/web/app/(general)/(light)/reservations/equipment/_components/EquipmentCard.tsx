@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Equipment } from "@repo/shared-types"
 import { EquipCategory } from "@repo/database"
-import { Check, MoreVertical, ScanSearch, Search } from "lucide-react"
+import { MoreVertical, ScanSearch, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
@@ -127,9 +127,8 @@ export default function EquipmentCard({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDelete?.(equipment)}
-                  className="justify-center text-sm font-medium"
+                  className="justify-center text-sm font-medium text-destructive focus:text-destructive"
                 >
-                  <Check size={14} className="mr-1" />
                   삭제하기
                 </DropdownMenuItem>
               </DropdownMenuContent>
