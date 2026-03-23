@@ -81,7 +81,7 @@ export default function EquipmentCalendarPage() {
     : "로딩 중..."
 
   return (
-    <div>
+    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="물품 대여"
         routes={[
@@ -105,13 +105,13 @@ export default function EquipmentCalendarPage() {
 
       {/* PC layout */}
       <div className="hidden w-full min-h-[739px] gap-5 md:flex">
-        <div className="w-1/4">
+        <div className="w-[280px] shrink-0">
           <MyReservationField
             rentals={rentalList}
             onRentalClick={setSelectedRental}
           />
         </div>
-        <div className="w-3/4">
+        <div className="flex-1 min-w-0">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
             <TabsList>
               <TabsTrigger value="week">Week</TabsTrigger>

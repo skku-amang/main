@@ -38,11 +38,11 @@ export default function MyReservationField({
   const currentMonth = monthNames[new Date().getMonth()]
 
   return (
-    <div className="w-full bg-white h-full py-7 px-5 rounded-[12px]">
-      <div className="justify-start mb-4 text-Zinc-700 text-xl font-semibold">
+    <div className="w-full bg-white h-full py-7 px-5 rounded-xl shadow-sm">
+      <div className="justify-start mb-4 text-zinc-700 text-[22px] font-semibold leading-tight">
         나의 예약현황
       </div>
-      <span className="justify-center text-gray-600 text-base font-semibold leading-none">
+      <span className="text-gray-600 text-base font-semibold leading-none">
         {currentMonth}
       </span>
       <div className="w-full flex flex-col pt-3 gap-[10px]">

@@ -133,7 +133,7 @@ export default function EquipmentListPage() {
   }
 
   return (
-    <div>
+    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="물품 대여"
         routes={[
@@ -144,7 +144,7 @@ export default function EquipmentListPage() {
       />
 
       {/* Toolbar: Filter + Admin Add + Search */}
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -171,7 +171,7 @@ export default function EquipmentListPage() {
         <div className="relative w-full max-w-xs">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <Input
             placeholder="검색"
@@ -180,7 +180,7 @@ export default function EquipmentListPage() {
               setSearch(e.target.value || null)
               setPage(1)
             }}
-            className="pl-9 rounded-full"
+            className="h-11 pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
           />
         </div>
       </div>

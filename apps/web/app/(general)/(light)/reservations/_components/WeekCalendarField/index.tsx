@@ -36,7 +36,7 @@ export default function WeekCalendarField({
     hour12: true
   })
   return (
-    <div className="w-full mt-7 flex bg-white">
+    <div className="w-full mt-7 flex bg-white rounded-xl overflow-hidden">
       <div className="w-7 flex flex-col">
         {Array.from({ length: 16 }).map((_, i) => {
           const hour = (i + 6) % 12 === 0 ? 12 : (i + 6) % 12

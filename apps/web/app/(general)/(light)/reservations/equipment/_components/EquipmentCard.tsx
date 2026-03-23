@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Equipment } from "@repo/shared-types"
 import { EquipCategory } from "@repo/database"
-import { MoreVertical, Pencil, ScanSearch, Search, Trash2 } from "lucide-react"
+import { Check, MoreVertical, ScanSearch, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
@@ -111,16 +111,21 @@ export default function EquipmentCard({
                   <MoreVertical size={16} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit?.(equipment)}>
-                  <Pencil size={14} />
+              <DropdownMenuContent
+                align="end"
+                className="w-[136px] rounded-xl p-1"
+              >
+                <DropdownMenuItem
+                  onClick={() => onEdit?.(equipment)}
+                  className="justify-center text-sm font-medium"
+                >
                   수정하기
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDelete?.(equipment)}
-                  className="text-destructive focus:text-destructive"
+                  className="justify-center text-sm font-medium"
                 >
-                  <Trash2 size={14} />
+                  <Check size={14} className="mr-1" />
                   삭제하기
                 </DropdownMenuItem>
               </DropdownMenuContent>

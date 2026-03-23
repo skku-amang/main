@@ -202,13 +202,13 @@ export default function AddScheduleButton({
         >
           <div className="flex gap-2 justify-center items-center">
             <PlusCircle size={18} />
-            Add Schedule
+            Add schedule
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Add schedule</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Add schedule</DialogTitle>
           <DialogDescription>예약 정보를 입력해주세요</DialogDescription>
         </DialogHeader>
 
