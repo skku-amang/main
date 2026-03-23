@@ -24,6 +24,8 @@ Production과 staging은 **같은 커밋(main HEAD)**에서 빌드되며, 환경
 
 `NEXT_PUBLIC_SITE_URL`은 신규 추가. 나머지는 기존 설정 유지.
 
+> **참고**: Preview 환경변수는 PR preview 배포에도 적용됨. PR preview에서 staging API를 사용하는 것이 현재 의도와 일치함 (기존 `NEXT_PUBLIC_API_URL` preview 설정도 동일 패턴).
+
 ## 변경 사항
 
 ### 1. Terraform — Vercel (`infra/terraform/vercel/main.tf`)
@@ -98,12 +100,25 @@ on:
     branches:
       - main
 
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
@@ -142,23 +157,26 @@ CLI로 설정 (수동 1회):
 # Vercel API token (Terraform에서 사용 중인 동일 토큰)
 gh secret set VERCEL_TOKEN --repo skku-amang/main
 
-# Vercel 프로젝트 식별자 (.envrc에서 확인)
-gh secret set VERCEL_ORG_ID --repo skku-amang/main --body "team_aDiKenl6xun665nVWV49POd4"
-gh secret set VERCEL_PROJECT_ID --repo skku-amang/main --body "prj_Be6ghVdveO0bbNJZrfyTFnQsXLRo"
+# Vercel 프로젝트 식별자 (.envrc에서 확인 가능)
+gh secret set VERCEL_ORG_ID --repo skku-amang/main
+gh secret set VERCEL_PROJECT_ID --repo skku-amang/main
 ```
 
-`VERCEL_TOKEN`은 `--body` 없이 실행하여 프롬프트에서 입력 (민감 정보).
+`VERCEL_TOKEN`과 ID 값은 `--body` 없이 실행하여 프롬프트에서 입력.
 
 ## 적용 순서
 
-1. **Terraform Cloudflare** — DNS 레코드 변경 (`terraform plan` → 사용자 승인 → `terraform apply`)
-2. **Terraform Vercel** — staging 도메인 + 환경변수 추가 (`terraform plan` → 사용자 승인 → `terraform apply`)
+1. **Terraform Vercel** — staging 도메인 + 환경변수 추가 (`terraform plan` → 사용자 승인 → `terraform apply`)
+2. **Terraform Cloudflare** — DNS 레코드 변경 (`terraform plan` → 사용자 승인 → `terraform apply`)
 3. **GHA Secrets** — `gh secret set` 명령 실행
 4. **GHA Workflow** — `deploy-staging.yml` 커밋 & push
 5. **검증** — main push 후 `amang.staging.json-server.win` 접근 확인
 
+> Vercel 도메인을 먼저 등록해야 DNS가 Vercel을 가리킬 때 즉시 서빙 가능. 순서를 바꾸면 DNS 전환 후 Vercel이 도메인을 인식하지 못하는 짧은 다운타임 발생.
+
 ## 주의 사항
 
-- Cloudflare DNS 변경 시 `amang.staging.json-server.win`이 homelab IP에서 Vercel로 전환됨. 기존에 해당 도메인으로 서비스 중인 웹 앱이 있다면 영향받음 (사용자 확인 완료).
+- Cloudflare DNS 변경 시 `amang.staging.json-server.win`이 homelab IP에서 Vercel로 전환됨 (사용자 확인 완료).
 - `*.amang.staging.json-server.win` 와일드카드 레코드는 변경하지 않음 — API 등 다른 staging 서비스는 여전히 homelab으로 연결.
 - Vercel CLI 버전은 `@latest`로 설치. CI 안정성이 중요하면 특정 버전 고정 고려.
+- 동시 push 시 `concurrency: cancel-in-progress` 설정으로 이전 배포를 취소하고 최신 커밋만 배포.
