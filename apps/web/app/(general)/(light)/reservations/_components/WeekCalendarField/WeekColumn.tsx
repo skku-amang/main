@@ -26,7 +26,15 @@ export default function WeekColumn({
   const dayNumber = date.format("D")
   const isToday = date.isSame(new Date(), "day")
 
-  const dayRentals = rentals.filter((r) => dayjs(r.startAt).isSame(date, "day"))
+  // 해당 날짜에 걸치는 모든 이벤트 (당일 시작 + 전날 시작~오늘 종료)
+  const dayRentals = rentals.filter((r) => {
+    const s = dayjs(r.startAt)
+    const e = dayjs(r.endAt)
+    return (
+      s.isSame(date, "day") ||
+      (s.isBefore(date, "day") && e.isAfter(date.startOf("day")))
+    )
+  })
 
   return (
     <div className="w-[14.28%] relative overflow-hidden border-x-[1.5px] border-gray-100">
@@ -55,13 +63,14 @@ export default function WeekColumn({
         const start = dayjs(rental.startAt)
         const end = dayjs(rental.endAt)
         const totalMin = 16 * 60 // 6AM~10PM
-        const startMin = Math.max(
-          0,
-          (start.hour() - START_HOUR) * 60 + start.minute()
-        )
-        const endMin = end.isSame(date, "day")
-          ? Math.min(totalMin, (end.hour() - START_HOUR) * 60 + end.minute())
-          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지 표시
+        const rawStartMin = start.isSame(date, "day")
+          ? (start.hour() - START_HOUR) * 60 + start.minute()
+          : 0 // 전날부터 이어지는 이벤트는 하루 시작부터
+        const startMin = Math.max(0, rawStartMin)
+        const rawEndMin = end.isSame(date, "day")
+          ? (end.hour() - START_HOUR) * 60 + end.minute()
+          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지
+        const endMin = Math.max(0, Math.min(totalMin, rawEndMin))
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
