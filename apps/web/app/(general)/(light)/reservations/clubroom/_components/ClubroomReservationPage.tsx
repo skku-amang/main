@@ -165,12 +165,12 @@ export default function ClubroomReservationPage() {
         />
 
         {/* Mobile tab buttons (pill style matching Figma) */}
-        <div className="flex gap-2 px-4 py-3">
+        <div className="flex gap-2 px-4 py-4">
           <button
             className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
               mobileTab === "schedule"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-neutral-700 hover:bg-gray-100"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "border border-gray-200 bg-white text-neutral-500 hover:bg-gray-50"
             }`}
             onClick={() => setMobileTab("schedule")}
           >
@@ -179,8 +179,8 @@ export default function ClubroomReservationPage() {
           <button
             className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
               mobileTab === "my"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-neutral-700 hover:bg-gray-100"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "border border-gray-200 bg-white text-neutral-500 hover:bg-gray-50"
             }`}
             onClick={() => setMobileTab("my")}
           >

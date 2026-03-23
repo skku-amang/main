@@ -43,7 +43,11 @@ export default function RentalDetailModal({
         <div className="flex items-center justify-between gap-3 px-1.5">
           {/* From */}
           <div className="flex items-center gap-2">
-            <Clock size={24} className="shrink-0 text-white" />
+            <Clock
+              size={24}
+              className="shrink-0"
+              style={{ color: "#15803D" }}
+            />
             <div>
               <p className="text-xl font-bold" style={{ color: "#374151" }}>
                 {start.format("HH:mm")}
@@ -55,11 +59,19 @@ export default function RentalDetailModal({
           </div>
 
           {/* Arrow */}
-          <ArrowRight size={32} className="shrink-0 text-white" />
+          <ArrowRight
+            size={32}
+            className="shrink-0"
+            style={{ color: "#15803D" }}
+          />
 
           {/* To */}
           <div className="flex items-center gap-2">
-            <Clock size={24} className="shrink-0 text-white" />
+            <Clock
+              size={24}
+              className="shrink-0"
+              style={{ color: "#15803D" }}
+            />
             <div>
               <p className="text-xl font-bold" style={{ color: "#374151" }}>
                 {end.format("HH:mm")}

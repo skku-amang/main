@@ -144,7 +144,8 @@ export default function EquipmentListPage() {
       />
 
       {/* Toolbar: Filter + Admin Add + Search */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      {/* Desktop toolbar */}
+      <div className="mb-6 hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -181,6 +182,47 @@ export default function EquipmentListPage() {
               setPage(1)
             }}
             className="h-11 pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
+          />
+        </div>
+      </div>
+      {/* Mobile toolbar */}
+      <div className="mb-4 flex flex-col gap-2 sm:hidden">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            onClick={() => setFilterOpen(true)}
+          >
+            <Filter size={16} />
+          </Button>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 shrink-0"
+              onClick={() => {
+                setEditingEquipment(null)
+                setFormOpen(true)
+              }}
+            >
+              <Plus size={16} />
+            </Button>
+          )}
+        </div>
+        <div className="relative w-full">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+          <Input
+            placeholder="검색"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value || null)
+              setPage(1)
+            }}
+            className="h-11 w-full pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
           />
         </div>
       </div>
@@ -285,7 +327,10 @@ export default function EquipmentListPage() {
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .filter((p) => {
               if (p === 1 || p === totalPages) return true
-              return Math.abs(p - currentPage) <= 2
+              // Show fewer page numbers on mobile (±1) vs desktop (±2)
+              const range =
+                typeof window !== "undefined" && window.innerWidth < 640 ? 1 : 2
+              return Math.abs(p - currentPage) <= range
             })
             .reduce<(number | "...")[]>((acc, p, i, arr) => {
               if (i > 0 && p - (arr[i - 1] ?? 0) > 1) acc.push("...")

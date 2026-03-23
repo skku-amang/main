@@ -71,7 +71,7 @@ export default function EquipmentCard({
                     e.stopPropagation()
                     setImageOpen(true)
                   }}
-                  className="absolute bottom-1 right-1 rounded-full bg-white/90 p-1 text-slate-800 opacity-0 shadow-md transition-opacity group-hover/img:opacity-100"
+                  className="absolute bottom-1 right-1 hidden rounded-full bg-white/90 p-1 text-slate-800 shadow-md transition-opacity group-hover/img:opacity-100 md:block md:opacity-0"
                 >
                   <ScanSearch size={14} />
                 </button>
@@ -95,9 +95,13 @@ export default function EquipmentCard({
             </h3>
             <div className="mt-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm">
               <span className="text-muted-foreground">모델명</span>
-              <span className="truncate">{equipment.model}</span>
+              <span className="truncate text-right md:text-left">
+                {equipment.model}
+              </span>
               <span className="text-muted-foreground">설명</span>
-              <span className="truncate">{equipment.description || "-"}</span>
+              <span className="truncate text-right md:text-left">
+                {equipment.description || "-"}
+              </span>
             </div>
           </div>
         </Link>

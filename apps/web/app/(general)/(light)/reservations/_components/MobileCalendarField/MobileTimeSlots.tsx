@@ -3,7 +3,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
-import { getRentalColor } from "../rentalColors"
 
 interface MobileTimeSlotsProps {
   selectedDate: Dayjs
@@ -11,85 +10,69 @@ interface MobileTimeSlotsProps {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-const START_HOUR = 6
-const END_HOUR = 22
-
 export default function MobileTimeSlots({
   selectedDate,
   rentals,
   onRentalClick
 }: MobileTimeSlotsProps) {
-  const dayRentals = rentals.filter((r) =>
-    dayjs(r.startAt).isSame(selectedDate, "day")
-  )
+  const dayRentals = rentals
+    .filter((r) => dayjs(r.startAt).isSame(selectedDate, "day"))
+    .sort(
+      (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
+    )
 
-  const hours = Array.from(
-    { length: END_HOUR - START_HOUR },
-    (_, i) => i + START_HOUR
-  )
-
-  const getRentalsAtHour = (hour: number) => {
-    return dayRentals.filter((r) => {
-      const startHour = dayjs(r.startAt).hour()
-      return startHour === hour
-    })
+  if (dayRentals.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+        <p className="text-sm">예약이 없습니다</p>
+      </div>
+    )
   }
 
   return (
-    <div className="flex flex-col">
-      {hours.map((hour) => {
-        const rentalsAtHour = getRentalsAtHour(hour)
-        const hasContent = rentalsAtHour.length > 0
-        const formattedHour = `${hour.toString().padStart(2, "0")}:00`
+    <div className="flex flex-col gap-2">
+      {dayRentals.map((rental) => {
+        const start = dayjs(rental.startAt)
+        const end = dayjs(rental.endAt)
+        const isToday = start.isSame(dayjs(), "day")
+        const timeRange = `${start.format("h:mmA")} - ${end.format("h:mmA")}`
+        const userLabel =
+          rental.users.length <= 1
+            ? (rental.users[0]?.name ?? "")
+            : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`
 
         return (
-          <div key={hour} className="flex min-h-[48px] border-b border-gray-50">
-            {/* Time label */}
-            <div
-              className={`w-[52px] shrink-0 pt-2.5 text-center text-[15px] font-medium tracking-wide ${
-                hasContent ? "font-semibold text-blue-600" : "text-neutral-500"
-              }`}
-            >
-              {formattedHour}
+          <div
+            key={rental.id}
+            className={`flex w-full items-center rounded-md bg-neutral-50 transition-colors ${onRentalClick ? "cursor-pointer hover:bg-neutral-100" : ""}`}
+            style={{ height: 80 }}
+            onClick={() => onRentalClick?.(rental)}
+          >
+            <div className="flex w-[74px] shrink-0 flex-col items-center justify-center">
+              <span
+                className={`text-base font-semibold leading-tight ${isToday ? "text-blue-500" : "text-zinc-700"}`}
+              >
+                {start.format("ddd")}
+              </span>
+              <span
+                className={`text-2xl font-semibold leading-8 ${isToday ? "text-blue-500" : "text-zinc-700"}`}
+              >
+                {start.format("DD")}
+              </span>
             </div>
-
-            {/* Content area */}
-            <div className="flex-1 py-1.5">
-              {rentalsAtHour.map((rental) => {
-                const start = dayjs(rental.startAt)
-                const end = dayjs(rental.endAt)
-                const color = getRentalColor(rental.id)
-                const userLabel =
-                  rental.users.length <= 1
-                    ? (rental.users[0]?.name ?? "")
-                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`
-
-                return (
-                  <div
-                    key={rental.id}
-                    className={`cursor-pointer rounded-md ${color.bg} border-l-2 ${color.border} px-3 py-2 ${color.hoverBg} transition-colors`}
-                    onClick={() => onRentalClick?.(rental)}
-                  >
-                    <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Clock size={10} />
-                        <span>
-                          {start.format("HH:mm")} - {end.format("HH:mm")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <UserRound size={10} />
-                        <span>{userLabel}</span>
-                      </div>
-                    </div>
-                    <p
-                      className={`mt-0.5 text-[13px] font-semibold ${color.text}`}
-                    >
-                      {rental.title}
-                    </p>
-                  </div>
-                )
-              })}
+            <div className="h-2/3 w-px bg-gray-200" />
+            <div className="flex flex-1 flex-col justify-center gap-[2px] pl-5">
+              <div className="flex items-center gap-2 text-gray-600">
+                <Clock size={12} />
+                <span className="text-[10px]">{timeRange}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <UserRound size={12} />
+                <span className="text-[10px]">{userLabel}</span>
+              </div>
+              <span className="text-xs font-semibold text-zinc-600">
+                {rental.title}
+              </span>
             </div>
           </div>
         )

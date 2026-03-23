@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from "dayjs"
+import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
 
@@ -84,14 +85,31 @@ export default function WeekColumn({
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
           >
+            {heightPx > 30 && (
+              <div
+                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
+              >
+                <Clock size={10} className="shrink-0" />
+                <span>
+                  {start.format("h:mmA")} - {end.format("h:mmA")}
+                </span>
+              </div>
+            )}
+            {heightPx > 45 && rental.users.length > 0 && (
+              <div
+                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
+              >
+                <UserRound size={10} className="shrink-0" />
+                <span className="truncate">
+                  {rental.users.length <= 1
+                    ? (rental.users[0]?.name ?? "")
+                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`}
+                </span>
+              </div>
+            )}
             <p className={`text-xs font-semibold ${color.text} truncate`}>
               {rental.title}
             </p>
-            {heightPx > 30 && (
-              <p className={`text-[10px] ${color.text} opacity-70`}>
-                {start.format("h:mmA")} - {end.format("h:mmA")}
-              </p>
-            )}
           </div>
         )
       })}
