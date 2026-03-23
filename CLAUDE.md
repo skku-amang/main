@@ -8,7 +8,40 @@ AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance
 
 ## Conventions
 
-- **이슈, 브랜치, PR, 커밋**: [CONTRIBUTING.md](CONTRIBUTING.md)의 컨벤션을 따른다.
+상세 내용은 [CONTRIBUTING.md](CONTRIBUTING.md) 참조. 아래는 핵심 규칙 요약 (서브에이전트 포함 모든 컨텍스트에서 반드시 준수):
+
+### 커밋
+
+[Conventional Commits v1.0.0](https://www.conventionalcommits.org/ko/v1.0.0/), **한글** 작성.
+
+```
+<타입>(<범위>): <설명>
+```
+
+- 타입: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
+- 범위: `web`, `api`, `db`, `types`, `api-client`, `ui`, `infra` (여러 범위: `feat(web,api): ...`)
+
+```
+feat(web): 공연 목록 페이지 무한 스크롤 추가
+fix(api): 팀 삭제 시 세션 cascade 누락 수정
+feat(web,api): 장비 예약 기능 구현
+```
+
+### 브랜치
+
+```
+<타입>/<영어-kebab-case>
+```
+
+예: `feat/equipment-reservation`, `fix/team-cascade-delete`
+
+### PR
+
+- 제목: 커밋과 동일한 Conventional Commits 형식
+- 라벨: `type:` + `scope:` 각 1개 이상 (예: `type: feat` + `scope: frontend`)
+- Assignee: PR 작성자
+- Reviewer: 변경 분야 담당자 (프론트: @ssukim12, 백엔드: @nhjbest22)
+- 본문: `.github/PULL_REQUEST_TEMPLATE.md` 템플릿 사용
 
 ## Commands
 
