@@ -1,0 +1,2 @@
+vercel_api_token = "" # Vercel Dashboard → Settings → Tokens
+vercel_team_id   = "team_aDiKenl6xun665nVWV49POd4"
