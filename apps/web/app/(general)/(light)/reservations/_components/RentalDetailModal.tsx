@@ -29,14 +29,7 @@ export default function RentalDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-[486px] rounded-3xl border-0 p-6 gap-4"
-        style={{
-          backgroundColor: "#F0FDF4",
-          boxShadow:
-            "0px 4px 6px 0px rgba(0, 0, 0, 0.05), 0px 4px 50px 0px rgba(0, 0, 0, 0.08)"
-        }}
-      >
+      <DialogContent className="max-w-[486px] rounded-3xl border-0 bg-[#F0FDF4] p-6 gap-4 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.05),0px_4px_50px_0px_rgba(0,0,0,0.08)]">
         <DialogHeader className="flex-row items-center justify-between gap-1.5">
           <DialogTitle
             className="text-2xl font-semibold"
