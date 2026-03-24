@@ -7,6 +7,7 @@
 | [@manamana32321](https://github.com/manamana32321) | 프로젝트 총괄 (전 분야) |
 | [@nhjbest22](https://github.com/nhjbest22)         | 백엔드                  |
 | [@ssukim12](https://github.com/ssukim12)           | 디자인, 프론트엔드      |
+| 윤규성                                             | 기획                    |
 
 ## 라벨
 
