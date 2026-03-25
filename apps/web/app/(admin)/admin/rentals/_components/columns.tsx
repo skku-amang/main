@@ -3,10 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
+import { UserCell } from "@/app/(admin)/_components/data-table/UserCell"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import ROUTES from "@/constants/routes"
 import { RentalDetail } from "@repo/shared-types"
 
 interface ColumnActions {
@@ -52,37 +55,75 @@ export function getColumns(actions: ColumnActions): ColumnDef<RentalDetail>[] {
         <DataTableColumnHeader column={column} title="장비" />
       ),
       meta: { label: "장비" },
-      cell: ({ row }) =>
-        row.original.equipment
-          ? `${row.original.equipment.brand} ${row.original.equipment.model}`
-          : "-"
+      cell: ({ row }) => {
+        const eq = row.original.equipment
+        if (!eq) return "-"
+        const label = `${eq.brand} ${eq.model}`
+        return (
+          <Link
+            href={`${ROUTES.ADMIN.EQUIPMENTS}?rowId=${eq.id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {label}
+          </Link>
+        )
+      }
     },
     {
       accessorKey: "startAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="시작 시간" />
       ),
-      meta: { label: "시작 시간" },
-      cell: ({ row }) =>
-        format(new Date(row.original.startAt), "yyyy-MM-dd HH:mm")
+      meta: { label: "시작 시간", editable: { type: "date" as const } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            ctx.row.original.startAt
+              ? format(new Date(ctx.row.original.startAt), "yyyy-MM-dd HH:mm")
+              : "-"
+          }
+        />
+      )
     },
     {
       accessorKey: "endAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="종료 시간" />
       ),
-      meta: { label: "종료 시간" },
-      cell: ({ row }) =>
-        format(new Date(row.original.endAt), "yyyy-MM-dd HH:mm")
+      meta: { label: "종료 시간", editable: { type: "date" as const } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            ctx.row.original.endAt
+              ? format(new Date(ctx.row.original.endAt), "yyyy-MM-dd HH:mm")
+              : "-"
+          }
+        />
+      )
     },
     {
-      id: "participantCount",
+      id: "participants",
       accessorFn: (row) => row.users.length,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="참여자 수" />
+        <DataTableColumnHeader column={column} title="참여자" />
       ),
-      meta: { label: "참여자 수" },
-      cell: ({ row }) => `${row.original.users.length}명`
+      meta: { label: "참여자" },
+      cell: ({ row }) => {
+        const users = row.original.users
+        if (!users || users.length === 0) return "-"
+        const first = users[0]
+        if (users.length === 1) return <UserCell user={first} />
+        return (
+          <span className="flex items-center gap-1">
+            <UserCell user={first} />
+            <span className="text-muted-foreground">
+              외 {users.length - 1}명
+            </span>
+          </span>
+        )
+      }
     },
     {
       accessorKey: "createdAt",
