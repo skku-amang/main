@@ -72,11 +72,26 @@ export function getColumns(actions: ColumnActions): ColumnDef<Equipment>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="카테고리" />
       ),
-      meta: { label: "카테고리" },
-      cell: ({ row }) => (
-        <Badge variant="outline">
-          {CATEGORY_LABELS[row.original.category] ?? row.original.category}
-        </Badge>
+      meta: {
+        label: "카테고리",
+        editable: {
+          type: "select",
+          options: Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
+            value,
+            label
+          }))
+        }
+      },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            <Badge variant="outline">
+              {CATEGORY_LABELS[ctx.row.original.category] ??
+                ctx.row.original.category}
+            </Badge>
+          }
+        />
       ),
       filterFn: (row, _id, filterValue) => {
         if (!filterValue) return true
