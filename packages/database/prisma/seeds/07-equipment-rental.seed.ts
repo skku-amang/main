@@ -72,7 +72,7 @@ const generateSequentialRentals = async (
             connect: rentalUsers.map((user) => ({ id: user.id }))
           },
           renter: {
-            connect: { id: rentalUsers[0].id }
+            connect: { id: rentalUsers[0]!.id }
           }
         }
       })
