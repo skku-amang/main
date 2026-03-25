@@ -14,7 +14,7 @@ import { rentalLogWithUserInlcude } from "@repo/shared-types"
 export class RentalService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createRentalDto: CreateRentalDto) {
+  async create(createRentalDto: CreateRentalDto, userId: number) {
     const { startAt, endAt, equipmentId, title, userIds } = createRentalDto
     const existingRental = await this.prisma.equipmentRental.findFirst({
       where: {
@@ -39,6 +39,9 @@ export class RentalService {
           },
           users: {
             connect: userIds.map((userId) => ({ id: userId }))
+          },
+          renter: {
+            connect: { id: userId }
           }
         },
         include: rentalLogWithUserInlcude
