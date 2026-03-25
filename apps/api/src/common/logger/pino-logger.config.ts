@@ -3,6 +3,7 @@ import { randomUUID } from "crypto"
 import type { Params } from "nestjs-pino"
 import type { PrettyOptions } from "pino-pretty"
 import PinoPretty from "pino-pretty"
+import { format } from "sql-formatter"
 
 const pinoPrettyOptions: PrettyOptions = {
   messageFormat: (log, messageKey) => {
@@ -11,6 +12,9 @@ const pinoPrettyOptions: PrettyOptions = {
     return msg && contextName
       ? `${msg} ${white("--")} ${contextName}`
       : `${msg}${contextName}`
+  },
+  customPrettifiers: {
+    query: (q) => format(String(q), { language: "postgresql" })
   },
   ignore: "context,hostname,pid,message"
 }
