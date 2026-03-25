@@ -41,20 +41,21 @@ export function getColumns(actions: ColumnActions): ColumnDef<RentalDetail>[] {
         editable: { type: "text" }
       },
       cell: (ctx) => (
-        <EditableCell
-          cellContext={ctx}
-          displayValue={ctx.row.original.title}
-        />
+        <EditableCell cellContext={ctx} displayValue={ctx.row.original.title} />
       )
     },
     {
       id: "equipment",
-      accessorFn: (row) => row.equipment?.name ?? "",
+      accessorFn: (row) =>
+        row.equipment ? `${row.equipment.brand} ${row.equipment.model}` : "",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="장비" />
       ),
       meta: { label: "장비" },
-      cell: ({ row }) => row.original.equipment?.name ?? "-"
+      cell: ({ row }) =>
+        row.original.equipment
+          ? `${row.original.equipment.brand} ${row.original.equipment.model}`
+          : "-"
     },
     {
       accessorKey: "startAt",
@@ -89,8 +90,7 @@ export function getColumns(actions: ColumnActions): ColumnDef<RentalDetail>[] {
         <DataTableColumnHeader column={column} title="생성일" />
       ),
       meta: { label: "생성일" },
-      cell: ({ row }) =>
-        format(new Date(row.original.createdAt), "yyyy-MM-dd")
+      cell: ({ row }) => format(new Date(row.original.createdAt), "yyyy-MM-dd")
     },
     {
       id: "actions",
