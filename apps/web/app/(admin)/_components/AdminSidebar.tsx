@@ -8,7 +8,8 @@ import {
   Users,
   Hash,
   Guitar,
-  Mic
+  Mic,
+  Package
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -33,7 +34,8 @@ const NAV_ITEMS = [
   { href: ROUTES.ADMIN.PERFORMANCES, label: "공연", icon: Music },
   { href: ROUTES.ADMIN.TEAMS, label: "팀", icon: Mic },
   { href: ROUTES.ADMIN.SESSIONS, label: "세션", icon: Guitar },
-  { href: ROUTES.ADMIN.RENTALS, label: "예약", icon: Calendar }
+  { href: ROUTES.ADMIN.RENTALS, label: "예약", icon: Calendar },
+  { href: ROUTES.ADMIN.EQUIPMENTS, label: "장비", icon: Package }
 ]
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
