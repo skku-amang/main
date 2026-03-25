@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
@@ -61,6 +61,13 @@ export default function AddScheduleButton({
   const [equipmentId, setEquipmentId] = useState<number | null>(
     equipments.length === 1 ? (equipments[0]?.id ?? null) : null
   )
+
+  // equipments prop이 비동기로 로딩될 때 equipmentId를 동기화
+  useEffect(() => {
+    if (equipments.length === 1 && equipmentId === null) {
+      setEquipmentId(equipments[0]?.id ?? null)
+    }
+  }, [equipments, equipmentId])
   const [title, setTitle] = useState("")
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
@@ -383,7 +390,7 @@ export default function AddScheduleButton({
 
             <div className="space-y-1.5">
               <label className="text-sm text-muted-foreground">Members</label>
-              <Select onValueChange={addUser} value="">
+              <Select onValueChange={addUser} value={undefined}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
