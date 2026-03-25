@@ -11,7 +11,9 @@ const ROUTES = {
     PERFORMANCES: "/admin/performances",
     TEAMS: "/admin/teams",
     TEAM_DETAIL: (teamId: number) => `/admin/teams/${teamId}`,
-    SESSIONS: "/admin/sessions"
+    SESSIONS: "/admin/sessions",
+    RENTALS: "/admin/rentals",
+    EQUIPMENTS: "/admin/equipments"
   },
   NOTICE: {
     CREATE: "/notices/create",

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  Calendar,
   LayoutDashboard,
   Menu,
   Music,
@@ -31,7 +32,8 @@ const NAV_ITEMS = [
   { href: ROUTES.ADMIN.GENERATIONS, label: "기수", icon: Hash },
   { href: ROUTES.ADMIN.PERFORMANCES, label: "공연", icon: Music },
   { href: ROUTES.ADMIN.TEAMS, label: "팀", icon: Mic },
-  { href: ROUTES.ADMIN.SESSIONS, label: "세션", icon: Guitar }
+  { href: ROUTES.ADMIN.SESSIONS, label: "세션", icon: Guitar },
+  { href: ROUTES.ADMIN.RENTALS, label: "예약", icon: Calendar }
 ]
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
