@@ -7,6 +7,7 @@ import { AllErrorFilter } from "./common/filters/all-error.filter"
 import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
+import { LoggingInterceptor } from "./common/interceptors/logging.interceptor"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -27,7 +28,10 @@ async function bootstrap() {
     new ZodValidationErrorFilter(httpAdapterHost),
     new ApiErrorFilter(httpAdapterHost)
   )
-  app.useGlobalInterceptors(new ApiResultInterceptor())
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new ApiResultInterceptor()
+  )
   const configService = app.get(ConfigService)
   await app.listen(configService.get<number>("PORT") ?? 8000)
 }
