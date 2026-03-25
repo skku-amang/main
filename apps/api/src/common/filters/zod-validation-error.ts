@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost } from "@nestjs/common"
+import { ExceptionFilter, Catch, ArgumentsHost, Logger } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
 import { ValidationError, Failure } from "@repo/api-client"
 import { ZodValidationException } from "nestjs-zod"
@@ -6,6 +6,8 @@ import { fromZodError } from "zod-validation-error/v3"
 
 @Catch(ZodValidationException)
 export class ZodValidationErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ZodValidationErrorFilter.name)
+
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: ZodValidationException, host: ArgumentsHost): void {
@@ -16,6 +18,10 @@ export class ZodValidationErrorFilter implements ExceptionFilter {
     const predefinedError = new ValidationError()
     const zodError = exception.getZodError()
     const validationError = fromZodError(zodError, { prefix: null })
+
+    this.logger.warn(
+      `Validation failed: ${validationError.message} [${request.method} ${request.url}]`
+    )
 
     const responseBody = {
       isSuccess: false,

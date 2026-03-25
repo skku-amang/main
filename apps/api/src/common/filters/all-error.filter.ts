@@ -3,27 +3,32 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
-  HttpException
+  HttpException,
+  Logger
 } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
 import { Failure, InternalServerError } from "@repo/api-client"
 
 @Catch()
 export class AllErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AllErrorFilter.name)
+
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
-  //TODO: Logger를 사용하여 상세한 에러 로그를 남기도록 수정해야 합니다.
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost
     const ctx = host.switchToHttp()
     const request = ctx.getRequest<Request>()
 
-    // 별도의 Logger를 사용하여 에러 로그를 남기도록 수정할 예정입니다.
     if (exception instanceof Error) {
-      console.error("Unhandled Error:", exception.name, exception.message)
-      console.error(exception.stack)
+      this.logger.error(
+        `Unhandled Error: ${exception.name} - ${exception.message}`,
+        exception.stack
+      )
     } else {
-      console.error("Unhandled Error:", JSON.stringify(exception, null, 2))
+      this.logger.error(
+        `Unhandled Error: ${JSON.stringify(exception, null, 2)}`
+      )
     }
 
     const httpStatus =
