@@ -4,11 +4,11 @@ import {
   OnModuleInit,
   OnModuleDestroy
 } from "@nestjs/common"
-import { PrismaClient } from "@repo/database"
+import { Prisma, PrismaClient } from "@repo/database"
 
 @Injectable()
 export class PrismaService
-  extends PrismaClient
+  extends PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel>
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name)
@@ -18,33 +18,30 @@ export class PrismaService
       log: [
         { emit: "event", level: "query" },
         { emit: "event", level: "error" },
+        { emit: "event", level: "info" },
         { emit: "event", level: "warn" }
       ]
     })
   }
 
   async onModuleInit() {
+    this.$on("error", (event) => {
+      this.logger.error(event)
+    })
+    this.$on("warn", (event) => {
+      this.logger.warn(event)
+    })
+    this.$on("info", (event) => {
+      this.logger.log(event)
+    })
+    this.$on("query", (event) => {
+      this.logger.debug(event, "SQL Query")
+    })
+
     await this.$connect()
-
-    this.$on("query" as never, (event: Record<string, unknown>) => {
-      this.logger.debug(
-        `Query: ${event.query} | Params: ${event.params} | Duration: ${event.duration}ms`
-      )
-    })
-
-    this.$on("error" as never, (event: Record<string, unknown>) => {
-      this.logger.error(`Prisma Error: ${event.message}`)
-    })
-
-    this.$on("warn" as never, (event: Record<string, unknown>) => {
-      this.logger.warn(`Prisma Warning: ${event.message}`)
-    })
-
-    this.logger.log("Prisma connected to database")
   }
 
   async onModuleDestroy() {
     await this.$disconnect()
-    this.logger.log("Prisma disconnected from database")
   }
 }

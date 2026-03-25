@@ -1,16 +1,17 @@
 import { ConfigService } from "@nestjs/config"
 import { HttpAdapterHost, NestFactory } from "@nestjs/core"
 import cookieParser from "cookie-parser"
+import { Logger, LoggerErrorInterceptor } from "nestjs-pino"
 import { ZodValidationPipe } from "nestjs-zod"
 import { AppModule } from "./app.module"
 import { AllErrorFilter } from "./common/filters/all-error.filter"
 import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
-import { LoggingInterceptor } from "./common/interceptors/logging.interceptor"
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, { bufferLogs: true })
+  app.useLogger(app.get(Logger))
   const httpAdapterHost = app.get(HttpAdapterHost)
   app.enableCors({
     origin: [
@@ -29,7 +30,7 @@ async function bootstrap() {
     new ApiErrorFilter(httpAdapterHost)
   )
   app.useGlobalInterceptors(
-    new LoggingInterceptor(),
+    new LoggerErrorInterceptor(),
     new ApiResultInterceptor()
   )
   const configService = app.get(ConfigService)
