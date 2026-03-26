@@ -1,6 +1,7 @@
 import { ConfigService } from "@nestjs/config"
 import { HttpAdapterHost, NestFactory } from "@nestjs/core"
 import cookieParser from "cookie-parser"
+import { Logger, LoggerErrorInterceptor } from "nestjs-pino"
 import { ZodValidationPipe } from "nestjs-zod"
 import { AppModule } from "./app.module"
 import { AllErrorFilter } from "./common/filters/all-error.filter"
@@ -9,7 +10,8 @@ import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, { bufferLogs: true })
+  app.useLogger(app.get(Logger))
   const httpAdapterHost = app.get(HttpAdapterHost)
   app.enableCors({
     origin: [
@@ -27,7 +29,10 @@ async function bootstrap() {
     new ZodValidationErrorFilter(httpAdapterHost),
     new ApiErrorFilter(httpAdapterHost)
   )
-  app.useGlobalInterceptors(new ApiResultInterceptor())
+  app.useGlobalInterceptors(
+    new LoggerErrorInterceptor(),
+    new ApiResultInterceptor()
+  )
   const configService = app.get(ConfigService)
   await app.listen(configService.get<number>("PORT") ?? 8000)
 }

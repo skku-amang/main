@@ -1,15 +1,21 @@
-import { ExceptionFilter, Catch, ArgumentsHost } from "@nestjs/common"
+import { ExceptionFilter, Catch, ArgumentsHost, Logger } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
 import { ApiError, Failure } from "@repo/api-client"
 
 @Catch(ApiError)
 export class ApiErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ApiErrorFilter.name)
+
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: ApiError, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost
     const ctx = host.switchToHttp()
     const request = ctx.getRequest<Request>()
+
+    this.logger.warn(
+      `${exception.title}: ${exception.detail} [${request.method} ${request.url}]`
+    )
 
     const responseBody = {
       isSuccess: false,
