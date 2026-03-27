@@ -8,8 +8,10 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
-  Query
+  Query,
+  Req
 } from "@nestjs/common"
+import { Request } from "express"
 import { RentalService } from "./rental.service"
 import { CreateRentalDto } from "./dto/create-rental.dto"
 import { UpdateRentalDto } from "./dto/update-rental.dto"
@@ -17,6 +19,7 @@ import { GetRentalQueryDto } from "./dto/get-rentals-query.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { Public } from "../auth/decorators/public.decorator"
 import { RentalOwnerGuard } from "../auth/guards/rental-owner.guard"
+import { JwtPayload } from "@repo/shared-types"
 
 @Controller("rentals")
 @UseGuards(AccessTokenGuard)
@@ -24,8 +27,9 @@ export class RentalController {
   constructor(private readonly rentalService: RentalService) {}
 
   @Post()
-  async create(@Body() createRentalDto: CreateRentalDto) {
-    return this.rentalService.create(createRentalDto)
+  async create(@Body() createRentalDto: CreateRentalDto, @Req() req: Request) {
+    const user = req.user as JwtPayload
+    return this.rentalService.create(createRentalDto, user.sub)
   }
 
   @Get()

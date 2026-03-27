@@ -56,7 +56,8 @@ model User {
   joinedTeams  TeamMember[]
   leadingTeams Team[]       @relation("teamLeader")
 
-  rentalLogs EquipmentRental[]
+  rentalLogs     EquipmentRental[] @relation("rentalUsers")
+  createdRentals EquipmentRental[] @relation("rentalCreator")
 
   @@map("users")
 }
@@ -202,7 +203,9 @@ model EquipmentRental {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
+  renterId Int?
+  renter   User?  @relation("rentalCreator", fields: [renterId], references: [id], onDelete: SetNull)
+  users    User[] @relation("rentalUsers")
 
   @@map("equipment_rentals")
 }

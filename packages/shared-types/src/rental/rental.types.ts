@@ -1,5 +1,5 @@
 import { Prisma, EquipmentRental } from "@repo/database"
-import { publicUserSelector } from "../user/user.types"
+import { publicUserSelector, basicUserSelector } from "../user/user.types"
 
 export type { EquipmentRental }
 
@@ -7,6 +7,9 @@ export const rentalLogWithUserInlcude = {
   equipment: true,
   users: {
     select: publicUserSelector
+  },
+  renter: {
+    select: basicUserSelector
   }
 } satisfies Prisma.EquipmentRentalInclude
 

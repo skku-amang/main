@@ -16,6 +16,7 @@ const seedMasterData = async () => {
   console.log("Seeding master data...")
   await seedSessions(prisma)
   await seedGenerations(prisma)
+  await seedEquipment(prisma)
   console.log("Master data seeding finished.")
 }
 
