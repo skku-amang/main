@@ -17,16 +17,18 @@ type FieldTransformer<TInput = any, TOutput = any> = (value: TInput) => TOutput
 /**
  * HTTP JSON 변환으로 인해 변경된 타입을 나타내는 타입
  * Date → string, 기타 타입은 그대로 유지
+ *
+ * `Date extends T`로 "T가 Date를 포함하는가"를 검사하여,
+ * 조건부 타입이 유니온에 분배 적용되는 것을 방지한다.
+ * (기존 방식인 `T extends Date | null`은 `null` 단독으로도 참이 되어
+ * `null`이 `string | null`로 잘못 변환되는 문제가 있었음)
  */
-type SerializedType<T> = T extends Date
-  ? string
-  : T extends Date | undefined
-    ? string | undefined
-    : T extends Date | null
-      ? string | null
-      : T extends Date | null | undefined
-        ? string | null | undefined
-        : T
+type SerializedType<T> = Date extends T
+  ?
+      | string
+      | (null extends T ? null : never)
+      | (undefined extends T ? undefined : never)
+  : T
 
 /**
  * 전체 객체에 대해 직렬화된 타입으로 변환
