@@ -3,10 +3,9 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["PORT", "NODE_ENV", "DATABASE_URL"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "format": {
       "dependsOn": ["^format"]
@@ -16,7 +15,6 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "persistent": true,
       "env": ["NODE_ENV"]
     },
     "check-types": {
@@ -39,7 +37,7 @@
     },
     "db:seed": {
       "cache": false,
-      "dependsOn": ["^db:generate", "^db:migrate"],
+      "dependsOn": ["db:generate", "db:migrate"],
       "env": ["DATABASE_URL", "SEED_DEFAULT_PASSWORD"]
     },
     "storybook": {

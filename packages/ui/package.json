@@ -13,7 +13,6 @@
     }
   },
   "scripts": {
-    "build": "tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",

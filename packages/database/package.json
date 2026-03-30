@@ -7,7 +7,7 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "prisma generate && tsc",
+    "build": "tsc",
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.ts\"",
