@@ -1,3 +1,6 @@
+// Import this first!
+import "./instrument"
+
 import { ConfigService } from "@nestjs/config"
 import { HttpAdapterHost, NestFactory } from "@nestjs/core"
 import cookieParser from "cookie-parser"
