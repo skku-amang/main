@@ -7,5 +7,6 @@ data:
   REFRESH_TOKEN_EXPIRES_IN_SECONDS: "604800"
   S3_REGION: ap-northeast-2
   S3_BUCKET: amang
+  S3_ENDPOINT: https://s3.amang.json-server.win
   NODE_ENV: production
   SENTRY_DSN: https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824
