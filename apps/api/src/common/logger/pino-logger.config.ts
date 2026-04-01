@@ -22,7 +22,9 @@ const pinoPrettyOptions: PrettyOptions = {
 export const pinoLoggerModuleOption: Params = {
   pinoHttp: {
     level: process.env.NODE_ENV === "production" ? "info" : "trace",
-    autoLogging: true,
+    autoLogging: {
+      ignore: (req) => req.url === "/health"
+    },
     formatters: {
       level(label) {
         return { level: label }
