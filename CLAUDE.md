@@ -10,6 +10,16 @@ AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance
 
 - **이슈, 브랜치, PR, 커밋**: [CONTRIBUTING.md](CONTRIBUTING.md)의 컨벤션을 따른다.
 
+## Onboarding
+
+신규 팀원 온보딩 또는 "온보딩 해줘" 요청 시 `scripts/setup.sh`를 실행한다.
+
+```bash
+./scripts/setup.sh
+```
+
+Prerequisites: Node.js 20+, Docker, direnv(선택). 스크립트가 pnpm 설치, 환경변수 복사, Docker 컨테이너 기동, DB 마이그레이션·시드를 자동으로 처리한다.
+
 ## Commands
 
 ```bash

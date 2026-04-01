@@ -35,55 +35,51 @@ packages/
 ### 사전 요구사항
 
 - **Node.js** >= 20.9.0
-- **pnpm** 10.x (`corepack enable`로 활성화)
 - **Docker** (PostgreSQL, MinIO 실행용)
+- **direnv** (선택 — MCP 도구 연동 시 필요)
 
-### 1. 클론 및 의존성 설치
+### 원커맨드 셋업
 
 ```bash
 git clone https://github.com/skku-amang/main.git
 cd main
-pnpm install
+./scripts/setup.sh
 ```
 
-### 2. 환경변수 설정
+pnpm 설치, 환경변수 복사, Docker 컨테이너 기동, DB 마이그레이션·시드까지 자동으로 처리됩니다.
 
-```bash
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
-cp packages/database/.env.example packages/database/.env
-```
-
-기본값이 로컬 개발에 맞게 설정되어 있으므로 그대로 사용해도 됩니다.
-
-### 3. DB 및 스토리지 실행
-
-```bash
-cd apps/api
-docker compose up -d
-```
-
-PostgreSQL(포트 5433)과 MinIO(포트 9000/9001)가 실행됩니다.
-
-### 4. 데이터베이스 마이그레이션 및 시드
-
-```bash
-# 프로젝트 루트에서
-pnpm db:deploy                          # 마이그레이션 적용
-cd packages/database
-pnpm db:generate                        # Prisma 클라이언트 생성
-pnpm db:seed                            # 시드 데이터 삽입
-```
-
-### 5. 개발 서버 실행
-
-```bash
-# 프로젝트 루트에서
-pnpm dev
-```
+완료 후 `pnpm dev`로 개발 서버를 실행합니다.
 
 - 웹: http://localhost:3000
 - API: http://localhost:8000
+- MinIO 콘솔: http://localhost:9001
+
+<details>
+<summary>수동 셋업 (참고용)</summary>
+
+```bash
+# 1. pnpm 활성화 및 의존성 설치
+corepack enable
+pnpm install
+
+# 2. 환경변수 복사 (기본값이 로컬 개발에 맞게 설정되어 있음)
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+cp packages/database/.env.example packages/database/.env
+
+# 3. Docker 컨테이너 실행 (PostgreSQL, MinIO)
+docker compose -f apps/api/docker-compose.yml up -d
+
+# 4. DB 셋업
+cd packages/database
+pnpm db:generate    # Prisma 클라이언트 생성
+cd ../..
+pnpm db:deploy      # 마이그레이션 적용
+cd packages/database
+pnpm db:seed        # 시드 데이터 삽입
+```
+
+</details>
 
 ## 자주 쓰는 명령어
 
@@ -135,3 +131,16 @@ Web (TanStack Query) → ApiClient (@repo/api-client) → API (NestJS) → Prism
 
 - **인증**: next-auth v5 → JWT access/refresh 토큰 → ApiClient가 토큰 자동 갱신
 - **타입 안전성**: `@repo/shared-types`의 Zod 스키마를 프론트/백엔드에서 공유
+
+## 기여 방법
+
+[CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요. 이슈 → 브랜치 → PR 워크플로우를 따릅니다.
+
+## 커뮤니케이션
+
+| 채널 | 용도 |
+|------|------|
+| [GitHub Issues](https://github.com/skku-amang/main/issues) | 버그 리포트, 기능 제안 |
+| Slack (Amang-Homepage) | 실시간 소통 |
+| Notion (아망 워크스페이스) | 기획, 회의록, 문서 |
+| Figma | UI/UX 디자인 |
