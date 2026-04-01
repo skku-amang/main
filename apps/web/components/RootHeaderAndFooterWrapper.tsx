@@ -37,8 +37,8 @@ const RootHeaderAndFooterWrapper = ({
   useHeader = true,
   headerMode = useHeader ? "light" : undefined
 }: RootHeaderAndFooterWrapperProps) => {
-  const headerHeightPiexel = 82
-  const footerHeightPiexl = 120
+  const headerHeightPixel = 82
+  const footerHeightPixel = 120
 
   const toPixelString = (value: number) => `${value}px`
 
@@ -46,22 +46,22 @@ const RootHeaderAndFooterWrapper = ({
     <div className="h-screen">
       <Header
         position="fixed"
-        height={toPixelString(headerHeightPiexel)}
+        height={toPixelString(headerHeightPixel)}
         mode={headerMode}
       />
 
       <main
         className={cn("h-auto min-h-full", mainClassName)}
         style={{
-          paddingTop: toPixelString(headerHeightPiexel + paddingTopPixel),
-          paddingBottom: toPixelString(footerHeightPiexl + paddingBottomPixel),
+          paddingTop: toPixelString(headerHeightPixel + paddingTopPixel),
+          paddingBottom: toPixelString(footerHeightPixel + paddingBottomPixel),
           ...mainStyle
         }}
       >
         {children}
       </main>
 
-      <Footer height={toPixelString(footerHeightPiexl)} />
+      <Footer height={toPixelString(footerHeightPixel)} />
     </div>
   )
 }
