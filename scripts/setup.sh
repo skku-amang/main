@@ -128,7 +128,7 @@ info "DB 초기화 중 (리셋 + 마이그레이션)..."
 ok "DB 마이그레이션 완료"
 
 info "시드 데이터 삽입 중..."
-(cd packages/database && SEED_DEFAULT_PASSWORD="${SEED_DEFAULT_PASSWORD:-amang1234}" pnpm db:seed)
+(cd packages/database && SEED_DEFAULT_PASSWORD="${SEED_DEFAULT_PASSWORD:-Test1234%}" pnpm db:seed)
 ok "시드 완료"
 
 echo ""
