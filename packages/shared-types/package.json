@@ -17,7 +17,9 @@
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.ts\"",
-    "lint": "eslint \"src/**/*.ts\" --fix"
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@repo/database": "workspace:*"
@@ -25,7 +27,8 @@
   "devDependencies": {
     "@repo/database": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "vitest": "^4.1.2"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }
