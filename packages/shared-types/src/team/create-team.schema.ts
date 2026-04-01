@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { isValidYoutubeUrl } from "./youtube"
 
 export const TeamSessionSchema = z.object({
   sessionId: z.number().int().positive(),
@@ -28,6 +29,9 @@ export const CreateTeamSchema = z.object({
   songYoutubeVideoUrl: z
     .string()
     .url("유튜브 영상 URL은 유효한 URL이어야 합니다.")
+    .refine(isValidYoutubeUrl, {
+      message: "유효한 YouTube URL을 입력해주세요"
+    })
     .nullable()
     .optional(),
   memberSessions: z.array(TeamSessionSchema)
