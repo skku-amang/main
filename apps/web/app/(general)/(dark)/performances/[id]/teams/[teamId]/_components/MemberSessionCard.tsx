@@ -18,7 +18,7 @@ interface MemberSessionCardProps {
   sessionName: SessionNameValue
   sessionIndex: number
   user: TeamMember
-  // eslint-disable-next-line no-unused-vars
+
   onUnapplySuccess: (team: TeamDetail) => void
 }
 

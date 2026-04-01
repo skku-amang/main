@@ -3,7 +3,7 @@ import MobileFilter from "@/app/(general)/(light)/performances/[id]/teams/_compo
 
 export interface FilterValue {
   label: string
-  // eslint-disable-next-line no-unused-vars
+
   onChecked: (value: boolean) => void
   checked?: boolean
 }

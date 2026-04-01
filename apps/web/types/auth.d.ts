@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 export declare module "next-auth" {
   /**
    * `authorize` 함수 호출 시 반환하는 유저 객체의 타입

@@ -142,7 +142,7 @@ const reducer = (state: State, action: Action) => {
             if (filterValues === "inactive")
               return isTeamSatisfied(team.teamSessions)
             return true
-          // eslint-disable-next-line no-fallthrough
+
           case "필요세션":
             if ((filterValues as Set<string>).size === 0) return true
             return getSessionsWithMissingMembers(team.teamSessions).some(

@@ -47,9 +47,9 @@ import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
-  // eslint-disable-next-line no-unused-vars
+
   onValid: (formData: z.infer<any>) => void
-  // eslint-disable-next-line no-unused-vars
+
   onInvalid: (formData: z.infer<any>) => void
   onPrevious?: () => void
 }

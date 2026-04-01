@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { CircleAlert } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
