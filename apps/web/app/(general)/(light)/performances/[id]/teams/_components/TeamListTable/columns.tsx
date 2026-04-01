@@ -34,7 +34,7 @@ import {
   isTeamSatisfied,
   TeamFromList
 } from "@/lib/team/teamSession"
-import YoutubeVideo from "@/lib/youtube"
+import { extractYoutubeVideoId } from "@repo/shared-types"
 
 export type TeamColumn = TeamFromList
 
@@ -115,7 +115,7 @@ const YoutubeCell = ({ row }: { row: any }) => {
   const rawUrl = row.original.songYoutubeVideoUrl
   if (!rawUrl) return null
 
-  const videoId = YoutubeVideo.getValidVideoIdOrNull(rawUrl) ?? rawUrl
+  const videoId = extractYoutubeVideoId(rawUrl) ?? rawUrl
 
   return (
     <button

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { extractYoutubeVideoId, isValidYoutubeUrl } from "./youtube"
+import {
+  extractYoutubeVideoId,
+  isValidYoutubeUrl,
+  getYoutubeUrl,
+  getYoutubeEmbedUrl,
+  getYoutubeThumbnailUrl
+} from "./youtube"
 
 describe("extractYoutubeVideoId", () => {
   describe("표준 youtube.com/watch URL", () => {
@@ -152,5 +158,29 @@ describe("isValidYoutubeUrl", () => {
 
   it("잘못된 URL에 대해 false를 반환한다", () => {
     expect(isValidYoutubeUrl("https://example.com")).toBe(false)
+  })
+})
+
+describe("getYoutubeUrl", () => {
+  it("videoId로 표준 watch URL을 생성한다", () => {
+    expect(getYoutubeUrl("J9leUoU96KU")).toBe(
+      "https://www.youtube.com/watch?v=J9leUoU96KU"
+    )
+  })
+})
+
+describe("getYoutubeEmbedUrl", () => {
+  it("videoId로 embed URL을 생성한다", () => {
+    expect(getYoutubeEmbedUrl("J9leUoU96KU")).toBe(
+      "https://www.youtube.com/embed/J9leUoU96KU"
+    )
+  })
+})
+
+describe("getYoutubeThumbnailUrl", () => {
+  it("videoId로 썸네일 URL을 생성한다", () => {
+    expect(getYoutubeThumbnailUrl("J9leUoU96KU")).toBe(
+      "https://img.youtube.com/vi/J9leUoU96KU/sddefault.jpg"
+    )
   })
 })

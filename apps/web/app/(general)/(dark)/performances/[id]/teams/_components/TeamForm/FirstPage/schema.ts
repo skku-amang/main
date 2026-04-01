@@ -1,11 +1,10 @@
+import { isValidYoutubeUrl } from "@repo/shared-types"
 import { z } from "zod"
-
-import YoutubeVideo from "@/lib/youtube"
 
 export const songYoutubeVideoUrlSchema = z
   .string()
   .optional()
-  .refine((value) => !value || YoutubeVideo.isUrlValid(value), {
+  .refine((value) => !value || isValidYoutubeUrl(value), {
     message: "유효한 YouTube URL을 입력해주세요"
   })
 const basicInfoSchema = z.object({

@@ -19,7 +19,7 @@ import { getSessionDisplayName } from "@/constants/session"
 import { useTeam } from "@/hooks/api/useTeam"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import { getMissingIndices } from "@/lib/team/teamSession"
-import YoutubePlayer from "@/lib/youtube/Player"
+import YoutubePlayer from "@/components/YoutubePlayer"
 import useTeamApplication from "../_hooks/useTeamApplication"
 
 const TeamDetailClient = () => {

@@ -15,7 +15,7 @@ import {
 import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import YoutubePlayer from "@/lib/youtube/Player"
+import YoutubePlayer from "@/components/YoutubePlayer"
 
 import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
 
