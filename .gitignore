@@ -59,4 +59,6 @@ tmp/
 # Storybook
 storybook-static
 .env*.local
+*.code-workspace
+!*.code-workspace.example
 .envrc.local

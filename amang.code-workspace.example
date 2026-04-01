@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "AMANG · main",
+      "path": ".",
+    },
+    {
+      "name": "AMANG · cookie-auth",
+      "path": "../cookie-auth",
+    },
+    {
+      "name": "홈랩 · main",
+      "path": "../../homelab-worktrees/main",
+    },
+  ],
+}
