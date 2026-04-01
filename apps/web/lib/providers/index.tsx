@@ -1,5 +1,7 @@
 "use client"
 
+import "../../sentry.client.config"
+
 import { SessionProvider, signOut, useSession } from "next-auth/react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { useEffect } from "react"

@@ -8,6 +8,7 @@ import {
 } from "@nestjs/common"
 import { HttpAdapterHost } from "@nestjs/core"
 import { Failure, InternalServerError } from "@repo/api-client"
+import * as Sentry from "@sentry/nestjs"
 
 @Catch()
 export class AllErrorFilter implements ExceptionFilter {
@@ -29,6 +30,15 @@ export class AllErrorFilter implements ExceptionFilter {
       this.logger.error(
         `Unhandled Error: ${JSON.stringify(exception, null, 2)}`
       )
+    }
+
+    const isServerError =
+      !(exception instanceof HttpException) ||
+      exception.getStatus() >= HttpStatus.INTERNAL_SERVER_ERROR
+    if (isServerError) {
+      Sentry.captureException(exception, {
+        extra: { url: request.url }
+      })
     }
 
     const httpStatus =
