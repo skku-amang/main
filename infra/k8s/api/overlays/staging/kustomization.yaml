@@ -9,4 +9,12 @@ resources:
   - ../../base
   - ingress.yaml
   - secret.yaml
-  - configmap.yaml
+
+patches:
+  - patch: |-
+      - op: add
+        path: /data/S3_ENDPOINT
+        value: "https://s3.amang.staging.json-server.win"
+    target:
+      kind: ConfigMap
+      name: api-config

@@ -4,3 +4,4 @@ metadata:
   name: web-config
 data:
   NODE_ENV: development
+  NEXT_PUBLIC_SENTRY_DSN: https://fec0864f2e695dbd2d9b09dafb90cca3@o4511134421286912.ingest.us.sentry.io/4511134423515136
