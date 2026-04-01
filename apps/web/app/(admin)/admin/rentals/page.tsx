@@ -166,9 +166,7 @@ export default function RentalsAdminPage() {
         }}
         onConfirm={handleDelete}
         description={
-          deleting
-            ? `${deleting.title} 예약을 삭제하시겠습니까?`
-            : undefined
+          deleting ? `${deleting.title} 예약을 삭제하시겠습니까?` : undefined
         }
         isPending={deleteMutation.isPending}
       />

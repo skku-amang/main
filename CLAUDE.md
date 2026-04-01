@@ -101,9 +101,12 @@ export const useTeam = createQueryHook(
 
 - `DATABASE_URL` - PostgreSQL 연결 문자열
 - `NEXT_PUBLIC_API_URL` - API 서버 URL (기본: <http://localhost:8000>)
+- `SENTRY_DSN` - API용 Sentry DSN (production only)
+- `NEXT_PUBLIC_SENTRY_DSN` - Web용 Sentry DSN (production only)
 
 ### 외부 도구 컨텍스트
 
 - **Figma**: `hmVkj0Fq8c3dbeslIG31X9` (AMANG-New-)
 - **Notion**: 아망 워크스페이스
 - **Slack**: Amang-Homepage 워크스페이스
+- **Sentry**: `amang-23` org (web, api 프로젝트)

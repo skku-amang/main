@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs"
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -39,4 +41,8 @@ const nextConfig = {
   output: "standalone"
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  org: "amang-23",
+  project: "web",
+  silent: !process.env.CI
+})
