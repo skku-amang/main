@@ -102,3 +102,11 @@ resource "vercel_project_environment_variable" "site_url_preview" {
   value      = "https://amang.staging.json-server.win"
   target     = ["preview", "development"]
 }
+
+resource "vercel_project_environment_variable" "sentry_dsn" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_SENTRY_DSN"
+  value      = "https://fec0864f2e695dbd2d9b09dafb90cca3@o4511134421286912.ingest.us.sentry.io/4511134423515136"
+  target     = ["production"]
+}
