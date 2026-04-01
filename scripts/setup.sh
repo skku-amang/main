@@ -124,7 +124,7 @@ info "Prisma 클라이언트 생성 중..."
 ok "Prisma 클라이언트 생성 완료"
 
 info "DB 초기화 중 (마이그레이션 + 시드)..."
-(cd packages/database && npx prisma migrate reset --force)
+(cd packages/database && PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="yes" npx prisma migrate reset --force)
 ok "DB 초기화 완료 (마이그레이션 적용 + 시드 삽입)"
 
 echo ""
