@@ -1,3 +1,5 @@
+import { extractYoutubeVideoId } from "@repo/shared-types"
+
 export interface YoutubeVideoInfo {
   author_name: string
   thumbnail_url: string
@@ -103,22 +105,10 @@ class YoutubeVideo {
     return `https://www.youtube.com/embed/${videoId}`
   }
 
-  public static getVideoId(url: string) {
-    // case 1: https://youtu.be/OU24A9C8BUk
-    if (url.includes("youtu.be/")) {
-      const videoIdPart = url.split(".be/")[1]
-      if (videoIdPart) {
-        return videoIdPart.split("?")[0] as string
-      }
-    }
-    // case 2: https://www.youtube.com/watch?v=zWvUFsWMmhY
-    else if (url.includes("youtube.com/watch?v=")) {
-      const videoIdPart = url.split("watch?v=")[1]
-      if (videoIdPart) {
-        return videoIdPart.split("?")[0] as string
-      }
-    }
-    throw new TypeError(`Invalid Youtube URL: '${url}'`)
+  public static getVideoId(url: string): string {
+    const videoId = extractYoutubeVideoId(url)
+    if (!videoId) throw new TypeError(`Invalid Youtube URL: '${url}'`)
+    return videoId
   }
 
   public static getValidVideoIdOrNull(url: string): string | null {
