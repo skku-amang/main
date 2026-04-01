@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import React from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +15,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
-import { cn } from "@/lib/utils"
 
 interface MenuItemProps {
   icon: React.ReactNode
@@ -48,15 +46,13 @@ const Profile = () => {
     return (
       <>
         {status === "loading" ? (
-          <LoaderCircle className="animate-spin text-white" size={30} />
+          <LoaderCircle className="animate-spin text-foreground" size={16} />
         ) : (
-          <Button
-            className={cn(
-              "text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]"
-            )}
-          >
-            <Link href={ROUTES.LOGIN}>Login</Link>
-          </Button>
+          <button className="win-btn">
+            <Link href={ROUTES.LOGIN} style={{ fontFamily: "Tahoma, sans-serif", fontSize: "11px", color: "#000", textDecoration: "none" }}>
+              로그인
+            </Link>
+          </button>
         )}
       </>
     )

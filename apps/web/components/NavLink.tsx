@@ -81,14 +81,11 @@ const NavLink = ({
       aria-disabled={!isAvailable}
       tabIndex={isAvailable ? undefined : -1}
       className={cn(
-        "flex items-center text-lg font-semibold",
-        !isAvailable && "pointer-events-none",
-        headerColorClass({
-          mode,
-          isActive: isAvailable,
-          isCurrentPathname: isCurrentPathname(pathname, href)
-        })
+        "win-menuitem flex items-center text-sm",
+        !isAvailable && "pointer-events-none opacity-40",
+        isCurrentPathname(pathname, href) && "active"
       )}
+      style={{ fontFamily: "Tahoma, sans-serif", fontSize: "11px", textDecoration: "none" }}
     >
       {children}
     </Link>

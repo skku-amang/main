@@ -62,35 +62,33 @@ const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className={cn(
-          "flex cursor-pointer items-center gap-x-1 text-lg font-semibold outline-none",
-          headerColorClass({ mode, isCurrentPathname })
-        )}
+        className="win-menuitem flex cursor-pointer items-center gap-x-1 outline-none"
+        style={{ fontFamily: "Tahoma, sans-serif", fontSize: "11px" }}
       >
         팀 모집
-        <ChevronDown className="h-4 w-4" />
+        <ChevronDown className="h-3 w-3" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="start" className="win-raised" style={{ background: "#d4d0c8", borderRadius: "0", padding: "2px", fontFamily: "Tahoma, sans-serif", fontSize: "11px", minWidth: "160px" }}>
         {isEmpty ? (
-          <div className="px-3 py-2 text-sm text-muted-foreground">
+          <div className="px-3 py-1 text-xs" style={{ color: "#808080" }}>
             모집 중인 공연이 없습니다
           </div>
         ) : (
           performances.map((p) => (
-            <DropdownMenuItem key={p.id} asChild className="cursor-pointer">
+            <DropdownMenuItem key={p.id} asChild className="cursor-pointer win-menuitem" style={{ fontSize: "11px" }}>
               <Link href={ROUTES.PERFORMANCE.TEAM.LIST(p.id)}>{p.name}</Link>
             </DropdownMenuItem>
           ))
         )}
         {session?.user?.isAdmin && (
           <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="cursor-pointer">
+            <DropdownMenuSeparator style={{ background: "#808080", margin: "2px 0" }} />
+            <DropdownMenuItem asChild className="cursor-pointer win-menuitem" style={{ fontSize: "11px" }}>
               <Link
                 href={ROUTES.ADMIN.PERFORMANCES}
                 className="flex items-center gap-x-2"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3 w-3" />
                 공연 관리
               </Link>
             </DropdownMenuItem>

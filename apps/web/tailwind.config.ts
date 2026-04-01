@@ -61,10 +61,10 @@ const config = {
         custom: "0 4px 4px rgba(0, 0, 0, 0.25)",
         checkbox: "0 4px 10px rgba(155, 169, 176, 0.2)"
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)"
+        borderRadius: {
+        lg: "0px",
+        md: "0px",
+        sm: "0px"
       },
       keyframes: {
         "accordion-down": {
@@ -81,7 +81,8 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out"
       },
       fontFamily: {
-        sans: ["var(--font-pretendard)"]
+        sans: ["var(--font-tahoma)", "Tahoma", "MS Sans Serif", "Arial", "sans-serif"],
+        mono: ["Fixedsys", "Courier New", "monospace"]
       },
       dropShadow: {
         search: "0 1px 2px rgba(64, 63, 84, 0.1)",
