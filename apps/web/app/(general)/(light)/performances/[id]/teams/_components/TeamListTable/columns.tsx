@@ -75,7 +75,7 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="rounded-lg border border-slate-100 p-[5px] text-sm drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
+          className="rounded-lg border border-slate-100 p-[5px] text-base drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
         >
           <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
             <Link
