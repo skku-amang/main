@@ -123,13 +123,9 @@ info "Prisma 클라이언트 생성 중..."
 (cd packages/database && pnpm db:generate)
 ok "Prisma 클라이언트 생성 완료"
 
-info "DB 마이그레이션 실행 중..."
-pnpm db:deploy
-ok "마이그레이션 완료"
-
-info "시드 데이터 삽입 중..."
-(cd packages/database && pnpm db:seed)
-ok "시드 완료"
+info "DB 초기화 중 (마이그레이션 + 시드)..."
+(cd packages/database && npx prisma migrate reset --force)
+ok "DB 초기화 완료 (마이그레이션 적용 + 시드 삽입)"
 
 echo ""
 
