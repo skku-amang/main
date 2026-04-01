@@ -8,14 +8,12 @@ if (typeof window !== "undefined" && Sentry.replayIntegration) {
   integrations.push(
     Sentry.feedbackIntegration({
       colorScheme: "system",
+      showName: false,
+      showEmail: false,
       triggerLabel: "버그 제보",
       formTitle: "버그 제보",
       submitButtonLabel: "보내기",
       cancelButtonLabel: "취소",
-      nameLabel: "이름",
-      namePlaceholder: "이름을 입력해주세요",
-      emailLabel: "이메일",
-      emailPlaceholder: "이메일을 입력해주세요",
       messageLabel: "설명",
       messagePlaceholder: "어떤 문제가 있었나요?",
       successMessageText: "버그 제보가 완료되었습니다. 감사합니다!",

@@ -2,6 +2,7 @@
 
 import "../../sentry.client.config"
 
+import * as Sentry from "@sentry/nextjs"
 import { SessionProvider, signOut, useSession } from "next-auth/react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { useEffect } from "react"
@@ -16,6 +17,18 @@ function SessionGuard({ children }: { children: React.ReactNode }) {
       signOut()
     }
   }, [session?.error])
+
+  useEffect(() => {
+    if (session?.user) {
+      Sentry.setUser({
+        id: session.user.id,
+        username: session.user.name ?? undefined,
+        email: session.user.email ?? undefined
+      })
+    } else {
+      Sentry.setUser(null)
+    }
+  }, [session?.user])
 
   return children
 }
