@@ -15,6 +15,9 @@ patches:
       - op: add
         path: /data/S3_ENDPOINT
         value: "https://s3.amang.staging.json-server.win"
+      - op: add
+        path: /data/NODE_ENV
+        value: "development"
     target:
       kind: ConfigMap
       name: api-config

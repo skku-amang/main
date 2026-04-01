@@ -15,6 +15,12 @@ patches:
       - op: add
         path: /data/S3_ENDPOINT
         value: "https://s3.amang.json-server.win"
+      - op: add
+        path: /data/NODE_ENV
+        value: "production"
+      - op: add
+        path: /data/SENTRY_DSN
+        value: "https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824"
     target:
       kind: ConfigMap
       name: api-config
