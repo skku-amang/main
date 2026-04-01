@@ -1,4 +1,9 @@
 import * as React from "react"
+import {
+  extractYoutubeVideoId,
+  getYoutubeEmbedUrl,
+  getYoutubeThumbnailUrl
+} from "@repo/shared-types"
 import { cn } from "@/lib/utils"
 
 type VideoSize = "xs" | "sm" | "md" | "lg"
@@ -19,35 +24,15 @@ const SIZE_STYLES: Record<
   lg: { radius: "rounded-2xl", play: "h-16 w-16", playIcon: "h-8 w-8" }
 }
 
-function getYoutubeId(url: string): string | null {
-  try {
-    const parsed = new URL(url)
-
-    if (parsed.hostname === "youtu.be") {
-      const id = parsed.pathname.slice(1)
-      return id ? id : null
-    }
-
-    const v = parsed.searchParams.get("v")
-    if (v) return v
-
-    if (parsed.pathname.startsWith("/embed/")) {
-      const id = parsed.pathname.split("/embed/")[1]
-      return id ? id : null
-    }
-
-    return null
-  } catch {
-    return null
-  }
-}
-
 export default function Video({
   youtubeUrl,
   size = "md",
   className
 }: VideoProps) {
-  const videoId = React.useMemo(() => getYoutubeId(youtubeUrl), [youtubeUrl])
+  const videoId = React.useMemo(
+    () => extractYoutubeVideoId(youtubeUrl),
+    [youtubeUrl]
+  )
   const [isPlaying, setIsPlaying] = React.useState(false)
   const s = SIZE_STYLES[size]
 
@@ -79,7 +64,7 @@ export default function Video({
           className="group absolute inset-0 flex items-center justify-center"
         >
           <img
-            src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+            src={getYoutubeThumbnailUrl(videoId)}
             alt="Video thumbnail"
             className="absolute inset-0 h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-100"
           />
@@ -101,7 +86,7 @@ export default function Video({
         </button>
       ) : (
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          src={`${getYoutubeEmbedUrl(videoId)}?autoplay=1`}
           title="YouTube video player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

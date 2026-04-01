@@ -1,6 +1,5 @@
 import React from "react"
-
-import YoutubeVideo from "@/lib/youtube"
+import { extractYoutubeVideoId, getYoutubeEmbedUrl } from "@repo/shared-types"
 
 interface YoutubePlayerProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   videoUrl: string
@@ -10,9 +9,12 @@ const YoutubePlayer: React.FC<YoutubePlayerProps> = ({
   videoUrl,
   ...iframeProps
 }) => {
+  const videoId = extractYoutubeVideoId(videoUrl)
+  if (!videoId) return null
+
   return (
     <iframe
-      src={`https://www.youtube.com/embed/${YoutubeVideo.getValidVideoIdOrNull(videoUrl)}`}
+      src={getYoutubeEmbedUrl(videoId)}
       allowFullScreen
       {...iframeProps}
     />

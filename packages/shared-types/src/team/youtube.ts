@@ -40,3 +40,18 @@ export function extractYoutubeVideoId(url: string): string | null {
 export function isValidYoutubeUrl(url: string): boolean {
   return extractYoutubeVideoId(url) !== null
 }
+
+/** videoId → 표준 YouTube watch URL */
+export function getYoutubeUrl(videoId: string): string {
+  return `https://www.youtube.com/watch?v=${videoId}`
+}
+
+/** videoId → iframe embed URL */
+export function getYoutubeEmbedUrl(videoId: string): string {
+  return `https://www.youtube.com/embed/${videoId}`
+}
+
+/** videoId → 썸네일 이미지 URL (sddefault) */
+export function getYoutubeThumbnailUrl(videoId: string): string {
+  return `https://img.youtube.com/vi/${videoId}/sddefault.jpg`
+}

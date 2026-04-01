@@ -35,8 +35,8 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import YoutubeVideo from "@/lib/youtube"
-import YoutubePlayer from "@/lib/youtube/Player"
+import { getYoutubeUrl } from "@repo/shared-types"
+import YoutubePlayer from "@/components/YoutubePlayer"
 
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useImageUpload } from "@/hooks/useImageUpload"
@@ -69,7 +69,7 @@ const FirstPage = ({
   const youtubeForm = useForm<z.infer<typeof youtubeSchema>>({
     resolver: zodResolver(youtubeSchema),
     defaultValues: {
-      songYoutubeVideoUrl: YoutubeVideo.getURL(
+      songYoutubeVideoUrl: getYoutubeUrl(
         form.getValues("songYoutubeVideoUrl") as string
       )
     }
