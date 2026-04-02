@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: api
+        app: api-job
         job-type: migrate
     spec:
       restartPolicy: Never
