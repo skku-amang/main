@@ -1,4 +1,4 @@
-import { SessionName } from "../../../packages/database/generated/prisma"
+import { SessionName } from "@repo/database/enums"
 
 type SessionImageType = {
   UNPRESSED: Record<SessionName, string>

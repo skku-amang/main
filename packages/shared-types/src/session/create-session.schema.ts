@@ -1,4 +1,4 @@
-import { SessionName } from "@repo/database"
+import { SessionName } from "@repo/database/enums"
 import { z } from "zod"
 
 /**

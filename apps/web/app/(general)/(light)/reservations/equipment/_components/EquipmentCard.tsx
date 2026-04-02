@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Equipment } from "@repo/shared-types"
-import { EquipCategory } from "@repo/database"
+import { EquipCategory } from "@repo/database/enums"
 import { MoreVertical, ScanSearch, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
