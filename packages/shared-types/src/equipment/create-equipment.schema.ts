@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { EquipCategory } from "@repo/database"
+import { EquipCategory } from "@repo/database/enums"
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_FILE_SIZE

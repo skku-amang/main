@@ -3,7 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./enums": {
+      "types": "./generated/prisma/index.d.ts",
+      "default": "./generated/prisma/index-browser.js"
+    }
   },
   "types": "./dist/index.d.ts",
   "scripts": {

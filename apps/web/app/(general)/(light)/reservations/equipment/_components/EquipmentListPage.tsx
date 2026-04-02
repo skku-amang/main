@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { EquipCategory } from "@repo/database"
+import { EquipCategory } from "@repo/database/enums"
 import { Equipment } from "@repo/shared-types"
 import { Filter, Plus, Search, RefreshCw, PackageSearch } from "lucide-react"
 import {

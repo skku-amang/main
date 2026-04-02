@@ -1,6 +1,6 @@
 "use client"
 
-import { EquipCategory } from "@repo/database"
+import { EquipCategory } from "@repo/database/enums"
 
 import {
   Dialog,

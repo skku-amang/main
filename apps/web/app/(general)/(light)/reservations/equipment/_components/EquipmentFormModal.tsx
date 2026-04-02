@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { EquipCategory } from "@repo/database"
+import { EquipCategory } from "@repo/database/enums"
 import { Equipment } from "@repo/shared-types"
 import { useQueryClient } from "@tanstack/react-query"
 
