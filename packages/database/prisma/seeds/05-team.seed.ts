@@ -2,6 +2,12 @@ import { PrismaClient, SessionName } from "../../generated/prisma"
 import { getRandomInt, getRandomItems, getRandomBoolean } from "./utils"
 
 export const seedTeam = async (prisma: PrismaClient) => {
+  const existing = await prisma.team.count()
+  if (existing > 0) {
+    console.log("Teams already seeded, skipping.")
+    return
+  }
+
   console.log("Seeding team...")
 
   const users = await prisma.user.findMany({
