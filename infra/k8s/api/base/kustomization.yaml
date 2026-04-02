@@ -5,5 +5,5 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  - migrate-cronjob.yaml
-  - seed-cronjob.yaml
+  - migrate-job.yaml
+  - seed-job.yaml
