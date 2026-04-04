@@ -6,6 +6,7 @@ import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -23,6 +24,14 @@ import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <Login />
+    </Suspense>
+  )
+}
 
 const Login = () => {
   const router = useRouter()
@@ -169,5 +178,3 @@ const Login = () => {
     </div>
   )
 }
-
-export default Login

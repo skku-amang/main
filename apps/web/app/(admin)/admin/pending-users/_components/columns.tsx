@@ -2,11 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Check, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
+import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { formatGenerationOrder } from "@/lib/utils"
 import { DetailedUser } from "@repo/shared-types"
@@ -45,28 +48,50 @@ export function getColumns({
       accessorKey: "name",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="이름" />
+      ),
+      meta: { label: "이름", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
       )
     },
     {
       accessorKey: "nickname",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="닉네임" />
+      ),
+      meta: { label: "닉네임", editable: { type: "text" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={ctx.getValue() as string}
+        />
       )
     },
     {
       accessorKey: "email",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="이메일" />
-      )
+      ),
+      meta: { label: "이메일" }
     },
     {
       id: "generation",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="기수" />
       ),
+      meta: { label: "기수" },
       accessorFn: (row) => row.generation.order,
-      cell: ({ row }) =>
-        `${formatGenerationOrder(row.original.generation.order)}기`,
+      cell: ({ row }) => (
+        <Link
+          href={`${ROUTES.ADMIN.GENERATIONS}?rowId=${row.original.generation.id}`}
+          className="text-blue-600 hover:underline"
+        >
+          {formatGenerationOrder(row.original.generation.order)}기
+        </Link>
+      ),
       filterFn: (row, _columnId, filterValue) =>
         String(row.original.generation.order) === filterValue
     },
@@ -75,14 +100,21 @@ export function getColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="세션" />
       ),
+      meta: { label: "세션" },
       accessorFn: (row) => row.sessions.map((s) => s.name).join(", "),
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
           {row.original.sessions.length > 0
             ? row.original.sessions.map((s) => (
-                <Badge key={s.id} variant="outline" className="text-xs">
-                  {getSessionDisplayName(s.name)}
-                </Badge>
+                <Link
+                  key={s.id}
+                  href={`${ROUTES.ADMIN.SESSIONS}?rowId=${s.id}`}
+                  className="hover:opacity-80"
+                >
+                  <Badge variant="outline" className="text-xs">
+                    {getSessionDisplayName(s.name)}
+                  </Badge>
+                </Link>
               ))
             : "-"}
         </div>

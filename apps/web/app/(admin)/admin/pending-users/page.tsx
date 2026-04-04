@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/DeleteConfirmDialog"
@@ -11,7 +11,8 @@ import { useSessions } from "@/hooks/api/useSession"
 import {
   useApproveUser,
   useDeleteUser,
-  usePendingUsers
+  usePendingUsers,
+  useUpdateUser
 } from "@/hooks/api/useUser"
 import { getSessionDisplayName } from "@/constants/session"
 import { formatGenerationOrder } from "@/lib/utils"
@@ -31,6 +32,7 @@ export default function PendingUsersAdminPage() {
   const [deleting, setDeleting] = useState<DetailedUser | null>(null)
 
   const approveMutation = useApproveUser()
+  const updateMutation = useUpdateUser()
   const deleteMutation = useDeleteUser()
 
   const generationFilters = useMemo(
@@ -51,6 +53,27 @@ export default function PendingUsersAdminPage() {
         value: s.name
       })) ?? [],
     [sessions]
+  )
+
+  const handleCellUpdate = useCallback(
+    async (rowId: number, columnId: string, value: unknown) => {
+      try {
+        await updateMutation.mutateAsync([rowId, { [columnId]: value }])
+        toast({ title: "회원 정보가 수정되었습니다." })
+        queryClient.invalidateQueries({ queryKey: ["pendingUsers"] })
+      } catch (error) {
+        toast({
+          title: "수정에 실패했습니다.",
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
+          variant: "destructive"
+        })
+        throw error
+      }
+    },
+    [updateMutation, toast, queryClient]
   )
 
   const handleApprove = (user: DetailedUser) => {
@@ -120,6 +143,7 @@ export default function PendingUsersAdminPage() {
         initialSorting={[{ id: "id", desc: false }]}
         enableGlobalSearch
         searchPlaceholder="이름으로 검색..."
+        onUpdateCell={handleCellUpdate}
         emptyMessage="승인 대기 중인 회원이 없습니다."
         filters={[
           {
