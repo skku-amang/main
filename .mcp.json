@@ -1,45 +1,23 @@
 {
   "mcpServers": {
     "notion": {
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
-      "env": {
-        "NOTION_TOKEN": "${NOTION_TOKEN}"
-      }
-    },
-    "figma": {
-      "command": "npx",
-      "args": ["-y", "figma-developer-mcp", "--stdio"],
-      "env": {
-        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
-      }
+      "command": "direnv",
+      "args": ["exec", ".", "notion-mcp-server"]
     },
     "slack": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "command": "direnv",
+      "args": ["exec", ".", "mcp-server-slack"],
       "env": {
-        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
         "SLACK_TEAM_ID": "T07LTTU4WSZ"
       }
     },
-    "vercel": {
-      "type": "http",
-      "url": "https://mcp.vercel.com"
-    },
     "kubernetes": {
-      "command": "npx",
-      "args": ["-y", "mcp-server-kubernetes"],
-      "env": {
-        "KUBECONFIG": "${KUBECONFIG}"
-      }
+      "command": "direnv",
+      "args": ["exec", ".", "mcp-server-kubernetes"]
     },
     "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
-    },
-    "sentry": {
-      "type": "http",
-      "url": "https://mcp.sentry.dev/mcp"
+      "command": "direnv",
+      "args": ["exec", ".", "sh", "-c", "mcp-server-postgres $DATABASE_URL"]
     }
   }
 }
