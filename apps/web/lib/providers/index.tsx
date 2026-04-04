@@ -9,14 +9,39 @@ import { useEffect } from "react"
 import { ApiClientProvider } from "./api-client-provider"
 import ReactQueryProvider from "./react-query-provider"
 
+const MAX_REFRESH_RETRIES = 3
+
 function SessionGuard({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
 
   useEffect(() => {
-    if (session?.error === "RefreshAccessTokenError") {
-      signOut()
+    if (session?.error !== "RefreshAccessTokenError") return
+
+    let cancelled = false
+
+    const retryRefresh = async () => {
+      for (let attempt = 1; attempt <= MAX_REFRESH_RETRIES; attempt++) {
+        if (cancelled) return
+        console.warn(
+          `[SessionGuard] 토큰 갱신 재시도 ${attempt}/${MAX_REFRESH_RETRIES}`
+        )
+        const newSession = await update()
+        if (newSession && !newSession.error) return
+      }
+      if (!cancelled) {
+        console.error(
+          "[SessionGuard] 토큰 갱신 최대 재시도 초과, 로그아웃 처리"
+        )
+        signOut()
+      }
     }
-  }, [session?.error])
+
+    retryRefresh()
+
+    return () => {
+      cancelled = true
+    }
+  }, [session?.error, update])
 
   useEffect(() => {
     if (session?.user) {
