@@ -21,24 +21,24 @@
 - ✅ YouTube 유틸 SSOT 통합 ([#369](https://github.com/skku-amang/main/issues/369) → [PR #372](https://github.com/skku-amang/main/pull/372))
 - ✅ Prisma engine enum entrypoint 분리 ([PR #380](https://github.com/skku-amang/main/pull/380)) — Vercel 배포 시 Query Engine 누락 해결
 - 🔧 에러 메시지 개선 + 팀 지원 에러 표시 ([#382](https://github.com/skku-amang/main/issues/382), [#384](https://github.com/skku-amang/main/issues/384) → [PR #383](https://github.com/skku-amang/main/pull/383))
-- ⏸️ 로그인 재요구 버그 ([#358](https://github.com/skku-amang/main/issues/358)) ← 4차 분배, 미착수
-- ⏸️ 모바일 회원가입 불가 ([#359](https://github.com/skku-amang/main/issues/359)) ← 4차 분배, 미착수
+- ⏸️ 로그인 재요구 버그 ([#358](https://github.com/skku-amang/main/issues/358)) ← 직전(4차) 분배, 미착수
+- ⏸️ 모바일 회원가입 불가 ([#359](https://github.com/skku-amang/main/issues/359)) ← 직전(4차) 분배, 미착수
 
 ## 인프라
 ### > @손장수
-- ✅ Sentry 도입 ([#361](https://github.com/skku-amang/main/issues/361) → [PR #370](https://github.com/skku-amang/main/pull/370)) ← 4차 분배
-- ✅ 임베디드 → 유저 QA ([#360](https://github.com/skku-amang/main/issues/360)) ← 4차 분배
+- ✅ Sentry 도입 ([#361](https://github.com/skku-amang/main/issues/361) → [PR #370](https://github.com/skku-amang/main/pull/370)) ← 직전(4차) 분배
+- ✅ 임베디드 → 유저 QA ([#360](https://github.com/skku-amang/main/issues/360)) ← 직전(4차) 분배
 - ✅ DB CronJob → ArgoCD PreSync Hook 전환 ([PR #377](https://github.com/skku-amang/main/pull/377))
 - ✅ Job 파드 라벨 충돌 502 해소 ([PR #378](https://github.com/skku-amang/main/pull/378))
 - ✅ 헬스체크 Sentry 에러 캡처 제외 ([PR #387](https://github.com/skku-amang/main/pull/387))
 - ✅ 온보딩 자동화 셋업 스크립트 ([PR #374](https://github.com/skku-amang/main/pull/374))
 - ✅ deps 업데이트 + ESLint 9 마이그레이션 ([PR #376](https://github.com/skku-amang/main/pull/376))
 - ✅ Jest → Vitest 마이그레이션 ([#367](https://github.com/skku-amang/main/issues/367))
-- 🔧 DB 마이그레이션 Job 생성 ([#362](https://github.com/skku-amang/main/issues/362)) ← 4차 분배, 진행 중
+- 🔧 DB 마이그레이션 Job 생성 ([#362](https://github.com/skku-amang/main/issues/362)) ← 직전(4차) 분배, 진행 중
 - 🔧 CI 테스트 워크플로우 분리 및 병렬화 ([#368](https://github.com/skku-amang/main/issues/368))
 - 🔧 seed 스크립트 멱등성 확보 ([#379](https://github.com/skku-amang/main/issues/379) → [PR #381](https://github.com/skku-amang/main/pull/381))
 
-## 4차 작업 분배 이행
+## 직전(4차) 작업 분배 이행
 
 | 분배 작업 | 영역 | 결과 |
 |---|---|---|
@@ -83,7 +83,7 @@
 1. **상태 아이콘**: ✅ 완료, 🔧 진행 중, ⏸️ 미착수, ⚠️ 미해결
 2. **링크 필수**: 모든 이슈/PR/Sentry 이슈에 클릭 가능한 링크 포함
 3. **이슈-PR 연결**: `(#이슈 → PR #번호)` 형태로 연결 관계 명시
-4. **4차 분배 표시**: 직전 회의에서 분배받은 항목에 `← N차 분배` 부기
+4. **직전 분배 표시**: 직전 회의에서 분배받은 항목에 `← 직전(N차) 분배` 부기
 5. **중복 제거**: 진행 상황에 있는 항목은 논의 안건에 포함하지 않음
 6. **토글 헤딩**: `### > @이름`은 노션에서 `is_toggleable: true` heading_3으로 변환
 7. **영역 분류**: `scope:` 라벨 기반, 없으면 제목 키워드로 추정
