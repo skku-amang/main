@@ -30,11 +30,7 @@ export const pinoLoggerModuleOption: Params = {
         return { level: label }
       }
     },
-    stream:
-      process.env.NODE_ENV !== "production" &&
-      process.env.NODE_ENV !== "staging"
-        ? PinoPretty(pinoPrettyOptions)
-        : undefined,
+    stream: process.stdout.isTTY ? PinoPretty(pinoPrettyOptions) : undefined,
     mixin(mergeObject: any) {
       if (!mergeObject.msg && mergeObject.message) {
         mergeObject = { ...mergeObject, msg: mergeObject.message }
