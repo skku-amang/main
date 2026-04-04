@@ -223,7 +223,7 @@ export class UsersService {
   }
 
   async approveUser(userId: number) {
-    const user = this.prisma.user.findUnique({ where: { id: userId } })
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
 
     if (!user)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
