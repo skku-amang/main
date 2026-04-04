@@ -1,7 +1,12 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
-import { AuthError, UserNotApprovedError } from "@repo/api-client"
+import {
+  AuthError,
+  RefreshTokenExpiredError,
+  RefreshTokenNotFoundError,
+  UserNotApprovedError
+} from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import { createHash, timingSafeEqual } from "crypto"
@@ -95,7 +100,7 @@ export class AuthService {
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
-      throw new AuthError("Access Denied")
+      throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
     }
 
     if (!user.isApproved) {
@@ -103,12 +108,18 @@ export class AuthService {
     }
 
     const incomingHash = createHash("sha256").update(refreshToken).digest("hex")
+
+    if (incomingHash.length !== user.hashedRefreshToken.length)
+      throw new RefreshTokenExpiredError("리프레시 토큰이 유효하지 않습니다.")
+
     const refreshTokenMatches = timingSafeEqual(
       Buffer.from(incomingHash),
       Buffer.from(user.hashedRefreshToken)
     )
     if (!refreshTokenMatches) {
-      throw new AuthError("Access Denied")
+      throw new RefreshTokenExpiredError(
+        "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+      )
     }
 
     const tokens = await this.getTokens(
