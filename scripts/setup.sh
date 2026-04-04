@@ -51,6 +51,16 @@ else
   HAS_DIRENV=true
 fi
 
+# Claude Code (선택)
+HAS_CLAUDE=false
+if command -v claude &>/dev/null; then
+  ok "Claude Code $(claude --version 2>/dev/null || echo '')"
+  HAS_CLAUDE=true
+else
+  warn "Claude Code가 설치되어 있지 않습니다. AI 도구 연동 시 필요합니다."
+  warn "설치: https://docs.anthropic.com/en/docs/claude-code"
+fi
+
 echo ""
 
 # ─── 2. pnpm 활성화 ───
@@ -133,7 +143,21 @@ ok "시드 완료"
 
 echo ""
 
-# ─── 8. 완료 ───
+# ─── 8. Claude Code 플러그인 (선택) ───
+if [ "$HAS_CLAUDE" = true ]; then
+  echo -en "${CYAN}[INFO]${NC} Claude Code 플러그인을 설치하시겠습니까? (Figma 등 MCP 도구 연동) [Y/n] "
+  read -r REPLY
+  if [[ -z "$REPLY" || "$REPLY" =~ ^[Yy]$ ]]; then
+    info "Claude Code 플러그인 설치 중..."
+    claude plugins install figma 2>/dev/null && ok "figma 플러그인 설치 완료" || warn "figma 플러그인 설치 실패"
+    echo ""
+  else
+    info "Claude Code 플러그인 설치를 건너뜁니다."
+    echo ""
+  fi
+fi
+
+# ─── 9. 완료 ───
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  셋업 완료!${NC}"
 echo -e "${GREEN}========================================${NC}"
