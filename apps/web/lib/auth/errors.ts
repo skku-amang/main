@@ -27,3 +27,8 @@ export const InvalidSigninCredentialsErrorCode = "Signin/Unauthorized"
 export class InvalidSigninCredentialsError extends CredentialsSignin {
   code = InvalidSigninCredentialsErrorCode
 }
+
+export const UserNotApprovedErrorCode = "User/NotApproved"
+export class UserNotApprovedSigninError extends CredentialsSignin {
+  code = UserNotApprovedErrorCode
+}

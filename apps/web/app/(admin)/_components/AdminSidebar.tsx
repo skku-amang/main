@@ -6,6 +6,7 @@ import {
   Menu,
   Music,
   Users,
+  UserCheck,
   Hash,
   Guitar,
   Mic,
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
     exact: true
   },
   { href: ROUTES.ADMIN.USERS, label: "회원", icon: Users },
+  { href: ROUTES.ADMIN.PENDING_USERS, label: "승인 대기", icon: UserCheck },
   { href: ROUTES.ADMIN.GENERATIONS, label: "기수", icon: Hash },
   { href: ROUTES.ADMIN.PERFORMANCES, label: "공연", icon: Music },
   { href: ROUTES.ADMIN.TEAMS, label: "팀", icon: Mic },

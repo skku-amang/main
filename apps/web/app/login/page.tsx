@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -16,7 +16,8 @@ import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
 import {
   InvalidSigninCredentialsErrorCode,
-  InvalidSigninErrorCode
+  InvalidSigninErrorCode,
+  UserNotApprovedErrorCode
 } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
@@ -25,6 +26,8 @@ const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
 const Login = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const signupSuccess = searchParams.get("signup") === "success"
   const { toast } = useToast()
 
   const {
@@ -50,6 +53,14 @@ const Login = () => {
         setError("password", {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
+        })
+        break
+
+      case UserNotApprovedErrorCode:
+        toast({
+          title: "로그인 실패",
+          description: "관리자 승인 후 로그인이 가능합니다.",
+          variant: "destructive"
         })
         break
 
@@ -102,6 +113,11 @@ const Login = () => {
           <h5 className="mb-8 text-sm font-normal text-slate-400">
             계속하려면 로그인해주세요
           </h5>
+          {signupSuccess && (
+            <div className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm">
+              회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다.
+            </div>
+          )}
           {/* 일반 로그인 */}
           <form
             className="flex w-full flex-col items-center"
