@@ -85,12 +85,15 @@ const authOptions: NextAuthConfig = {
 
       // 토큰 갱신 시도
       try {
-        const { accessToken, expiresIn } = await refreshAccessToken(
-          token?.refreshToken as string
-        )
+        const {
+          accessToken,
+          refreshToken: newRefreshToken,
+          expiresIn
+        } = await refreshAccessToken(token?.refreshToken as string)
         return {
           ...token,
           accessToken,
+          refreshToken: newRefreshToken,
           expiresIn: Date.now() + expiresIn * 1000
         }
       } catch (error) {
