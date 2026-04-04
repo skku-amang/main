@@ -12,14 +12,18 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name)
+  private static readonly isProduction =
+    process.env.NODE_ENV === "production"
 
   constructor() {
     super({
       log: [
-        { emit: "event", level: "query" },
         { emit: "event", level: "error" },
+        { emit: "event", level: "warn" },
         { emit: "event", level: "info" },
-        { emit: "event", level: "warn" }
+        ...(PrismaService.isProduction
+          ? []
+          : [{ emit: "event" as const, level: "query" as const }])
       ]
     })
   }
@@ -31,12 +35,16 @@ export class PrismaService
     this.$on("warn", (event) => {
       this.logger.warn(event)
     })
+
     this.$on("info", (event) => {
       this.logger.log(event)
     })
-    this.$on("query", (event) => {
-      this.logger.debug(event, "SQL Query")
-    })
+
+    if (!PrismaService.isProduction) {
+      this.$on("query", (event) => {
+        this.logger.debug(event, "SQL Query")
+      })
+    }
 
     await this.$connect()
   }
