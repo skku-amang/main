@@ -31,7 +31,8 @@ export const pinoLoggerModuleOption: Params = {
       }
     },
     stream:
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV !== "production" &&
+      process.env.NODE_ENV !== "staging"
         ? PinoPretty(pinoPrettyOptions)
         : undefined,
     mixin(mergeObject: any) {
