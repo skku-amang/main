@@ -812,6 +812,18 @@ export default class ApiClient {
   }
 
   /**
+   * 승인 대기 중인 유저 목록 조회 (관리자용 API)
+   * @throws {ForbiddenError} 관리자 권한이 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getPendingUsers() {
+    return this._request<
+      DetailedUserList,
+      ForbiddenError | InternalServerError
+    >(`/users/admin/pending`, "GET")
+  }
+
+  /**
    * 특정 유저 조회
    * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
    * @throws {InternalServerError} 서버 오류 발생 시
@@ -898,6 +910,19 @@ export default class ApiClient {
   }
 
   /**
+   * 유저 승인 (관리자용 API)
+   * @throws {ForbiddenError} 관리자 권한이 없는 경우
+   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public approveUser(id: number) {
+    return this._request<
+      DetailedUser,
+      ForbiddenError | NotFoundError | InternalServerError
+    >(`/users/${id}/approve`, "PATCH")
+  }
+
+  /**
    * 회원가입
    * @throws {ValidationError}
    * @throws {ConflictError}
@@ -917,6 +942,7 @@ export default class ApiClient {
   /**
    * 로그인
    * @throws {AuthError}
+   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
    * @throws {InternalServerError}
    */
   public login(loginUser: LoginUser) {
