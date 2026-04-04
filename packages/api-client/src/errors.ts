@@ -260,6 +260,19 @@ export class InvalidPerformanceDateError extends ApiError {
 }
 
 // ----------------------------------
+// Approve Specific Errors
+// ----------------------------------
+export class UserNotApprovedError extends ApiError {
+  readonly type = "/errors/user/not-approved"
+  readonly status = 403
+  readonly title = "User Not Approved"
+
+  constructor(detail?: string, instance?: string) {
+    super("관리자 승인 후 로그인이 가능합니다.", detail, instance)
+  }
+}
+
+// ----------------------------------
 // Token Specific Errors
 // ----------------------------------
 

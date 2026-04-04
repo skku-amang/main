@@ -1,8 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ConflictError, ValidationError } from "@repo/api-client"
 import { CreateUserSchema, passwordField } from "@repo/shared-types"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -32,10 +32,7 @@ import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
-import {
-  DuplicatedCredentialsErrorCode,
-  InvalidSignupCredentialsErrorCode
-} from "@/lib/auth/errors"
+import { apiClient } from "@/lib/apiClient"
 import { formatGenerationOrder } from "@/lib/utils"
 
 const confirmPasswordMergedCreateUserSchema = CreateUserSchema.merge(
@@ -61,23 +58,19 @@ const SignupForm = () => {
   async function onSubmit(
     formData: z.infer<typeof confirmPasswordMergedCreateUserSchema>
   ) {
-    const res = await signIn("credentials", {
-      name: formData.name,
-      nickname: formData.nickname,
-      email: formData.email,
-      password: formData.password,
-      sessions: formData.sessions,
-      generationId: formData.generationId,
-      redirect: false
-    })
-    if (!res?.error) return router.push(ROUTES.HOME)
-
-    const shouldBeUniqueFields = ["nickname", "email"]
-    const allFields = Object.keys(
-      confirmPasswordMergedCreateUserSchema._def.schema.shape
-    )
-    switch (res.code) {
-      case DuplicatedCredentialsErrorCode:
+    try {
+      await apiClient.signup({
+        name: formData.name,
+        nickname: formData.nickname,
+        email: formData.email,
+        password: formData.password,
+        sessions: formData.sessions,
+        generationId: formData.generationId
+      })
+      router.push(ROUTES.LOGIN + "?signup=success")
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        const shouldBeUniqueFields = ["nickname", "email"]
         shouldBeUniqueFields.forEach((key) => {
           form.setError(
             key as keyof z.infer<typeof confirmPasswordMergedCreateUserSchema>,
@@ -92,31 +85,19 @@ const SignupForm = () => {
           description: "이미 가입된 회원 정보입니다.",
           variant: "destructive"
         })
-        break
-
-      case InvalidSignupCredentialsErrorCode:
-        allFields.forEach((key) => {
-          form.setError(
-            key as keyof z.infer<typeof confirmPasswordMergedCreateUserSchema>,
-            {
-              type: "manual",
-              message: "회원가입 정보가 올바르지 않습니다."
-            }
-          )
-        })
+      } else if (error instanceof ValidationError) {
         toast({
           title: "회원가입 실패",
           description: "회원가입 정보가 올바르지 않습니다.",
           variant: "destructive"
         })
-        break
-
-      default:
+      } else {
         toast({
           title: "회원가입 실패",
           description: "알 수 없는 에러 발생!",
           variant: "destructive"
         })
+      }
     }
   }
 

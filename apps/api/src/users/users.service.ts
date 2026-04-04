@@ -51,6 +51,7 @@ export class UsersService {
 
   async findAll() {
     const users = await this.prisma.user.findMany({
+      where: { isApproved: true },
       select: publicUserSelector
     })
 
@@ -63,9 +64,18 @@ export class UsersService {
     })
   }
 
+  async findPendingUsers() {
+    return this.prisma.user.findMany({
+      where: {
+        isApproved: false
+      },
+      select: detailedUserSelector
+    })
+  }
+
   async findOne(userId: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, isApproved: true },
       select: publicUserSelector
     })
 
@@ -208,6 +218,19 @@ export class UsersService {
       data: {
         password: hashedPassword
       },
+      select: detailedUserSelector
+    })
+  }
+
+  async approveUser(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { isApproved: true },
       select: detailedUserSelector
     })
   }

@@ -7,6 +7,7 @@ const ROUTES = {
   ADMIN: {
     INDEX: "/admin",
     USERS: "/admin/users",
+    PENDING_USERS: "/admin/pending-users",
     GENERATIONS: "/admin/generations",
     PERFORMANCES: "/admin/performances",
     TEAMS: "/admin/teams",

@@ -16,3 +16,12 @@ export const useUpdatePassword = createMutationHook(
 export const useUpdateUser = createMutationHook(ApiClient.prototype.updateUser)
 
 export const useDeleteUser = createMutationHook(ApiClient.prototype.deleteUser)
+
+export const usePendingUsers = createQueryHook(
+  ApiClient.prototype.getPendingUsers,
+  () => ["pendingUsers"]
+)
+
+export const useApproveUser = createMutationHook(
+  ApiClient.prototype.approveUser
+)
