@@ -2,6 +2,12 @@ import { PrismaClient } from "../../generated/prisma"
 import { EquipCategory } from "../../generated/prisma"
 
 export const seedEquipment = async (prisma: PrismaClient) => {
+  const existing = await prisma.equipment.count()
+  if (existing > 0) {
+    console.log("Equipment already seeded, skipping.")
+    return
+  }
+
   console.log("Seeding Amang Room...")
 
   await prisma.equipment.create({

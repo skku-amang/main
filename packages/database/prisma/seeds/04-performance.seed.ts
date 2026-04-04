@@ -2,6 +2,12 @@ import { PrismaClient } from "../../generated/prisma"
 import { getDate } from "./utils"
 
 export const seedPerformance = async (prisma: PrismaClient) => {
+  const existing = await prisma.performance.count()
+  if (existing > 0) {
+    console.log("Performances already seeded, skipping.")
+    return
+  }
+
   console.log("Seeding performance...")
 
   const performaces = [
