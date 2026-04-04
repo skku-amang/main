@@ -22,6 +22,7 @@ import {
   RefreshTokenResponse,
   SessionDetail,
   SessionList,
+  SignUpResponse,
   TeamApplication,
   TeamDetail,
   TeamList,
@@ -63,7 +64,8 @@ import {
   RefreshTokenExpiredError,
   SessionNotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  UserNotApprovedError
 } from "./errors"
 
 /**
@@ -108,6 +110,8 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new ReferencedEntityNotFoundError(detail, instance)
     case "/errors/performance/invalid-performance-date":
       return new InvalidPerformanceDateError(detail, instance)
+    case "/errors/user/not-approved":
+      return new UserNotApprovedError(detail, instance)
     case "/errors/token/refresh-token-expired":
       return new RefreshTokenExpiredError(detail, instance)
     case "/errors/token/access-token-expired":
@@ -902,7 +906,7 @@ export default class ApiClient {
    */
   public signup(userData: CreateUser) {
     return this._request<
-      AuthResponse,
+      SignUpResponse,
       | ValidationError
       | ConflictError
       | UnprocessableEntityError

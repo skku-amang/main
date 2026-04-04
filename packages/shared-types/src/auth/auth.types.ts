@@ -20,3 +20,7 @@ export type RefreshTokenResponse = {
 export type LogoutResponse = {
   message: string
 }
+
+export type SignUpResponse = {
+  message: string
+}
