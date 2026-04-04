@@ -143,18 +143,24 @@ ok "시드 완료"
 
 echo ""
 
-# ─── 8. Claude Code 플러그인 (선택) ───
-if [ "$HAS_CLAUDE" = true ]; then
-  echo -en "${CYAN}[INFO]${NC} Claude Code 플러그인을 설치하시겠습니까? (Figma 등 MCP 도구 연동) [Y/n] "
+# ─── 8. Claude Code 도구 설정 (선택) ───
+if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
+  echo -en "${CYAN}[INFO]${NC} Claude Code MCP 도구를 설정하시겠습니까? (Notion, Slack, Figma 등 연동) [Y/n] "
   read -r REPLY
   if [[ -z "$REPLY" || "$REPLY" =~ ^[Yy]$ ]]; then
+    info "MCP 서버 패키지 글로벌 설치 중..."
+    pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack mcp-server-kubernetes @modelcontextprotocol/server-postgres 2>/dev/null \
+      && ok "MCP 서버 패키지 설치 완료" \
+      || warn "MCP 서버 패키지 설치 실패 — 수동 설치가 필요합니다"
     info "Claude Code 플러그인 설치 중..."
     claude plugins install figma 2>/dev/null && ok "figma 플러그인 설치 완료" || warn "figma 플러그인 설치 실패"
     echo ""
   else
-    info "Claude Code 플러그인 설치를 건너뜁니다."
+    info "Claude Code 도구 설정을 건너뜁니다."
     echo ""
   fi
+elif [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = false ]; then
+  warn "direnv가 없어 MCP 서버 설정을 건너뜁니다. direnv 설치 후 다시 실행해주세요."
 fi
 
 # ─── 9. 완료 ───
