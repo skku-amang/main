@@ -946,11 +946,10 @@ export default class ApiClient {
    * @throws {InternalServerError}
    */
   public login(loginUser: LoginUser) {
-    return this._request<AuthResponse, AuthError | InternalServerError>(
-      "/auth/login",
-      "POST",
-      loginUser
-    )
+    return this._request<
+      AuthResponse,
+      AuthError | UserNotApprovedError | InternalServerError
+    >("/auth/login", "POST", loginUser)
   }
 
   /**
@@ -979,13 +978,15 @@ export default class ApiClient {
 
   /**
    * 토큰 갱신
+   * @throws {AuthError}
+   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
+   * @throws {InternalServerError}
    */
   public refreshToken(refreshToken: string) {
-    return this._request<RefreshTokenResponse, AuthError | InternalServerError>(
-      "/auth/refresh",
-      "POST",
-      { refreshToken }
-    )
+    return this._request<
+      RefreshTokenResponse,
+      AuthError | UserNotApprovedError | InternalServerError
+    >("/auth/refresh", "POST", { refreshToken })
   }
 }
 
