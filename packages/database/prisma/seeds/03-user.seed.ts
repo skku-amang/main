@@ -43,6 +43,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
         bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
         image,
         isAdmin: true,
+        isApproved: true,
         generation: {
           connect: {
             id: generation.id
@@ -79,6 +80,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
         bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
         image,
         isAdmin: false,
+        isApproved: true,
         generation: {
           connect: {
             id: generation.id
