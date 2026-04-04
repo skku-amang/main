@@ -984,14 +984,20 @@ export default class ApiClient {
 
   /**
    * 토큰 갱신
-   * @throws {AuthError}
+   * @throws {RefreshTokenExpiredError} 리프레시 토큰이 만료되었거나 유효하지 않은 경우
+   * @throws {RefreshTokenNotFoundError} 리프레시 토큰이 존재하지 않는 경우 (로그아웃 상태)
+   * @throws {AuthError} 토큰 형식이 올바르지 않은 경우
    * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
-   * @throws {InternalServerError}
+   * @throws {InternalServerError} 서버 오류 발생 시
    */
   public refreshToken(refreshToken: string) {
     return this._request<
       RefreshTokenResponse,
-      AuthError | UserNotApprovedError | InternalServerError
+      | RefreshTokenExpiredError
+      | RefreshTokenNotFoundError
+      | AuthError
+      | UserNotApprovedError
+      | InternalServerError
     >("/auth/refresh", "POST", { refreshToken })
   }
 }
