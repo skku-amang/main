@@ -25,10 +25,13 @@ const useTeamApplication = (teamId: number) => {
       })
       setSelectedSessions([])
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "지원 실패",
-        description: "팀 지원 중 오류가 발생했습니다.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "팀 지원 중 오류가 발생했습니다.",
         variant: "destructive"
       })
     }

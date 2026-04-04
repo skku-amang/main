@@ -44,6 +44,7 @@ import {
 import { ApiResult } from "./api-result"
 import {
   AccessTokenExpiredError,
+  AccessTokenNotFoundError,
   ApiError,
   AuthError,
   ConflictError,
@@ -61,6 +62,7 @@ import {
   ProblemDocument,
   ReferencedEntityNotFoundError,
   RefreshTokenExpiredError,
+  RefreshTokenNotFoundError,
   SessionNotFoundError,
   UnprocessableEntityError,
   ValidationError
@@ -110,8 +112,12 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new InvalidPerformanceDateError(detail, instance)
     case "/errors/token/refresh-token-expired":
       return new RefreshTokenExpiredError(detail, instance)
+    case "/errors/token/refresh-token-not-found":
+      return new RefreshTokenNotFoundError(detail, instance)
     case "/errors/token/access-token-expired":
       return new AccessTokenExpiredError(detail, instance)
+    case "/errors/token/access-token-not-found":
+      return new AccessTokenNotFoundError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
