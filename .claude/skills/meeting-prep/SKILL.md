@@ -9,7 +9,7 @@ argument-hint: "[이전 회의 노션 URL (생략 시 자동 탐색)]"
 
 직전 회의 이후부터 현재까지의 활동을 수집하여 회의록 초안을 생성한다.
 
-- Notion API 패턴 및 영역 분류 매핑: [reference.md](reference.md)
+- Notion 블록 구조 레퍼런스: [reference.md](reference.md)
 - 출력 형식 및 few-shot 예시: [examples/output.md](examples/output.md)
 
 ## 프로젝트 상수
@@ -85,7 +85,7 @@ gh pr list --repo skku-amang/main --state all \
 
 #### 영역 판정
 
-[reference.md](reference.md)의 "영역 분류 매핑" 테이블 참조.
+GitHub 이슈/PR의 `scope:` 라벨로 영역을 판정한다. 라벨이 SSOT이므로 별도 매핑 테이블 없이 라벨 값을 그대로 사용.
 
 #### 진행 상황 vs 논의 안건 분류
 - **진행 상황**: CLOSED 이슈, MERGED PR, 진행 중(OPEN PR이 있는 이슈), 미착수(직전 회의 분배 항목 중 이슈/PR 없음)
@@ -122,11 +122,9 @@ gh pr list --repo skku-amang/main --state all \
 - `@멘션`은 가능하면 Notion user mention 사용, 불가하면 plain text `@이름`
 - 특정 블록 뒤에 삽입할 때는 `after` 파라미터 사용
 
-Notion MCP 연결 실패 시에만 `curl`로 직접 호출 ([reference.md](reference.md) 참조).
-
 ## 주의사항
 
-- Notion MCP 서버가 연결 안 되면 환경변수 로드 확인 (`direnv allow`) 후 세션 재시작
+- Notion MCP 서버가 연결 안 되면 환경변수 로드 확인 (`direnv allow`) 후 세션 재시작. 재시작 후에도 안 되면 사용자에게 알림
 - Notion API에서 `unsupported` 블록은 건너뛰고, `has_children: true`인 블록은 `mcp__notion__API-get-block-children`으로 재귀 탐색
 - Sentry MCP 도구 권한 오류 시 `search_issues`만으로 수집 가능
 - 회의록 DB에 현재 회의 페이지가 아직 없으면 사용자에게 생성 요청
