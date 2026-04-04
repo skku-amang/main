@@ -51,6 +51,7 @@ export class UsersService {
 
   async findAll() {
     const users = await this.prisma.user.findMany({
+      where: { isApproved: true },
       select: publicUserSelector
     })
 
@@ -65,7 +66,7 @@ export class UsersService {
 
   async findOne(userId: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, isApproved: true },
       select: publicUserSelector
     })
 
