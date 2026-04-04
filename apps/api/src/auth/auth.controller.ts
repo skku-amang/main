@@ -21,7 +21,11 @@ export class AuthController {
   @Post("signup")
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto)
+    await this.authService.signUp(createUserDto)
+
+    return {
+      message: "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."
+    }
   }
 
   @Post("login")

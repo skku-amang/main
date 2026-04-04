@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
-import { AuthError, ForbiddenError } from "@repo/api-client"
+import {
+  AuthError,
+  ForbiddenError,
+  UserNotApprovedError
+} from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import { CreateUserDto } from "../users/dto/create-user.dto"
@@ -16,15 +20,7 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto)
-    const tokens = await this.getTokens(
-      user.id,
-      user.email,
-      user.name,
-      user.isAdmin
-    )
-    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    await this.usersService.create(createUserDto)
   }
 
   async login(loginDto: LoginUserDto) {
@@ -32,9 +28,14 @@ export class AuthService {
     if (!user) {
       throw new AuthError("존재하지 않는 이메일입니다.")
     }
+
     const isMatch = await bcrypt.compare(loginDto.password, user.password)
     if (!isMatch) {
       throw new AuthError("비밀번호가 일치하지 않습니다.")
+    }
+
+    if (!user.isApproved) {
+      throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
     const tokens = await this.getTokens(
@@ -98,6 +99,10 @@ export class AuthService {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
       throw new ForbiddenError("Access Denied")
+    }
+
+    if (!user.isApproved) {
+      throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
     const refreshTokenMatches = await bcrypt.compare(
