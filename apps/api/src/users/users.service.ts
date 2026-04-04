@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
+import { createHash } from "crypto"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
@@ -87,7 +88,7 @@ export class UsersService {
 
   async updateRefreshToken(userId: number, refreshToken: string | null) {
     const hashedRefreshToken = refreshToken
-      ? await bcrypt.hash(refreshToken, 10)
+      ? createHash("sha256").update(refreshToken).digest("hex")
       : null
     await this.prisma.user.update({
       where: { id: userId },

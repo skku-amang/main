@@ -1,13 +1,10 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
-import {
-  AuthError,
-  ForbiddenError,
-  UserNotApprovedError
-} from "@repo/api-client"
+import { AuthError, UserNotApprovedError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
+import { createHash, timingSafeEqual } from "crypto"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { UsersService } from "../users/users.service"
@@ -98,19 +95,20 @@ export class AuthService {
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
-      throw new ForbiddenError("Access Denied")
+      throw new AuthError("Access Denied")
     }
 
     if (!user.isApproved) {
       throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
-    const refreshTokenMatches = await bcrypt.compare(
-      refreshToken,
-      user.hashedRefreshToken
+    const incomingHash = createHash("sha256").update(refreshToken).digest("hex")
+    const refreshTokenMatches = timingSafeEqual(
+      Buffer.from(incomingHash),
+      Buffer.from(user.hashedRefreshToken)
     )
     if (!refreshTokenMatches) {
-      throw new ForbiddenError("Access Denied")
+      throw new AuthError("Access Denied")
     }
 
     const tokens = await this.getTokens(
