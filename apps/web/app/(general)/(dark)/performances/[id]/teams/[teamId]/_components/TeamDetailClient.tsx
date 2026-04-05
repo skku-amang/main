@@ -16,6 +16,7 @@ import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
+import Link from "next/link"
 import { useTeam } from "@/hooks/api/useTeam"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import { getMissingIndices } from "@/lib/team/teamSession"
@@ -166,81 +167,95 @@ const TeamDetailClient = () => {
             }
             className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
-              <li className="mb-1 md:mb-[10px]">
-                ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
-                선착순으로 마감됩니다
-              </li>
-              <li>
-                <span className="md:hidden">
-                  ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
-                  취소할 수 있습니다
-                </span>
-                <span className="hidden md:inline">
-                  ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수 있습니다
-                </span>
-              </li>
-            </ul>
-
-            {/* 빈 자리 세션 버튼들 */}
-            <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
-              {team.teamSessions?.map((ts) => {
-                const missingIndices = getMissingIndices(ts)
-                return missingIndices.map((index) => {
-                  const selected = isSelected(ts.session.id, index)
-                  return (
-                    <ApplyButton
-                      key={`apply-${ts.session.id}-${index}`}
-                      sessionName={ts.session.name}
-                      sessionIndex={index}
-                      isSelected={selected}
-                      onToggle={() => {
-                        if (selected) {
-                          onRemoveSession(ts.session.id, index)
-                        } else {
-                          onAppendSession(ts.session.id, index)
-                        }
-                      }}
-                    />
-                  )
-                })
-              })}
-            </div>
-
-            {/* 지원하기 버튼 (모바일) */}
-            {selectedSessions.length > 0 && (
-              <Button
-                shape="round"
-                className="mt-6 w-full md:hidden"
-                onClick={onSubmit}
-              >
-                지원하기
-              </Button>
-            )}
-
-            {team.teamSessions?.every(
-              (ts) => getMissingIndices(ts).length === 0
-            ) && (
-              <div className="py-4 text-center text-sm text-gray-400">
-                모든 세션이 마감되었습니다.
+            {session.status === "unauthenticated" ? (
+              <div className="py-8 text-center">
+                <p className="mb-4 text-sm text-gray-500">
+                  로그인 후 세션에 지원할 수 있습니다.
+                </p>
+                <Button shape="round" asChild>
+                  <Link href={ROUTES.LOGIN}>로그인하기</Link>
+                </Button>
               </div>
-            )}
-
-            {/* 지원하기 버튼 (데스크탑) - 카드 안쪽 하단 우측 */}
-            {selectedSessions.length > 0 && (
+            ) : (
               <>
-                <div className="my-4 hidden h-px w-full bg-slate-200 md:block" />
-                <div className="hidden justify-end md:flex">
+                <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
+                  <li className="mb-1 md:mb-[10px]">
+                    ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
+                    선착순으로 마감됩니다
+                  </li>
+                  <li>
+                    <span className="md:hidden">
+                      ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
+                      취소할 수 있습니다
+                    </span>
+                    <span className="hidden md:inline">
+                      ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수
+                      있습니다
+                    </span>
+                  </li>
+                </ul>
+
+                {/* 빈 자리 세션 버튼들 */}
+                <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
+                  {team.teamSessions?.map((ts) => {
+                    const missingIndices = getMissingIndices(ts)
+                    return missingIndices.map((index) => {
+                      const selected = isSelected(ts.session.id, index)
+                      return (
+                        <ApplyButton
+                          key={`apply-${ts.session.id}-${index}`}
+                          sessionName={ts.session.name}
+                          sessionIndex={index}
+                          isSelected={selected}
+                          onToggle={() => {
+                            if (selected) {
+                              onRemoveSession(ts.session.id, index)
+                            } else {
+                              onAppendSession(ts.session.id, index)
+                            }
+                          }}
+                        />
+                      )
+                    })
+                  })}
+                </div>
+
+                {/* 지원하기 버튼 (모바일) */}
+                {selectedSessions.length > 0 && (
                   <Button
-                    variant="outlinePrimary"
                     shape="round"
-                    className="w-[120px] gap-2"
+                    className="mt-6 w-full md:hidden"
                     onClick={onSubmit}
                   >
                     지원하기
-                    <span aria-hidden="true">&gt;</span>
                   </Button>
-                </div>
+                )}
+
+                {team.teamSessions?.every(
+                  (ts) => getMissingIndices(ts).length === 0
+                ) && (
+                  <div className="py-4 text-center text-sm text-gray-400">
+                    모든 세션이 마감되었습니다.
+                  </div>
+                )}
+
+                {/* 지원하기 버튼 (데스크탑) - 카드 안쪽 하단 우측 */}
+                {selectedSessions.length > 0 && (
+                  <>
+                    <div className="my-4 hidden h-px w-full bg-slate-200 md:block" />
+                    <div className="hidden justify-end md:flex">
+                      <Button
+                        variant="outlinePrimary"
+                        shape="round"
+                        className="w-[120px] gap-2"
+                        onClick={onSubmit}
+                      >
+                        지원하기
+                        <span aria-hidden="true">&gt;</span>
+                      </Button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </SessionSetCard>
