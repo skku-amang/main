@@ -5,17 +5,21 @@ import "../../sentry.client.config"
 import * as Sentry from "@sentry/nextjs"
 import { SessionProvider, signOut, useSession } from "next-auth/react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { ApiClientProvider } from "./api-client-provider"
 import ReactQueryProvider from "./react-query-provider"
+
+import ROUTES from "@/constants/routes"
 
 const MAX_REFRESH_RETRIES = 3
 
 function SessionGuard({ children }: { children: React.ReactNode }) {
   const { data: session, update } = useSession()
+  const isSigningOut = useRef(false)
 
   useEffect(() => {
     if (session?.error !== "RefreshAccessTokenError") return
+    if (isSigningOut.current) return
 
     let cancelled = false
 
@@ -29,10 +33,13 @@ function SessionGuard({ children }: { children: React.ReactNode }) {
         if (newSession && !newSession.error) return
       }
       if (!cancelled) {
+        isSigningOut.current = true
         console.error(
           "[SessionGuard] 토큰 갱신 최대 재시도 초과, 로그아웃 처리"
         )
-        signOut()
+        signOut({
+          redirectTo: `${ROUTES.LOGIN}?callbackUrl=${window.location.pathname}`
+        })
       }
     }
 
@@ -61,7 +68,7 @@ function SessionGuard({ children }: { children: React.ReactNode }) {
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NuqsAdapter>
-      <SessionProvider>
+      <SessionProvider refetchOnWindowFocus={false}>
         <SessionGuard>
           <ApiClientProvider>
             <ReactQueryProvider>{children}</ReactQueryProvider>

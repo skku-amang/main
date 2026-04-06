@@ -19,5 +19,10 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/profile"] // 보호된 경로를 여기에 추가
+  matcher: [
+    "/admin/:path*",
+    "/profile/:path*",
+    "/performances/:id/teams/create",
+    "/performances/:id/teams/:teamId/edit"
+  ]
 }
