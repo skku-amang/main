@@ -51,7 +51,8 @@ const Login = () => {
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     const res = await signIn("credentials", { ...formData, redirect: false })
     if (!res?.error) {
-      const callbackUrl = searchParams.get("callbackUrl") ?? ROUTES.HOME
+      const raw = searchParams.get("callbackUrl")
+      const callbackUrl = raw?.startsWith("/") ? raw : ROUTES.HOME
       return router.push(callbackUrl)
     }
 
