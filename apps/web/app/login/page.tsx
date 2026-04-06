@@ -50,7 +50,10 @@ const Login = () => {
 
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     const res = await signIn("credentials", { ...formData, redirect: false })
-    if (!res?.error) return router.push(ROUTES.HOME)
+    if (!res?.error) {
+      const callbackUrl = searchParams.get("callbackUrl") ?? ROUTES.HOME
+      return router.push(callbackUrl)
+    }
 
     switch (res.code) {
       case InvalidSigninErrorCode:

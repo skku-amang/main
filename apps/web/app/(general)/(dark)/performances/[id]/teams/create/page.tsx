@@ -18,7 +18,10 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
   const performanceId = params.id
 
   const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN)
+  if (!session)
+    redirect(
+      `${ROUTES.LOGIN}?callbackUrl=/performances/${performanceId}/teams/create`
+    )
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
