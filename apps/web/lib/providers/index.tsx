@@ -37,7 +37,9 @@ function SessionGuard({ children }: { children: React.ReactNode }) {
         console.error(
           "[SessionGuard] 토큰 갱신 최대 재시도 초과, 로그아웃 처리"
         )
-        signOut({ redirectTo: ROUTES.LOGIN })
+        signOut({
+          redirectTo: `${ROUTES.LOGIN}?callbackUrl=${window.location.pathname}`
+        })
       }
     }
 
