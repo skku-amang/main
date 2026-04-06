@@ -203,6 +203,12 @@ export default function ClubroomReservationPage() {
             />
           )}
         </div>
+
+        <AddScheduleButton
+          className="fixed bottom-6 right-6 z-50 shadow-lg"
+          equipments={equipmentList}
+          iconOnly
+        />
       </div>
 
       <RentalDetailModal

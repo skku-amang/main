@@ -221,6 +221,12 @@ export default function EquipmentCalendarPage() {
             />
           )}
         </div>
+
+        <AddScheduleButton
+          className="fixed bottom-6 right-6 z-50 shadow-lg"
+          equipments={equipmentForSchedule}
+          iconOnly
+        />
       </div>
 
       <RentalDetailModal
