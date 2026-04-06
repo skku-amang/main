@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import { Equipment } from "@repo/shared-types"
+import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options
 const HOURS = Array.from({ length: 24 }, (_, i) =>
@@ -42,11 +43,13 @@ const MINUTES = Array.from({ length: 12 }, (_, i) =>
 interface AddScheduleButtonProps {
   className?: string
   equipments: Equipment[]
+  iconOnly?: boolean
 }
 
 export default function AddScheduleButton({
   className,
-  equipments
+  equipments,
+  iconOnly
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
@@ -56,6 +59,9 @@ export default function AddScheduleButton({
   const { toast } = useToast()
 
   const currentUserId = session?.user?.id ? Number(session.user.id) : null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const disablePastDates = { before: today }
 
   // Form state
   const [equipmentId, setEquipmentId] = useState<number | null>(
@@ -78,6 +84,13 @@ export default function AddScheduleButton({
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     currentUserId ? [currentUserId] : []
   )
+
+  // session이 비동기로 로딩될 때 본인 ID를 참여자에 동기화
+  useEffect(() => {
+    if (currentUserId && selectedUserIds.length === 0) {
+      setSelectedUserIds([currentUserId])
+    }
+  }, [currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -203,14 +216,19 @@ export default function AddScheduleButton({
       <DialogTrigger asChild>
         <Button
           className={cn(
-            "text-gray-50 w-36 h-9 text-sm font-medium bg-primary",
+            "text-gray-50 text-sm font-medium bg-primary",
+            iconOnly ? "h-14 w-14 rounded-full p-0" : "w-36 h-9",
             className
           )}
         >
-          <div className="flex gap-2 justify-center items-center">
-            <PlusCircle size={18} />
-            Add schedule
-          </div>
+          {iconOnly ? (
+            <PlusCircle size={24} />
+          ) : (
+            <div className="flex gap-2 justify-center items-center">
+              <PlusCircle size={18} />
+              Add schedule
+            </div>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[600px]">
@@ -269,8 +287,8 @@ export default function AddScheduleButton({
               <span>Date & Time</span>
             </div>
 
-            {/* Calendars side by side */}
-            <div className="flex gap-3">
+            {/* Desktop: two calendars side by side */}
+            <div className="hidden sm:flex gap-3">
               <div className="flex-1 min-w-0 space-y-1.5">
                 <label className="text-sm text-muted-foreground">
                   Start date
@@ -279,6 +297,7 @@ export default function AddScheduleButton({
                   mode="single"
                   selected={startDate}
                   onSelect={setStartDate}
+                  disabled={disablePastDates}
                   className="rounded-md border p-1"
                   classNames={{
                     day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
@@ -296,6 +315,7 @@ export default function AddScheduleButton({
                   mode="single"
                   selected={endDate}
                   onSelect={setEndDate}
+                  disabled={disablePastDates}
                   className="rounded-md border p-1"
                   classNames={{
                     day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
@@ -307,8 +327,34 @@ export default function AddScheduleButton({
               </div>
             </div>
 
-            {/* Time selectors */}
-            <div className="flex gap-3">
+            {/* Mobile: range calendar */}
+            <div className="sm:hidden space-y-1.5">
+              <Calendar
+                mode="range"
+                selected={
+                  startDate || endDate
+                    ? { from: startDate, to: endDate }
+                    : undefined
+                }
+                onSelect={(range: DateRange | undefined) => {
+                  setStartDate(range?.from)
+                  setEndDate(range?.to)
+                }}
+                disabled={disablePastDates}
+                className="rounded-md border p-1"
+                classNames={{
+                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md"
+                }}
+              />
+              {(errors.startDate || errors.endDate) && (
+                <p className="text-sm text-destructive">
+                  {errors.startDate || errors.endDate}
+                </p>
+              )}
+            </div>
+
+            {/* Desktop: time selectors */}
+            <div className="hidden sm:flex gap-3">
               <div className="flex-1 space-y-1.5">
                 <label className="text-sm text-muted-foreground">From</label>
                 <div className="flex items-center gap-1">
@@ -376,13 +422,81 @@ export default function AddScheduleButton({
                 )}
               </div>
             </div>
+
+            {/* Mobile: compact time row */}
+            <div className="flex sm:hidden items-center gap-2">
+              <div className="flex flex-1 items-center gap-1">
+                <Select value={startHour} onValueChange={setStartHour}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="HH" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HOURS.map((h) => (
+                      <SelectItem key={h} value={h}>
+                        {h}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground">:</span>
+                <Select value={startMinute} onValueChange={setStartMinute}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="MM" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINUTES.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <span className="text-muted-foreground text-sm">~</span>
+              <div className="flex flex-1 items-center gap-1">
+                <Select value={endHour} onValueChange={setEndHour}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="HH" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HOURS.map((h) => (
+                      <SelectItem key={h} value={h}>
+                        {h}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground">:</span>
+                <Select value={endMinute} onValueChange={setEndMinute}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="MM" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINUTES.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {/* Mobile time errors */}
+            <div className="sm:hidden">
+              {errors.startTime && (
+                <p className="text-sm text-destructive">{errors.startTime}</p>
+              )}
+              {errors.endTime && (
+                <p className="text-sm text-destructive">{errors.endTime}</p>
+              )}
+            </div>
           </div>
 
           {/* Separator */}
-          <div className="border-t" />
+          <div className="border-t sm:block hidden" />
 
-          {/* Add participants */}
-          <div className="space-y-3">
+          {/* Add participants (desktop only — mobile defaults to current user) */}
+          <div className="hidden sm:block space-y-3">
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <UserRound size={14} />
               <span>Add participants</span>
