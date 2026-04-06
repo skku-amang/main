@@ -7,3 +7,7 @@ export NOTION_TOKEN=ntn_xxx
 
 # Slack: 팀 공용 봇 토큰 — 장수에게 문의
 export SLACK_BOT_TOKEN=xoxb-xxx
+
+# Sentry: https://sentry.io/settings/account/api/auth-tokens/ 에서 User Auth Token 생성
+# scope: org:read, project:read, event:read, issue:read
+export SENTRY_ACCESS_TOKEN=sntryu_xxx
