@@ -22,6 +22,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/profile/:path*",
-    "/performances/:id/teams/create"
+    "/performances/:id/teams/create",
+    "/performances/:id/teams/:teamId/edit"
   ]
 }
