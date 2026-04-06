@@ -30,14 +30,14 @@ argument-hint: "[이전 회의 노션 URL (생략 시 자동 탐색)]"
 
 `$ARGUMENTS`에 노션 URL이 있으면 해당 페이지 사용. 없으면:
 
-1. `mcp__notion__API-query-data-source`로 회의록 DB(`29a779af-a9b3-44a1-954a-bc780abc9cfc`)를 `일시` 내림차순으로 쿼리
+1. `mcp__amang-notion__API-query-data-source`로 회의록 DB(`29a779af-a9b3-44a1-954a-bc780abc9cfc`)를 `일시` 내림차순으로 쿼리
 2. 가장 최근 2개 페이지 가져오기 (직전 회의 = 두 번째, 현재 회의 = 첫 번째)
-3. `mcp__notion__API-retrieve-a-page`로 직전 회의의 `일시` 속성에서 날짜 추출 → 수집 시작일
+3. `mcp__amang-notion__API-retrieve-a-page`로 직전 회의의 `일시` 속성에서 날짜 추출 → 수집 시작일
 4. 직전 회의의 제목에서 차수(N차) 추출 → 이행 상황 표시에 사용
 
 ### 3단계: 직전 회의 작업 분배 파싱
 
-`mcp__notion__API-get-block-children`으로 직전 회의 페이지의 블록을 가져온다.
+`mcp__amang-notion__API-get-block-children`으로 직전 회의 페이지의 블록을 가져온다.
 `# 작업 분배` 섹션을 찾아 하위 블록을 파싱:
 - 호출자에게 분배된 작업 영역별(프론트, 백엔드, 인프라 등) 항목 추출
 - `has_children: true`인 블록은 재귀적으로 children 조회
@@ -74,7 +74,7 @@ gh pr list --repo skku-amang/main --state all \
 
 #### 에이전트 C: Sentry 에러
 
-`mcp__sentry__search_issues`로 web, api 프로젝트의 이슈 검색.
+`mcp__amang-sentry__search_issues`로 web, api 프로젝트의 이슈 검색.
 
 수집 필드: 이슈 ID, 에러 제목, 프로젝트(web/api), 이벤트 수, 상태(resolved/unresolved), 담당자
 해결된 이슈는 관련 PR 번호 매핑 시도 (커밋 메시지, PR 제목에서 Sentry 이슈 ID 검색)
@@ -116,7 +116,7 @@ GitHub 이슈/PR의 `scope:` 라벨로 영역을 판정한다. 라벨이 SSOT이
 
 사용자가 승인하면 Notion MCP 도구로 현재 회의 페이지에 작성:
 
-- `mcp__notion__API-patch-block-children`으로 블록 추가
+- `mcp__amang-notion__API-patch-block-children`으로 블록 추가
 - `heading_3`은 `is_toggleable: true` + children으로 항목 삽입
 - 이슈/PR 링크는 Notion rich text의 `link` 속성 사용
 - `@멘션`은 가능하면 Notion user mention 사용, 불가하면 plain text `@이름`
@@ -125,6 +125,6 @@ GitHub 이슈/PR의 `scope:` 라벨로 영역을 판정한다. 라벨이 SSOT이
 ## 주의사항
 
 - Notion MCP 서버가 연결 안 되면 환경변수 로드 확인 (`direnv allow`) 후 세션 재시작. 재시작 후에도 안 되면 사용자에게 알림
-- Notion API에서 `unsupported` 블록은 건너뛰고, `has_children: true`인 블록은 `mcp__notion__API-get-block-children`으로 재귀 탐색
+- Notion API에서 `unsupported` 블록은 건너뛰고, `has_children: true`인 블록은 `mcp__amang-notion__API-get-block-children`으로 재귀 탐색
 - Sentry MCP 도구 권한 오류 시 `search_issues`만으로 수집 가능
 - 회의록 DB에 현재 회의 페이지가 아직 없으면 사용자에게 생성 요청

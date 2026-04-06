@@ -53,7 +53,7 @@ Notion API가 지원하지 않는 블록 타입 (예: synced_block, column_list 
 
 ### has_children 블록
 
-`has_children: true`인 블록은 `mcp__notion__API-get-block-children`으로 별도 조회해야 내용을 볼 수 있다.
+`has_children: true`인 블록은 `mcp__amang-notion__API-get-block-children`으로 별도 조회해야 내용을 볼 수 있다.
 - heading_3 토글의 실제 내용은 children에 있음
 - 재귀적으로 탐색 필요 (예: bullet 안에 sub-bullet)
 
