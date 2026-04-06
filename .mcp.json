@@ -1,23 +1,27 @@
 {
   "mcpServers": {
-    "notion": {
+    "amang-notion": {
       "command": "direnv",
       "args": ["exec", ".", "notion-mcp-server"]
     },
-    "slack": {
+    "amang-slack": {
       "command": "direnv",
       "args": ["exec", ".", "mcp-server-slack"],
       "env": {
         "SLACK_TEAM_ID": "T07LTTU4WSZ"
       }
     },
-    "kubernetes": {
+    "amang-kubernetes": {
       "command": "direnv",
       "args": ["exec", ".", "mcp-server-kubernetes"]
     },
-    "postgres": {
+    "amang-postgres": {
       "command": "direnv",
       "args": ["exec", ".", "sh", "-c", "mcp-server-postgres $DATABASE_URL"]
+    },
+    "amang-sentry": {
+      "command": "direnv",
+      "args": ["exec", ".", "sentry-mcp"]
     }
   }
 }
