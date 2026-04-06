@@ -33,8 +33,7 @@ const ROUTES = {
         `/performances/${performanceId}/teams/${teamId}`,
       EDIT: (performanceId: number, teamId: number) =>
         `/performances/${performanceId}/teams/${teamId}/edit`
-    },
-    EDIT: (id: number) => `/performances/${id}/edit`
+    }
   },
   MEMBER: {
     LIST: "/members",
