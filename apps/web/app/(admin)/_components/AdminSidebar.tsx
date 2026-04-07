@@ -133,6 +133,21 @@ export function AdminSidebar() {
               <div className="flex-1 px-3 py-4">
                 <NavLinks onNavigate={() => setOpen(false)} />
               </div>
+              <div className="border-t border-neutral-200 px-3 py-4">
+                <Link
+                  href={ROUTES.HOME}
+                  onClick={(e) => {
+                    if (guardNavigation(ROUTES.HOME)) {
+                      e.preventDefault()
+                      return
+                    }
+                    setOpen(false)
+                  }}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+                >
+                  사이트로 돌아가기
+                </Link>
+              </div>
             </div>
           </SheetContent>
         </Sheet>

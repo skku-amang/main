@@ -46,7 +46,8 @@ const ROUTES = {
   },
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",
-    EQUIPMENT: "/reservations/equipment"
+    EQUIPMENT: "/reservations/equipment",
+    EQUIPMENT_DETAIL: (id: number) => `/reservations/equipment/${id}`
   }
 }
 

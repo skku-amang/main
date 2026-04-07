@@ -19,9 +19,14 @@ export default function MonthBlock({
       {days.map((d, i) => {
         const isThisMonth = d.month() === currentMonth.month()
         const isToday = d.isSame(new Date(), "day")
-        const dayRentals = rentals.filter((r) =>
-          dayjs(r.startAt).isSame(d, "day")
-        )
+        const dayRentals = rentals.filter((r) => {
+          const s = dayjs(r.startAt)
+          const e = dayjs(r.endAt)
+          return (
+            s.isSame(d, "day") ||
+            (s.isBefore(d, "day") && e.isAfter(d.startOf("day")))
+          )
+        })
 
         return (
           <div key={i} className="border-r border-b border-gray-100 p-2">

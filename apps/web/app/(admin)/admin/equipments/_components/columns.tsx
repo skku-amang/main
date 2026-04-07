@@ -4,6 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Check, EllipsisVertical, Pencil, Trash2, X } from "lucide-react"
 
+import Link from "next/link"
+
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
@@ -15,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import ROUTES from "@/constants/routes"
 import { Equipment } from "@repo/shared-types"
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -44,8 +47,38 @@ export function getColumns(actions: ColumnActions): ColumnDef<Equipment>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ID" />
       ),
+      cell: ({ row }) => (
+        <Link
+          href={ROUTES.RESERVATION.EQUIPMENT_DETAIL(row.original.id)}
+          className="text-blue-600 hover:underline"
+          target="_blank"
+        >
+          {row.original.id}
+        </Link>
+      ),
       size: 60,
       enableHiding: false
+    },
+    {
+      accessorKey: "image",
+      header: "이미지",
+      meta: { label: "이미지", editable: { type: "image" } },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            ctx.row.original.image ? (
+              <img
+                src={ctx.row.original.image}
+                alt="장비"
+                className="h-10 w-10 rounded object-cover"
+              />
+            ) : (
+              "-"
+            )
+          }
+        />
+      )
     },
     {
       accessorKey: "brand",

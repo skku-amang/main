@@ -94,7 +94,7 @@ export default function EquipmentCalendarPage() {
 
       {/* Selected equipment header */}
       <div className="mb-4 flex items-center gap-3">
-        <span className="text-lg font-semibold">선택된 물품</span>
+        <span className="text-lg font-semibold">{equipmentLabel}</span>
         <Link
           href={ROUTES.RESERVATION.EQUIPMENT}
           className="text-sm text-muted-foreground hover:underline"

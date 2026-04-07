@@ -38,6 +38,7 @@ export default function WeekCalendarField({
   return (
     <div className="w-full mt-7 flex bg-white rounded-xl overflow-hidden">
       <div className="w-7 flex flex-col">
+        <div className="h-[42px]" />
         {Array.from({ length: 16 }).map((_, i) => {
           const hour = (i + 6) % 12 === 0 ? 12 : (i + 6) % 12
           const isPM = i + 6 >= 12
@@ -45,7 +46,7 @@ export default function WeekCalendarField({
           return (
             <div
               key={i}
-              className="text-[8px] w-full h-[42px] text-center first:text-[0px] text-gray-400"
+              className="text-[8px] w-full h-[42px] text-center text-gray-400"
             >
               {hour}
               {isPM ? "PM" : "AM"}
