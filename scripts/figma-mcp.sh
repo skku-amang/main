@@ -5,18 +5,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-
-# .envrc.local에서 FIGMA_API_KEY 로드
-if [ -z "${FIGMA_API_KEY:-}" ] && [ -f "$PROJECT_ROOT/.envrc.local" ]; then
-  set -a
-  source "$PROJECT_ROOT/.envrc.local"
-  set +a
-fi
-
 if [ -z "${FIGMA_API_KEY:-}" ]; then
-  echo "ERROR: FIGMA_API_KEY가 설정되지 않았습니다. .envrc.local을 확인해주세요." >&2
+  echo "ERROR: FIGMA_API_KEY가 설정되지 않았습니다. direnv가 .envrc.local을 로드했는지 확인해주세요." >&2
   exit 1
 fi
 

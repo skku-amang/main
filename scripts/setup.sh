@@ -168,8 +168,6 @@ if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
     else
       warn "nvm이 없어 Figma MCP를 건너뜁니다. nvm 설치 후 'nvm install 22 && nvm exec 22 npm install -g figma-developer-mcp'"
     fi
-    info "Claude Code 플러그인 설치 중..."
-    claude plugins install figma 2>/dev/null && ok "figma 플러그인 설치 완료" || warn "figma 플러그인 설치 실패"
     echo ""
   else
     info "Claude Code 도구 설정을 건너뜁니다."
