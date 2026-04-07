@@ -29,7 +29,6 @@ const meta: Meta<typeof Header> = {
   tags: ["autodocs"],
   args: {
     position: "sticky",
-    height: "82px",
     mode: "dark"
   },
   argTypes: {
@@ -40,9 +39,6 @@ const meta: Meta<typeof Header> = {
     mode: {
       control: "radio",
       options: ["light", "dark", "transparent"]
-    },
-    height: {
-      control: "text"
     }
   },
   parameters: {
