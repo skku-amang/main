@@ -22,6 +22,10 @@
     "amang-sentry": {
       "command": "direnv",
       "args": ["exec", ".", "sentry-mcp"]
+    },
+    "amang-figma": {
+      "command": "direnv",
+      "args": ["exec", ".", "amang-figma-mcp", "--stdio"]
     }
   }
 }

@@ -116,7 +116,7 @@ export const useTeam = createQueryHook(
 
 ### 외부 도구 컨텍스트
 
-- **Figma**: `hmVkj0Fq8c3dbeslIG31X9` (AMANG-New-)
-- **Notion**: 아망 워크스페이스
-- **Slack**: Amang-Homepage 워크스페이스
-- **Sentry**: `amang-23` org (web, api 프로젝트)
+- **Figma**: `hmVkj0Fq8c3dbeslIG31X9` (AMANG-New-) — MCP: `amang-figma` (figma-developer-mcp, `FIGMA_API_KEY`)
+- **Notion**: 아망 워크스페이스 — MCP: `amang-notion`
+- **Slack**: Amang-Homepage 워크스페이스 — MCP: `amang-slack`
+- **Sentry**: `amang-23` org (web, api 프로젝트) — MCP: `amang-sentry`
