@@ -23,13 +23,9 @@ type MenuItem = {
 
 const Header = ({
   position,
-  height = "82px",
-  mobileHeight,
   mode = "light"
 }: {
   position: "sticky" | "fixed"
-  height: string
-  mobileHeight?: string
   mode?: HeaderMode
 }) => {
   const menuItems: MenuItem[] = [
@@ -50,23 +46,13 @@ const Header = ({
     <header
       className={cn(
         position,
-        "top-0 z-50 flex w-full justify-center backdrop-blur-sm",
-        mobileHeight && "md:[height:var(--header-h-desktop)]",
+        "top-0 z-50 flex h-[var(--header-height)] w-full justify-center backdrop-blur-sm",
         {
           "bg-primary md:bg-slate-50": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }
       )}
-      style={
-        mobileHeight
-          ? ({
-              "--header-h-mobile": mobileHeight,
-              "--header-h-desktop": height,
-              height: "var(--header-h-mobile)"
-            } as React.CSSProperties)
-          : { height }
-      }
     >
       {/* Mobile */}
       <nav

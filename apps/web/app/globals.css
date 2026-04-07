@@ -71,6 +71,16 @@
   }
 }
 
+/* Responsive header/main padding — mobile 40px, desktop 82px */
+:root {
+  --header-height: 40px;
+}
+@media (min-width: 768px) {
+  :root {
+    --header-height: 82px;
+  }
+}
+
 /* Hide scrollbar while keeping scroll functionality */
 html {
   scrollbar-width: none; /* Firefox */

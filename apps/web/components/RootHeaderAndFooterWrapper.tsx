@@ -37,32 +37,22 @@ const RootHeaderAndFooterWrapper = ({
   useHeader = true,
   headerMode = useHeader ? "light" : undefined
 }: RootHeaderAndFooterWrapperProps) => {
-  const mobileHeaderHeightPixel = 40
-  const desktopHeaderHeightPixel = 82
   const footerHeightPixel = 120
 
   const toPixelString = (value: number) => `${value}px`
 
   return (
     <div className="h-screen">
-      <Header
-        position="fixed"
-        height={toPixelString(desktopHeaderHeightPixel)}
-        mobileHeight={toPixelString(mobileHeaderHeightPixel)}
-        mode={headerMode}
-      />
+      <Header position="fixed" mode={headerMode} />
 
       <main
-        className={cn("h-auto min-h-full", mainClassName)}
+        className={cn(
+          "h-auto min-h-full pt-[calc(var(--header-height)+var(--extra-pt))]",
+          mainClassName
+        )}
         style={
           {
-            ["--pt-mobile" as string]: toPixelString(
-              mobileHeaderHeightPixel + paddingTopPixel
-            ),
-            ["--pt-desktop" as string]: toPixelString(
-              desktopHeaderHeightPixel + paddingTopPixel
-            ),
-            paddingTop: `var(--pt-mobile)`,
+            "--extra-pt": toPixelString(paddingTopPixel),
             paddingBottom: toPixelString(
               footerHeightPixel + paddingBottomPixel
             ),
@@ -70,7 +60,6 @@ const RootHeaderAndFooterWrapper = ({
           } as React.CSSProperties
         }
       >
-        <style>{`@media (min-width: 768px) { [style*="--pt-mobile"] { padding-top: var(--pt-desktop) !important; } }`}</style>
         {children}
       </main>
 
