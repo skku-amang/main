@@ -90,11 +90,11 @@ export default function EquipmentCalendarPage() {
   return (
     <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
-        title="물품 대여"
+        title="장비 대여"
         routes={[
           { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "예약" },
-          { display: "물품 대여", href: ROUTES.RESERVATION.EQUIPMENT },
+          { display: "장비 대여", href: ROUTES.RESERVATION.EQUIPMENT },
           { display: equipmentLabel }
         ]}
       />
