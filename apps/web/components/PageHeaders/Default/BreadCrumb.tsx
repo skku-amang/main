@@ -24,7 +24,7 @@ const DefaultPageHeaderBreadCrumb = ({
   const router = useRouter()
 
   return (
-    <div className="flex flex-nowrap items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
+    <div className="flex flex-nowrap items-center justify-center gap-x-0.5 whitespace-nowrap text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
       {routes.map((route, index) => {
         const last = index === routes.length - 1
         const secondToLast = index === routes.length - 2
