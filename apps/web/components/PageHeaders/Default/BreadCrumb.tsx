@@ -68,7 +68,9 @@ const DefaultPageHeaderBreadCrumb = ({
             className="inline-flex items-center gap-x-0.5 md:gap-x-1.5"
           >
             {routeContent}
-            {!last && <ChevronRight size={20} strokeWidth={1.67} />}
+            {!last && !(shouldHideLast && index === routes.length - 2) && (
+              <ChevronRight size={20} strokeWidth={1.67} />
+            )}
           </span>
         )
       })}
