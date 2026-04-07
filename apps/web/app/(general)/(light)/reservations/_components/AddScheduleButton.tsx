@@ -71,8 +71,9 @@ export default function AddScheduleButton({
   )
 
   // equipments prop이 비동기로 로딩될 때 equipmentId를 동기화
+  // 모바일에서 장비 셀렉터가 숨겨지므로 첫 번째 장비를 자동 선택
   useEffect(() => {
-    if (equipments.length === 1 && equipmentId === null) {
+    if (equipments.length >= 1 && equipmentId === null) {
       setEquipmentId(equipments[0]?.id ?? null)
     }
   }, [equipments, equipmentId])
