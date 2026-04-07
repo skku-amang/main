@@ -103,6 +103,14 @@ resource "vercel_project_environment_variable" "site_url_preview" {
   target     = ["preview", "development"]
 }
 
+resource "vercel_project_environment_variable" "developer_emails" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_DEVELOPER_EMAILS"
+  value      = var.developer_emails
+  target     = ["production", "preview"]
+}
+
 resource "vercel_project_environment_variable" "sentry_dsn" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
