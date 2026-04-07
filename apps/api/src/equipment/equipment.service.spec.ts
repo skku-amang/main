@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing"
 import { EquipmentService } from "./equipment.service"
 import { PrismaService } from "../prisma/prisma.service"
+import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 describe("EquipmentService", () => {
   let service: EquipmentService
@@ -17,6 +18,12 @@ describe("EquipmentService", () => {
             findUnique: jest.fn(),
             update: jest.fn(),
             delete: jest.fn()
+          }
+        },
+        {
+          provide: ObjectStorageService,
+          useValue: {
+            deleteObject: jest.fn()
           }
         }
       ]
