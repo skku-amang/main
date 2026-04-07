@@ -34,12 +34,12 @@ const Header = ({
 }) => {
   const menuItems: MenuItem[] = [
     {
-      name: "공간 대여",
+      name: "동방 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
       active: true
     },
     {
-      name: "물품 대여",
+      name: "장비 대여",
       url: ROUTES.RESERVATION.EQUIPMENT,
       active: true
     },

@@ -23,9 +23,10 @@ export default function MobileMonthBlock({
         const isToday = d.isSame(new Date(), "day")
         const isSelected =
           selectedDate && d.isSame(selectedDate, "day") && !isToday
-        const hasRentals = rentals.some((r) =>
-          dayjs(r.startAt).isSame(d, "day")
-        )
+        const dayFormatted = d.format("YYYY-MM-DD")
+        const rentalCount = rentals.filter(
+          (r) => dayjs(r.startAt).format("YYYY-MM-DD") === dayFormatted
+        ).length
 
         return (
           <div
@@ -46,8 +47,13 @@ export default function MobileMonthBlock({
             >
               {d.date()}
             </span>
-            {hasRentals && (
-              <div className="mt-0.5 h-1 w-1 rounded-full bg-blue-400" />
+            {rentalCount > 0 && (
+              <div className="mt-0.5 flex gap-0.5">
+                <div className="h-1 w-1 rounded-full bg-blue-400" />
+                {rentalCount >= 2 && (
+                  <div className="h-1 w-1 rounded-full bg-blue-400" />
+                )}
+              </div>
             )}
           </div>
         )

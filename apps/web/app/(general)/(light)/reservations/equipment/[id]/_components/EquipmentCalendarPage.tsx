@@ -43,7 +43,8 @@ export default function EquipmentCalendarPage() {
     "date",
     parseAsString.withDefault(dayjs().format("YYYY-MM-DD"))
   )
-  const selectedDate = dayjs(selectedDateStr)
+  const [y, m, d] = selectedDateStr.split("-").map(Number)
+  const selectedDate = dayjs(new Date(y!, m! - 1, d!))
   const setSelectedDate = (date: Dayjs) =>
     setSelectedDateStr(date.format("YYYY-MM-DD"))
   const params = useParams()
