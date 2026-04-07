@@ -24,7 +24,7 @@ const DefaultPageHeaderBreadCrumb = ({
   const router = useRouter()
 
   return (
-    <div className="flex flex-nowrap items-center justify-center gap-x-0.5 whitespace-nowrap text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
+    <div className="flex flex-nowrap items-center justify-center whitespace-nowrap text-xs font-medium text-slate-400 md:text-base">
       {routes.map((route, index) => {
         const last = index === routes.length - 1
         const secondToLast = index === routes.length - 2
@@ -33,9 +33,8 @@ const DefaultPageHeaderBreadCrumb = ({
         // 4단계 이상일 때만 마지막 항목을 모바일에서 숨김
         const hiddenOnMobile =
           last && shouldHideLast ? "hidden md:contents" : ""
-        // 마지막 직전 chevron도 모바일에서 숨김
-        const chevronHiddenOnMobile =
-          secondToLast && shouldHideLast ? "hidden md:inline-block" : ""
+        // 4단계 이상: 직전 항목의 chevron은 완전히 숨김 (마지막 항목이 자체 chevron을 가짐)
+        const chevronHidden = secondToLast && shouldHideLast ? "hidden" : ""
 
         const routeContent = route.dropdownItems ? (
           <Select
@@ -68,14 +67,19 @@ const DefaultPageHeaderBreadCrumb = ({
         )
 
         return (
-          <span key={index} className={hiddenOnMobile}>
-            {last && <ChevronRight size={20} strokeWidth={1.67} />}
+          <span
+            key={index}
+            className={`inline-flex items-center gap-x-0.5 md:gap-x-1.5 ${hiddenOnMobile}`}
+          >
+            {last && shouldHideLast && (
+              <ChevronRight size={20} strokeWidth={1.67} />
+            )}
             {routeContent}
             {!last && (
               <ChevronRight
                 size={20}
                 strokeWidth={1.67}
-                className={chevronHiddenOnMobile}
+                className={chevronHidden}
               />
             )}
           </span>
