@@ -11,3 +11,7 @@ export SLACK_BOT_TOKEN=xoxb-xxx
 # Sentry: https://sentry.io/settings/account/api/auth-tokens/ 에서 User Auth Token 생성
 # scope: org:read, project:read, event:read, issue:read
 export SENTRY_ACCESS_TOKEN=sntryu_xxx
+
+# Figma: https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens
+# Personal Access Token 생성 후 입력
+export FIGMA_API_KEY=figd_xxx
