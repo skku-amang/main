@@ -1,37 +1,25 @@
 import { PrismaService } from "./../prisma/prisma.service"
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { CreateEquipmentDto } from "./dto/create-equipment.dto"
 import { UpdateEquipmentDto } from "./dto/update-equipment.dto"
 import { Prisma, EquipCategory } from "@repo/database"
-import { ConflictError, NotFoundError } from "@repo/api-client"
-import * as path from "node:path"
-import { randomUUID } from "node:crypto"
+import { NotFoundError } from "@repo/api-client"
+import { ObjectStorageService } from "../object-storage/object-storage.service"
 import { equipmentWithRentalLogInclude } from "@repo/shared-types"
 
 @Injectable()
 export class EquipmentService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(EquipmentService.name)
 
-  async create(
-    createEquipmentDto: CreateEquipmentDto,
-    file?: Express.Multer.File
-  ) {
-    const imageUrl: string | undefined = undefined
-    if (file) {
-      const fileExt = path.extname(file.originalname)
-      const fileName = `${randomUUID()}${fileExt}`
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly objectStorageService: ObjectStorageService
+  ) {}
 
-      // TODO: 파일 업로드 구현 필요
-      // await this.minioService.upload ?
-    }
-    const equipment = await this.prisma.equipment.create({
-      data: {
-        ...createEquipmentDto,
-        image: imageUrl
-      }
+  async create(createEquipmentDto: CreateEquipmentDto) {
+    return this.prisma.equipment.create({
+      data: createEquipmentDto
     })
-
-    return equipment
   }
 
   async findAll(type?: string) {
@@ -64,11 +52,7 @@ export class EquipmentService {
     return equipment
   }
 
-  async update(
-    id: number,
-    updateEquipmentDto: UpdateEquipmentDto,
-    file?: Express.Multer.File
-  ) {
+  async update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
     try {
       const oldEquipment = await this.prisma.equipment.findUnique({
         where: { id },
@@ -77,35 +61,22 @@ export class EquipmentService {
       if (!oldEquipment)
         throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
 
-      const oldImageUrl = oldEquipment?.image
-      const imageUrl: string | undefined = undefined
+      if (
+        "image" in updateEquipmentDto &&
+        oldEquipment.image &&
+        oldEquipment.image !== updateEquipmentDto.image
+      ) {
+        this.deleteImageSafely(oldEquipment.image)
+      }
 
-      if (file) {
-        // 파일 업로드 필요.
-        const fileExt = path.extname(file.originalname)
-        const fileName = `${randomUUID()}${fileExt}`
-
-        // TODO: 파일 업로드 구현 필요
-        // imageUrl =
-      }
-      if (oldImageUrl && imageUrl) {
-        // TODO: oldImageUrl에 있는 기존 이미지 삭제 필요
-      }
-      const updateData: Prisma.EquipmentUpdateInput = {
-        ...updateEquipmentDto,
-        image: imageUrl
-      }
-      const equipment = await this.prisma.equipment.update({
+      return await this.prisma.equipment.update({
         where: { id },
-        data: updateData,
+        data: updateEquipmentDto,
         include: equipmentWithRentalLogInclude
       })
-
-      return equipment
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025")
-          // Race Condition 방지 처리
           throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
       }
       throw error
@@ -119,7 +90,7 @@ export class EquipmentService {
       })
 
       if (equipment.image) {
-        // TODO: 이미지 삭제 로직 구현 필요
+        this.deleteImageSafely(equipment.image)
       }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -130,5 +101,11 @@ export class EquipmentService {
       }
       throw error
     }
+  }
+
+  private deleteImageSafely(imageUrl: string) {
+    this.objectStorageService.deleteObject(imageUrl).catch((error) => {
+      this.logger.warn(`S3 이미지 삭제 실패 (${imageUrl}):`, error)
+    })
   }
 }

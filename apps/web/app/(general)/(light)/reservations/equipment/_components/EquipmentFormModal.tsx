@@ -1,6 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ImagePlus, Loader2, X } from "lucide-react"
+import { useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { EquipCategory } from "@repo/database/enums"
@@ -36,6 +38,7 @@ import {
   useCreateEquipment,
   useUpdateEquipment
 } from "@/hooks/api/useEquipment"
+import { useImageUpload } from "@/hooks/useImageUpload"
 
 const CATEGORY_OPTIONS: { value: EquipCategory; label: string }[] = [
   { value: EquipCategory.GUITAR, label: "기타" },
@@ -57,7 +60,8 @@ const formSchema = z.object({
   category: z.nativeEnum(EquipCategory, {
     required_error: "장비 카테고리는 필수입니다."
   }),
-  description: z.string().optional()
+  description: z.string().optional(),
+  image: z.string().url().nullable().optional()
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -79,6 +83,13 @@ export default function EquipmentFormModal({
   const updateEquipment = useUpdateEquipment()
   const isEditing = !!equipment
 
+  const imageUpload = useImageUpload({
+    onSuccess: (publicUrl) => {
+      form.setValue("image", publicUrl)
+    }
+  })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: equipment
@@ -86,14 +97,24 @@ export default function EquipmentFormModal({
           brand: equipment.brand,
           model: equipment.model,
           category: equipment.category,
-          description: equipment.description ?? ""
+          description: equipment.description ?? "",
+          image: equipment.image ?? null
         }
       : {
           brand: "",
           model: "",
-          description: ""
+          description: "",
+          image: null
         }
   })
+
+  const displayImage = imageUpload.preview ?? form.watch("image")
+
+  const handleRemoveImage = () => {
+    imageUpload.reset()
+    form.setValue("image", null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
 
   const onSubmit = (values: FormValues) => {
     if (isEditing) {
@@ -118,6 +139,7 @@ export default function EquipmentFormModal({
           queryClient.invalidateQueries({ queryKey: ["equipments"] })
           onOpenChange(false)
           form.reset()
+          imageUpload.reset()
         },
         onError: () => {
           toast({
@@ -134,7 +156,10 @@ export default function EquipmentFormModal({
     <Dialog
       open={open}
       onOpenChange={(value) => {
-        if (!value) form.reset()
+        if (!value) {
+          form.reset()
+          imageUpload.reset()
+        }
         onOpenChange(value)
       }}
     >
@@ -222,7 +247,61 @@ export default function EquipmentFormModal({
               )}
             />
 
-            {/* TODO: 장비 이미지 업로드 (백엔드 이미지 업로드 구현 후) */}
+            {/* 장비 이미지 */}
+            <div>
+              <SimpleLabel>장비 이미지</SimpleLabel>
+              <div className="mt-1 flex items-center gap-3">
+                {displayImage ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border">
+                    <img
+                      src={displayImage}
+                      alt="장비 이미지"
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -right-1 -top-1 rounded-full bg-destructive p-0.5 text-destructive-foreground shadow-sm"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md border-2 border-dashed text-muted-foreground hover:border-primary hover:text-primary"
+                  >
+                    <ImagePlus size={24} />
+                  </button>
+                )}
+                <div className="flex flex-col gap-1">
+                  {!displayImage && (
+                    <p className="text-sm text-muted-foreground">
+                      JPEG, PNG, WebP (최대 20MB)
+                    </p>
+                  )}
+                  {imageUpload.isUploading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 size={14} className="animate-spin" />
+                      업로드 중... {imageUpload.progress}%
+                    </div>
+                  )}
+                  {imageUpload.error && (
+                    <p className="text-sm text-destructive">
+                      {imageUpload.error}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={imageUpload.selectAndUpload}
+              />
+            </div>
 
             <div className="flex justify-center gap-3 pt-2">
               <Button
@@ -237,7 +316,9 @@ export default function EquipmentFormModal({
                 type="submit"
                 className="w-28"
                 disabled={
-                  createEquipment.isPending || updateEquipment.isPending
+                  createEquipment.isPending ||
+                  updateEquipment.isPending ||
+                  imageUpload.isUploading
                 }
               >
                 저장
