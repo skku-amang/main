@@ -24,17 +24,18 @@ const DefaultPageHeaderBreadCrumb = ({
   const router = useRouter()
 
   return (
-    <div className="flex items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
+    <div className="flex flex-nowrap items-center justify-center gap-x-0.5 text-xs font-medium text-slate-400 md:gap-x-1.5 md:text-base">
       {routes.map((route, index) => {
         const last = index === routes.length - 1
         const secondToLast = index === routes.length - 2
+        const shouldHideLast = routes.length > 3
 
-        // 마지막 항목은 모바일에서 숨김 (chevron 포함)
-        const hiddenOnMobile = last ? "hidden md:contents" : ""
+        // 4단계 이상일 때만 마지막 항목을 모바일에서 숨김
+        const hiddenOnMobile =
+          last && shouldHideLast ? "hidden md:contents" : ""
         // 마지막 직전 chevron도 모바일에서 숨김
-        const chevronHiddenOnMobile = secondToLast
-          ? "hidden md:inline-block"
-          : ""
+        const chevronHiddenOnMobile =
+          secondToLast && shouldHideLast ? "hidden md:inline-block" : ""
 
         const routeContent = route.dropdownItems ? (
           <Select
