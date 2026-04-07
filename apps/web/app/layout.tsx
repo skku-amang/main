@@ -4,10 +4,10 @@ import { Metadata } from "next"
 import localFont from "next/font/local"
 import React from "react"
 
-import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
 import { Toaster } from "@/components/ui/toaster"
+import VercelAnalytics from "@/components/VercelAnalytics"
 import { SEO } from "@/constants/seo"
 import Providers from "@/lib/providers"
 import { cn } from "@/lib/utils"
@@ -80,7 +80,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster />
-          <Analytics />
+          <VercelAnalytics />
           <SpeedInsights />
         </Providers>
       </body>
