@@ -24,10 +24,12 @@ type MenuItem = {
 const Header = ({
   position,
   height = "82px",
+  mobileHeight,
   mode = "light"
 }: {
   position: "sticky" | "fixed"
   height: string
+  mobileHeight?: string
   mode?: HeaderMode
 }) => {
   const menuItems: MenuItem[] = [
@@ -48,14 +50,23 @@ const Header = ({
     <header
       className={cn(
         position,
-        "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
+        "top-0 z-50 flex w-full justify-center backdrop-blur-sm",
+        mobileHeight && "md:[height:var(--header-h-desktop)]",
         {
           "bg-primary md:bg-slate-50": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }
       )}
-      style={{ height }}
+      style={
+        mobileHeight
+          ? ({
+              "--header-h-mobile": mobileHeight,
+              "--header-h-desktop": height,
+              height: "var(--header-h-mobile)"
+            } as React.CSSProperties)
+          : { height }
+      }
     >
       {/* Mobile */}
       <nav
@@ -70,7 +81,7 @@ const Header = ({
         <MobileBackButton />
         <Link
           href={ROUTES.HOME}
-          className={cn("text-2xl", knewave.className, "text-white")}
+          className={cn("text-[21px]", knewave.className, "text-white")}
         >
           Amang
         </Link>

@@ -27,7 +27,7 @@ const DefaultPageHeader = ({
   return (
     <div
       className={cn(
-        "flex flex-col justify-center space-y-1 pb-2 pt-10 text-center md:space-y-5 md:pb-[91px] md:pt-[135px]",
+        "flex flex-col justify-center space-y-1 pt-12 pb-2 text-center md:space-y-5 md:pb-[91px] md:pt-[135px]",
         className
       )}
     >
