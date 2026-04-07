@@ -61,19 +61,23 @@ export class EquipmentService {
       if (!oldEquipment)
         throw new NotFoundError(`ID가 ${id}인 장비를 찾을 수 없습니다.`)
 
-      if (
-        "image" in updateEquipmentDto &&
-        oldEquipment.image &&
-        oldEquipment.image !== updateEquipmentDto.image
-      ) {
-        this.deleteImageSafely(oldEquipment.image)
-      }
+      const oldImageUrl = oldEquipment.image
 
-      return await this.prisma.equipment.update({
+      const updated = await this.prisma.equipment.update({
         where: { id },
         data: updateEquipmentDto,
         include: equipmentWithRentalLogInclude
       })
+
+      if (
+        "image" in updateEquipmentDto &&
+        oldImageUrl &&
+        oldImageUrl !== updateEquipmentDto.image
+      ) {
+        this.deleteImageSafely(oldImageUrl)
+      }
+
+      return updated
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025")
