@@ -20,12 +20,10 @@ type HeaderProps =
   | {
       useHeader?: true
       headerMode?: HeaderMode
-      headerHeightPixel?: number
     }
   | {
       useHeader?: false
       headerMode?: undefined
-      headerHeightPixel?: undefined
     }
 
 const RootHeaderAndFooterWrapper = ({
