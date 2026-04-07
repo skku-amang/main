@@ -1,5 +1,5 @@
 import { PrismaService } from "./../prisma/prisma.service"
-import { Injectable, Logger } from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
 import { CreateEquipmentDto } from "./dto/create-equipment.dto"
 import { UpdateEquipmentDto } from "./dto/update-equipment.dto"
 import { Prisma, EquipCategory } from "@repo/database"
@@ -9,8 +9,6 @@ import { equipmentWithRentalLogInclude } from "@repo/shared-types"
 
 @Injectable()
 export class EquipmentService {
-  private readonly logger = new Logger(EquipmentService.name)
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly objectStorageService: ObjectStorageService
@@ -74,7 +72,7 @@ export class EquipmentService {
         oldImageUrl &&
         oldImageUrl !== updateEquipmentDto.image
       ) {
-        this.deleteImageSafely(oldImageUrl)
+        this.objectStorageService.deleteObjectSafely(oldImageUrl)
       }
 
       return updated
@@ -94,7 +92,7 @@ export class EquipmentService {
       })
 
       if (equipment.image) {
-        this.deleteImageSafely(equipment.image)
+        this.objectStorageService.deleteObjectSafely(equipment.image)
       }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -105,11 +103,5 @@ export class EquipmentService {
       }
       throw error
     }
-  }
-
-  private deleteImageSafely(imageUrl: string) {
-    this.objectStorageService.deleteObject(imageUrl).catch((error) => {
-      this.logger.warn(`S3 이미지 삭제 실패 (${imageUrl}):`, error)
-    })
   }
 }
