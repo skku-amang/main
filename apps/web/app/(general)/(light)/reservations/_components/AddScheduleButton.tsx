@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
+import { useRouter, usePathname } from "next/navigation"
 import dayjs from "dayjs"
 import { Clock, PlusCircle, UserRound, X } from "lucide-react"
 
@@ -36,8 +37,8 @@ import type { DateRange } from "react-day-picker"
 const HOURS = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 )
-const MINUTES = Array.from({ length: 12 }, (_, i) =>
-  (i * 5).toString().padStart(2, "0")
+const MINUTES = Array.from({ length: 4 }, (_, i) =>
+  (i * 15).toString().padStart(2, "0")
 )
 
 interface AddScheduleButtonProps {
@@ -59,6 +60,8 @@ export default function AddScheduleButton({
   const createRental = useCreateRental()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const currentUserId = session?.user?.id ? Number(session.user.id) : null
   const today = new Date()
@@ -212,6 +215,10 @@ export default function AddScheduleButton({
     <Dialog
       open={open}
       onOpenChange={(v) => {
+        if (v && !session) {
+          router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          return
+        }
         setOpen(v)
         if (!v) resetForm()
       }}
@@ -219,8 +226,11 @@ export default function AddScheduleButton({
       <DialogTrigger asChild>
         <Button
           className={cn(
-            "text-white text-base font-semibold bg-third",
-            iconOnly ? "h-14 w-14 rounded-full p-0" : "h-[45px] rounded-[10px]",
+            iconOnly
+              ? "h-14 w-14 rounded-full p-0 bg-primary text-gray-50"
+              : label
+                ? "text-white text-base font-semibold bg-third h-[45px] rounded-[10px]"
+                : "text-gray-50 text-sm font-medium bg-primary w-36 h-9",
             className
           )}
         >
@@ -341,7 +351,7 @@ export default function AddScheduleButton({
                 }
                 onSelect={(range: DateRange | undefined) => {
                   setStartDate(range?.from)
-                  setEndDate(range?.to)
+                  setEndDate(range?.to ?? range?.from)
                 }}
                 disabled={disablePastDates}
                 className="rounded-md border p-1 w-full"

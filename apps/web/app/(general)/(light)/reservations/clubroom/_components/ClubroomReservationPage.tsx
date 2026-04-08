@@ -8,7 +8,7 @@ import ROUTES from "@/constants/routes"
 import MyReservationField from "../../_components/MyReservationField"
 import AddScheduleButton from "../../_components/AddScheduleButton"
 import WeekCalendarField from "../../_components/WeekCalendarField"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import WeekLabel from "../../_components/WeekLable"
 import MonthCalendarField from "../../_components/MonthCalendarField"
@@ -44,14 +44,24 @@ export default function ClubroomReservationPage() {
   const selectedDate = dayjs(new Date(y!, m! - 1, d!))
   const setSelectedDate = (date: Dayjs) =>
     setSelectedDateStr(date.format("YYYY-MM-DD"))
-  const getWeekStart = (date = dayjs()) => date.startOf("week")
 
-  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
-  const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
+  // Google Calendar 방식: selectedDate에서 주/월 범위 파생
+  const currentMonday = selectedDate.startOf("week")
+  const calendarViewMonth = selectedDate.startOf("month")
 
-  useEffect(() => {
-    setCalendarViewMonth(currentMonday)
-  }, [currentMonday])
+  // WeekLabel 네비게이션용 래퍼
+  const setCurrentMonday = (mondayOrFn: Dayjs | ((prev: Dayjs) => Dayjs)) => {
+    const newMonday =
+      typeof mondayOrFn === "function" ? mondayOrFn(currentMonday) : mondayOrFn
+    setSelectedDate(newMonday)
+  }
+  const setCalendarViewMonth = (
+    monthOrFn: Dayjs | ((prev: Dayjs) => Dayjs)
+  ) => {
+    const newMonth =
+      typeof monthOrFn === "function" ? monthOrFn(calendarViewMonth) : monthOrFn
+    setSelectedDate(newMonth)
+  }
 
   // 데이터 조회 범위: 현재 보고 있는 달의 시작~끝 (+전후 1주)
   const queryRange = useMemo(() => {
@@ -130,6 +140,7 @@ export default function ClubroomReservationPage() {
               <MonthCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}
