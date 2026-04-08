@@ -11,7 +11,7 @@ interface WeekColumnProp {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-const START_HOUR = 6
+const START_HOUR = 0
 const PX_PER_HOUR = 42
 const HEADER_PX = 42
 
@@ -52,7 +52,7 @@ export default function WeekColumn({
       </div>
 
       {/* 시간 구간 */}
-      {Array.from({ length: 16 }).map((_, i) => (
+      {Array.from({ length: 24 }).map((_, i) => (
         <div
           key={i}
           className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
@@ -63,7 +63,7 @@ export default function WeekColumn({
       {dayRentals.map((rental) => {
         const start = dayjs(rental.startAt)
         const end = dayjs(rental.endAt)
-        const totalMin = 16 * 60 // 6AM~10PM
+        const totalMin = 24 * 60
         const rawStartMin = start.isSame(date, "day")
           ? (start.hour() - START_HOUR) * 60 + start.minute()
           : 0 // 전날부터 이어지는 이벤트는 하루 시작부터
