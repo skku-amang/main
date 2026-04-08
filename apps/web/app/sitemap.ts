@@ -22,18 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9
     },
     {
-      url: `${BASE_URL}/members`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5
-    },
-    {
-      url: `${BASE_URL}/notices`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.6
-    },
-    {
       url: `${BASE_URL}/reservations/clubroom`,
       lastModified: new Date(),
       changeFrequency: "daily",
