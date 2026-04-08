@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
-import { FilterPopoverContent } from "@/components/Filter"
+import { FilterPopoverContent } from "@/components/FilterPopover"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
