@@ -166,7 +166,7 @@ export function TeamListDataTable<TValue>({
     "관악기"
   ]
 
-  const filterValues: Record<string, FilterValue[]> = {
+  const filterValues: { 필요세션: FilterValue[]; 모집상태: FilterValue[] } = {
     필요세션: [
       {
         label: "모두",
