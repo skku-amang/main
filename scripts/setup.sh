@@ -152,22 +152,7 @@ if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
     pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack mcp-server-kubernetes @modelcontextprotocol/server-postgres 2>/dev/null \
       && ok "MCP 서버 패키지 설치 완료" \
       || warn "MCP 서버 패키지 설치 실패 — 수동 설치가 필요합니다"
-    # Figma MCP는 Node v24 ESM 호환 문제로 Node v22에서 실행 필요
-    info "Figma MCP 설정 중 (Node v22 필요)..."
-    if command -v nvm &>/dev/null || [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
-      [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ] && source "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
-      nvm install 22 --no-progress 2>/dev/null && nvm exec 22 npm install -g figma-developer-mcp 2>/dev/null \
-        && ok "Figma MCP 설치 완료 (Node v22)" \
-        || warn "Figma MCP 설치 실패 — 'nvm install 22 && nvm exec 22 npm install -g figma-developer-mcp'"
-      nvm use default 2>/dev/null
-      # 래퍼 스크립트를 PATH에 심볼릭 링크
-      mkdir -p ~/.local/bin
-      ln -sf "$(cd "$(dirname "$0")" && pwd)/figma-mcp.sh" ~/.local/bin/amang-figma-mcp \
-        && ok "amang-figma-mcp 심볼릭 링크 생성 완료" \
-        || warn "심볼릭 링크 생성 실패"
-    else
-      warn "nvm이 없어 Figma MCP를 건너뜁니다. nvm 설치 후 'nvm install 22 && nvm exec 22 npm install -g figma-developer-mcp'"
-    fi
+    info "Figma MCP는 공식 리모트 서버(mcp.figma.com)를 사용합니다. 첫 연결 시 브라우저에서 OAuth 로그인이 필요합니다."
     echo ""
   else
     info "Claude Code 도구 설정을 건너뜁니다."
