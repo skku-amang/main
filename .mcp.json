@@ -24,8 +24,8 @@
       "args": ["exec", ".", "sentry-mcp"]
     },
     "amang-figma": {
-      "command": "direnv",
-      "args": ["exec", ".", "amang-figma-mcp", "--stdio"]
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
     }
   }
 }
