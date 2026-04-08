@@ -67,6 +67,16 @@ import {
 
 type StatusFilter = "all" | "active" | "inactive"
 
+const SESSION_LABELS = [
+  "보컬",
+  "기타",
+  "신디",
+  "베이스",
+  "드럼",
+  "현악기",
+  "관악기"
+]
+
 interface DataTableProps<TValue> {
   className?: string
   columns: ColumnDef<TeamColumn, TValue>[]
@@ -156,16 +166,6 @@ export function TeamListDataTable<TValue>({
     })
   }, [data, sessionFilter, statusFilter])
 
-  const sessionLabels = [
-    "보컬",
-    "기타",
-    "신디",
-    "베이스",
-    "드럼",
-    "현악기",
-    "관악기"
-  ]
-
   const filterValues: { 필요세션: FilterValue[]; 모집상태: FilterValue[] } = {
     필요세션: [
       {
@@ -173,7 +173,7 @@ export function TeamListDataTable<TValue>({
         onChecked: () => setSessionFilter(new Set()),
         checked: sessionFilter.size === 0
       },
-      ...sessionLabels.map((label) => ({
+      ...SESSION_LABELS.map((label) => ({
         label,
         onChecked: (checked: boolean) => toggleSession(label, checked),
         checked: sessionFilter.has(label)
