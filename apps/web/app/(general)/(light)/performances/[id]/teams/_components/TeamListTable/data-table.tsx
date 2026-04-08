@@ -48,7 +48,10 @@ import {
 import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
-import { getSessionDisplayName } from "@/constants/session"
+import {
+  getSessionDisplayName,
+  SESSION_DISPLAY_NAME
+} from "@/constants/session"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
@@ -73,15 +76,7 @@ import {
 
 type StatusFilter = "all" | "active" | "inactive"
 
-const SESSION_LABELS = [
-  "보컬",
-  "기타",
-  "신디",
-  "베이스",
-  "드럼",
-  "현악기",
-  "관악기"
-]
+const SESSION_LABELS = Object.values(SESSION_DISPLAY_NAME)
 
 interface DataTableProps<TValue> {
   className?: string
