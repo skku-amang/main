@@ -5,13 +5,7 @@ import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { EquipCategory } from "@repo/database/enums"
 import { Equipment } from "@repo/shared-types"
-import {
-  CirclePlus,
-  Filter,
-  Plus,
-  RefreshCw,
-  PackageSearch
-} from "lucide-react"
+import { Filter, Plus, RefreshCw, PackageSearch } from "lucide-react"
 import {
   ChevronLeft,
   ChevronRight,
@@ -155,45 +149,17 @@ export default function EquipmentListPage() {
       />
 
       {/* Desktop toolbar */}
-      <div className="mb-6 hidden items-center justify-between py-[25px] md:flex">
-        {/* 검색 */}
-        <Search
-          placeholder="검색"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value || null)
-            setPage(1)
-          }}
-          className="max-w-sm"
-        />
-
-        {/* 생성 및 필터 */}
-        <div className="flex gap-4">
-          {isAdmin && (
-            <Button
-              className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
-              onClick={() => {
-                setEditingEquipment(null)
-                setFormOpen(true)
-              }}
-            >
-              <CirclePlus size={24} className="me-[9px]" />
-              Create
-            </Button>
-          )}
-
+      <div className="mb-6 hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex items-center gap-2">
           <Popover open={filterOpen} onOpenChange={setFilterOpen}>
             <PopoverTrigger asChild>
-              <Button
-                variant={filterOpen ? "outline" : undefined}
-                className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
-              >
-                <Filter size={24} className="me-[9px]" />
-                Filter
+              <Button variant="outline" size="sm">
+                <Filter size={16} />
+                &nbsp;필터
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              align="end"
+              align="start"
               className="w-[480px] rounded-[12px] p-0"
             >
               <FilterContent
@@ -206,7 +172,29 @@ export default function EquipmentListPage() {
               />
             </PopoverContent>
           </Popover>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEditingEquipment(null)
+                setFormOpen(true)
+              }}
+            >
+              <Plus size={16} />
+              &nbsp;장비 추가
+            </Button>
+          )}
         </div>
+        <Search
+          placeholder="검색"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value || null)
+            setPage(1)
+          }}
+          className="max-w-sm"
+        />
       </div>
 
       {/* Mobile toolbar */}
