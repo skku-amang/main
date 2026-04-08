@@ -6,7 +6,8 @@ import {
   CreateEquipmentSchema,
   Equipment
 } from "@repo/shared-types"
-import { useEffect } from "react"
+import { ImagePlus, Loader2, X } from "lucide-react"
+import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { useImageUpload } from "@/hooks/useImageUpload"
 
 const CATEGORY_OPTIONS = [
   { value: "ROOM", label: "동아리방" },
@@ -51,8 +53,7 @@ const CATEGORY_OPTIONS = [
   { value: "ETC", label: "기타(기타)" }
 ] as const
 
-// Form schema without image (admin panel doesn't handle image upload yet)
-const FormSchema = CreateEquipmentSchema.omit({ image: true })
+const FormSchema = CreateEquipmentSchema
 
 interface EquipmentFormDialogProps {
   open: boolean
@@ -69,26 +70,43 @@ export function EquipmentFormDialog({
   editingEquipment,
   isPending
 }: EquipmentFormDialogProps) {
-  const form = useForm<Omit<CreateEquipment, "image">>({
+  const form = useForm<CreateEquipment>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       brand: "",
       model: "",
       category: "ETC" as const,
       isAvailable: true,
-      description: ""
+      description: "",
+      image: null
     }
   })
 
+  const imageUpload = useImageUpload({
+    onSuccess: (publicUrl) => {
+      form.setValue("image", publicUrl)
+    }
+  })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const displayImage = imageUpload.preview ?? form.watch("image")
+
+  const handleRemoveImage = () => {
+    imageUpload.reset()
+    form.setValue("image", null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
   useEffect(() => {
     if (open) {
+      imageUpload.reset()
       if (editingEquipment) {
         form.reset({
           brand: editingEquipment.brand,
           model: editingEquipment.model,
           category: editingEquipment.category,
           isAvailable: editingEquipment.isAvailable,
-          description: editingEquipment.description ?? ""
+          description: editingEquipment.description ?? "",
+          image: editingEquipment.image ?? null
         })
       } else {
         form.reset({
@@ -96,10 +114,12 @@ export function EquipmentFormDialog({
           model: "",
           category: "ETC" as const,
           isAvailable: true,
-          description: ""
+          description: "",
+          image: null
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editingEquipment, form])
 
   return (
@@ -111,12 +131,63 @@ export function EquipmentFormDialog({
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) =>
-              onSubmit(data as CreateEquipment)
-            )}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* 이미지 업로드 */}
+            <FormItem>
+              <FormLabel>이미지</FormLabel>
+              <div className="flex items-center gap-3">
+                {displayImage ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border">
+                    <img
+                      src={displayImage}
+                      alt="장비 이미지"
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -right-1 -top-1 rounded-full bg-destructive p-0.5 text-destructive-foreground shadow-sm"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md border-2 border-dashed text-muted-foreground hover:border-primary hover:text-primary"
+                  >
+                    <ImagePlus size={24} />
+                  </button>
+                )}
+                <div className="flex flex-col gap-1">
+                  {!displayImage && (
+                    <p className="text-sm text-muted-foreground">
+                      JPEG, PNG, WebP (최대 20MB)
+                    </p>
+                  )}
+                  {imageUpload.isUploading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 size={14} className="animate-spin" />
+                      업로드 중... {imageUpload.progress}%
+                    </div>
+                  )}
+                  {imageUpload.error && (
+                    <p className="text-sm text-destructive">
+                      {imageUpload.error}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={imageUpload.selectAndUpload}
+              />
+            </FormItem>
+
             <FormField
               control={form.control}
               name="brand"
@@ -205,7 +276,10 @@ export function EquipmentFormDialog({
             />
 
             <DialogFooter>
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending || imageUpload.isUploading}
+              >
                 {isPending ? "처리 중..." : editingEquipment ? "수정" : "생성"}
               </Button>
             </DialogFooter>
