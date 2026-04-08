@@ -20,12 +20,10 @@ type HeaderProps =
   | {
       useHeader?: true
       headerMode?: HeaderMode
-      headerHeightPixel?: number
     }
   | {
       useHeader?: false
       headerMode?: undefined
-      headerHeightPixel?: undefined
     }
 
 const RootHeaderAndFooterWrapper = ({
@@ -37,26 +35,28 @@ const RootHeaderAndFooterWrapper = ({
   useHeader = true,
   headerMode = useHeader ? "light" : undefined
 }: RootHeaderAndFooterWrapperProps) => {
-  const headerHeightPixel = 82
   const footerHeightPixel = 120
 
   const toPixelString = (value: number) => `${value}px`
 
   return (
     <div className="h-screen">
-      <Header
-        position="fixed"
-        height={toPixelString(headerHeightPixel)}
-        mode={headerMode}
-      />
+      <Header position="fixed" mode={headerMode} />
 
       <main
-        className={cn("h-auto min-h-full", mainClassName)}
-        style={{
-          paddingTop: toPixelString(headerHeightPixel + paddingTopPixel),
-          paddingBottom: toPixelString(footerHeightPixel + paddingBottomPixel),
-          ...mainStyle
-        }}
+        className={cn(
+          "h-auto min-h-full pt-[calc(var(--header-height)+var(--extra-pt))]",
+          mainClassName
+        )}
+        style={
+          {
+            "--extra-pt": toPixelString(paddingTopPixel),
+            paddingBottom: toPixelString(
+              footerHeightPixel + paddingBottomPixel
+            ),
+            ...mainStyle
+          } as React.CSSProperties
+        }
       >
         {children}
       </main>

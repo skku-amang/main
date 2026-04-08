@@ -44,12 +44,14 @@ interface AddScheduleButtonProps {
   className?: string
   equipments: Equipment[]
   iconOnly?: boolean
+  label?: string
 }
 
 export default function AddScheduleButton({
   className,
   equipments,
-  iconOnly
+  iconOnly,
+  label
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
@@ -69,8 +71,9 @@ export default function AddScheduleButton({
   )
 
   // equipments prop이 비동기로 로딩될 때 equipmentId를 동기화
+  // 모바일에서 장비 셀렉터가 숨겨지므로 첫 번째 장비를 자동 선택
   useEffect(() => {
-    if (equipments.length === 1 && equipmentId === null) {
+    if (equipments.length >= 1 && equipmentId === null) {
       setEquipmentId(equipments[0]?.id ?? null)
     }
   }, [equipments, equipmentId])
@@ -216,8 +219,8 @@ export default function AddScheduleButton({
       <DialogTrigger asChild>
         <Button
           className={cn(
-            "text-gray-50 text-sm font-medium bg-primary",
-            iconOnly ? "h-14 w-14 rounded-full p-0" : "w-36 h-9",
+            "text-white text-base font-semibold bg-third",
+            iconOnly ? "h-14 w-14 rounded-full p-0" : "h-[45px] rounded-[10px]",
             className
           )}
         >
@@ -226,7 +229,7 @@ export default function AddScheduleButton({
           ) : (
             <div className="flex gap-2 justify-center items-center">
               <PlusCircle size={18} />
-              Add schedule
+              {label ?? "Add schedule"}
             </div>
           )}
         </Button>
@@ -238,9 +241,9 @@ export default function AddScheduleButton({
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* 장비 선택 (여러 장비일 때만 표시) */}
+          {/* 장비 선택 (데스크톱 + 여러 장비일 때만 표시) */}
           {equipments.length > 1 && (
-            <div className="space-y-1.5">
+            <div className="hidden sm:block space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">
                 장비
               </label>
@@ -341,9 +344,14 @@ export default function AddScheduleButton({
                   setEndDate(range?.to)
                 }}
                 disabled={disablePastDates}
-                className="rounded-md border p-1"
+                className="rounded-md border p-1 w-full"
                 classNames={{
-                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md"
+                  head_row: "flex w-full",
+                  head_cell:
+                    "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem]",
+                  row: "flex w-full mt-2",
+                  cell: "flex-1 h-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                  day: "h-9 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md"
                 }}
               />
               {(errors.startDate || errors.endDate) && (
@@ -555,18 +563,18 @@ export default function AddScheduleButton({
           <div className="border-t" />
 
           {/* Action buttons */}
-          <div className="flex justify-center gap-3">
+          <div className="flex gap-3">
             <Button
               type="button"
               variant="outline"
-              className="w-28"
+              className="flex-1"
               onClick={handleCancel}
             >
               취소
             </Button>
             <Button
               type="button"
-              className="w-28"
+              className="flex-1"
               onClick={handleSubmit}
               disabled={createRental.isPending}
             >

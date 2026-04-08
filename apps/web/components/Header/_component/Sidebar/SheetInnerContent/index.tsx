@@ -25,7 +25,6 @@ import NavLinkHeader from "./NavLinkHeader"
 const iconSize = 24
 const iconcolor = "text-gray-500"
 
-// eslint-disable-next-line no-unused-vars
 const SheetInnerContent = ({
   setIsOpen
 }: {
@@ -108,14 +107,14 @@ const SheetInnerContent = ({
               icon={<Building2 size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              공간 대여
+              동방 대여
             </NavLink>
             <NavLink
               href={ROUTES.RESERVATION.EQUIPMENT}
               icon={<Package size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              물품 대여
+              장비 대여
             </NavLink>
             <NavLink
               href={ROUTES.PERFORMANCE.LIST}

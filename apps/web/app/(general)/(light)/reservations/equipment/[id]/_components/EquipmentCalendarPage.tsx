@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useQueryState, parseAsStringLiteral } from "nuqs"
+import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import dayjs, { Dayjs } from "dayjs"
@@ -39,7 +39,14 @@ export default function EquipmentCalendarPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
+  const [selectedDateStr, setSelectedDateStr] = useQueryState(
+    "date",
+    parseAsString.withDefault(dayjs().format("YYYY-MM-DD"))
+  )
+  const [y, m, d] = selectedDateStr.split("-").map(Number)
+  const selectedDate = dayjs(new Date(y!, m! - 1, d!))
+  const setSelectedDate = (date: Dayjs) =>
+    setSelectedDateStr(date.format("YYYY-MM-DD"))
   const params = useParams()
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
@@ -83,17 +90,17 @@ export default function EquipmentCalendarPage() {
   return (
     <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
-        title="물품 대여"
+        title="장비 대여"
         routes={[
           { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "예약" },
-          { display: "물품 대여", href: ROUTES.RESERVATION.EQUIPMENT },
+          { display: "장비 대여", href: ROUTES.RESERVATION.EQUIPMENT },
           { display: equipmentLabel }
         ]}
       />
 
-      {/* Selected equipment header */}
-      <div className="mb-4 flex items-center gap-3">
+      {/* Selected equipment header (desktop only) */}
+      <div className="mb-4 hidden items-center gap-3 md:flex">
         <span className="text-lg font-semibold">{equipmentLabel}</span>
         <Link
           href={ROUTES.RESERVATION.EQUIPMENT}
@@ -185,9 +192,9 @@ export default function EquipmentCalendarPage() {
         {/* Mobile tabs */}
         <div className="flex gap-2 px-4 py-4">
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "schedule"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("schedule")}
@@ -195,9 +202,9 @@ export default function EquipmentCalendarPage() {
             예약 현황
           </button>
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "my"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("my")}
@@ -223,9 +230,9 @@ export default function EquipmentCalendarPage() {
         </div>
 
         <AddScheduleButton
-          className="fixed bottom-6 right-6 z-50 shadow-lg"
+          className="fixed bottom-4 left-4 right-4 z-50 shadow-lg"
           equipments={equipmentForSchedule}
-          iconOnly
+          label="예약하기"
         />
       </div>
 
