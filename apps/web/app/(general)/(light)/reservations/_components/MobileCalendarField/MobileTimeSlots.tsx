@@ -3,7 +3,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
-import { useEffect, useRef } from "react"
 
 interface MobileTimeSlotsProps {
   selectedDate: Dayjs
@@ -11,22 +10,14 @@ interface MobileTimeSlotsProps {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const SCROLL_TO_HOUR = 9
+const DEFAULT_START = 9
+const DEFAULT_END = 22
 
 export default function MobileTimeSlots({
   selectedDate,
   rentals,
   onRentalClick
 }: MobileTimeSlotsProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const target = containerRef.current?.querySelector(
-      `[data-hour="${SCROLL_TO_HOUR}"]`
-    )
-    target?.scrollIntoView({ block: "start", behavior: "instant" })
-  }, [])
   const selectedDay = selectedDate.format("YYYY-MM-DD")
   const dayRentals = rentals
     .filter((r) => dayjs(r.startAt).format("YYYY-MM-DD") === selectedDay)
@@ -43,12 +34,21 @@ export default function MobileTimeSlots({
     rentalsByHour.set(hour, list)
   }
 
+  // 기본 09~22시, 예약 있으면 동적 확장
+  const rentalHours = Array.from(rentalsByHour.keys())
+  const startHour = Math.min(DEFAULT_START, ...rentalHours)
+  const endHour = Math.max(DEFAULT_END, ...rentalHours)
+  const hours = Array.from(
+    { length: endHour - startHour + 1 },
+    (_, i) => i + startHour
+  )
+
   return (
-    <div ref={containerRef} className="flex flex-col">
-      {HOURS.map((hour) => {
+    <div className="flex flex-col">
+      {hours.map((hour) => {
         const hourRentals = rentalsByHour.get(hour)
         return (
-          <div key={hour} data-hour={hour} className="flex min-h-[44px]">
+          <div key={hour} className="flex min-h-[44px]">
             {/* Hour label */}
             <div className="w-14 shrink-0 pt-3 text-sm font-medium text-zinc-500">
               {String(hour).padStart(2, "0")}:00

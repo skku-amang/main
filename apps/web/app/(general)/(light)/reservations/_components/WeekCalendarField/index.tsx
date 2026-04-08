@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react"
-import { Dayjs } from "dayjs"
+import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import WeekColumn from "./WeekColumn"
 
@@ -9,28 +8,27 @@ interface WeekCalendarFieldProp {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-const START_HOUR = 0
+const DEFAULT_START = 6
+const DEFAULT_END = 22
 const ROW_H = 42
-const TOTAL_MIN = 24 * 60
-const SCROLL_TO_HOUR = 6
 
 export default function WeekCalendarField({
   currentMonday,
   rentals,
   onRentalClick
 }: WeekCalendarFieldProp) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    containerRef.current.scrollTop = SCROLL_TO_HOUR * ROW_H
-  }, [])
+  // 주간 전체 rental의 시간 범위로 동적 확장
+  const rentalHours = rentals.map((r) => dayjs(r.startAt).hour())
+  const startHour = Math.min(DEFAULT_START, ...rentalHours)
+  const endHour = Math.max(DEFAULT_END, ...rentalHours)
+  const slotCount = endHour - startHour + 1
+  const totalMin = slotCount * 60
 
   const currentTime = new Date()
   const h = currentTime.getHours()
   const m = currentTime.getMinutes()
-  const minutesSinceStart = (h - START_HOUR) * 60 + m
-  const clampedMin = Math.max(0, Math.min(TOTAL_MIN, minutesSinceStart))
+  const minutesSinceStart = (h - startHour) * 60 + m
+  const clampedMin = Math.max(0, Math.min(totalMin, minutesSinceStart))
   const nowTopPx = (clampedMin * ROW_H) / 60 + 42
 
   const timeLabel = currentTime.toLocaleTimeString("en-US", {
@@ -39,16 +37,13 @@ export default function WeekCalendarField({
     hour12: true
   })
   return (
-    <div
-      ref={containerRef}
-      className="w-full mt-7 flex bg-white rounded-xl overflow-y-auto"
-      style={{ maxHeight: `${16 * ROW_H + 42}px` }}
-    >
+    <div className="w-full mt-7 flex bg-white rounded-xl overflow-hidden">
       <div className="w-7 flex flex-col shrink-0">
         <div className="h-[42px]" />
-        {Array.from({ length: 24 }).map((_, i) => {
-          const hour = i % 12 === 0 ? 12 : i % 12
-          const isPM = i >= 12
+        {Array.from({ length: slotCount }).map((_, i) => {
+          const absHour = i + startHour
+          const hour = absHour % 12 === 0 ? 12 : absHour % 12
+          const isPM = absHour >= 12
 
           return (
             <div
@@ -69,6 +64,8 @@ export default function WeekCalendarField({
             currentMonday={currentMonday}
             rentals={rentals}
             onRentalClick={onRentalClick}
+            startHour={startHour}
+            slotCount={slotCount}
             key={i}
           />
         ))}
