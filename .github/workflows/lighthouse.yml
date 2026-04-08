@@ -34,16 +34,16 @@ jobs:
             const emoji = (v) => v >= 0.9 ? '🟢' : v >= 0.5 ? '🟠' : '🔴';
             const row = (label, v) => `| ${label} | ${emoji(v)} ${score(v)} |`;
             const body = [
-              '### ⚡ Lighthouse Report',
+              '### ⚡ Lighthouse 보고서',
               '',
-              '| Category | Score |',
+              '| 항목 | 점수 |',
               '| --- | --- |',
-              row('Performance', r.performance),
-              row('Accessibility', r.accessibility),
-              row('Best Practices', r['best-practices']),
+              row('성능', r.performance),
+              row('접근성', r.accessibility),
+              row('권장사항', r['best-practices']),
               row('SEO', r.seo),
               '',
-              `[Full Report](${results[0].url})`,
+              `[상세 보고서](${results[0].url})`,
             ].join('\n');
             core.setOutput('comment', body);
 
