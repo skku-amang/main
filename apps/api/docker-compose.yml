@@ -11,7 +11,6 @@ services:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   # 개발용 pgAdmin (선택사항)
   pgadmin:
