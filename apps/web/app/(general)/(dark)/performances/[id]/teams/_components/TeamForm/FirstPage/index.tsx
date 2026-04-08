@@ -34,8 +34,6 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import { getYoutubeUrl } from "@repo/shared-types"
-
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useImageUpload } from "@/hooks/useImageUpload"
 import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
@@ -283,11 +281,7 @@ const FirstPage = ({
         </div>
 
         <YoutubeInput
-          defaultUrl={
-            getYoutubeUrl(
-              form.getValues("songYoutubeVideoUrl") as string
-            ) || ""
-          }
+          defaultUrl={(form.getValues("songYoutubeVideoUrl") as string) || ""}
           onConfirm={handleYoutubeConfirm}
         />
       </div>

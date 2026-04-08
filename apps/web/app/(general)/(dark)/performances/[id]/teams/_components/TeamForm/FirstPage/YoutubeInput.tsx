@@ -26,7 +26,7 @@ const YoutubeInput = ({
   const debouncedUrl = useDebouncedValue(urlInput, 500)
 
   const validation = useMemo(() => {
-    if (!debouncedUrl) return { valid: false, error: null } as const
+    if (!debouncedUrl) return { valid: true, error: null } as const
     if (isValidYoutubeUrl(debouncedUrl))
       return { valid: true, error: null } as const
     return {
@@ -51,6 +51,7 @@ const YoutubeInput = ({
             className={cn(
               showLinkIcon && "pl-10",
               validation.error &&
+                !isPending &&
                 "border-destructive focus-visible:ring-destructive"
             )}
             placeholder="Enter URL"
@@ -60,9 +61,11 @@ const YoutubeInput = ({
         {/* 상태 표시 + 확인 버튼 */}
         {validation.valid && !isPending ? (
           <div className="flex items-center gap-x-2">
-            <span className="flex items-center gap-x-1 text-sm text-emerald-600">
-              <Check size={16} strokeWidth={3} />
-            </span>
+            {debouncedUrl && (
+              <span className="flex items-center gap-x-1 text-sm text-emerald-600">
+                <Check size={16} strokeWidth={3} />
+              </span>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -72,13 +75,13 @@ const YoutubeInput = ({
               확인
             </Button>
           </div>
-        ) : validation.error ? (
+        ) : validation.error && !isPending ? (
           <span className="shrink-0 text-sm text-destructive">Failed</span>
         ) : null}
       </div>
 
       {/* 에러 메시지 */}
-      {validation.error && (
+      {validation.error && !isPending && (
         <div className="mt-1 text-xs text-destructive">{validation.error}</div>
       )}
 
