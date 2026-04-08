@@ -6,7 +6,7 @@ import {
   FilterItem,
   FilterPopoverContent,
   FilterSection
-} from "@/components/Filter"
+} from "@/components/FilterPopover"
 import { Separator } from "@/components/ui/separator"
 
 const FILTER_CATEGORIES: { value: EquipCategory; label: string }[] = [
