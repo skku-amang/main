@@ -1,0 +1,54 @@
+name: Lighthouse CI
+
+on:
+  deployment_status:
+
+jobs:
+  lighthouse:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        env:
+          LHCI_TARGET_URL: ${{ github.event.deployment_status.target_url }}
+        with:
+          urls: ${{ env.LHCI_TARGET_URL }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Format Lighthouse Score
+        id: format
+        uses: actions/github-script@v7
+        env:
+          LIGHTHOUSE_MANIFEST: ${{ steps.lighthouse.outputs.manifest }}
+        with:
+          script: |
+            const results = JSON.parse(process.env.LIGHTHOUSE_MANIFEST);
+            const r = results[0].summary;
+            const score = (v) => `${Math.round(v * 100)}`;
+            const emoji = (v) => v >= 0.9 ? '🟢' : v >= 0.5 ? '🟠' : '🔴';
+            const row = (label, v) => `| ${label} | ${emoji(v)} ${score(v)} |`;
+            const body = [
+              '### ⚡ Lighthouse Report',
+              '',
+              '| Category | Score |',
+              '| --- | --- |',
+              row('Performance', r.performance),
+              row('Accessibility', r.accessibility),
+              row('Best Practices', r['best-practices']),
+              row('SEO', r.seo),
+              '',
+              `[Full Report](${results[0].url})`,
+            ].join('\n');
+            core.setOutput('comment', body);
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: lighthouse
+          message: ${{ steps.format.outputs.comment }}
