@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
+import { FilterPopoverContent } from "@/components/Filter"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -187,7 +188,7 @@ export function TeamListDataTable<TValue>({
   // nuqs 쿼리 동기화
   const [sortQuery, setSortQuery] = useQueryState(
     "sort",
-    parseAsString.withDefault("")
+    parseAsString.withDefault("status-asc")
   )
   const [searchQuery, setSearchQuery] = useQueryState(
     "search",
@@ -408,35 +409,19 @@ export function TeamListDataTable<TValue>({
                 align="end"
                 className="w-[480px] rounded-[12px] p-0"
               >
-                {/* 헤더 */}
-                <div className="flex items-center justify-between px-6 pb-3 pt-5">
-                  <div className="flex items-baseline gap-x-3">
-                    <h3 className="text-xl font-bold">Filter</h3>
-                    <button
-                      onClick={() => {
-                        dispatch({
-                          type: "clearFilter",
-                          payload: { target: "필요세션" }
-                        })
-                        dispatch({
-                          type: "setFilter",
-                          payload: { target: "모집상태", value: "all" }
-                        })
-                      }}
-                      className="text-xs text-sky-500 hover:text-sky-600"
-                    >
-                      초기화
-                    </button>
-                  </div>
-                  <button onClick={() => setFilterOpen(false)}>
-                    <X className="h-4 w-4 text-slate-400" />
-                  </button>
-                </div>
-
-                <Separator />
-
-                {/* 필터 내용 */}
-                <div className="space-y-5 px-6 py-5">
+                <FilterPopoverContent
+                  onReset={() => {
+                    dispatch({
+                      type: "clearFilter",
+                      payload: { target: "필요세션" }
+                    })
+                    dispatch({
+                      type: "setFilter",
+                      payload: { target: "모집상태", value: "all" }
+                    })
+                  }}
+                  onClose={() => setFilterOpen(false)}
+                >
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
@@ -458,7 +443,7 @@ export function TeamListDataTable<TValue>({
                       })
                     }
                   />
-                </div>
+                </FilterPopoverContent>
               </PopoverContent>
             </Popover>
           </div>
