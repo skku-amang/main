@@ -39,7 +39,7 @@ export default function FilterSection({
         {onSelectAll && (
           <button
             onClick={onSelectAll}
-            className="text-xs text-sky-500 hover:text-sky-600"
+            className="text-xs text-blue-500 hover:text-blue-600"
           >
             모두 선택
           </button>

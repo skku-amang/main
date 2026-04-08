@@ -221,12 +221,6 @@ export function TeamListDataTable<TValue>({
   const filterValues: Record<keyof State["filters"], FilterValue[]> = {
     필요세션: [
       {
-        label: "모두",
-        onChecked: () =>
-          dispatch({ type: "clearFilter", payload: { target: "필요세션" } }),
-        checked: state.filters.필요세션.size === 0
-      },
-      {
         label: "보컬",
         onChecked: (checked) =>
           dispatch({
@@ -291,15 +285,6 @@ export function TeamListDataTable<TValue>({
       }
     ],
     모집상태: [
-      {
-        label: "모두",
-        onChecked: () =>
-          dispatch({
-            type: "setFilter",
-            payload: { target: "모집상태", value: "all" }
-          }),
-        checked: state.filters.모집상태 === "all"
-      },
       {
         label: "Active",
         onChecked: (checked) =>
@@ -407,7 +392,7 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-[480px] rounded-[12px] p-0"
+                className="w-[526px] rounded-[12px] p-0"
               >
                 <FilterPopoverContent
                   onReset={() => {
