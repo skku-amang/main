@@ -47,7 +47,9 @@ export default function RentalDetailModal({
   if (!rental) return null
 
   const currentUserId = session?.user?.id ? Number(session.user.id) : null
-  const isOwner = rental.users.some((u) => u.id === currentUserId)
+  const canDelete =
+    rental.users.some((u) => u.id === currentUserId) ||
+    session?.user?.isAdmin === true
 
   const handleDelete = () => {
     deleteRental.mutate([rental.id], {
@@ -163,7 +165,7 @@ export default function RentalDetailModal({
           </div>
         )}
         {/* Delete button */}
-        {isOwner && (
+        {canDelete && (
           <div className="pt-2">
             <Button
               variant="destructive"
