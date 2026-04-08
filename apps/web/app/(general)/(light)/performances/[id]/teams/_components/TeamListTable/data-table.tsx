@@ -14,7 +14,13 @@ import {
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryState
+} from "nuqs"
 import { useCallback, useMemo, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
@@ -125,22 +131,46 @@ export function TeamListDataTable<TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const [filterOpen, setFilterOpen] = useState(false)
-  const [sessionFilter, setSessionFilter] = useState<Set<string>>(new Set())
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
+  const [sessionFilterArr, setSessionFilterArr] = useQueryState(
+    "sessions",
+    parseAsArrayOf(parseAsString).withDefault([])
+  )
+  const [statusFilter, setStatusFilter] = useQueryState(
+    "status",
+    parseAsStringLiteral(["all", "active", "inactive"] as const).withDefault(
+      "all"
+    )
+  )
 
-  const toggleSession = useCallback((session: string, checked: boolean) => {
-    setSessionFilter((prev) => {
-      const next = new Set(prev)
-      if (checked) next.add(session)
-      else next.delete(session)
-      return next
-    })
-  }, [])
+  const sessionFilter = useMemo(
+    () => new Set(sessionFilterArr),
+    [sessionFilterArr]
+  )
+
+  const setSessionFilter = useCallback(
+    (value: Set<string>) => {
+      const arr = [...value]
+      setSessionFilterArr(arr.length > 0 ? arr : null)
+    },
+    [setSessionFilterArr]
+  )
+
+  const toggleSession = useCallback(
+    (session: string, checked: boolean) => {
+      setSessionFilterArr((prev) => {
+        const arr = prev ?? []
+        if (checked) return [...arr, session]
+        const next = arr.filter((s) => s !== session)
+        return next.length > 0 ? next : null
+      })
+    },
+    [setSessionFilterArr]
+  )
 
   const resetFilters = useCallback(() => {
-    setSessionFilter(new Set())
+    setSessionFilterArr(null)
     setStatusFilter("all")
-  }, [])
+  }, [setSessionFilterArr, setStatusFilter])
 
   const filteredData = useMemo(() => {
     if (sessionFilter.size === 0 && statusFilter === "all") return data
