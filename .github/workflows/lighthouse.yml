@@ -17,7 +17,12 @@ jobs:
         env:
           LHCI_TARGET_URL: ${{ github.event.deployment_status.target_url }}
         with:
-          urls: ${{ env.LHCI_TARGET_URL }}
+          urls: |
+            ${{ env.LHCI_TARGET_URL }}
+            ${{ env.LHCI_TARGET_URL }}/login
+            ${{ env.LHCI_TARGET_URL }}/performances
+            ${{ env.LHCI_TARGET_URL }}/reservations/equipment
+            ${{ env.LHCI_TARGET_URL }}/reservations/clubroom
           uploadArtifacts: true
           temporaryPublicStorage: true
 
@@ -29,21 +34,20 @@ jobs:
         with:
           script: |
             const results = JSON.parse(process.env.LIGHTHOUSE_MANIFEST);
-            const r = results[0].summary;
             const score = (v) => `${Math.round(v * 100)}`;
             const emoji = (v) => v >= 0.9 ? '🟢' : v >= 0.5 ? '🟠' : '🔴';
-            const row = (label, v) => `| ${label} | ${emoji(v)} ${score(v)} |`;
+            const cell = (v) => `${emoji(v)} ${score(v)}`;
+            const rows = results.map((r) => {
+              const s = r.summary;
+              const page = new URL(r.url).pathname || '/';
+              return `| \`${page}\` | ${cell(s.performance)} | ${cell(s.accessibility)} | ${cell(s['best-practices'])} | ${cell(s.seo)} | [보기](${r.url}) |`;
+            });
             const body = [
               '### ⚡ Lighthouse 보고서',
               '',
-              '| 항목 | 점수 |',
-              '| --- | --- |',
-              row('성능', r.performance),
-              row('접근성', r.accessibility),
-              row('권장사항', r['best-practices']),
-              row('SEO', r.seo),
-              '',
-              `[상세 보고서](${results[0].url})`,
+              '| 페이지 | 성능 | 접근성 | 권장사항 | SEO | 상세 |',
+              '| --- | --- | --- | --- | --- | --- |',
+              ...rows,
             ].join('\n');
             core.setOutput('comment', body);
 

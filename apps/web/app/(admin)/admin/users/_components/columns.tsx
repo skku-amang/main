@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { EllipsisVertical, ExternalLink, Pencil, Trash2 } from "lucide-react"
+import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
@@ -150,12 +150,6 @@ export function getColumns({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <CopyRowLinkItem rowId={row.original.id} />
-            <DropdownMenuItem asChild>
-              <Link href={ROUTES.MEMBER.DETAIL(row.original.id)}>
-                <ExternalLink className="mr-2 h-4 w-4" />
-                바로가기
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
               편집

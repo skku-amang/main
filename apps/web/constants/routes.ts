@@ -16,12 +16,6 @@ const ROUTES = {
     RENTALS: "/admin/rentals",
     EQUIPMENTS: "/admin/equipments"
   },
-  NOTICE: {
-    CREATE: "/notices/create",
-    LIST: "/notices",
-    DETAIL: (id: number) => `/notices/${id}`,
-    EDIT: (id: number) => `/notices/${id}/edit`
-  },
   PERFORMANCE: {
     LIST: "/performances",
     DETAIL: (id: number) => `/performances/${id}`,
@@ -34,10 +28,6 @@ const ROUTES = {
       EDIT: (performanceId: number, teamId: number) =>
         `/performances/${performanceId}/teams/${teamId}/edit`
     }
-  },
-  MEMBER: {
-    LIST: "/members",
-    DETAIL: (id: number) => `/members/${id}`
   },
   PROFILE: {
     INDEX: "/profile",
