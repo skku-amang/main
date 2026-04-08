@@ -10,8 +10,8 @@ interface MobileTimeSlotsProps {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-/** Hours to display in the time-slot list (09:00 – 23:00) */
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 9)
+const DEFAULT_START = 9
+const DEFAULT_END = 22
 
 export default function MobileTimeSlots({
   selectedDate,
@@ -34,9 +34,18 @@ export default function MobileTimeSlots({
     rentalsByHour.set(hour, list)
   }
 
+  // 기본 09~22시, 예약 있으면 동적 확장
+  const rentalHours = Array.from(rentalsByHour.keys())
+  const startHour = Math.min(DEFAULT_START, ...rentalHours)
+  const endHour = Math.max(DEFAULT_END, ...rentalHours)
+  const hours = Array.from(
+    { length: endHour - startHour + 1 },
+    (_, i) => i + startHour
+  )
+
   return (
     <div className="flex flex-col">
-      {HOURS.map((hour) => {
+      {hours.map((hour) => {
         const hourRentals = rentalsByHour.get(hour)
         return (
           <div key={hour} className="flex min-h-[44px]">
