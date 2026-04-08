@@ -5,7 +5,13 @@ import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { EquipCategory } from "@repo/database/enums"
 import { Equipment } from "@repo/shared-types"
-import { Filter, Plus, Search, RefreshCw, PackageSearch } from "lucide-react"
+import {
+  CirclePlus,
+  Filter,
+  Plus,
+  RefreshCw,
+  PackageSearch
+} from "lucide-react"
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,18 +26,23 @@ import {
   parseAsStringLiteral
 } from "nuqs"
 
+import Search from "@/components/Search"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { useEquipments, useDeleteEquipment } from "@/hooks/api/useEquipment"
 import { useToast } from "@/components/hooks/use-toast"
 
 import EquipmentCard from "./EquipmentCard"
-import FilterModal, { FILTER_CATEGORIES } from "./FilterModal"
+import FilterContent, { FILTER_CATEGORIES } from "./FilterModal"
 import EquipmentFormModal from "./EquipmentFormModal"
 
 const ITEMS_PER_PAGE = 9
@@ -58,9 +69,6 @@ export default function EquipmentListPage() {
   )
   const [filterOpen, setFilterOpen] = useState(false)
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
-
-  // Mobile search toggle
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   // Equipment form modal state
   const [formOpen, setFormOpen] = useState(false)
@@ -146,93 +154,91 @@ export default function EquipmentListPage() {
         ]}
       />
 
-      {/* Toolbar: Filter + Admin Add + Search */}
       {/* Desktop toolbar */}
-      <div className="mb-6 hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFilterOpen(true)}
-          >
-            <Filter size={16} />
-            &nbsp;필터
-          </Button>
+      <div className="mb-6 hidden items-center justify-between py-[25px] md:flex">
+        {/* 검색 */}
+        <Search
+          placeholder="검색"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value || null)
+            setPage(1)
+          }}
+          className="max-w-sm"
+        />
+
+        {/* 생성 및 필터 */}
+        <div className="flex gap-4">
           {isAdmin && (
             <Button
-              variant="outline"
-              size="sm"
+              className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
               onClick={() => {
                 setEditingEquipment(null)
                 setFormOpen(true)
               }}
             >
-              <Plus size={16} />
-              &nbsp;장비 추가
+              <CirclePlus size={24} className="me-[9px]" />
+              Create
             </Button>
           )}
+
+          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant={filterOpen ? "outline" : undefined}
+                className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
+              >
+                <Filter size={24} className="me-[9px]" />
+                Filter
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-[480px] rounded-[12px] p-0"
+            >
+              <FilterContent
+                onClose={() => setFilterOpen(false)}
+                selectedCategories={selectedCategories}
+                onCategoriesChange={(categories) => {
+                  setSelectedCategories(categories)
+                  setPage(1)
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-        <div className="relative w-full max-w-xs">
+      </div>
+
+      {/* Mobile toolbar */}
+      <div className="mb-4 space-y-3 md:hidden">
+        <div className="flex items-center gap-x-3">
+          {/* 검색 */}
           <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <Input
             placeholder="검색"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value || null)
               setPage(1)
             }}
-            className="h-11 pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
+            className="h-9 min-w-0 flex-1 border-gray-200 drop-shadow-search"
           />
+
+          {/* 필터 — TODO: mobile drawer filter (currently desktop-only popover) */}
+
+          {/* 생성 */}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              className="h-9 w-9 shrink-0 rounded-lg border border-gray-200 bg-slate-50 p-2 drop-shadow-search"
+              onClick={() => {
+                setEditingEquipment(null)
+                setFormOpen(true)
+              }}
+            >
+              <Plus size={16} />
+            </Button>
+          )}
         </div>
-      </div>
-      {/* Mobile toolbar — icon-only buttons right-aligned */}
-      <div className="mb-4 flex items-center justify-end gap-2 sm:hidden">
-        {mobileSearchOpen ? (
-          <div className="relative flex-1 min-w-0">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-            <Input
-              autoFocus
-              placeholder="검색"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value || null)
-                setPage(1)
-              }}
-              onBlur={() => {
-                if (!search) setMobileSearchOpen(false)
-              }}
-              className="h-9 w-full pl-9 rounded-full border-gray-200 text-sm placeholder:text-gray-400"
-            />
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => setMobileSearchOpen(true)}
-          >
-            <Search size={18} />
-          </Button>
-        )}
-        {isAdmin && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => {
-              setEditingEquipment(null)
-              setFormOpen(true)
-            }}
-          >
-            <Plus size={18} />
-          </Button>
-        )}
       </div>
 
       {/* Equipment Grid */}
@@ -412,15 +418,6 @@ export default function EquipmentListPage() {
       )}
 
       {/* Modals */}
-      <FilterModal
-        open={filterOpen}
-        onOpenChange={setFilterOpen}
-        selectedCategories={selectedCategories}
-        onCategoriesChange={(categories) => {
-          setSelectedCategories(categories)
-          setPage(1)
-        }}
-      />
       <EquipmentFormModal
         key={editingEquipment?.id ?? "new"}
         open={formOpen}

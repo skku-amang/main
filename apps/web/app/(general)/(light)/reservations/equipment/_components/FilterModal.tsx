@@ -3,12 +3,11 @@
 import { EquipCategory } from "@repo/database/enums"
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
+  FilterItem,
+  FilterPopoverContent,
+  FilterSection
+} from "@/components/Filter"
+import { Separator } from "@/components/ui/separator"
 
 const FILTER_CATEGORIES: { value: EquipCategory; label: string }[] = [
   { value: EquipCategory.GUITAR, label: "기타" },
@@ -24,76 +23,42 @@ const FILTER_CATEGORIES: { value: EquipCategory; label: string }[] = [
   { value: EquipCategory.ETC, label: "그 외" }
 ]
 
-interface FilterModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+interface FilterContentProps {
+  onClose: () => void
   selectedCategories: EquipCategory[]
   onCategoriesChange: (categories: EquipCategory[]) => void
 }
 
-export default function FilterModal({
-  open,
-  onOpenChange,
+export default function FilterContent({
+  onClose,
   selectedCategories,
   onCategoriesChange
-}: FilterModalProps) {
-  const allSelected = selectedCategories.length === FILTER_CATEGORIES.length
-
-  const toggleCategory = (category: EquipCategory) => {
-    if (selectedCategories.includes(category)) {
-      onCategoriesChange(selectedCategories.filter((c) => c !== category))
-    } else {
-      onCategoriesChange([...selectedCategories, category])
-    }
-  }
-
+}: FilterContentProps) {
   const selectAll = () => {
     onCategoriesChange(FILTER_CATEGORIES.map((c) => c.value))
   }
 
+  const items: FilterItem[] = FILTER_CATEGORIES.map(({ value, label }) => ({
+    label,
+    checked: selectedCategories.includes(value),
+    onCheckedChange: (checked) => {
+      if (checked) {
+        onCategoriesChange([...selectedCategories, value])
+      } else {
+        onCategoriesChange(selectedCategories.filter((c) => c !== value))
+      }
+    }
+  }))
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <div className="flex items-center gap-3">
-            <DialogTitle className="text-lg font-bold">Filter</DialogTitle>
-            <button
-              onClick={selectAll}
-              className="text-sm text-primary hover:underline"
-            >
-              초기화
-            </button>
-          </div>
-        </DialogHeader>
-
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold">물품 분류</span>
-            <button
-              onClick={selectAll}
-              className="text-sm text-primary hover:underline"
-            >
-              모두 선택
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            {FILTER_CATEGORIES.map(({ value, label }) => (
-              <label
-                key={value}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Checkbox
-                  checked={selectedCategories.includes(value)}
-                  onCheckedChange={() => toggleCategory(value)}
-                />
-                <span className="text-sm">{label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <FilterPopoverContent onReset={selectAll} onClose={onClose}>
+      <FilterSection
+        header="물품 분류"
+        items={items}
+        onSelectAll={selectAll}
+        columns={4}
+      />
+    </FilterPopoverContent>
   )
 }
 

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Equipment } from "@repo/shared-types"
 import { EquipCategory } from "@repo/database/enums"
-import { MoreVertical, ScanSearch, Search } from "lucide-react"
+import { MoreVertical, Pencil, ScanSearch, Search, Trash2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
@@ -50,13 +50,13 @@ export default function EquipmentCard({
 
   return (
     <>
-      <div className="relative rounded-lg border bg-card p-3 transition-colors hover:bg-accent/50">
+      <div className="relative rounded-lg border bg-card p-3 transition-colors hover:bg-accent/50 md:h-[172px]">
         <Link
           href={`${ROUTES.RESERVATION.EQUIPMENT}/${equipment.id}`}
-          className="flex gap-4"
+          className="flex h-full gap-4"
         >
           {/* Image thumbnail */}
-          <div className="group/img relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
+          <div className="group/img relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-muted md:h-full md:w-auto md:aspect-square">
             {equipment.image ? (
               <>
                 <img
@@ -93,13 +93,11 @@ export default function EquipmentCard({
               {equipment.brand}{" "}
               {CATEGORY_LABELS[equipment.category] ?? equipment.category}
             </h3>
-            <div className="mt-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm">
-              <span className="text-muted-foreground">모델명</span>
-              <span className="truncate text-right md:text-left">
-                {equipment.model}
-              </span>
-              <span className="text-muted-foreground">설명</span>
-              <span className="truncate text-right md:text-left">
+            <div className="mt-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
+              <span className="font-medium">모델명</span>
+              <span className="truncate text-right">{equipment.model}</span>
+              <span className="font-medium">설명</span>
+              <span className="truncate text-right">
                 {equipment.description || "-"}
               </span>
             </div>
@@ -117,18 +115,20 @@ export default function EquipmentCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-[136px] rounded-xl p-1"
+                className="rounded-lg border border-slate-100 p-[5px] text-base drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
               >
                 <DropdownMenuItem
                   onClick={() => onEdit?.(equipment)}
-                  className="justify-center text-sm font-medium"
+                  className="flex items-center justify-center gap-x-2 px-6 py-2 hover:cursor-pointer"
                 >
+                  <Pencil />
                   수정하기
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDelete?.(equipment)}
-                  className="justify-center text-sm font-medium text-destructive focus:text-destructive"
+                  className="flex items-center justify-center gap-x-2 px-6 py-2 text-destructive focus:text-destructive hover:cursor-pointer"
                 >
+                  <Trash2 />
                   삭제하기
                 </DropdownMenuItem>
               </DropdownMenuContent>
