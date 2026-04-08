@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Check,
   CircleAlert,
@@ -13,7 +12,7 @@ import { z } from "zod"
 
 import PosterImageDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/PosterImageDialog"
 import YoutubeDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeDialog"
-import YoutubeSubmitButton from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeSubmitButton"
+import YoutubeInput from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeInput"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -36,14 +35,13 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { getYoutubeUrl } from "@repo/shared-types"
-import YoutubePlayer from "@/components/YoutubePlayer"
 
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useImageUpload } from "@/hooks/useImageUpload"
 import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
 import Description from "../Description"
 import Paginator from "../Paginator"
-import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
+import basicInfoSchema from "./schema"
 
 interface FirstPageProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
@@ -62,22 +60,9 @@ const FirstPage = ({
 }: FirstPageProps) => {
   const { data: performances } = usePerformances()
 
-  // 유튜브 URL 로직
-  const youtubeSchema = z.object({
-    songYoutubeVideoUrl: songYoutubeVideoUrlSchema
-  })
-  const youtubeForm = useForm<z.infer<typeof youtubeSchema>>({
-    resolver: zodResolver(youtubeSchema),
-    defaultValues: {
-      songYoutubeVideoUrl: getYoutubeUrl(
-        form.getValues("songYoutubeVideoUrl") as string
-      )
-    }
-  })
-
-  function onInnerFormValid(formData: any) {
+  function handleYoutubeConfirm(url: string) {
     form.clearErrors("songYoutubeVideoUrl")
-    form.setValue("songYoutubeVideoUrl", formData.songYoutubeVideoUrl)
+    form.setValue("songYoutubeVideoUrl", url)
   }
 
   // 모바일 포스터 이미지 업로드
@@ -297,63 +282,14 @@ const FirstPage = ({
           </div>
         </div>
 
-        {/* TODO: 기존 값 그대로 사용하려고 할 때 에러 발생하는 버그 수정 필요 */}
-        <Form {...youtubeForm}>
-          <form
-            onSubmit={youtubeForm.handleSubmit(onInnerFormValid, (e) =>
-              console.log(e)
-            )}
-          >
-            <div className="flex items-center justify-between gap-x-2">
-              {/* 입력 필드 */}
-              <Input
-                placeholder="Enter URL"
-                {...youtubeForm.register("songYoutubeVideoUrl")}
-                className={cn(
-                  form.formState.errors.songYoutubeVideoUrl &&
-                    "border-destructive focus-visible:ring-destructive"
-                )}
-                onChange={(e) => {
-                  youtubeForm.clearErrors("songYoutubeVideoUrl")
-                  youtubeForm.reset(
-                    {
-                      ...youtubeForm.getValues(),
-                      songYoutubeVideoUrl: e.target.value
-                    },
-                    {
-                      keepErrors: true, // 기존 에러 상태를 유지합니다.
-                      keepDirty: true, // 기존 dirty 상태를 유지합니다.
-                      keepTouched: true, // 기존 touched 상태를 유지합니다.
-                      keepIsSubmitted: false, // 제출 상태를 초기화합니다.
-                      keepSubmitCount: false // 제출 횟수를 초기화합니다.
-                    }
-                  )
-                }}
-              />
-
-              {/* 업로드 버튼 */}
-              <YoutubeSubmitButton
-                error={youtubeForm.formState.errors.songYoutubeVideoUrl}
-                isSubmitted={youtubeForm.formState.isSubmitted}
-              />
-            </div>
-
-            {/* 유튜브 플레이어 */}
-            {youtubeForm.getValues("songYoutubeVideoUrl") && (
-              <YoutubePlayer
-                videoUrl={youtubeForm.getValues("songYoutubeVideoUrl")!}
-                className="mt-3 w-full"
-              />
-            )}
-
-            {/* 에러 메시지 */}
-            {youtubeForm.formState.errors.songYoutubeVideoUrl && (
-              <div className="mt-1 text-xs text-destructive">
-                {youtubeForm.formState.errors.songYoutubeVideoUrl.message}
-              </div>
-            )}
-          </form>
-        </Form>
+        <YoutubeInput
+          defaultUrl={
+            getYoutubeUrl(
+              form.getValues("songYoutubeVideoUrl") as string
+            ) || ""
+          }
+          onConfirm={handleYoutubeConfirm}
+        />
       </div>
 
       {/* 포스터 이미지 모바일: 블록 */}
