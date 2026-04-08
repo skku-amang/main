@@ -8,7 +8,7 @@ interface WeekCalendarFieldProp {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-const DEFAULT_START = 6
+const DEFAULT_START = 9
 const DEFAULT_END = 22
 const ROW_H = 42
 
