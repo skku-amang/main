@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
@@ -41,9 +41,18 @@ export default function EquipmentCalendarPage() {
   )
   const [selectedDateStr, setSelectedDateStr] = useQueryState(
     "date",
-    parseAsString.withDefault(dayjs().format("YYYY-MM-DD"))
+    parseAsString
   )
-  const [y, m, d] = selectedDateStr.split("-").map(Number)
+  const todayStr = dayjs().format("YYYY-MM-DD")
+  const dateStr = selectedDateStr || todayStr
+
+  useEffect(() => {
+    if (!selectedDateStr) {
+      setSelectedDateStr(todayStr)
+    }
+  }, [selectedDateStr, todayStr, setSelectedDateStr])
+
+  const [y, m, d] = dateStr.split("-").map(Number)
   const selectedDate = dayjs(new Date(y!, m! - 1, d!))
   const setSelectedDate = (date: Dayjs) =>
     setSelectedDateStr(date.format("YYYY-MM-DD"))

@@ -1,3 +1,6 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import WeekColumn from "./WeekColumn"
@@ -24,14 +27,20 @@ export default function WeekCalendarField({
   const slotCount = endHour - startHour + 1
   const totalMin = slotCount * 60
 
-  const currentTime = new Date()
-  const h = currentTime.getHours()
-  const m = currentTime.getMinutes()
-  const minutesSinceStart = (h - startHour) * 60 + m
-  const clampedMin = Math.max(0, Math.min(totalMin, minutesSinceStart))
-  const nowTopPx = (clampedMin * ROW_H) / 60 + 42
+  const [now, setNow] = useState<Date | null>(null)
+  useEffect(() => {
+    setNow(new Date())
+  }, [])
 
-  const timeLabel = currentTime.toLocaleTimeString("en-US", {
+  const nowTopPx = (() => {
+    if (!now) return 0
+    const minutesSinceStart =
+      (now.getHours() - startHour) * 60 + now.getMinutes()
+    const clampedMin = Math.max(0, Math.min(totalMin, minutesSinceStart))
+    return (clampedMin * ROW_H) / 60 + 42
+  })()
+
+  const timeLabel = now?.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true
@@ -69,16 +78,18 @@ export default function WeekCalendarField({
             key={i}
           />
         ))}
-        <div
-          className="w-full absolute bg-destructive h-[1px]"
-          style={{ top: `${nowTopPx}px` }}
-        >
-          <div className="w-full relative">
-            <div className="absolute w-11 flex items-center justify-center -translate-y-1/2 h-4 rounded-lg text-[10px] text-white bg-destructive -left-5">
-              {timeLabel}
+        {now && (
+          <div
+            className="w-full absolute bg-destructive h-[1px]"
+            style={{ top: `${nowTopPx}px` }}
+          >
+            <div className="w-full relative">
+              <div className="absolute w-11 flex items-center justify-center -translate-y-1/2 h-4 rounded-lg text-[10px] text-white bg-destructive -left-5">
+                {timeLabel}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
