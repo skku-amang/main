@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
@@ -51,13 +51,21 @@ export default function EquipmentCalendarPage() {
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
 
-  const getWeekStart = (date = dayjs()) => date.startOf("week")
-  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
-  const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
+  const currentMonday = selectedDate.startOf("week")
+  const calendarViewMonth = selectedDate.startOf("month")
 
-  useEffect(() => {
-    setCalendarViewMonth(currentMonday)
-  }, [currentMonday])
+  const setCurrentMonday = (mondayOrFn: Dayjs | ((prev: Dayjs) => Dayjs)) => {
+    const newMonday =
+      typeof mondayOrFn === "function" ? mondayOrFn(currentMonday) : mondayOrFn
+    setSelectedDate(newMonday)
+  }
+  const setCalendarViewMonth = (
+    monthOrFn: Dayjs | ((prev: Dayjs) => Dayjs)
+  ) => {
+    const newMonth =
+      typeof monthOrFn === "function" ? monthOrFn(calendarViewMonth) : monthOrFn
+    setSelectedDate(newMonth)
+  }
 
   const queryRange = useMemo(() => {
     const monthStart = calendarViewMonth
@@ -149,6 +157,7 @@ export default function EquipmentCalendarPage() {
               <MonthCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}

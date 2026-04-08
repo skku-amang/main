@@ -38,10 +38,19 @@ export default function MobileTimeSlots({
   const rentalHours = Array.from(rentalsByHour.keys())
   const startHour = Math.min(DEFAULT_START, ...rentalHours)
   const endHour = Math.max(DEFAULT_END, ...rentalHours)
+
+  // 예약이 진행 중인 시간대 (시작 시간 제외, 종료 시간 이전)는 스킵 대상
+  const occupiedHours = new Set<number>()
+  for (const rental of dayRentals) {
+    const sH = dayjs(rental.startAt).hour()
+    const eH = dayjs(rental.endAt).hour()
+    for (let h = sH + 1; h < eH; h++) occupiedHours.add(h)
+  }
+
   const hours = Array.from(
     { length: endHour - startHour + 1 },
     (_, i) => i + startHour
-  )
+  ).filter((h) => !occupiedHours.has(h) || rentalsByHour.has(h))
 
   return (
     <div className="flex flex-col">
