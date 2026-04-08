@@ -193,11 +193,6 @@ export function TeamListDataTable<TValue>({
 
   const filterValues: { 필요세션: FilterValue[]; 모집상태: FilterValue[] } = {
     필요세션: [
-      {
-        label: "모두",
-        onChecked: () => setSessionFilter(new Set()),
-        checked: sessionFilter.size === 0
-      },
       ...SESSION_LABELS.map((label) => ({
         label,
         onChecked: (checked: boolean) => toggleSession(label, checked),
@@ -205,11 +200,6 @@ export function TeamListDataTable<TValue>({
       }))
     ],
     모집상태: [
-      {
-        label: "모두",
-        onChecked: () => setStatusFilter("all"),
-        checked: statusFilter === "all"
-      },
       {
         label: "Active",
         onChecked: (checked: boolean) =>
@@ -311,7 +301,7 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-[480px] rounded-[12px] p-0"
+                className="w-[526px] rounded-[12px] p-0"
               >
                 <FilterPopoverContent
                   onReset={resetFilters}
