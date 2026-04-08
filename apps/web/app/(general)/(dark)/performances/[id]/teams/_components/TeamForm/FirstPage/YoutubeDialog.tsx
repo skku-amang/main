@@ -1,5 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Link, Youtube } from "lucide-react"
+import { Youtube } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -12,12 +11,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { Form } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import YoutubePlayer from "@/components/YoutubePlayer"
 
-import basicInfoSchema, { songYoutubeVideoUrlSchema } from "./schema"
+import basicInfoSchema from "./schema"
+import YoutubeInput from "./YoutubeInput"
 
 interface YoutubeDialogProps {
   form: ReturnType<typeof useForm<z.infer<typeof basicInfoSchema>>>
@@ -27,20 +24,10 @@ interface YoutubeDialogProps {
 const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
   const [open, setOpen] = useState(false)
 
-  const innerSchema = z.object({
-    songYoutubeVideoUrl: songYoutubeVideoUrlSchema
-  })
-  const innerForm = useForm<z.infer<typeof innerSchema>>({
-    resolver: zodResolver(innerSchema),
-    defaultValues: {
-      songYoutubeVideoUrl: form.getValues(fieldName) as string
-    }
-  })
-
-  function onInnerFormValid(formData: any) {
+  function handleConfirm(url: string) {
     form.clearErrors("songYoutubeVideoUrl")
-    form.setValue("songYoutubeVideoUrl", formData.songYoutubeVideoUrl)
-    !form.formState.errors.songYoutubeVideoUrl && setOpen(false)
+    form.setValue("songYoutubeVideoUrl", url)
+    setOpen(false)
   }
 
   return (
@@ -76,50 +63,12 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
           <p className="mb-4 text-sm text-zinc-500">
             유튜브 링크를 업로드하여 주세요.
           </p>
-          <Form {...innerForm}>
-            <form
-              onSubmit={innerForm.handleSubmit(onInnerFormValid, (e) =>
-                console.error(e)
-              )}
-            >
-              <div className="flex items-center gap-x-3">
-                <div className="relative flex-1">
-                  <Link className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    {...innerForm.register("songYoutubeVideoUrl")}
-                    className={cn(
-                      "pl-10",
-                      innerForm.formState.errors["songYoutubeVideoUrl"]
-                        ?.message &&
-                        "border-destructive focus-visible:ring-destructive"
-                    )}
-                    placeholder="Enter URL"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="rounded-lg bg-secondary"
-                  disabled={!!innerForm.formState.errors.songYoutubeVideoUrl}
-                >
-                  업로드
-                </Button>
-              </div>
-              {innerForm.formState.errors.songYoutubeVideoUrl && (
-                <div className="mt-1 text-xs text-destructive">
-                  {innerForm.formState.errors.songYoutubeVideoUrl.message}
-                </div>
-              )}
-            </form>
-          </Form>
-          {innerForm.getValues("songYoutubeVideoUrl") && (
-            <div className="aspect-video overflow-visible">
-              <YoutubePlayer
-                videoUrl={innerForm.getValues("songYoutubeVideoUrl")!}
-                className="mt-4 h-full w-full"
-                allowFullScreen
-              />
-            </div>
-          )}
+          <YoutubeInput
+            defaultUrl={(form.getValues(fieldName) as string) || ""}
+            onConfirm={handleConfirm}
+            showLinkIcon
+            playerClassName="mt-4 h-full aspect-video"
+          />
         </div>
       </DialogContent>
     </Dialog>
