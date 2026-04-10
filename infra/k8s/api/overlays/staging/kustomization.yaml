@@ -18,9 +18,6 @@ patches:
       - op: add
         path: /data/NODE_ENV
         value: "development"
-      - op: add
-        path: /data/DB_HOST
-        value: "postgres-svc.amang-db-staging"
     target:
       kind: ConfigMap
       name: api-config
