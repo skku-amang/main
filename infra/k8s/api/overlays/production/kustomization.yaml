@@ -19,9 +19,6 @@ patches:
         path: /data/NODE_ENV
         value: "production"
       - op: add
-        path: /data/DB_HOST
-        value: "postgres-svc.amang-db-production"
-      - op: add
         path: /data/SENTRY_DSN
         value: "https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824"
     target:
