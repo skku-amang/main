@@ -26,6 +26,8 @@ spec:
             - secretRef:
                 name: api-secrets
             - secretRef:
+                name: amang-db-credentials
+            - secretRef:
                 name: minio-s3-credentials
           livenessProbe:
             httpGet:

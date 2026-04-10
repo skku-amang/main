@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: amang-db
 
 resources:
-  - credentials.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml

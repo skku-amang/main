@@ -6,3 +6,5 @@ namespace: amang-db-staging
 
 resources:
   - ../../base
+  - sealed-credentials.yaml
+  - network-policy.yaml
