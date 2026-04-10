@@ -6,6 +6,7 @@ import {
   Menu,
   Music,
   Users,
+  UserCheck,
   Hash,
   Guitar,
   Mic,
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
     exact: true
   },
   { href: ROUTES.ADMIN.USERS, label: "회원", icon: Users },
+  { href: ROUTES.ADMIN.PENDING_USERS, label: "승인 대기", icon: UserCheck },
   { href: ROUTES.ADMIN.GENERATIONS, label: "기수", icon: Hash },
   { href: ROUTES.ADMIN.PERFORMANCES, label: "공연", icon: Music },
   { href: ROUTES.ADMIN.TEAMS, label: "팀", icon: Mic },
@@ -130,6 +132,21 @@ export function AdminSidebar() {
               </div>
               <div className="flex-1 px-3 py-4">
                 <NavLinks onNavigate={() => setOpen(false)} />
+              </div>
+              <div className="border-t border-neutral-200 px-3 py-4">
+                <Link
+                  href={ROUTES.HOME}
+                  onClick={(e) => {
+                    if (guardNavigation(ROUTES.HOME)) {
+                      e.preventDefault()
+                      return
+                    }
+                    setOpen(false)
+                  }}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+                >
+                  사이트로 돌아가기
+                </Link>
               </div>
             </div>
           </SheetContent>

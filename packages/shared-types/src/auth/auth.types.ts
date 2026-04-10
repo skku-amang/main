@@ -14,9 +14,14 @@ export type AuthResponse = {
 
 export type RefreshTokenResponse = {
   accessToken: string
+  refreshToken: string
   expiresIn: number
 }
 
 export type LogoutResponse = {
+  message: string
+}
+
+export type SignUpResponse = {
   message: string
 }

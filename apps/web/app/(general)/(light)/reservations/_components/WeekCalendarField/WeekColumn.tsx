@@ -9,9 +9,10 @@ interface WeekColumnProp {
   nowTopPx: number
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  startHour: number
+  slotCount: number
 }
 
-const START_HOUR = 6
 const PX_PER_HOUR = 42
 const HEADER_PX = 42
 
@@ -20,7 +21,9 @@ export default function WeekColumn({
   nowTopPx,
   offset,
   rentals,
-  onRentalClick
+  onRentalClick,
+  startHour,
+  slotCount
 }: WeekColumnProp) {
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
@@ -52,7 +55,7 @@ export default function WeekColumn({
       </div>
 
       {/* 시간 구간 */}
-      {Array.from({ length: 16 }).map((_, i) => (
+      {Array.from({ length: slotCount }).map((_, i) => (
         <div
           key={i}
           className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
@@ -63,14 +66,14 @@ export default function WeekColumn({
       {dayRentals.map((rental) => {
         const start = dayjs(rental.startAt)
         const end = dayjs(rental.endAt)
-        const totalMin = 16 * 60 // 6AM~10PM
+        const totalMin = slotCount * 60
         const rawStartMin = start.isSame(date, "day")
-          ? (start.hour() - START_HOUR) * 60 + start.minute()
-          : 0 // 전날부터 이어지는 이벤트는 하루 시작부터
+          ? (start.hour() - startHour) * 60 + start.minute()
+          : 0
         const startMin = Math.max(0, rawStartMin)
         const rawEndMin = end.isSame(date, "day")
-          ? (end.hour() - START_HOUR) * 60 + end.minute()
-          : totalMin // 다음 날로 넘어가는 이벤트는 끝까지
+          ? (end.hour() - startHour) * 60 + end.minute()
+          : totalMin
         const endMin = Math.max(0, Math.min(totalMin, rawEndMin))
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60

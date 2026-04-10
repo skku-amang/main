@@ -61,7 +61,7 @@ export class AuthError extends ApiError {
   readonly title = "Authentication Error"
 
   constructor(detail?: string, instance?: string) {
-    super("유효한 인증 정보가 필요합니다.", detail, instance)
+    super("로그인이 필요합니다.", detail, instance)
   }
 }
 
@@ -100,7 +100,7 @@ export class UnprocessableEntityError extends ApiError {
   readonly title = "Unprocessable Entity"
 
   constructor(detail?: string, instance?: string) {
-    super("처리할 수 없는 엔티티입니다", detail, instance)
+    super("요청을 처리할 수 없습니다.", detail, instance)
   }
 }
 
@@ -260,6 +260,19 @@ export class InvalidPerformanceDateError extends ApiError {
 }
 
 // ----------------------------------
+// Approve Specific Errors
+// ----------------------------------
+export class UserNotApprovedError extends ApiError {
+  readonly type = "/errors/user/not-approved"
+  readonly status = 403
+  readonly title = "User Not Approved"
+
+  constructor(detail?: string, instance?: string) {
+    super("관리자 승인 후 로그인이 가능합니다.", detail, instance)
+  }
+}
+
+// ----------------------------------
 // Token Specific Errors
 // ----------------------------------
 
@@ -272,7 +285,7 @@ export class RefreshTokenExpiredError extends ApiError {
   readonly title = "Refresh Token Expired"
 
   constructor(detail?: string, instance?: string) {
-    super("리프레시 토큰이 만료되었습니다.", detail, instance)
+    super("로그인이 만료되었습니다. 다시 로그인해주세요.", detail, instance)
   }
 }
 
@@ -285,7 +298,7 @@ export class AccessTokenExpiredError extends ApiError {
   readonly title = "Access Token Expired"
 
   constructor(detail?: string, instance?: string) {
-    super("액세스 토큰이 만료되었습니다.", detail, instance)
+    super("로그인이 만료되었습니다. 다시 로그인해주세요.", detail, instance)
   }
 }
 
@@ -298,7 +311,7 @@ export class RefreshTokenNotFoundError extends ApiError {
   readonly title = "Refresh Token Not Found"
 
   constructor(detail?: string, instance?: string) {
-    super("리프레시 토큰이 존재하지 않습니다.", detail, instance)
+    super("로그인이 만료되었습니다. 다시 로그인해주세요.", detail, instance)
   }
 }
 
@@ -311,6 +324,6 @@ export class AccessTokenNotFoundError extends ApiError {
   readonly title = "Access Token Not Found"
 
   constructor(detail?: string, instance?: string) {
-    super("액세스 토큰이 존재하지 않습니다.", detail, instance)
+    super("로그인이 필요합니다.", detail, instance)
   }
 }

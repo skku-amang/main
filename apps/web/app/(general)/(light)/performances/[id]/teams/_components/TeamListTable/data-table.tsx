@@ -14,8 +14,14 @@ import {
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
-import { useMemo, useReducer, useState } from "react"
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryState
+} from "nuqs"
+import { useCallback, useMemo, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
 import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
@@ -31,6 +37,7 @@ import {
   TableHeader,
   TableRow
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/table"
+import { FilterPopoverContent } from "@/components/FilterPopover"
 import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import {
@@ -41,7 +48,10 @@ import {
 import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
-import { getSessionDisplayName } from "@/constants/session"
+import {
+  getSessionDisplayName,
+  SESSION_DISPLAY_NAME
+} from "@/constants/session"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
@@ -64,102 +74,9 @@ import {
   DrawerTrigger
 } from "./drawer"
 
-type State = {
-  filters: { 필요세션: Set<string>; 모집상태: "all" | "active" | "inactive" }
-  result: TeamColumn[]
-  originalData: TeamColumn[]
-}
-type Action =
-  | {
-      type: "addFilter"
-      payload: { target: keyof State["filters"]; value: string }
-    }
-  | {
-      type: "removeFilter"
-      payload: { target: keyof State["filters"]; value: string }
-    }
-  | { type: "clearFilter"; payload: { target: keyof State["filters"] } }
-  | {
-      type: "setFilter"
-      payload: { target: "모집상태"; value: State["filters"]["모집상태"] }
-    }
-const reducer = (state: State, action: Action) => {
-  let newState: State = { ...state }
-  // 필터 추가
-  switch (action.payload.target) {
-    case "필요세션":
-      switch (action.type) {
-        case "clearFilter":
-          newState = { ...state }
-          newState.filters[action.payload.target] = new Set()
-          break
-        case "addFilter":
-          state.filters[action.payload.target].add(action.payload.value)
-          newState.filters[action.payload.target] = new Set(
-            state.filters[action.payload.target]
-          )
-          break
-        case "removeFilter":
-          state.filters[action.payload.target].delete(action.payload.value)
-          newState.filters[action.payload.target] = new Set(
-            state.filters[action.payload.target]
-          )
-          break
-        default:
-          throw new TypeError(`Invalid action type`)
-      }
-      break
-    case "모집상태":
-      switch (action.type) {
-        case "setFilter":
-          newState = { ...state }
-          newState.filters.모집상태 = action.payload.value
-      }
-      break
-    default:
-      throw new TypeError(`Invalid action type`)
-  }
+type StatusFilter = "all" | "active" | "inactive"
 
-  // 실제 데이터에 반영
-
-  // 모두 선택시 최적화
-  if (
-    newState.filters.필요세션.size === 0 &&
-    newState.filters.모집상태 === "all"
-  ) {
-    return { ...newState, result: newState.originalData }
-  }
-
-  // 필터 값 존재시
-  newState.result = state.originalData.filter((team) => {
-    return Object.entries(newState.filters).every(
-      ([filterKey, filterValues]) => {
-        if (!team.teamSessions) return false
-        switch (filterKey) {
-          case "모집상태":
-            if (filterValues === "active")
-              return !isTeamSatisfied(team.teamSessions)
-            if (filterValues === "inactive")
-              return isTeamSatisfied(team.teamSessions)
-            return true
-
-          case "필요세션":
-            if ((filterValues as Set<string>).size === 0) return true
-            return getSessionsWithMissingMembers(team.teamSessions).some(
-              (ts) => {
-                return (filterValues as Set<string>).has(
-                  getSessionDisplayName(ts.session.name)
-                )
-              }
-            )
-          default:
-            throw new TypeError(`Invalid action type`)
-        }
-      }
-    )
-  })
-  return newState
-}
+const SESSION_LABELS = Object.values(SESSION_DISPLAY_NAME)
 
 interface DataTableProps<TValue> {
   className?: string
@@ -187,7 +104,7 @@ export function TeamListDataTable<TValue>({
   // nuqs 쿼리 동기화
   const [sortQuery, setSortQuery] = useQueryState(
     "sort",
-    parseAsString.withDefault("")
+    parseAsString.withDefault("status-asc")
   )
   const [searchQuery, setSearchQuery] = useQueryState(
     "search",
@@ -209,119 +126,97 @@ export function TeamListDataTable<TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const [filterOpen, setFilterOpen] = useState(false)
-  const [state, dispatch] = useReducer(reducer, {
-    filters: {
-      모집상태: "all",
-      필요세션: new Set()
+  const [sessionFilterArr, setSessionFilterArr] = useQueryState(
+    "sessions",
+    parseAsArrayOf(parseAsString).withDefault([])
+  )
+  const [statusFilter, setStatusFilter] = useQueryState(
+    "status",
+    parseAsStringLiteral(["all", "active", "inactive"] as const).withDefault(
+      "all"
+    )
+  )
+
+  const sessionFilter = useMemo(
+    () => new Set(sessionFilterArr),
+    [sessionFilterArr]
+  )
+
+  const setSessionFilter = useCallback(
+    (value: Set<string>) => {
+      const arr = [...value]
+      setSessionFilterArr(arr.length > 0 ? arr : null)
     },
-    result: data,
-    originalData: data
-  } as State)
-  const filterValues: Record<keyof State["filters"], FilterValue[]> = {
-    필요세션: [
-      {
-        label: "모두",
-        onChecked: () =>
-          dispatch({ type: "clearFilter", payload: { target: "필요세션" } }),
-        checked: state.filters.필요세션.size === 0
-      },
-      {
-        label: "보컬",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "보컬" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("보컬")
-      },
-      {
-        label: "기타",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "기타" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("기타")
-      },
-      {
-        label: "신디",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "신디" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("신디")
-      },
-      {
-        label: "베이스",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "베이스" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("베이스")
-      },
-      {
-        label: "드럼",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "드럼" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("드럼")
-      },
-      {
-        label: "현악기",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "현악기" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("현악기")
-      },
-      {
-        label: "관악기",
-        onChecked: (checked) =>
-          dispatch({
-            type: checked ? "addFilter" : "removeFilter",
-            payload: { target: "필요세션", value: "관악기" }
-          }),
-        checked: !!state.filters["필요세션"]?.has("관악기")
+    [setSessionFilterArr]
+  )
+
+  const toggleSession = useCallback(
+    (session: string, checked: boolean) => {
+      setSessionFilterArr((prev) => {
+        const arr = prev ?? []
+        if (checked) return [...arr, session]
+        const next = arr.filter((s) => s !== session)
+        return next.length > 0 ? next : null
+      })
+    },
+    [setSessionFilterArr]
+  )
+
+  const resetFilters = useCallback(() => {
+    setSessionFilterArr(null)
+    setStatusFilter("all")
+  }, [setSessionFilterArr, setStatusFilter])
+
+  const filteredData = useMemo(() => {
+    if (sessionFilter.size === 0 && statusFilter === "all") return data
+
+    return data.filter((team) => {
+      if (!team.teamSessions) return false
+
+      if (statusFilter === "active" && isTeamSatisfied(team.teamSessions))
+        return false
+      if (statusFilter === "inactive" && !isTeamSatisfied(team.teamSessions))
+        return false
+
+      if (sessionFilter.size > 0) {
+        const hasMatchingSession = getSessionsWithMissingMembers(
+          team.teamSessions
+        ).some((ts) =>
+          sessionFilter.has(getSessionDisplayName(ts.session.name))
+        )
+        if (!hasMatchingSession) return false
       }
+
+      return true
+    })
+  }, [data, sessionFilter, statusFilter])
+
+  const filterValues: { 필요세션: FilterValue[]; 모집상태: FilterValue[] } = {
+    필요세션: [
+      ...SESSION_LABELS.map((label) => ({
+        label,
+        onChecked: (checked: boolean) => toggleSession(label, checked),
+        checked: sessionFilter.has(label)
+      }))
     ],
     모집상태: [
       {
-        label: "모두",
-        onChecked: () =>
-          dispatch({
-            type: "setFilter",
-            payload: { target: "모집상태", value: "all" }
-          }),
-        checked: state.filters.모집상태 === "all"
-      },
-      {
         label: "Active",
-        onChecked: (checked) =>
-          dispatch({
-            type: "setFilter",
-            payload: { target: "모집상태", value: checked ? "active" : "all" }
-          }),
-        checked: state.filters["모집상태"] === "active"
+        onChecked: (checked: boolean) =>
+          setStatusFilter(checked ? "active" : "all"),
+        checked: statusFilter === "active"
       },
       {
         label: "Inactive",
-        onChecked: (checked) =>
-          dispatch({
-            type: "setFilter",
-            payload: { target: "모집상태", value: checked ? "inactive" : "all" }
-          }),
-        checked: state.filters["모집상태"] === "inactive"
+        onChecked: (checked: boolean) =>
+          setStatusFilter(checked ? "inactive" : "all"),
+        checked: statusFilter === "inactive"
       }
     ]
   }
 
   const table = useReactTable({
-    data: state.result,
+    data: filteredData,
     columns: visibleColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -406,59 +301,24 @@ export function TeamListDataTable<TValue>({
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-[480px] rounded-[12px] p-0"
+                className="w-[526px] rounded-[12px] p-0"
               >
-                {/* 헤더 */}
-                <div className="flex items-center justify-between px-6 pb-3 pt-5">
-                  <div className="flex items-baseline gap-x-3">
-                    <h3 className="text-xl font-bold">Filter</h3>
-                    <button
-                      onClick={() => {
-                        dispatch({
-                          type: "clearFilter",
-                          payload: { target: "필요세션" }
-                        })
-                        dispatch({
-                          type: "setFilter",
-                          payload: { target: "모집상태", value: "all" }
-                        })
-                      }}
-                      className="text-xs text-sky-500 hover:text-sky-600"
-                    >
-                      초기화
-                    </button>
-                  </div>
-                  <button onClick={() => setFilterOpen(false)}>
-                    <X className="h-4 w-4 text-slate-400" />
-                  </button>
-                </div>
-
-                <Separator />
-
-                {/* 필터 내용 */}
-                <div className="space-y-5 px-6 py-5">
+                <FilterPopoverContent
+                  onReset={resetFilters}
+                  onClose={() => setFilterOpen(false)}
+                >
                   <TeamListTableFilter
                     header="필요세션"
                     filterValues={filterValues.필요세션}
-                    onSelectAll={() =>
-                      dispatch({
-                        type: "clearFilter",
-                        payload: { target: "필요세션" }
-                      })
-                    }
+                    onSelectAll={() => setSessionFilter(new Set())}
                   />
                   <Separator />
                   <TeamListTableFilter
                     header="모집상태"
                     filterValues={filterValues.모집상태}
-                    onSelectAll={() =>
-                      dispatch({
-                        type: "setFilter",
-                        payload: { target: "모집상태", value: "all" }
-                      })
-                    }
+                    onSelectAll={() => setStatusFilter("all")}
                   />
-                </div>
+                </FilterPopoverContent>
               </PopoverContent>
             </Popover>
           </div>
@@ -560,8 +420,7 @@ export function TeamListDataTable<TValue>({
                 <TeamHeaderButton asChild variant="outline">
                   <Filter
                     className={
-                      state.filters.필요세션.size > 0 ||
-                      state.filters.모집상태 !== "all"
+                      sessionFilter.size > 0 || statusFilter !== "all"
                         ? "text-primary"
                         : "text-gray-400"
                     }
@@ -577,16 +436,7 @@ export function TeamListDataTable<TValue>({
                     </div>
                     <button
                       className="h-full text-[10px] font-normal text-third"
-                      onClick={() => {
-                        dispatch({
-                          type: "clearFilter",
-                          payload: { target: "필요세션" }
-                        })
-                        dispatch({
-                          type: "setFilter",
-                          payload: { target: "모집상태", value: "all" }
-                        })
-                      }}
+                      onClick={resetFilters}
                     >
                       초기화
                     </button>

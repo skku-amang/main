@@ -1,15 +1,31 @@
 "use client"
 
+import { useState } from "react"
 import dayjs from "dayjs"
-import { ArrowRight, Clock } from "lucide-react"
+import { ArrowRight, Clock, Trash2 } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { useToast } from "@/components/hooks/use-toast"
+import { useDeleteRental } from "@/hooks/api/useRental"
 
 interface RentalDetailModalProps {
   rental: RentalDetail | null
@@ -22,7 +38,38 @@ export default function RentalDetailModal({
   open,
   onOpenChange
 }: RentalDetailModalProps) {
+  const { data: session } = useSession()
+  const deleteRental = useDeleteRental()
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   if (!rental) return null
+
+  const currentUserId = session?.user?.id ? Number(session.user.id) : null
+  const canDelete =
+    rental.users.some((u) => u.id === currentUserId) ||
+    session?.user?.isAdmin === true
+
+  const handleDelete = () => {
+    deleteRental.mutate([rental.id], {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["rentals"] })
+        onOpenChange(false)
+        toast({ title: "예약이 삭제되었습니다." })
+      },
+      onError: (error) => {
+        toast({
+          variant: "destructive",
+          title: "삭제 실패",
+          description:
+            error instanceof Error
+              ? error.message
+              : "예약을 삭제하지 못했습니다."
+        })
+      }
+    })
+  }
 
   const start = dayjs(rental.startAt)
   const end = dayjs(rental.endAt)
@@ -117,7 +164,43 @@ export default function RentalDetailModal({
             </div>
           </div>
         )}
+        {/* Delete button */}
+        {canDelete && (
+          <div className="pt-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              className="w-full"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={deleteRental.isPending}
+            >
+              <Trash2 size={14} className="mr-1.5" />
+              {deleteRental.isPending ? "삭제 중..." : "예약 삭제"}
+            </Button>
+          </div>
+        )}
       </DialogContent>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>예약을 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{rental.title}&rdquo; 예약이 영구적으로 삭제됩니다. 이
+              작업은 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

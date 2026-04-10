@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useQueryState, parseAsStringLiteral } from "nuqs"
+import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import dayjs, { Dayjs } from "dayjs"
@@ -39,18 +39,42 @@ export default function EquipmentCalendarPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
+  const [selectedDateStr, setSelectedDateStr] = useQueryState(
+    "date",
+    parseAsString
+  )
+  const todayStr = dayjs().format("YYYY-MM-DD")
+  const dateStr = selectedDateStr || todayStr
+
+  useEffect(() => {
+    if (!selectedDateStr) {
+      setSelectedDateStr(todayStr)
+    }
+  }, [selectedDateStr, todayStr, setSelectedDateStr])
+
+  const [y, m, d] = dateStr.split("-").map(Number)
+  const selectedDate = dayjs(new Date(y!, m! - 1, d!))
+  const setSelectedDate = (date: Dayjs) =>
+    setSelectedDateStr(date.format("YYYY-MM-DD"))
   const params = useParams()
   const equipmentId = Number(params.id)
   const { data: equipmentDetail } = useEquipment(equipmentId)
 
-  const getWeekStart = (date = dayjs()) => date.startOf("week")
-  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
-  const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
+  const currentMonday = selectedDate.startOf("week")
+  const calendarViewMonth = selectedDate.startOf("month")
 
-  useEffect(() => {
-    setCalendarViewMonth(currentMonday)
-  }, [currentMonday])
+  const setCurrentMonday = (mondayOrFn: Dayjs | ((prev: Dayjs) => Dayjs)) => {
+    const newMonday =
+      typeof mondayOrFn === "function" ? mondayOrFn(currentMonday) : mondayOrFn
+    setSelectedDate(newMonday)
+  }
+  const setCalendarViewMonth = (
+    monthOrFn: Dayjs | ((prev: Dayjs) => Dayjs)
+  ) => {
+    const newMonth =
+      typeof monthOrFn === "function" ? monthOrFn(calendarViewMonth) : monthOrFn
+    setSelectedDate(newMonth)
+  }
 
   const queryRange = useMemo(() => {
     const monthStart = calendarViewMonth
@@ -83,18 +107,18 @@ export default function EquipmentCalendarPage() {
   return (
     <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
       <DefaultPageHeader
-        title="물품 대여"
+        title="장비 대여"
         routes={[
           { display: <DefaultHomeIcon />, href: ROUTES.HOME },
           { display: "예약" },
-          { display: "물품 대여", href: ROUTES.RESERVATION.EQUIPMENT },
+          { display: "장비 대여", href: ROUTES.RESERVATION.EQUIPMENT },
           { display: equipmentLabel }
         ]}
       />
 
-      {/* Selected equipment header */}
-      <div className="mb-4 flex items-center gap-3">
-        <span className="text-lg font-semibold">선택된 물품</span>
+      {/* Selected equipment header (desktop only) */}
+      <div className="mb-4 hidden items-center gap-3 md:flex">
+        <span className="text-lg font-semibold">{equipmentLabel}</span>
         <Link
           href={ROUTES.RESERVATION.EQUIPMENT}
           className="text-sm text-muted-foreground hover:underline"
@@ -142,6 +166,7 @@ export default function EquipmentCalendarPage() {
               <MonthCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -185,9 +210,9 @@ export default function EquipmentCalendarPage() {
         {/* Mobile tabs */}
         <div className="flex gap-2 px-4 py-4">
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "schedule"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("schedule")}
@@ -195,9 +220,9 @@ export default function EquipmentCalendarPage() {
             예약 현황
           </button>
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "my"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("my")}
@@ -221,6 +246,12 @@ export default function EquipmentCalendarPage() {
             />
           )}
         </div>
+
+        <AddScheduleButton
+          className="fixed bottom-4 left-4 right-4 z-50 shadow-lg"
+          equipments={equipmentForSchedule}
+          label="예약하기"
+        />
       </div>
 
       <RentalDetailModal

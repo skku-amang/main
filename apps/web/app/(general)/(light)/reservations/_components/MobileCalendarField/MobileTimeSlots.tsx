@@ -10,16 +10,17 @@ interface MobileTimeSlotsProps {
   onRentalClick?: (rental: RentalDetail) => void
 }
 
-/** Hours to display in the time-slot list (09:00 – 23:00) */
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 9)
+const DEFAULT_START = 9
+const DEFAULT_END = 22
 
 export default function MobileTimeSlots({
   selectedDate,
   rentals,
   onRentalClick
 }: MobileTimeSlotsProps) {
+  const selectedDay = selectedDate.format("YYYY-MM-DD")
   const dayRentals = rentals
-    .filter((r) => dayjs(r.startAt).isSame(selectedDate, "day"))
+    .filter((r) => dayjs(r.startAt).format("YYYY-MM-DD") === selectedDay)
     .sort(
       (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
     )
@@ -33,9 +34,27 @@ export default function MobileTimeSlots({
     rentalsByHour.set(hour, list)
   }
 
+  // 기본 09~22시, 예약 있으면 동적 확장
+  const rentalHours = Array.from(rentalsByHour.keys())
+  const startHour = Math.min(DEFAULT_START, ...rentalHours)
+  const endHour = Math.max(DEFAULT_END, ...rentalHours)
+
+  // 예약이 진행 중인 시간대 (시작 시간 제외, 종료 시간 이전)는 스킵 대상
+  const occupiedHours = new Set<number>()
+  for (const rental of dayRentals) {
+    const sH = dayjs(rental.startAt).hour()
+    const eH = dayjs(rental.endAt).hour()
+    for (let h = sH + 1; h < eH; h++) occupiedHours.add(h)
+  }
+
+  const hours = Array.from(
+    { length: endHour - startHour + 1 },
+    (_, i) => i + startHour
+  ).filter((h) => !occupiedHours.has(h) || rentalsByHour.has(h))
+
   return (
     <div className="flex flex-col">
-      {HOURS.map((hour) => {
+      {hours.map((hour) => {
         const hourRentals = rentalsByHour.get(hour)
         return (
           <div key={hour} className="flex min-h-[44px]">
@@ -58,22 +77,36 @@ export default function MobileTimeSlots({
                 return (
                   <div
                     key={rental.id}
-                    className={`my-1 rounded-md bg-neutral-50 px-3 py-2 ${onRentalClick ? "cursor-pointer hover:bg-neutral-100" : ""}`}
+                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
                     onClick={() => onRentalClick?.(rental)}
                   >
-                    <div className="flex items-center gap-4 text-gray-500">
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={12} />
+                    {/* Day/Date */}
+                    <div className="flex w-16 shrink-0 flex-col items-center justify-center">
+                      <span className="text-sm font-semibold text-zinc-600">
+                        {start.format("ddd")}
+                      </span>
+                      <span className="text-xl font-semibold text-zinc-700">
+                        {start.format("DD")}
+                      </span>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="mx-2 h-10 w-px bg-gray-200" />
+
+                    {/* Details */}
+                    <div className="flex flex-1 flex-col gap-0.5 pl-2">
+                      <div className="flex items-center gap-1.5 text-gray-500">
+                        <Clock size={11} />
                         <span className="text-[11px]">{timeRange}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <UserRound size={12} />
+                      <div className="flex items-center gap-1.5 text-gray-500">
+                        <UserRound size={11} />
                         <span className="text-[11px]">{userLabel}</span>
                       </div>
+                      <span className="text-xs font-semibold text-zinc-600">
+                        {rental.title}
+                      </span>
                     </div>
-                    <span className="mt-0.5 block text-sm font-bold text-zinc-700">
-                      {rental.title}
-                    </span>
                   </div>
                 )
               })}

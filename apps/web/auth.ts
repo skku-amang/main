@@ -2,21 +2,19 @@ import type { Session } from "next-auth"
 import NextAuth, { NextAuthConfig, User } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
+import { UserNotApprovedError } from "@repo/api-client"
+import { LoginUser, LoginUserSchema } from "@repo/shared-types"
+
 import { apiClient } from "@/lib/apiClient"
-import { InvalidSigninCredentialsError } from "@/lib/auth/errors"
 import {
-  CreateUser,
-  CreateUserSchema,
-  LoginUser,
-  LoginUserSchema
-} from "@repo/shared-types"
+  InvalidSigninCredentialsError,
+  UserNotApprovedSigninError
+} from "@/lib/auth/errors"
 
 const authOptions: NextAuthConfig = {
   providers: [
     Credentials({
       credentials: {
-        name: { label: "Name", type: "text" },
-        nickname: { label: "Nickname", type: "text" },
         email: {
           label: "Email",
           type: "email",
@@ -27,48 +25,17 @@ const authOptions: NextAuthConfig = {
           label: "Password",
           type: "password",
           placeholder: "********"
-        },
-        sessions: { label: "Sessions", type: "text" },
-        generationId: { label: "Generation", type: "text" },
-        csrfToken: { label: "csrfToken", type: "hidden" },
-        callbackUrl: { label: "callbackUrl", type: "hidden" }
+        }
       },
       /**
-       * 로그인 또는 회원가입 시 호출되는 함수
+       * 로그인 시 호출되는 함수
        * @param credentials 유저가 입력한 로그인 정보
        * @returns `null`을 반환하면 로그인 실패, `object`를 반환하면 로그인 성공되어 `jwt` 콜백의 `user`으로 전달됨
        */
       authorize: async (credentials) => {
-        const { name, nickname, email, generationId, sessions, password } =
-          credentials as {
-            id?: string
-            name?: string
-            nickname?: string
-            email?: string
-            generationId?: string
-            sessions?: string
-            password?: string
-          }
-        let parsedGenerationId: number | undefined
-        let parsedSessions: number[] | undefined
-        if (generationId) {
-          parsedGenerationId = parseInt(generationId as string)
-        }
-        if (sessions) {
-          parsedSessions =
-            (sessions as string).split(",").map((s) => parseInt(s)) || []
-        }
-
-        if (name && nickname && sessions) {
-          const userInfo = await CreateUserSchema.parseAsync({
-            name,
-            nickname,
-            email,
-            password,
-            generationId: parsedGenerationId,
-            sessions: parsedSessions
-          })
-          return signup({ ...userInfo })
+        const { email, password } = credentials as {
+          email?: string
+          password?: string
         }
         const userInfo = await LoginUserSchema.parseAsync({
           email,
@@ -116,18 +83,29 @@ const authOptions: NextAuthConfig = {
         return token
       }
 
+      // refreshToken이 없으면 갱신 불가 (비로그인 상태)
+      if (!token.refreshToken) {
+        return token
+      }
+
       // 토큰 갱신 시도
       try {
-        const { accessToken, expiresIn } = await refreshAccessToken(
-          token?.refreshToken as string
-        )
+        const {
+          accessToken,
+          refreshToken: newRefreshToken,
+          expiresIn
+        } = await refreshAccessToken(token.refreshToken as string)
         return {
           ...token,
           accessToken,
+          refreshToken: newRefreshToken,
           expiresIn: Date.now() + expiresIn * 1000
         }
       } catch (error) {
         console.error("Error refreshing access token", error)
+        if (error instanceof UserNotApprovedError) {
+          return { ...token, error: "UserNotApprovedError" }
+        }
         return { ...token, error: "RefreshAccessTokenError" }
       }
     },
@@ -187,37 +165,10 @@ async function login({ email, password }: LoginUser) {
     } as User
   } catch (error) {
     console.error("[auth] login error:", error)
-    throw new InvalidSigninCredentialsError()
-  }
-}
-
-async function signup({
-  name,
-  nickname,
-  email,
-  password,
-  generationId,
-  sessions
-}: CreateUser) {
-  const { user, accessToken, expiresIn, refreshToken } = await apiClient.signup(
-    {
-      name,
-      nickname,
-      email,
-      password,
-      generationId,
-      sessions
+    if (error instanceof UserNotApprovedError) {
+      throw new UserNotApprovedSigninError()
     }
-  )
-  return {
-    id: user.id.toString(),
-    name: user.name,
-    nickname: user.nickname,
-    email: user.email,
-    isAdmin: user.isAdmin,
-    accessToken,
-    refreshToken,
-    expiresIn
+    throw new InvalidSigninCredentialsError()
   }
 }
 

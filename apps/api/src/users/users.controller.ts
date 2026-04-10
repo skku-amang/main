@@ -38,6 +38,12 @@ export class UsersController {
     return this.userService.findAllForAdmin()
   }
 
+  @Get("admin/pending")
+  @UseGuards(AdminGuard)
+  findPendingUsers() {
+    return this.userService.findPendingUsers()
+  }
+
   @Get(":id")
   @Public()
   async findOne(@Param("id", ParseIntPipe) id: number) {
@@ -79,6 +85,12 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto
   ) {
     return this.userService.updateUser(id, updateUserDto)
+  }
+
+  @Patch(":id/approve")
+  @UseGuards(AdminGuard)
+  async approveUser(@Param("id", ParseIntPipe) id: number) {
+    return this.userService.approveUser(id)
   }
 
   @Delete(":id")

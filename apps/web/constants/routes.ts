@@ -7,6 +7,7 @@ const ROUTES = {
   ADMIN: {
     INDEX: "/admin",
     USERS: "/admin/users",
+    PENDING_USERS: "/admin/pending-users",
     GENERATIONS: "/admin/generations",
     PERFORMANCES: "/admin/performances",
     TEAMS: "/admin/teams",
@@ -14,12 +15,6 @@ const ROUTES = {
     SESSIONS: "/admin/sessions",
     RENTALS: "/admin/rentals",
     EQUIPMENTS: "/admin/equipments"
-  },
-  NOTICE: {
-    CREATE: "/notices/create",
-    LIST: "/notices",
-    DETAIL: (id: number) => `/notices/${id}`,
-    EDIT: (id: number) => `/notices/${id}/edit`
   },
   PERFORMANCE: {
     LIST: "/performances",
@@ -32,12 +27,7 @@ const ROUTES = {
         `/performances/${performanceId}/teams/${teamId}`,
       EDIT: (performanceId: number, teamId: number) =>
         `/performances/${performanceId}/teams/${teamId}/edit`
-    },
-    EDIT: (id: number) => `/performances/${id}/edit`
-  },
-  MEMBER: {
-    LIST: "/members",
-    DETAIL: (id: number) => `/members/${id}`
+    }
   },
   PROFILE: {
     INDEX: "/profile",
@@ -46,7 +36,8 @@ const ROUTES = {
   },
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",
-    EQUIPMENT: "/reservations/equipment"
+    EQUIPMENT: "/reservations/equipment",
+    EQUIPMENT_DETAIL: (id: number) => `/reservations/equipment/${id}`
   }
 }
 

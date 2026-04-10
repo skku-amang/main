@@ -26,7 +26,7 @@ export default async function AdminLayout({
     <UnsavedChangesProvider>
       <div className="flex h-screen">
         <AdminSidebar />
-        <main className="flex-1 overflow-auto bg-neutral-50 p-6">
+        <main className="flex-1 overflow-auto bg-neutral-50 p-6 pt-16 md:pt-6">
           {children}
         </main>
       </div>

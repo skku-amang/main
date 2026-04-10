@@ -7,6 +7,7 @@ import {
   Instagram,
   LogIn,
   Package,
+  Settings,
   Users,
   Youtube
 } from "lucide-react"
@@ -24,7 +25,6 @@ import NavLinkHeader from "./NavLinkHeader"
 const iconSize = 24
 const iconcolor = "text-gray-500"
 
-// eslint-disable-next-line no-unused-vars
 const SheetInnerContent = ({
   setIsOpen
 }: {
@@ -72,6 +72,24 @@ const SheetInnerContent = ({
       </Link>
       <Separator />
       <div className="flex-auto ">
+        {/* Admin */}
+        {session?.user?.isAdmin && (
+          <>
+            <div className="my-6">
+              <NavLinkHeader className="mb-4">ADMIN</NavLinkHeader>
+              <div className="space-y-7">
+                <NavLink
+                  href={ROUTES.ADMIN.INDEX}
+                  icon={<Settings size={iconSize} className={iconcolor} />}
+                  onClick={() => setIsOpen(false)}
+                >
+                  관리자
+                </NavLink>
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
         {/* Main */}
         <div className="my-6">
           <NavLinkHeader className="mb-4">MAIN</NavLinkHeader>
@@ -89,14 +107,14 @@ const SheetInnerContent = ({
               icon={<Building2 size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              공간 대여
+              동방 대여
             </NavLink>
             <NavLink
               href={ROUTES.RESERVATION.EQUIPMENT}
               icon={<Package size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
-              물품 대여
+              장비 대여
             </NavLink>
             <NavLink
               href={ROUTES.PERFORMANCE.LIST}

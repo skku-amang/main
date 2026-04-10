@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
+import { useRouter, usePathname } from "next/navigation"
 import dayjs from "dayjs"
 import { Clock, PlusCircle, UserRound, X } from "lucide-react"
 
@@ -30,23 +31,28 @@ import { cn } from "@/lib/utils"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import { Equipment } from "@repo/shared-types"
+import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options
 const HOURS = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 )
-const MINUTES = Array.from({ length: 12 }, (_, i) =>
-  (i * 5).toString().padStart(2, "0")
+const MINUTES = Array.from({ length: 4 }, (_, i) =>
+  (i * 15).toString().padStart(2, "0")
 )
 
 interface AddScheduleButtonProps {
   className?: string
   equipments: Equipment[]
+  iconOnly?: boolean
+  label?: string
 }
 
 export default function AddScheduleButton({
   className,
-  equipments
+  equipments,
+  iconOnly,
+  label
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
@@ -54,8 +60,13 @@ export default function AddScheduleButton({
   const createRental = useCreateRental()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const currentUserId = session?.user?.id ? Number(session.user.id) : null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const disablePastDates = { before: today }
 
   // Form state
   const [equipmentId, setEquipmentId] = useState<number | null>(
@@ -63,8 +74,9 @@ export default function AddScheduleButton({
   )
 
   // equipments prop이 비동기로 로딩될 때 equipmentId를 동기화
+  // 모바일에서 장비 셀렉터가 숨겨지므로 첫 번째 장비를 자동 선택
   useEffect(() => {
-    if (equipments.length === 1 && equipmentId === null) {
+    if (equipments.length >= 1 && equipmentId === null) {
       setEquipmentId(equipments[0]?.id ?? null)
     }
   }, [equipments, equipmentId])
@@ -78,6 +90,13 @@ export default function AddScheduleButton({
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     currentUserId ? [currentUserId] : []
   )
+
+  // session이 비동기로 로딩될 때 본인 ID를 참여자에 동기화
+  useEffect(() => {
+    if (currentUserId && selectedUserIds.length === 0) {
+      setSelectedUserIds([currentUserId])
+    }
+  }, [currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -196,6 +215,10 @@ export default function AddScheduleButton({
     <Dialog
       open={open}
       onOpenChange={(v) => {
+        if (v && !session) {
+          router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          return
+        }
         setOpen(v)
         if (!v) resetForm()
       }}
@@ -203,14 +226,22 @@ export default function AddScheduleButton({
       <DialogTrigger asChild>
         <Button
           className={cn(
-            "text-gray-50 w-36 h-9 text-sm font-medium bg-primary",
+            iconOnly
+              ? "h-14 w-14 rounded-full p-0 bg-primary text-gray-50"
+              : label
+                ? "text-white text-base font-semibold bg-third h-[45px] rounded-[10px]"
+                : "text-gray-50 text-sm font-medium bg-primary w-36 h-9",
             className
           )}
         >
-          <div className="flex gap-2 justify-center items-center">
-            <PlusCircle size={18} />
-            Add schedule
-          </div>
+          {iconOnly ? (
+            <PlusCircle size={24} />
+          ) : (
+            <div className="flex gap-2 justify-center items-center">
+              <PlusCircle size={18} />
+              {label ?? "Add schedule"}
+            </div>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[600px]">
@@ -220,9 +251,9 @@ export default function AddScheduleButton({
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* 장비 선택 (여러 장비일 때만 표시) */}
+          {/* 장비 선택 (데스크톱 + 여러 장비일 때만 표시) */}
           {equipments.length > 1 && (
-            <div className="space-y-1.5">
+            <div className="hidden sm:block space-y-1.5">
               <label className="text-sm font-medium text-muted-foreground">
                 장비
               </label>
@@ -269,8 +300,8 @@ export default function AddScheduleButton({
               <span>Date & Time</span>
             </div>
 
-            {/* Calendars side by side */}
-            <div className="flex gap-3">
+            {/* Desktop: two calendars side by side */}
+            <div className="hidden sm:flex gap-3">
               <div className="flex-1 min-w-0 space-y-1.5">
                 <label className="text-sm text-muted-foreground">
                   Start date
@@ -279,6 +310,7 @@ export default function AddScheduleButton({
                   mode="single"
                   selected={startDate}
                   onSelect={setStartDate}
+                  disabled={disablePastDates}
                   className="rounded-md border p-1"
                   classNames={{
                     day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
@@ -296,6 +328,7 @@ export default function AddScheduleButton({
                   mode="single"
                   selected={endDate}
                   onSelect={setEndDate}
+                  disabled={disablePastDates}
                   className="rounded-md border p-1"
                   classNames={{
                     day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
@@ -307,8 +340,39 @@ export default function AddScheduleButton({
               </div>
             </div>
 
-            {/* Time selectors */}
-            <div className="flex gap-3">
+            {/* Mobile: range calendar */}
+            <div className="sm:hidden space-y-1.5">
+              <Calendar
+                mode="range"
+                selected={
+                  startDate || endDate
+                    ? { from: startDate, to: endDate }
+                    : undefined
+                }
+                onSelect={(range: DateRange | undefined) => {
+                  setStartDate(range?.from)
+                  setEndDate(range?.to ?? range?.from)
+                }}
+                disabled={disablePastDates}
+                className="rounded-md border p-1 w-full"
+                classNames={{
+                  head_row: "flex w-full",
+                  head_cell:
+                    "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem]",
+                  row: "flex w-full mt-2",
+                  cell: "flex-1 h-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                  day: "h-9 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md"
+                }}
+              />
+              {(errors.startDate || errors.endDate) && (
+                <p className="text-sm text-destructive">
+                  {errors.startDate || errors.endDate}
+                </p>
+              )}
+            </div>
+
+            {/* Desktop: time selectors */}
+            <div className="hidden sm:flex gap-3">
               <div className="flex-1 space-y-1.5">
                 <label className="text-sm text-muted-foreground">From</label>
                 <div className="flex items-center gap-1">
@@ -376,13 +440,81 @@ export default function AddScheduleButton({
                 )}
               </div>
             </div>
+
+            {/* Mobile: compact time row */}
+            <div className="flex sm:hidden items-center gap-2">
+              <div className="flex flex-1 items-center gap-1">
+                <Select value={startHour} onValueChange={setStartHour}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="HH" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HOURS.map((h) => (
+                      <SelectItem key={h} value={h}>
+                        {h}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground">:</span>
+                <Select value={startMinute} onValueChange={setStartMinute}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="MM" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINUTES.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <span className="text-muted-foreground text-sm">~</span>
+              <div className="flex flex-1 items-center gap-1">
+                <Select value={endHour} onValueChange={setEndHour}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="HH" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HOURS.map((h) => (
+                      <SelectItem key={h} value={h}>
+                        {h}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground">:</span>
+                <Select value={endMinute} onValueChange={setEndMinute}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="MM" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINUTES.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {/* Mobile time errors */}
+            <div className="sm:hidden">
+              {errors.startTime && (
+                <p className="text-sm text-destructive">{errors.startTime}</p>
+              )}
+              {errors.endTime && (
+                <p className="text-sm text-destructive">{errors.endTime}</p>
+              )}
+            </div>
           </div>
 
           {/* Separator */}
-          <div className="border-t" />
+          <div className="border-t sm:block hidden" />
 
-          {/* Add participants */}
-          <div className="space-y-3">
+          {/* Add participants (desktop only — mobile defaults to current user) */}
+          <div className="hidden sm:block space-y-3">
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <UserRound size={14} />
               <span>Add participants</span>
@@ -441,18 +573,18 @@ export default function AddScheduleButton({
           <div className="border-t" />
 
           {/* Action buttons */}
-          <div className="flex justify-center gap-3">
+          <div className="flex gap-3">
             <Button
               type="button"
               variant="outline"
-              className="w-28"
+              className="flex-1"
               onClick={handleCancel}
             >
               취소
             </Button>
             <Button
               type="button"
-              className="w-28"
+              className="flex-1"
               onClick={handleSubmit}
               disabled={createRental.isPending}
             >

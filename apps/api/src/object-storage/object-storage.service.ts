@@ -82,20 +82,16 @@ export class ObjectStorageService implements OnModuleInit {
   }
 
   async deleteObject(url: string) {
-    try {
-      const key = this.extractKeyFromUrl(url)
+    const key = this.extractKeyFromUrl(url)
+    const command = new DeleteObjectCommand({ Bucket: this.bucket, Key: key })
+    await this.s3.send(command)
+    this.logger.log(`Object "${key}" deleted successfully`)
+  }
 
-      const command = new DeleteObjectCommand({
-        Bucket: this.bucket,
-        Key: key
-      })
-
-      await this.s3.send(command)
-      this.logger.log(`Object "${key}" deleted successfully`)
-    } catch (error) {
-      this.logger.error(`Failed to delete object "${url}":`, error)
-      throw error
-    }
+  deleteObjectSafely(url: string) {
+    this.deleteObject(url).catch((error) => {
+      this.logger.warn(`Failed to delete object "${url}":`, error)
+    })
   }
 
   private extractKeyFromUrl(url: string) {

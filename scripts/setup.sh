@@ -51,6 +51,16 @@ else
   HAS_DIRENV=true
 fi
 
+# Claude Code (선택)
+HAS_CLAUDE=false
+if command -v claude &>/dev/null; then
+  ok "Claude Code $(claude --version 2>/dev/null || echo '')"
+  HAS_CLAUDE=true
+else
+  warn "Claude Code가 설치되어 있지 않습니다. AI 도구 연동 시 필요합니다."
+  warn "설치: https://docs.anthropic.com/en/docs/claude-code"
+fi
+
 echo ""
 
 # ─── 2. pnpm 활성화 ───
@@ -133,7 +143,26 @@ ok "시드 완료"
 
 echo ""
 
-# ─── 8. 완료 ───
+# ─── 8. Claude Code 도구 설정 (선택) ───
+if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
+  echo -en "${CYAN}[INFO]${NC} Claude Code MCP 도구를 설정하시겠습니까? (Notion, Slack, Figma 등 연동) [Y/n] "
+  read -r REPLY
+  if [[ -z "$REPLY" || "$REPLY" =~ ^[Yy]$ ]]; then
+    info "MCP 서버 패키지 글로벌 설치 중..."
+    pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack mcp-server-kubernetes @modelcontextprotocol/server-postgres 2>/dev/null \
+      && ok "MCP 서버 패키지 설치 완료" \
+      || warn "MCP 서버 패키지 설치 실패 — 수동 설치가 필요합니다"
+    info "Figma MCP는 공식 리모트 서버(mcp.figma.com)를 사용합니다. 첫 연결 시 브라우저에서 OAuth 로그인이 필요합니다."
+    echo ""
+  else
+    info "Claude Code 도구 설정을 건너뜁니다."
+    echo ""
+  fi
+elif [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = false ]; then
+  warn "direnv가 없어 MCP 서버 설정을 건너뜁니다. direnv 설치 후 다시 실행해주세요."
+fi
+
+# ─── 9. 완료 ───
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  셋업 완료!${NC}"
 echo -e "${GREEN}========================================${NC}"

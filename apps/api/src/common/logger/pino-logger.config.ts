@@ -4,6 +4,10 @@ import type { Params } from "nestjs-pino"
 import type { PrettyOptions } from "pino-pretty"
 import PinoPretty from "pino-pretty"
 import { format } from "sql-formatter"
+import { JwtService } from "@nestjs/jwt"
+import { JwtPayload } from "@repo/shared-types"
+
+const jwtService = new JwtService()
 
 const pinoPrettyOptions: PrettyOptions = {
   messageFormat: (log, messageKey) => {
@@ -30,10 +34,7 @@ export const pinoLoggerModuleOption: Params = {
         return { level: label }
       }
     },
-    stream:
-      process.env.NODE_ENV !== "production"
-        ? PinoPretty(pinoPrettyOptions)
-        : undefined,
+    stream: process.stdout.isTTY ? PinoPretty(pinoPrettyOptions) : undefined,
     mixin(mergeObject: any) {
       if (!mergeObject.msg && mergeObject.message) {
         mergeObject = { ...mergeObject, msg: mergeObject.message }
@@ -41,7 +42,12 @@ export const pinoLoggerModuleOption: Params = {
       return mergeObject
     },
     customProps(req: any) {
-      return req.user ? { userId: req.user.sub } : { userId: "anonymous" }
+      const token = req.headers?.authorization?.split(" ")[1]
+      const payload = token ? jwtService.decode<JwtPayload>(token) : null
+
+      return payload
+        ? { userId: payload.sub, username: payload.name }
+        : { userId: "anonymous", username: "anonymous" }
     },
     genReqId(req, res) {
       const id = randomUUID()

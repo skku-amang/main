@@ -7,6 +7,27 @@ import TeamDetailClient from "./_components/TeamDetailClient"
 
 type Props = { params: Promise<{ id: string; teamId: string }> }
 
+function getYoutubeThumbnail(url: string): string | null {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/
+  )
+  return match
+    ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`
+    : null
+}
+
+function getOgImage(
+  team: { posterImage?: string | null; songYoutubeVideoUrl?: string | null },
+  alt: string
+) {
+  if (team.posterImage) return { url: team.posterImage, alt }
+  if (team.songYoutubeVideoUrl) {
+    const thumb = getYoutubeThumbnail(team.songYoutubeVideoUrl)
+    if (thumb) return { url: thumb, alt }
+  }
+  return { url: SEO.DEFAULT_OG_IMAGE, alt: SEO.SITE_NAME }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, teamId } = await params
   try {
@@ -23,9 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: `${title} | AMANG`,
         description,
-        images: team.posterImage
-          ? [{ url: team.posterImage, alt: title }]
-          : [{ url: SEO.DEFAULT_OG_IMAGE, alt: SEO.SITE_NAME }]
+        images: [getOgImage(team, title)]
       }
     }
   } catch {

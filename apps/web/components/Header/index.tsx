@@ -23,21 +23,19 @@ type MenuItem = {
 
 const Header = ({
   position,
-  height = "82px",
   mode = "light"
 }: {
   position: "sticky" | "fixed"
-  height: string
   mode?: HeaderMode
 }) => {
   const menuItems: MenuItem[] = [
     {
-      name: "공간 대여",
+      name: "동방 대여",
       url: ROUTES.RESERVATION.CLUBROOM,
       active: true
     },
     {
-      name: "물품 대여",
+      name: "장비 대여",
       url: ROUTES.RESERVATION.EQUIPMENT,
       active: true
     },
@@ -48,14 +46,13 @@ const Header = ({
     <header
       className={cn(
         position,
-        "top-0 z-50 flex h-full w-full justify-center backdrop-blur-sm",
+        "top-0 z-50 flex h-[var(--header-height)] w-full justify-center backdrop-blur-sm",
         {
           "bg-primary md:bg-slate-50": mode === "light",
           "bg-primary": mode === "dark",
           "bg-transparent": mode === "transparent"
         }
       )}
-      style={{ height }}
     >
       {/* Mobile */}
       <nav
@@ -70,7 +67,7 @@ const Header = ({
         <MobileBackButton />
         <Link
           href={ROUTES.HOME}
-          className={cn("text-2xl", knewave.className, "text-white")}
+          className={cn("text-[21px]", knewave.className, "text-white")}
         >
           Amang
         </Link>

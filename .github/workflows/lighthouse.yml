@@ -1,0 +1,58 @@
+name: Lighthouse CI
+
+on:
+  deployment_status:
+
+jobs:
+  lighthouse:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        env:
+          LHCI_TARGET_URL: ${{ github.event.deployment_status.target_url }}
+        with:
+          urls: |
+            ${{ env.LHCI_TARGET_URL }}
+            ${{ env.LHCI_TARGET_URL }}/login
+            ${{ env.LHCI_TARGET_URL }}/performances
+            ${{ env.LHCI_TARGET_URL }}/reservations/equipment
+            ${{ env.LHCI_TARGET_URL }}/reservations/clubroom
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Format Lighthouse Score
+        id: format
+        uses: actions/github-script@v7
+        env:
+          LIGHTHOUSE_MANIFEST: ${{ steps.lighthouse.outputs.manifest }}
+        with:
+          script: |
+            const results = JSON.parse(process.env.LIGHTHOUSE_MANIFEST);
+            const score = (v) => `${Math.round(v * 100)}`;
+            const emoji = (v) => v >= 0.9 ? '🟢' : v >= 0.5 ? '🟠' : '🔴';
+            const cell = (v) => `${emoji(v)} ${score(v)}`;
+            const rows = results.map((r) => {
+              const s = r.summary;
+              const page = new URL(r.url).pathname || '/';
+              return `| \`${page}\` | ${cell(s.performance)} | ${cell(s.accessibility)} | ${cell(s['best-practices'])} | ${cell(s.seo)} | [보기](${r.url}) |`;
+            });
+            const body = [
+              '### ⚡ Lighthouse 보고서',
+              '',
+              '| 페이지 | 성능 | 접근성 | 권장사항 | SEO | 상세 |',
+              '| --- | --- | --- | --- | --- | --- |',
+              ...rows,
+            ].join('\n');
+            core.setOutput('comment', body);
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: lighthouse
+          message: ${{ steps.format.outputs.comment }}

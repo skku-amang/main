@@ -38,7 +38,13 @@ export default function MobileCalendarField({
       <div className="flex w-full">
         {DayLabel.map((Day, i) => (
           <div
-            className="flex h-10 flex-1 items-center justify-center text-[15px] font-semibold text-blue-600"
+            className={`flex h-10 flex-1 items-center justify-center text-[15px] font-semibold ${
+              i === 0
+                ? "text-red-500"
+                : i === 6
+                  ? "text-blue-600"
+                  : "text-black"
+            }`}
             key={i}
           >
             {Day}

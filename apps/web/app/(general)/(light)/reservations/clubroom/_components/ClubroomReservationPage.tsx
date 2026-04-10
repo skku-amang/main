@@ -8,8 +8,8 @@ import ROUTES from "@/constants/routes"
 import MyReservationField from "../../_components/MyReservationField"
 import AddScheduleButton from "../../_components/AddScheduleButton"
 import WeekCalendarField from "../../_components/WeekCalendarField"
-import { useEffect, useMemo, useState } from "react"
-import { useQueryState, parseAsStringLiteral } from "nuqs"
+import { useMemo, useState } from "react"
+import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import WeekLabel from "../../_components/WeekLable"
 import MonthCalendarField from "../../_components/MonthCalendarField"
 import MobileCalendarField from "../../_components/MobileCalendarField"
@@ -36,15 +36,32 @@ export default function ClubroomReservationPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
-  const getWeekStart = (date = dayjs()) => date.startOf("week")
+  const [selectedDateStr, setSelectedDateStr] = useQueryState(
+    "date",
+    parseAsString.withDefault(dayjs().format("YYYY-MM-DD"))
+  )
+  const [y, m, d] = selectedDateStr.split("-").map(Number)
+  const selectedDate = dayjs(new Date(y!, m! - 1, d!))
+  const setSelectedDate = (date: Dayjs) =>
+    setSelectedDateStr(date.format("YYYY-MM-DD"))
 
-  const [currentMonday, setCurrentMonday] = useState(getWeekStart())
-  const [calendarViewMonth, setCalendarViewMonth] = useState(currentMonday)
+  // Google Calendar 방식: selectedDate에서 주/월 범위 파생
+  const currentMonday = selectedDate.startOf("week")
+  const calendarViewMonth = selectedDate.startOf("month")
 
-  useEffect(() => {
-    setCalendarViewMonth(currentMonday)
-  }, [currentMonday])
+  // WeekLabel 네비게이션용 래퍼
+  const setCurrentMonday = (mondayOrFn: Dayjs | ((prev: Dayjs) => Dayjs)) => {
+    const newMonday =
+      typeof mondayOrFn === "function" ? mondayOrFn(currentMonday) : mondayOrFn
+    setSelectedDate(newMonday)
+  }
+  const setCalendarViewMonth = (
+    monthOrFn: Dayjs | ((prev: Dayjs) => Dayjs)
+  ) => {
+    const newMonth =
+      typeof monthOrFn === "function" ? monthOrFn(calendarViewMonth) : monthOrFn
+    setSelectedDate(newMonth)
+  }
 
   // 데이터 조회 범위: 현재 보고 있는 달의 시작~끝 (+전후 1주)
   const queryRange = useMemo(() => {
@@ -123,6 +140,7 @@ export default function ClubroomReservationPage() {
               <MonthCalendarField
                 currentMonday={currentMonday}
                 rentals={rentalList}
+                onRentalClick={setSelectedRental}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -167,9 +185,9 @@ export default function ClubroomReservationPage() {
         {/* Mobile tab buttons (pill style matching Figma) */}
         <div className="flex gap-2 px-4 py-4">
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "schedule"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("schedule")}
@@ -177,9 +195,9 @@ export default function ClubroomReservationPage() {
             예약 현황
           </button>
           <button
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
               mobileTab === "my"
-                ? "bg-primary text-primary-foreground"
+                ? "bg-third text-white"
                 : "bg-white text-gray-400"
             }`}
             onClick={() => setMobileTab("my")}
@@ -203,6 +221,12 @@ export default function ClubroomReservationPage() {
             />
           )}
         </div>
+
+        <AddScheduleButton
+          className="fixed bottom-4 left-4 right-4 z-50 shadow-lg"
+          equipments={equipmentList}
+          label="예약하기"
+        />
       </div>
 
       <RentalDetailModal

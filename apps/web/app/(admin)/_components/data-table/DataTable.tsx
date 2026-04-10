@@ -27,6 +27,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   OnChangeFn,
+  PaginationState,
   RowSelectionState,
   SortingState,
   useReactTable,
@@ -241,6 +242,33 @@ function DataTableInner<TData, TValue>({
     [sorting, setSortId, setSortOrder]
   )
 
+  // URL-synced pagination state
+  const [urlPage, setUrlPage] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(1).withOptions({ history: "replace" })
+  )
+  const [urlPageSize, setUrlPageSize] = useQueryState(
+    "pageSize",
+    parseAsInteger.withDefault(10).withOptions({ history: "replace" })
+  )
+
+  const pagination: PaginationState = useMemo(
+    () => ({ pageIndex: urlPage - 1, pageSize: urlPageSize }),
+    [urlPage, urlPageSize]
+  )
+
+  const handlePaginationChange: OnChangeFn<PaginationState> = useCallback(
+    (updaterOrValue) => {
+      const next =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(pagination)
+          : updaterOrValue
+      setUrlPage(next.pageIndex + 1)
+      setUrlPageSize(next.pageSize)
+    },
+    [pagination, setUrlPage, setUrlPageSize]
+  )
+
   // URL-synced filter state via nuqs
   const filterParsers = useMemo(
     () => Object.fromEntries(filters.map((f) => [f.columnId, parseAsString])),
@@ -352,6 +380,7 @@ function DataTableInner<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: handleSortingChange,
+    onPaginationChange: handlePaginationChange,
     onColumnFiltersChange: handleColumnFiltersChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onRowSelectionChange: setRowSelection,
@@ -361,6 +390,7 @@ function DataTableInner<TData, TValue>({
     onColumnOrderChange: setColumnOrder,
     state: {
       sorting,
+      pagination,
       columnFilters,
       columnVisibility,
       columnOrder,
@@ -392,9 +422,9 @@ function DataTableInner<TData, TValue>({
     const pageSize = t.getState().pagination.pageSize
     const targetPage = Math.floor(rowIndex / pageSize)
     if (t.getState().pagination.pageIndex !== targetPage) {
-      t.setPageIndex(targetPage)
+      setUrlPage(targetPage + 1)
     }
-  }, [highlightedRowId])
+  }, [highlightedRowId, setUrlPage])
 
   // Scroll highlighted row into view
   useEffect(() => {

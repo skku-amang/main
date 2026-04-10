@@ -6,22 +6,28 @@ interface MonthBlockProps {
   days: Dayjs[]
   currentMonth: Dayjs
   rentals: RentalDetail[]
-  onSelect?(d: Dayjs): void
+  onRentalClick?: (rental: RentalDetail) => void
 }
 
 export default function MonthBlock({
   days,
   currentMonth,
-  rentals
+  rentals,
+  onRentalClick
 }: MonthBlockProps) {
   return (
     <div className="grid grid-cols-7 auto-rows-[120px] border-t border-l border-gray-100">
       {days.map((d, i) => {
         const isThisMonth = d.month() === currentMonth.month()
         const isToday = d.isSame(new Date(), "day")
-        const dayRentals = rentals.filter((r) =>
-          dayjs(r.startAt).isSame(d, "day")
-        )
+        const dayRentals = rentals.filter((r) => {
+          const s = dayjs(r.startAt)
+          const e = dayjs(r.endAt)
+          return (
+            s.isSame(d, "day") ||
+            (s.isBefore(d, "day") && e.isAfter(d.startOf("day")))
+          )
+        })
 
         return (
           <div key={i} className="border-r border-b border-gray-100 p-2">
@@ -37,7 +43,8 @@ export default function MonthBlock({
               return (
                 <div
                   key={rental.id}
-                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-0.5 truncate`}
+                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-0.5 truncate cursor-pointer`}
+                  onClick={() => onRentalClick?.(rental)}
                 >
                   {rental.title}
                 </div>

@@ -5,8 +5,13 @@
 # Notion: https://www.notion.so/profile/integrations 에서 아망 워크스페이스 Internal Integration 생성
 export NOTION_TOKEN=ntn_xxx
 
-# Figma: https://www.figma.com/developers/api#access-tokens 에서 Personal Access Token 생성
-export FIGMA_API_KEY=figd_xxx
-
 # Slack: 팀 공용 봇 토큰 — 장수에게 문의
 export SLACK_BOT_TOKEN=xoxb-xxx
+
+# Sentry: https://sentry.io/settings/account/api/auth-tokens/ 에서 User Auth Token 생성
+# scope: org:read, project:read, event:read, issue:read
+export SENTRY_ACCESS_TOKEN=sntryu_xxx
+
+# Vercel: https://vercel.com/account/tokens 에서 토큰 생성
+# 빌드 로그 조회, 배포 상태 확인 등에 사용
+export VERCEL_TOKEN=vcp_xxx

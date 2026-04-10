@@ -1,9 +1,15 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
-import { AuthError, ForbiddenError } from "@repo/api-client"
+import {
+  AuthError,
+  RefreshTokenExpiredError,
+  RefreshTokenNotFoundError,
+  UserNotApprovedError
+} from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
+import { createHash, timingSafeEqual } from "crypto"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { UsersService } from "../users/users.service"
@@ -16,15 +22,7 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto)
-    const tokens = await this.getTokens(
-      user.id,
-      user.email,
-      user.name,
-      user.isAdmin
-    )
-    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
-    return { ...tokens, user }
+    await this.usersService.create(createUserDto)
   }
 
   async login(loginDto: LoginUserDto) {
@@ -32,9 +30,14 @@ export class AuthService {
     if (!user) {
       throw new AuthError("존재하지 않는 이메일입니다.")
     }
+
     const isMatch = await bcrypt.compare(loginDto.password, user.password)
     if (!isMatch) {
       throw new AuthError("비밀번호가 일치하지 않습니다.")
+    }
+
+    if (!user.isApproved) {
+      throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
     const tokens = await this.getTokens(
@@ -97,15 +100,26 @@ export class AuthService {
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.usersService.findOneById(userId)
     if (!user || !user.hashedRefreshToken) {
-      throw new ForbiddenError("Access Denied")
+      throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
     }
 
-    const refreshTokenMatches = await bcrypt.compare(
-      refreshToken,
-      user.hashedRefreshToken
+    if (!user.isApproved) {
+      throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
+    }
+
+    const incomingHash = createHash("sha256").update(refreshToken).digest("hex")
+
+    if (incomingHash.length !== user.hashedRefreshToken.length)
+      throw new RefreshTokenExpiredError("리프레시 토큰이 유효하지 않습니다.")
+
+    const refreshTokenMatches = timingSafeEqual(
+      Buffer.from(incomingHash),
+      Buffer.from(user.hashedRefreshToken)
     )
     if (!refreshTokenMatches) {
-      throw new ForbiddenError("Access Denied")
+      throw new RefreshTokenExpiredError(
+        "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+      )
     }
 
     const tokens = await this.getTokens(

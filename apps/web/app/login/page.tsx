@@ -5,7 +5,8 @@ import { signIn } from "next-auth/react"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -16,15 +17,26 @@ import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
 import {
   InvalidSigninCredentialsErrorCode,
-  InvalidSigninErrorCode
+  InvalidSigninErrorCode,
+  UserNotApprovedErrorCode
 } from "@/lib/auth/errors"
 import { cn } from "@/lib/utils"
 import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <Login />
+    </Suspense>
+  )
+}
+
 const Login = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const signupSuccess = searchParams.get("signup") === "success"
   const { toast } = useToast()
 
   const {
@@ -38,7 +50,11 @@ const Login = () => {
 
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     const res = await signIn("credentials", { ...formData, redirect: false })
-    if (!res?.error) return router.push(ROUTES.HOME)
+    if (!res?.error) {
+      const raw = searchParams.get("callbackUrl")
+      const callbackUrl = raw?.startsWith("/") ? raw : ROUTES.HOME
+      return router.push(callbackUrl)
+    }
 
     switch (res.code) {
       case InvalidSigninErrorCode:
@@ -53,6 +69,14 @@ const Login = () => {
         })
         break
 
+      case UserNotApprovedErrorCode:
+        toast({
+          title: "로그인 실패",
+          description: "관리자 승인 후 로그인이 가능합니다.",
+          variant: "destructive"
+        })
+        break
+
       default:
         toast({
           title: "로그인 실패",
@@ -64,7 +88,7 @@ const Login = () => {
 
   return (
     <div className="flex h-full w-full items-center justify-center px-6 lg:px-0">
-      <div className="flex w-full max-w-md flex-col items-center justify-center rounded-2xl bg-white lg:relative lg:h-[653px] lg:max-w-none lg:w-[60rem] lg:shadow-2xl xl:w-[70rem]">
+      <div className="flex w-full max-w-md flex-col items-center justify-center rounded-2xl bg-slate-50 lg:relative lg:h-[653px] lg:max-w-none lg:w-[60rem] lg:bg-white lg:shadow-2xl xl:w-[70rem]">
         <Image
           width="680"
           height="753"
@@ -102,6 +126,11 @@ const Login = () => {
           <h5 className="mb-8 text-sm font-normal text-slate-400">
             계속하려면 로그인해주세요
           </h5>
+          {signupSuccess && (
+            <div className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm">
+              회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다.
+            </div>
+          )}
           {/* 일반 로그인 */}
           <form
             className="flex w-full flex-col items-center"
@@ -153,5 +182,3 @@ const Login = () => {
     </div>
   )
 }
-
-export default Login

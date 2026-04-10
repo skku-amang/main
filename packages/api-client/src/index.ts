@@ -22,6 +22,7 @@ import {
   RefreshTokenResponse,
   SessionDetail,
   SessionList,
+  SignUpResponse,
   TeamApplication,
   TeamDetail,
   TeamList,
@@ -44,6 +45,7 @@ import {
 import { ApiResult } from "./api-result"
 import {
   AccessTokenExpiredError,
+  AccessTokenNotFoundError,
   ApiError,
   AuthError,
   ConflictError,
@@ -61,9 +63,11 @@ import {
   ProblemDocument,
   ReferencedEntityNotFoundError,
   RefreshTokenExpiredError,
+  RefreshTokenNotFoundError,
   SessionNotFoundError,
   UnprocessableEntityError,
-  ValidationError
+  ValidationError,
+  UserNotApprovedError
 } from "./errors"
 
 /**
@@ -108,10 +112,16 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new ReferencedEntityNotFoundError(detail, instance)
     case "/errors/performance/invalid-performance-date":
       return new InvalidPerformanceDateError(detail, instance)
+    case "/errors/user/not-approved":
+      return new UserNotApprovedError(detail, instance)
     case "/errors/token/refresh-token-expired":
       return new RefreshTokenExpiredError(detail, instance)
+    case "/errors/token/refresh-token-not-found":
+      return new RefreshTokenNotFoundError(detail, instance)
     case "/errors/token/access-token-expired":
       return new AccessTokenExpiredError(detail, instance)
+    case "/errors/token/access-token-not-found":
+      return new AccessTokenNotFoundError(detail, instance)
     default:
       // API 서버에서 알 수 없는 에러가 전달될 경우
       // detail과 instance가 없을 수 있습니다.
@@ -808,6 +818,18 @@ export default class ApiClient {
   }
 
   /**
+   * 승인 대기 중인 유저 목록 조회 (관리자용 API)
+   * @throws {ForbiddenError} 관리자 권한이 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getPendingUsers() {
+    return this._request<
+      DetailedUserList,
+      ForbiddenError | InternalServerError
+    >(`/users/admin/pending`, "GET")
+  }
+
+  /**
    * 특정 유저 조회
    * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
    * @throws {InternalServerError} 서버 오류 발생 시
@@ -894,6 +916,19 @@ export default class ApiClient {
   }
 
   /**
+   * 유저 승인 (관리자용 API)
+   * @throws {ForbiddenError} 관리자 권한이 없는 경우
+   * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public approveUser(id: number) {
+    return this._request<
+      DetailedUser,
+      ForbiddenError | NotFoundError | InternalServerError
+    >(`/users/${id}/approve`, "PATCH")
+  }
+
+  /**
    * 회원가입
    * @throws {ValidationError}
    * @throws {ConflictError}
@@ -902,7 +937,7 @@ export default class ApiClient {
    */
   public signup(userData: CreateUser) {
     return this._request<
-      AuthResponse,
+      SignUpResponse,
       | ValidationError
       | ConflictError
       | UnprocessableEntityError
@@ -913,14 +948,14 @@ export default class ApiClient {
   /**
    * 로그인
    * @throws {AuthError}
+   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
    * @throws {InternalServerError}
    */
   public login(loginUser: LoginUser) {
-    return this._request<AuthResponse, AuthError | InternalServerError>(
-      "/auth/login",
-      "POST",
-      loginUser
-    )
+    return this._request<
+      AuthResponse,
+      AuthError | UserNotApprovedError | InternalServerError
+    >("/auth/login", "POST", loginUser)
   }
 
   /**
@@ -949,13 +984,21 @@ export default class ApiClient {
 
   /**
    * 토큰 갱신
+   * @throws {RefreshTokenExpiredError} 리프레시 토큰이 만료되었거나 유효하지 않은 경우
+   * @throws {RefreshTokenNotFoundError} 리프레시 토큰이 존재하지 않는 경우 (로그아웃 상태)
+   * @throws {AuthError} 토큰 형식이 올바르지 않은 경우
+   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
    */
   public refreshToken(refreshToken: string) {
-    return this._request<RefreshTokenResponse, AuthError | InternalServerError>(
-      "/auth/refresh",
-      "POST",
-      { refreshToken }
-    )
+    return this._request<
+      RefreshTokenResponse,
+      | RefreshTokenExpiredError
+      | RefreshTokenNotFoundError
+      | AuthError
+      | UserNotApprovedError
+      | InternalServerError
+    >("/auth/refresh", "POST", { refreshToken })
   }
 }
 

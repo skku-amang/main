@@ -35,6 +35,7 @@ export class PrismaService
       this.logger.log(event)
     })
     this.$on("query", (event) => {
+      if (event.query === "SELECT 1") return
       this.logger.debug(event, "SQL Query")
     })
 

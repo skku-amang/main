@@ -5,11 +5,13 @@ import MonthBlock from "./MonthBlock"
 interface MonthCalendarFieldProps {
   currentMonday: Dayjs
   rentals: RentalDetail[]
+  onRentalClick?: (rental: RentalDetail) => void
 }
 
 export default function MonthCalendarField({
   currentMonday,
-  rentals
+  rentals,
+  onRentalClick
 }: MonthCalendarFieldProps) {
   const WeekLabelList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
@@ -49,6 +51,7 @@ export default function MonthCalendarField({
         days={daysInGrid}
         currentMonth={currentMonth}
         rentals={rentals}
+        onRentalClick={onRentalClick}
       />
     </div>
   )
