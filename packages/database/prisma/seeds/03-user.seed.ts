@@ -1,9 +1,9 @@
-import { PrismaClient } from "../../generated/prisma"
+import { Prisma, PrismaClient } from "../../generated/prisma"
 import * as bcrypt from "bcrypt"
 import { getRandomItem } from "./utils"
 
 const upsertUser = (
-  prisma: PrismaClient,
+  tx: Prisma.TransactionClient,
   data: {
     email: string
     password: string
@@ -16,7 +16,7 @@ const upsertUser = (
     sessionId: number
   }
 ) =>
-  prisma.user.upsert({
+  tx.user.upsert({
     where: { email: data.email },
     update: {},
     create: {
@@ -54,9 +54,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
 
   const hashedPassword = await bcrypt.hash(defaultPassword, 10)
 
-  console.log("Seeding Admin Users...")
-
-  const adminUsers = Array.from({ length: 5 }, (_, index) => {
+  const adminUserData = Array.from({ length: 5 }, (_, index) => {
     const userNumber = index + 1
     const nickname = `관리자${userNumber}`
     const email = `admin${userNumber}@g.skku.edu`
@@ -64,7 +62,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const session = getRandomItem(sessions)
     const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
-    return upsertUser(prisma, {
+    return {
       email,
       password: hashedPassword,
       name: nickname,
@@ -74,15 +72,10 @@ export const seedUsers = async (prisma: PrismaClient) => {
       isAdmin: true,
       generationId: generation.id,
       sessionId: session.id
-    })
+    }
   })
 
-  await Promise.all(adminUsers)
-  console.log("Seeding Admin Users completed.")
-
-  console.log("Seeding General Users...")
-
-  const generalUsers = Array.from({ length: 20 }, (_, index) => {
+  const generalUserData = Array.from({ length: 20 }, (_, index) => {
     const userNumber = index + 1
     const nickname = `사용자${userNumber}`
     const email = `user${userNumber}@g.skku.edu`
@@ -90,7 +83,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const session = getRandomItem(sessions)
     const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
-    return upsertUser(prisma, {
+    return {
       email,
       password: hashedPassword,
       name: nickname,
@@ -100,9 +93,16 @@ export const seedUsers = async (prisma: PrismaClient) => {
       isAdmin: false,
       generationId: generation.id,
       sessionId: session.id
-    })
+    }
   })
 
-  await Promise.all(generalUsers)
-  console.log("Seeding General Users completed.")
+  console.log("Seeding Users...")
+
+  await prisma.$transaction(async (tx) => {
+    for (const data of [...adminUserData, ...generalUserData]) {
+      await upsertUser(tx, data)
+    }
+  })
+
+  console.log("Seeding Users completed.")
 }
