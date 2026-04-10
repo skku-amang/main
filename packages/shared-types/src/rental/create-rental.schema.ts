@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { safeString } from "../constants/sanitization"
 
 /**
  * @description 대여 기록 원본 Zod 스키마
@@ -9,7 +10,7 @@ export const RentalSchema = z.object({
     .number({ invalid_type_error: "장비 ID는 숫자여야 합니다." })
     .int("장비 아이디는 정수여야 합니다.")
     .positive(),
-  title: z.string().min(1, "장비 대여 명은 필수입니다."),
+  title: safeString({ max: 100, message: "장비 대여 명은 필수입니다." }),
   startAt: z.coerce.date({
     required_error: "대여 시작 시간은 필수입니다."
   }),
