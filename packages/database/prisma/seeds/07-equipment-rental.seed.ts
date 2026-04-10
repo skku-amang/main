@@ -127,7 +127,7 @@ export const seedEquipmentRental = async (prisma: PrismaClient) => {
     }
   })
 
-  if (equipments) {
+  if (equipments.length > 0) {
     console.log("Seeding Equipment Rental Rental...")
     await Promise.all(
       equipments.map((equipment) =>
