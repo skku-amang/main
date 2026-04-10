@@ -6,3 +6,4 @@ namespace: amang-db-production
 
 resources:
   - ../../base
+  - sealed-credentials.yaml
