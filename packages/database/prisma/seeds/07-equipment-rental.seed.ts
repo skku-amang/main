@@ -7,7 +7,7 @@ import {
   getRandomItems
 } from "./utils"
 
-const generateSequentialRentals = async (
+const buildRentalOperations = (
   prisma: PrismaClient,
   equipment: Equipment,
   users: User[],
@@ -81,7 +81,7 @@ const generateSequentialRentals = async (
     currentTime = new Date(endAt)
   }
 
-  if (rentalOperation.length > 0) await prisma.$transaction(rentalOperation)
+  return rentalOperation
 }
 
 export const seedEquipmentRental = async (prisma: PrismaClient) => {
@@ -107,41 +107,24 @@ export const seedEquipmentRental = async (prisma: PrismaClient) => {
     }
   })
 
-  if (room) {
-    console.log("Seeding Amang Room Rental...")
-    await generateSequentialRentals(
-      prisma,
-      room,
-      users,
-      startDate,
-      endDate,
-      true
-    )
-
-    console.log("Seeding Amang Room completed.")
-  }
-
   const equipments = await prisma.equipment.findMany({
     where: {
       category: EquipCategory.MICROPHONE
     }
   })
 
-  if (equipments.length > 0) {
-    console.log("Seeding Equipment Rental Rental...")
-    await Promise.all(
-      equipments.map((equipment) =>
-        generateSequentialRentals(
-          prisma,
-          equipment,
-          users,
-          startDate,
-          endDate,
-          false
-        )
-      )
+  const allOperation = [
+    ...(room
+      ? buildRentalOperations(prisma, room, users, startDate, endDate, true)
+      : []),
+    ...equipments.flatMap((equip) =>
+      buildRentalOperations(prisma, equip, users, startDate, endDate, false)
     )
+  ]
 
-    console.log("Seeding Equipment Rental completed.")
-  }
+  console.log("Seeding Equipment Rental...")
+
+  if (allOperation.length > 0) await prisma.$transaction(allOperation)
+
+  console.log("Seeding Equipment Rental completed.")
 }
