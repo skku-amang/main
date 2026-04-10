@@ -83,13 +83,18 @@ const authOptions: NextAuthConfig = {
         return token
       }
 
+      // refreshToken이 없으면 갱신 불가 (비로그인 상태)
+      if (!token.refreshToken) {
+        return token
+      }
+
       // 토큰 갱신 시도
       try {
         const {
           accessToken,
           refreshToken: newRefreshToken,
           expiresIn
-        } = await refreshAccessToken(token?.refreshToken as string)
+        } = await refreshAccessToken(token.refreshToken as string)
         return {
           ...token,
           accessToken,
