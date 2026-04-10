@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { PASSWORD_REGEX } from "../constants/regex"
+import { safeString } from "../constants/sanitization"
 
 /**
  * @description 비밀번호 유효성 검사 정규식
@@ -20,8 +21,8 @@ export const CreateUserSchema = z
   .object({
     email: z.string().email({ message: "유효한 이메일 주소를 입력해주세요." }),
     password: passwordField,
-    name: z.string().min(1, { message: "이름은 비워둘 수 없습니다." }),
-    nickname: z.string().min(1, { message: "닉네임은 비워둘 수 없습니다." }),
+    name: safeString({ max: 50, message: "이름은 비워둘 수 없습니다." }),
+    nickname: safeString({ max: 30, message: "닉네임은 비워둘 수 없습니다." }),
     generationId: z
       .number({ invalid_type_error: "기수 ID는 숫자여야 합니다." })
       .int("기수 ID는 정수여야 합니다."),

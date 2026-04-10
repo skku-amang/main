@@ -1,10 +1,11 @@
 import z from "zod"
+import { safeString, safeNullableString } from "../constants/sanitization"
 
 export const PerformanceObjectSchema = z.object({
-  name: z.string().min(1, "공연 이름은 필수입니다."),
-  description: z.string().nullable().optional(),
-  posterImage: z.string().nullable().optional(),
-  location: z.string().nullable().optional(),
+  name: safeString({ max: 100, message: "공연 이름은 필수입니다." }),
+  description: safeNullableString({ max: 1000 }),
+  posterImage: z.string().url().nullable().optional(),
+  location: safeNullableString({ max: 200 }),
   startAt: z.coerce.date().nullable().optional(),
   endAt: z.coerce.date().nullable().optional()
 })

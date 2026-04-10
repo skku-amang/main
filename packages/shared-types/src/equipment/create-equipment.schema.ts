@@ -1,14 +1,15 @@
 import { z } from "zod"
 import { EquipCategory } from "@repo/database/enums"
+import { safeString, safeNullableString } from "../constants/sanitization"
 
 export const CreateEquipmentSchema = z.object({
-  brand: z.string().min(1, "장비 브랜드 명은 필수입니다."),
-  model: z.string().min(1, "장비 모델 명은 필수입니다."),
+  brand: safeString({ max: 100, message: "장비 브랜드 명은 필수입니다." }),
+  model: safeString({ max: 100, message: "장비 모델 명은 필수입니다." }),
   category: z.nativeEnum(EquipCategory, {
     required_error: "장비 카테고리는 필수입니다."
   }),
   isAvailable: z.boolean().optional(),
-  description: z.string().optional(),
+  description: safeNullableString({ max: 500 }),
   image: z.string().url().nullable().optional()
 })
 
