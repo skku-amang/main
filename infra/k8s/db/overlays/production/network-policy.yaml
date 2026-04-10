@@ -10,17 +10,17 @@ spec:
     - Ingress
   ingress:
     - from:
-        # amang API 서버
+        # amang API 서버 (production only)
         - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/part-of: amang
+              kubernetes.io/metadata.name: amang-api-production
           podSelector:
             matchLabels:
               app: api
-        # amang migrate/seed Job
+        # amang migrate/seed Job (production only)
         - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/part-of: amang
+              kubernetes.io/metadata.name: amang-api-production
           podSelector:
             matchLabels:
               app: api-job
