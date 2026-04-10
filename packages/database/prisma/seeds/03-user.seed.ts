@@ -1,6 +1,36 @@
-import { PrismaClient } from "../../generated/prisma"
+import { Prisma, PrismaClient } from "../../generated/prisma"
 import * as bcrypt from "bcrypt"
 import { getRandomItem } from "./utils"
+
+const upsertUser = (
+  tx: Prisma.TransactionClient,
+  data: {
+    email: string
+    password: string
+    name: string
+    nickname: string
+    bio: string
+    image: string
+    isAdmin: boolean
+    generationId: number
+    sessionId: number
+  }
+) =>
+  tx.user.upsert({
+    where: { email: data.email },
+    update: {},
+    create: {
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      nickname: data.nickname,
+      bio: data.bio,
+      image: data.image,
+      isAdmin: data.isAdmin,
+      generation: { connect: { id: data.generationId } },
+      sessions: { connect: { id: data.sessionId } }
+    }
+  })
 
 export const seedUsers = async (prisma: PrismaClient) => {
   const defaultPassword = process.env.SEED_DEFAULT_PASSWORD
@@ -24,9 +54,7 @@ export const seedUsers = async (prisma: PrismaClient) => {
 
   const hashedPassword = await bcrypt.hash(defaultPassword, 10)
 
-  console.log("Seeding Admin Users...")
-
-  const adminUsers = Array.from({ length: 5 }, (_, index) => {
+  const adminUserData = Array.from({ length: 5 }, (_, index) => {
     const userNumber = index + 1
     const nickname = `관리자${userNumber}`
     const email = `admin${userNumber}@g.skku.edu`
@@ -34,36 +62,20 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const session = getRandomItem(sessions)
     const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
-    return prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: nickname,
-        nickname: nickname,
-        bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
-        image,
-        isAdmin: true,
-        isApproved: true,
-        generation: {
-          connect: {
-            id: generation.id
-          }
-        },
-        sessions: {
-          connect: {
-            id: session.id
-          }
-        }
-      }
-    })
+    return {
+      email,
+      password: hashedPassword,
+      name: nickname,
+      nickname,
+      bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+      image,
+      isAdmin: true,
+      generationId: generation.id,
+      sessionId: session.id
+    }
   })
 
-  await Promise.all(adminUsers)
-  console.log("Seeding Admin Uers completed.")
-
-  console.log("Seeding General Users...")
-
-  const generalUsers = Array.from({ length: 20 }, (_, index) => {
+  const generalUserData = Array.from({ length: 20 }, (_, index) => {
     const userNumber = index + 1
     const nickname = `사용자${userNumber}`
     const email = `user${userNumber}@g.skku.edu`
@@ -71,30 +83,26 @@ export const seedUsers = async (prisma: PrismaClient) => {
     const session = getRandomItem(sessions)
     const image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(email)}`
 
-    return prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: nickname,
-        nickname: nickname,
-        bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
-        image,
-        isAdmin: false,
-        isApproved: true,
-        generation: {
-          connect: {
-            id: generation.id
-          }
-        },
-        sessions: {
-          connect: {
-            id: session.id
-          }
-        }
-      }
-    })
+    return {
+      email,
+      password: hashedPassword,
+      name: nickname,
+      nickname,
+      bio: `안녕하세요. 아망 ${generation.order / 2}기 ${nickname}입니다.`,
+      image,
+      isAdmin: false,
+      generationId: generation.id,
+      sessionId: session.id
+    }
   })
 
-  await Promise.all(generalUsers)
-  console.log("Seeding General Users completed.")
+  console.log("Seeding Users...")
+
+  await prisma.$transaction(async (tx) => {
+    for (const data of [...adminUserData, ...generalUserData]) {
+      await upsertUser(tx, data)
+    }
+  })
+
+  console.log("Seeding Users completed.")
 }

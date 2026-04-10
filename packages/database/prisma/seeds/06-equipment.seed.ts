@@ -2,20 +2,11 @@ import { PrismaClient } from "../../generated/prisma"
 import { EquipCategory } from "../../generated/prisma"
 
 export const seedEquipment = async (prisma: PrismaClient) => {
-  console.log("Seeding Amang Room...")
-
-  await prisma.equipment.create({
-    data: {
-      category: EquipCategory.ROOM,
-      brand: "AMANG",
-      model: "ROOM",
-      description: "아망의 동아리방입니다.",
-      image: "https://picsum.photos/200/300"
-    }
-  })
-  console.log("Seeding Amang Room completed.")
-
-  console.log("Seeding Equipment...")
+  const existing = await prisma.equipment.count()
+  if (existing > 0) {
+    console.log("Equipment already seeded, skipping.")
+    return
+  }
 
   const EQUIPMENT_DATA = [
     {
@@ -246,11 +237,26 @@ export const seedEquipment = async (prisma: PrismaClient) => {
     }
   ]
 
-  await prisma.equipment.createMany({
-    data: EQUIPMENT_DATA.map((equip) => ({
-      ...equip,
-      image: "https://picsum.photos/200/300"
-    }))
+  console.log("Seeding Equipment...")
+
+  await prisma.$transaction(async (tx) => {
+    await tx.equipment.create({
+      data: {
+        category: EquipCategory.ROOM,
+        brand: "AMANG",
+        model: "ROOM",
+        description: "아망의 동아리방입니다.",
+        image: "https://picsum.photos/200/300"
+      }
+    })
+
+    await tx.equipment.createMany({
+      data: EQUIPMENT_DATA.map((equip) => ({
+        ...equip,
+        image: "https://picsum.photos/200/300"
+      }))
+    })
   })
+
   console.log("Seeding Equipment completed.")
 }
