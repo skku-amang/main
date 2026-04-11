@@ -97,11 +97,17 @@ GitHub 이슈/PR의 `scope:` 라벨로 영역을 판정한다. 라벨이 SSOT이
 [examples/output.md](examples/output.md)의 형식과 규칙을 **정확히** 따른다.
 
 핵심 규칙:
-- **모든 이슈/PR/Sentry 이슈에 클릭 가능한 링크 필수**
-- `### > @이름` 토글 헤딩 구조 사용
-- 상태 아이콘: ✅ 완료, 🔧 진행 중, ⏸️ 미착수, ⚠️ 미해결
-- 정렬: ✅ → 🔧 → ⏸️ 순서
-- 직전 분배 항목: `← 직전(N차) 분배` 부기 (N은 직전 회의 차수)
+- **테이블 형식 사용**: `heading_3` 토글 안에 `table` 블록으로 항목 표시
+- **진행 상황 컬럼**: `#` | `내용` | `진행` | `중요도` | `링크` | `상세` (table_width=6)
+- **논의 안건 컬럼**: `#` | `내용` | `중요도` | `링크` | `상세` (table_width=5, 진행 컬럼 없음)
+- **Sentry 컬럼**: `상태` | `에러` | `프로젝트` | `이벤트` | `링크` | `처리` (table_width=6, 토글 없이 직접 table)
+- **중요도 기준**: 🔴 높음(Sentry·보안·미이행) / 🟡 보통(버그·진행 중·배포) / ⚪ 낮음(chore·리팩토링·제안)
+- **진행 아이콘**: ✅ 완료, 🔧 진행 중, ⏸️ 미착수, ⚠️ 미해결
+- **정렬**: ✅ → 🔧 → ⏸️ 순서
+- **링크 컬럼**: 이슈/PR 번호에 클릭 가능한 link 속성 필수, `#이슈 → PR #번호` 형태
+- **상세 컬럼**: 직전 분배 부기(`← N차 분배`), 상태 비고(OPEN 등), 한줄 설명
+- **빈 셀 처리**: 빈 셀도 `[{"type": "text", "text": {"content": ""}}]`로 채울 것 (400 에러 방지)
+- **1회 호출로 토글+테이블 생성**: `heading_3.children`에 `table`을 직접 포함하여 한 번에 생성
 
 ### 7단계: 사용자 확인
 
@@ -117,10 +123,15 @@ GitHub 이슈/PR의 `scope:` 라벨로 영역을 판정한다. 라벨이 SSOT이
 사용자가 승인하면 Notion MCP 도구로 현재 회의 페이지에 작성:
 
 - `mcp__amang-notion__API-patch-block-children`으로 블록 추가
-- `heading_3`은 `is_toggleable: true` + children으로 항목 삽입
+- 각 영역별 `heading_2` 뒤에 `heading_3` 토글(children에 `table` 포함)을 **1회 호출로** 삽입
+- `heading_3.children[0]`이 `table`, `table.children`이 `table_row` 배열
+- 모든 `table_row.cells` 배열 길이는 `table_width`와 정확히 일치해야 함
+- 빈 셀도 `[{"type": "text", "text": {"content": ""}}]`로 채움 (빈 배열·null 금지)
 - 이슈/PR 링크는 Notion rich text의 `link` 속성 사용
 - `@멘션`은 가능하면 Notion user mention 사용, 불가하면 plain text `@이름`
 - 특정 블록 뒤에 삽입할 때는 `after` 파라미터 사용
+- Sentry 테이블은 토글 없이 `heading_2` 바로 아래에 `table` 직접 삽입
+- 각 섹션(진행 상황/논의 안건/특이사항)을 **병렬 서브에이전트**로 동시 작성하여 속도 최적화
 
 ## 주의사항
 
