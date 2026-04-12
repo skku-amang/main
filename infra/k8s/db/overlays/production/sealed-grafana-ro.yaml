@@ -1,0 +1,20 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: grafana-ro-credentials
+  namespace: amang-db-production
+spec:
+  encryptedData:
+    DATABASE_URL: AgBiDX7NRXi4dGtcXxbM5yw/eDqNwUQ53ZS+VPBT99Sc+okVFcSN4Ng7zZ+SYWBRSgZuLoWlKwR9uWVU09s1YAo/Wzt94x7j8fAhN8GThmlnUTsEBt6iVKsQBptm3DFfX6OLUkFJSiVklrxvBo0WiZNHmBsosduZO26I61+aYRiZQfZIIh/+TCYoG+s41wtnP0mRoByiqcvgTF8kylJlXiUDZHBkDRnAWUlMzQEx7xVeEvdRbAiksHX3lxYJbN2MrwDDSW13JOia/Pzkfs/9o0uOpD1jVr+mv3HNbEpMI8DFimsjsLP4AG7QBKhqUk5u8T/eD8a/d0QHKivnL0i9Nj6v5/h6sYBvKLCWWp4vHYinG32zi6bj603j608YUtF9RWP1gFYYbPkmaIHfQ0CX7F629E5gk64mPRa1/ylWGgeUCVDXbOoR5l8p0gCqwCBQr+QqCEot06CMAZd3RMnaTx1aLme9uweHTMdlR+HJVfkpKNrUL4FHN0O8ZIuNIMYwQ8GWh8iFkJXaG/eZyIE3V+AspBGoDEWI2QPQVuqsbshOYrZdrEBjSmlBVICrm/PMbugDgLah2lUUnOOyFzQfGNb0PTutzAAvbXvr4ouTRVXPVqSRF8OvcjM6Rc4Cd3k0K2dQSFt2osrx4OhroGxh+FFHlCnBJJWW554o8pzxLo8V184WSR+sPuWgbPKIUyRSN8L3U+7ifZ0EUdnxFyihyFaCmiWE9nyunFVCM6gS4Ye69iKBOSTHeMl4bKjLIGsAzXurgX7uWOgM8dxtTraiQZ4uEfm/foy6UmA6R+uw4BhTcGFBIFOipRItEpXdYXzfNrW6BXwog4Ru4rlhVdc/wockKH79vUNuk+CKXW5Upqt+3RjVtbWFyA==
+    GRAFANA_RO_PASSWORD: AgC+kHH5tO/4FUna4+Lp34Gb5NhW1LGL/xjIVUN1wK3J+XiJHiSImV/FSbSZgNGhheydbdKyc2eTBaPp5f7W+uuWWNyfgdgMjxateGXECwAiV3Lr1Atq6q7WSn8i207MTHLLzZ16rQwu1Swqh+IF0HtB9F72/Ckdhzbc5f5H5LAYkEu3Fyxhs4dLjoBcnWi5JriAt0PW3FuPyTWA/0U2AOWQv+Jb/1jiRDp52hcBrO4jdRssg9rPA4hznysVObF6YmmebEVk/RHkmF7ubffZyyaRTyHRZjkuGUDVb+nTGeNxVxmsStX03UvUpFBV9QQCEgkbcvj+47Xjd15iyKCyi7A0SnnAvjg9o63Ukmgl4JujAz3KExYQAm6/qJeUcJGlx9HgeMhptRH0e0TTdu2ZWpPbNphzt0QVBwspy0I156qvJFY3JtR6wRQamqvIAurniULf7nNykNDSt3tIUAtDoz6YmIW1eL2KYWO7AbIj85XBSsdI2eIvx0+jGnDfI6QBmdJqOdcmJiql4OBnVBlVx5k6Ka5JmqpsB2oiUobKz7n9VPgTIc5mbWccqDCHtD145VbRhZoehVCWi6sQgsRIjDaQZvrOYSgK/5Jj3Ps3HolKuqkV8WgqzbxLnf6GAffClqW/wu+yeHBeyez5wS6zah2ebck3nI99hSxetITynpQ6bM0kLD3qjwfs/zIdzCuiXJom80JyMuRn0UcBWqpngOv0ulU7MvUJRqpdFqHreRWnYg==
+  template:
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: observability
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: observability
+      name: grafana-ro-credentials
+      namespace: amang-db-production
+    type: Opaque
