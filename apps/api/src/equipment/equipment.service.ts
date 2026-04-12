@@ -68,7 +68,7 @@ export class EquipmentService {
       })
 
       if (
-        "image" in updateEquipmentDto &&
+        updateEquipmentDto.image !== undefined &&
         oldImageUrl &&
         oldImageUrl !== updateEquipmentDto.image
       ) {

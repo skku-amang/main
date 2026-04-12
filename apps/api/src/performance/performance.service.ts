@@ -8,10 +8,14 @@ import {
   performanceFindOneInclude,
   performanceTeamsInclude
 } from "@repo/shared-types"
+import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 @Injectable()
 export class PerformanceService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly objectStorageService: ObjectStorageService
+  ) {}
 
   async create(createPerformanceDto: CreatePerformanceDto) {
     const performance = await this.prisma.performance.create({
@@ -57,6 +61,8 @@ export class PerformanceService {
     if (!performance)
       throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
 
+    const oldImageUrl = performance.image
+
     const startAt = updatePerformanceDto.startAt ?? performance.startAt
     const endAt = updatePerformanceDto.endAt ?? performance.endAt
 
@@ -71,6 +77,13 @@ export class PerformanceService {
         where: { id },
         data: updatePerformanceDto
       })
+
+      if (
+        updatePerformanceDto.image !== undefined &&
+        oldImageUrl &&
+        oldImageUrl !== updatePerformanceDto.image
+      )
+        this.objectStorageService.deleteObjectSafely(oldImageUrl)
 
       return this.findOne(id)
     } catch (error) {
