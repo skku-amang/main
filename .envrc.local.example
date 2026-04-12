@@ -15,3 +15,9 @@ export SENTRY_ACCESS_TOKEN=sntryu_xxx
 # Vercel: https://vercel.com/account/tokens 에서 토큰 생성
 # 빌드 로그 조회, 배포 상태 확인 등에 사용
 export VERCEL_TOKEN=vcp_xxx
+
+# Grafana MCP (https://grafana.json-server.win → Administration → Service accounts → Add service account token)
+# 설치: go install github.com/grafana/mcp-grafana/cmd/mcp-grafana@latest
+# TODO: 추후 MCP 전용 Service Account 분리 (현재는 개인 토큰 사용)
+export GRAFANA_URL=https://grafana.json-server.win
+export GRAFANA_SERVICE_ACCOUNT_TOKEN=glsa_xxx
