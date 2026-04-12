@@ -24,6 +24,10 @@ spec:
           podSelector:
             matchLabels:
               app: api-job
+        # DB 관리 Job (같은 ns 내, 예: grafana_ro 초기화)
+        - podSelector:
+            matchLabels:
+              app: api-job
         # CloudBeaver (DB 관리 UI)
         - namespaceSelector:
             matchLabels:
