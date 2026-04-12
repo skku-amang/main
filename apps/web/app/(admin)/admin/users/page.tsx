@@ -54,8 +54,14 @@ export default function UsersAdminPage() {
 
   const handleCellUpdate = useCallback(
     async (rowId: number, columnId: string, value: unknown) => {
+      const payload: Record<string, unknown> = {}
+      if (columnId === "generation") {
+        payload.generationId = Number(value)
+      } else {
+        payload[columnId] = value
+      }
       try {
-        await updateMutation.mutateAsync([rowId, { [columnId]: value }])
+        await updateMutation.mutateAsync([rowId, payload])
         toast({ title: "회원 정보가 수정되었습니다." })
         queryClient.invalidateQueries({ queryKey: ["users"] })
       } catch (error) {
