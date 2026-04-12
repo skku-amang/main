@@ -39,9 +39,16 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 각 항목에 대해 수집:
 
-- ID, 제목, 메시지, 스택트레이스 상위 10줄(에러의 경우), 피드백 본문(feedback의 경우)
-- 영향 유저 수, 이벤트 수, first_seen, last_seen
+- ID, 제목, 영향 유저 수, 이벤트 수, first_seen, last_seen
 - tags: url, browser, environment, release
+- 에러의 경우: 메시지, 스택트레이스 상위 10줄
+- **User Feedback의 경우**: `event.contexts.feedback.message` 필드(= 유저가 입력한 **원문**)를 사용. 이슈 `description` 필드는 Sentry가 AI로 자동 생성한 영문 요약이므로 **분류·제목 용도로 쓰지 말 것**. 원문은 대부분 한국어
+
+### 🌐 언어 주의
+
+amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘둘리지 말고 `feedback.message` 원문 기준으로:
+- 분류(💡 vs 📝) 판단
+- GH 이슈 제목 생성 시 원문 그대로 (또는 원문 요약) 사용 — 유저 목소리 번역 손실 방지
 
 ### 2. 자동 분류 (Classifier)
 
