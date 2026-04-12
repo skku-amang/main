@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing"
 import { PerformanceService } from "./performance.service"
 import { PrismaService } from "../prisma/prisma.service"
+import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 describe("PerformanceService", () => {
   let service: PerformanceService
@@ -20,6 +21,12 @@ describe("PerformanceService", () => {
               update: jest.fn(),
               delete: jest.fn()
             }
+          }
+        },
+        {
+          provide: ObjectStorageService,
+          useValue: {
+            deleteObjectSafely: jest.fn()
           }
         }
       ]
