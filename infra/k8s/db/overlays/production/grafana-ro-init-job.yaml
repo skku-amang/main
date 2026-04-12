@@ -1,0 +1,71 @@
+---
+# grafana_ro 역할 생성/업데이트 + SELECT 권한 부여
+# ArgoCD Sync 훅으로 실행, 멱등성 보장 (pg_roles 존재 여부 분기 + IF NOT EXISTS GRANT).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-grafana-ro-init
+  namespace: amang-db-production
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: api-job
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-grafana-ro
+          image: postgres:16.10-alpine
+          env:
+            - name: PGHOST
+              value: postgres-svc.amang-db-production.svc.cluster.local
+            - name: PGPORT
+              value: "5432"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: amang-db-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: amang-db-credentials
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: amang-db-credentials
+                  key: POSTGRES_DB
+            - name: GRAFANA_RO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-ro-credentials
+                  key: GRAFANA_RO_PASSWORD
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              export PGPASSWORD="$POSTGRES_PASSWORD"
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 <<'SQL'
+              DO $$
+              BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'grafana_ro') THEN
+                  CREATE ROLE grafana_ro LOGIN;
+                END IF;
+              END
+              $$;
+              SQL
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+                -v pw="$GRAFANA_RO_PASSWORD" \
+                -c "ALTER ROLE grafana_ro WITH PASSWORD :'pw';"
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 <<SQL
+              GRANT CONNECT ON DATABASE "$POSTGRES_DB" TO grafana_ro;
+              GRANT USAGE ON SCHEMA public TO grafana_ro;
+              GRANT SELECT ON ALL TABLES IN SCHEMA public TO grafana_ro;
+              ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO grafana_ro;
+              SQL
