@@ -60,7 +60,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       isSelfMade: initialData?.isSelfMade,
       description: initialData?.description || "",
       songYoutubeVideoUrl: initialData?.songYoutubeVideoUrl || "",
-      posterImage: initialData?.posterImage || ""
+      image: initialData?.image || ""
     }
   })
   function onFirstPageValid(formData: z.infer<typeof basicInfoSchema>) {
@@ -215,7 +215,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         isSelfMade: initialData.isSelfMade,
         description: initialData.description || "",
         songYoutubeVideoUrl: initialData.songYoutubeVideoUrl || "",
-        posterImage: initialData.posterImage || ""
+        image: initialData.image || ""
       })
       secondPageForm.reset(constructDefaultValues(initialData))
     }
@@ -310,7 +310,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         description: firstPageForm.getValues("description") || null,
         songYoutubeVideoUrl:
           firstPageForm.getValues("songYoutubeVideoUrl") || null,
-        posterImage: firstPageForm.getValues("posterImage") || null,
+        image: firstPageForm.getValues("image") || null,
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }
@@ -338,7 +338,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         description: firstPageForm.getValues("description") || null,
         songYoutubeVideoUrl:
           firstPageForm.getValues("songYoutubeVideoUrl") || null,
-        posterImage: firstPageForm.getValues("posterImage") || null,
+        image: firstPageForm.getValues("image") || null,
         isFreshmenFixed: firstPageForm.getValues("isFreshmenFixed") ?? false,
         isSelfMade: firstPageForm.getValues("isSelfMade") ?? false
       }

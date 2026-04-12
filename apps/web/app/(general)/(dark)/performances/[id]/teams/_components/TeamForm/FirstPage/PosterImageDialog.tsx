@@ -27,7 +27,7 @@ interface PosterImageDialogProps {
 function PosterImageDialog({ form }: PosterImageDialogProps) {
   const [open, setOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const currentImage = form.watch("posterImage")
+  const currentImage = form.watch("image")
 
   const {
     file,
@@ -40,14 +40,14 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
     reset
   } = useImageUpload({
     onSuccess: (publicUrl) => {
-      form.setValue("posterImage", publicUrl)
+      form.setValue("image", publicUrl)
       setOpen(false)
       reset()
     }
   })
 
   function handleRemove(): void {
-    form.setValue("posterImage", "")
+    form.setValue("image", "")
     reset()
   }
 
