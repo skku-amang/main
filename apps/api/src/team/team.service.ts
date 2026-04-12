@@ -145,7 +145,7 @@ export class TeamService {
       leaderId,
       memberSessions,
       description,
-      posterImage,
+      image,
       songYoutubeVideoUrl,
       ...scalarData
     } = updateTeamDto
@@ -245,7 +245,7 @@ export class TeamService {
         data: {
           ...scalarData,
           description: description ?? null,
-          posterImage: posterImage ?? null,
+          image: image ?? null,
           songYoutubeVideoUrl: songYoutubeVideoUrl ?? null,
           leader: { connect: { id: leaderId } }
         }
