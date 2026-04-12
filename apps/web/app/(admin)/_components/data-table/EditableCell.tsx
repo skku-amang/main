@@ -13,9 +13,10 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { useGenerations } from "@/hooks/api/useGeneration"
 import { useGetPresignedUrl } from "@/hooks/api/useUpload"
 import { useUsers } from "@/hooks/api/useUser"
-import { cn } from "@/lib/utils"
+import { cn, formatGenerationOrder } from "@/lib/utils"
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@repo/shared-types"
 
 import "./types"
@@ -160,6 +161,51 @@ function UserSelectCellEditor({
           <SelectValue />
         </SelectTrigger>
         <UserSelectContent users={users} allowNone={allowNone} />
+      </Select>
+      {isPending && (
+        <Loader2 className="absolute right-7 top-1/2 h-3 w-3 -translate-y-1/2 animate-spin text-muted-foreground" />
+      )}
+    </div>
+  )
+}
+
+// --- Generation select cell editor ---
+
+function GenerationSelectCellEditor({
+  value,
+  onSelect,
+  onCancel,
+  isPending
+}: {
+  value: string
+  onSelect: (value: string) => void
+  onCancel: () => void
+  isPending: boolean
+}) {
+  const { data: generations } = useGenerations()
+  const sorted = generations?.slice().sort((a, b) => b.order - a.order) ?? []
+
+  return (
+    <div className="absolute inset-0 z-10 flex items-center px-1">
+      <Select
+        defaultOpen
+        value={value}
+        onValueChange={onSelect}
+        onOpenChange={(open) => {
+          if (!open) onCancel()
+        }}
+        disabled={isPending}
+      >
+        <SelectTrigger className="h-7 text-sm">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {sorted.map((g) => (
+            <SelectItem key={g.id} value={g.id.toString()}>
+              {formatGenerationOrder(g.order)}기
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
       {isPending && (
         <Loader2 className="absolute right-7 top-1/2 h-3 w-3 -translate-y-1/2 animate-spin text-muted-foreground" />
@@ -503,6 +549,17 @@ function EditableCellInner({
         onCancel={handleCancel}
         isPending={isPending}
         allowNone
+      />
+    )
+  }
+
+  if (editable.type === "generation") {
+    return (
+      <GenerationSelectCellEditor
+        value={String(rawValue ?? "")}
+        onSelect={handleSelectSave}
+        onCancel={handleCancel}
+        isPending={isPending}
       />
     )
   }

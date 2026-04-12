@@ -99,15 +99,19 @@ export function getColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="기수" />
       ),
-      meta: { label: "기수" },
-      accessorFn: (row) => row.generation.order,
-      cell: ({ row }) => (
-        <Link
-          href={`${ROUTES.ADMIN.GENERATIONS}?rowId=${row.original.generation.id}`}
-          className="text-blue-600 hover:underline"
-        >
-          {formatGenerationOrder(row.original.generation.order)}기
-        </Link>
+      meta: { label: "기수", editable: { type: "generation" } },
+      accessorFn: (row) => row.generation.id,
+      sortingFn: (a, b) =>
+        a.original.generation.order - b.original.generation.order,
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            <span>
+              {formatGenerationOrder(ctx.row.original.generation.order)}기
+            </span>
+          }
+        />
       ),
       filterFn: (row, _columnId, filterValue) =>
         String(row.original.generation.order) === filterValue

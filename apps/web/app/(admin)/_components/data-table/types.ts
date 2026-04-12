@@ -16,7 +16,15 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string
     editable?: {
-      type: "text" | "number" | "date" | "select" | "boolean" | "image" | "user"
+      type:
+        | "text"
+        | "number"
+        | "date"
+        | "select"
+        | "boolean"
+        | "image"
+        | "user"
+        | "generation"
       step?: number
       displayTransform?: (v: number) => string
       saveTransform?: (v: number) => number
