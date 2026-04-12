@@ -8,5 +8,4 @@ resources:
   - ../../base
   - sealed-credentials.yaml
   - sealed-grafana-ro.yaml
-  - grafana-ro-init-job.yaml
   - network-policy.yaml
