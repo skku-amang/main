@@ -79,7 +79,7 @@ export class PerformanceService {
       })
 
       if (
-        "image" in updatePerformanceDto &&
+        updatePerformanceDto.image !== undefined &&
         oldImageUrl &&
         oldImageUrl !== updatePerformanceDto.image
       )
