@@ -61,7 +61,7 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 | 라벨 | 액션 |
 | --- | --- |
-| 🔥 | `gh issue create` — `kind: bug` + `priority: critical` + `from: sentry` 또는 `from: user-feedback`. body는 [issue-template.md](issue-template.md) 적용. **제목은 자연어** (CC 포맷 금지) |
+| 🔥 | `gh issue create` — `kind: bug` + `priority: critical` + `from: sentry` 또는 `from: user-feedback`. body는 [.github/ISSUE_TEMPLATE/sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md) 적용. **제목은 자연어** (CC 포맷 금지) |
 | 📝 | `gh issue create` — `kind: bug` + `priority: high`(영향 유저 ≥3) 또는 `priority: low` + `from:*` |
 | 👀 | Sentry MCP `update_issue`로 `triaged` + `observing` 태그 부착만 |
 | 🚫 | **출력만** — "Sentry 웹에서 Archive 권장" 메시지. 자동 실행 안 함 |
