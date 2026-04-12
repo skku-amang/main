@@ -90,7 +90,7 @@ const TeamDetailClient = () => {
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-[93%] flex-col gap-y-5 md:w-[466px] md:shrink-0 md:gap-y-[24px]">
           <BasicInfo team={team} canEdit={canEdit} />
-          {team.posterImage && <PosterImage src={team.posterImage} />}
+          {team.image && <PosterImage src={team.image} />}
         </div>
 
         {/* 세션 구성 */}

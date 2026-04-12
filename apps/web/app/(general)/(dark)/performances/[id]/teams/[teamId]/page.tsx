@@ -17,10 +17,10 @@ function getYoutubeThumbnail(url: string): string | null {
 }
 
 function getOgImage(
-  team: { posterImage?: string | null; songYoutubeVideoUrl?: string | null },
+  team: { image?: string | null; songYoutubeVideoUrl?: string | null },
   alt: string
 ) {
-  if (team.posterImage) return { url: team.posterImage, alt }
+  if (team.image) return { url: team.image, alt }
   if (team.songYoutubeVideoUrl) {
     const thumb = getYoutubeThumbnail(team.songYoutubeVideoUrl)
     if (thumb) return { url: thumb, alt }
