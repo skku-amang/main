@@ -65,7 +65,7 @@ const FirstPage = ({
 
   // 모바일 포스터 이미지 업로드
   const poster = useImageUpload({
-    onSuccess: (publicUrl) => form.setValue("posterImage", publicUrl)
+    onSuccess: (publicUrl) => form.setValue("image", publicUrl)
   })
 
   return (
@@ -320,7 +320,7 @@ const FirstPage = ({
                 type="button"
                 onClick={() => {
                   poster.reset()
-                  form.setValue("posterImage", "")
+                  form.setValue("image", "")
                 }}
               >
                 <Trash2 size={18} className="text-gray-400" />
@@ -342,7 +342,7 @@ const FirstPage = ({
               type="button"
               onClick={() => {
                 poster.reset()
-                form.setValue("posterImage", "")
+                form.setValue("image", "")
               }}
             >
               <Trash2 size={18} className="text-gray-400" />
@@ -379,17 +379,16 @@ const FirstPage = ({
         )}
 
         {/* 미리보기 */}
-        {!poster.isUploading &&
-          (poster.preview || form.getValues("posterImage")) && (
-            <div className="relative mt-2 aspect-[3/4] w-full overflow-hidden rounded-lg">
-              <Image
-                src={poster.preview || form.getValues("posterImage") || ""}
-                alt="포스터 미리보기"
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
+        {!poster.isUploading && (poster.preview || form.getValues("image")) && (
+          <div className="relative mt-2 aspect-[3/4] w-full overflow-hidden rounded-lg">
+            <Image
+              src={poster.preview || form.getValues("image") || ""}
+              alt="포스터 미리보기"
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
 
         <input
           ref={poster.inputRef}

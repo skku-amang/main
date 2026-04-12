@@ -98,7 +98,7 @@ model Performance {
 
   name        String // 공연 이름
   description String? // 공연 설명
-  posterImage String? // 대표 이미지 URL
+  image       String? // 대표 이미지 URL
   location    String? // 공연 장소
   startAt     DateTime? // 공연 시작 일시
   endAt       DateTime? // 공연 종료 일시
@@ -116,7 +116,7 @@ model Team {
 
   name                String // 팀 이름
   description         String? // 팀 설명
-  posterImage         String? // 포스터 이미지 URL
+  image               String? // 포스터 이미지 URL
   songName            String // 곡 제목
   songArtist          String // 곡 아티스트
   isFreshmenFixed     Boolean @default(false) // 신입생 고정 여부

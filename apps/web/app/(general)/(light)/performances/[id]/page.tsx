@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: `${title} | AMANG`,
         description,
-        images: performance.posterImage
-          ? [{ url: performance.posterImage, alt: title }]
+        images: performance.image
+          ? [{ url: performance.image, alt: title }]
           : [{ url: SEO.DEFAULT_OG_IMAGE, alt: SEO.SITE_NAME }]
       }
     }

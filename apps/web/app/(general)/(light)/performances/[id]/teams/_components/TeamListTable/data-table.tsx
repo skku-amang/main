@@ -535,7 +535,7 @@ export function TeamListDataTable<TValue>({
                   songArtist={row.original.songArtist}
                   isFreshmenFixed={row.original.isFreshmenFixed}
                   isSelfMade={row.original.isSelfMade}
-                  image={row.original.posterImage}
+                  image={row.original.image}
                   leader={row.original.leader}
                   missingTeamSessions={missingMemberSessions(
                     row.original.teamSessions

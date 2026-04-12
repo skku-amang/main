@@ -17,7 +17,7 @@ export const CreateTeamSchema = z.object({
   description: z.string().nullable().optional(),
   leaderId: z.number().int().positive("팀 리더 ID는 정수여야 합니다."),
   performanceId: z.number().int("공연 ID는 정수여야 합니다.").positive(),
-  posterImage: z
+  image: z
     .string()
     .url("포스터 이미지 URL은 유효한 URL이어야 합니다.")
     .nullable()

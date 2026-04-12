@@ -50,7 +50,7 @@ const PerformanceListClient = () => {
               key={p.id}
               id={p.id}
               name={p.name}
-              posterSrc={p.posterImage}
+              posterSrc={p.image}
               location={p.location}
               startAt={p.startAt}
             />

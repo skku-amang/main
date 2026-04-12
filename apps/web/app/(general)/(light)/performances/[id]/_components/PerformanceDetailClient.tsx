@@ -113,7 +113,7 @@ const PerformanceDetailClient = () => {
         <div className="w-full shrink-0 md:w-[400px]">
           <PosterImage
             alt={`${performance.name} 포스터`}
-            src={performance.posterImage}
+            src={performance.image}
           />
         </div>
 

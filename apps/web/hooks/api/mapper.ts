@@ -311,7 +311,7 @@ type TestPerformance = MapperResult<
 //   name: string,            // 원본 유지
 //   description: string,     // 원본 유지
 //   location: string,        // 원본 유지
-//   posterImage: string,     // 원본 유지
+//   image: string,           // 원본 유지
 //   startAt: Date | null,    // string → Date로 변환됨
 //   endAt: Date | null,      // string → Date로 변환됨
 //   createdAt: Date,         // string → Date로 변환됨

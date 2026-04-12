@@ -114,16 +114,16 @@ export function getColumns(
         row.original.songArtist === filterValue
     },
     {
-      accessorKey: "posterImage",
+      accessorKey: "image",
       header: "포스터",
       meta: { label: "포스터", editable: { type: "image" } },
       cell: (ctx) => (
         <EditableCell
           cellContext={ctx}
           displayValue={
-            ctx.row.original.posterImage ? (
+            ctx.row.original.image ? (
               <img
-                src={ctx.row.original.posterImage}
+                src={ctx.row.original.image}
                 alt="포스터"
                 className="h-10 w-8 rounded object-cover"
               />
