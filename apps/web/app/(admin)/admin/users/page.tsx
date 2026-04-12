@@ -98,12 +98,19 @@ export default function UsersAdminPage() {
     name: string
     nickname: string
     bio?: string
+    image?: string | null
+    generationId: number
     sessions: number[]
   }) => {
     if (!editing) return
 
+    const payload = {
+      ...data,
+      image: data.image ?? undefined
+    }
+
     updateMutation
-      .mutateAsync([editing.id, data])
+      .mutateAsync([editing.id, payload])
       .then(() => {
         toast({ title: "회원 정보가 수정되었습니다." })
         queryClient.invalidateQueries({ queryKey: ["users"] })
