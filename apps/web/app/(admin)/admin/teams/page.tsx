@@ -109,7 +109,7 @@ export default function TeamsAdminPage() {
       songArtist: team.songArtist,
       isFreshmenFixed: team.isFreshmenFixed,
       isSelfMade: team.isSelfMade,
-      posterImage: team.posterImage,
+      image: team.image,
       songYoutubeVideoUrl: team.songYoutubeVideoUrl,
       memberSessions: team.teamSessions.map((ts) => ({
         sessionId: ts.sessionId,
