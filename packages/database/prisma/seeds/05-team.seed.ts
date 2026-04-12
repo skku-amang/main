@@ -54,7 +54,7 @@ export const seedTeam = async (prisma: PrismaClient) => {
           data: {
             name: `${performance.name} ${teamNumber}팀`,
             description: `${performance.name} ${teamNumber}팀입니다.`,
-            posterImage: "https://picsum.photos/200/300",
+            image: "https://picsum.photos/200/300",
             songName: isSelfMade
               ? `자작곡 ${teamNumber}`
               : `커버곡 ${teamNumber}`,
