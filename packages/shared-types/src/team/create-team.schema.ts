@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { safeString, safeNullableString } from "../constants/sanitization"
 import { isValidYoutubeUrl } from "./youtube"
 
 export const TeamSessionSchema = z.object({
@@ -13,8 +14,8 @@ export const TeamSessionSchema = z.object({
 })
 
 export const CreateTeamSchema = z.object({
-  name: z.string().min(1, "팀 이름은 필수입니다."),
-  description: z.string().nullable().optional(),
+  name: safeString({ max: 100, message: "팀 이름은 필수입니다." }),
+  description: safeNullableString({ max: 500 }),
   leaderId: z.number().int().positive("팀 리더 ID는 정수여야 합니다."),
   performanceId: z.number().int("공연 ID는 정수여야 합니다.").positive(),
   posterImage: z
@@ -22,8 +23,8 @@ export const CreateTeamSchema = z.object({
     .url("포스터 이미지 URL은 유효한 URL이어야 합니다.")
     .nullable()
     .optional(),
-  songName: z.string().min(1, "노래 이름은 필수입니다."),
-  songArtist: z.string().min(1, "노래 아티스트는 필수입니다."),
+  songName: safeString({ max: 200, message: "노래 이름은 필수입니다." }),
+  songArtist: safeString({ max: 100, message: "노래 아티스트는 필수입니다." }),
   isFreshmenFixed: z.boolean().default(false),
   isSelfMade: z.boolean().default(false),
   songYoutubeVideoUrl: z
