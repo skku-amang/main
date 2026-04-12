@@ -13,7 +13,7 @@
 
 이슈/PR 라벨은 **제목으로 표현할 수 없는 메타데이터**만 담습니다. `type:` / `scope:`는 Conventional Commits 제목(`fix(web): ...`)으로 표현되므로 라벨로 중복 관리하지 않습니다.
 
-라벨 자체는 [`scripts/setup-labels.sh`](scripts/setup-labels.sh)로 선언적 관리되며, 이 스크립트가 SSOT입니다. 수동 생성·수정 금지.
+아래 "라벨 매니페스트" 섹션이 **단일 정의(SSOT)** 입니다. GitHub 레포의 라벨은 이 표에 맞춰 관리합니다 (추가/변경 시 GitHub UI 또는 `gh label` 명령으로 직접 적용).
 
 ### 축별 라벨
 
@@ -41,12 +41,34 @@
 - 머지 순서 중요하면 `priority:*`
 - 리뷰·배포 블로킹 상태면 `status:*`
 
+### 라벨 매니페스트
+
+| 이름                  | 색상   | 설명                                        |
+| --------------------- | ------ | ------------------------------------------- |
+| kind: bug             | 3B82F6 | 버그 — 작동하지 않거나 기대와 다르게 동작   |
+| kind: enhancement     | 60A5FA | 기능 추가 또는 기존 기능 개선               |
+| kind: question        | 93C5FD | 질문 — 사용법 / 안내 요청                   |
+| kind: task            | BFDBFE | 일반 작업 (리팩토링, 문서, 의존성 등)       |
+| priority: critical    | B91C1C | 즉시 수정 필요 (프로덕션 장애 / 다수 영향)  |
+| priority: high        | DC2626 | 이번 스프린트 내 처리                       |
+| priority: low         | FCA5A5 | 여유 있을 때 처리                           |
+| status: needs-triage  | FBBF24 | 트리아지 대기                               |
+| status: observing     | FCD34D | 재발 모니터링 중                            |
+| status: confirmed     | FDE68A | 재현 확인됨                                 |
+| status: blocked       | F59E0B | 진행 불가 — 외부 의존성 대기                |
+| from: sentry          | 10B981 | Sentry 자동 유입                            |
+| from: user-feedback   | 34D399 | 유저 피드백                                 |
+| resolution: duplicate | 9CA3AF | 중복                                        |
+| resolution: wontfix   | 6B7280 | 수정하지 않음                               |
+| resolution: invalid   | D1D5DB | 유효하지 않음                               |
+| good first issue      | 7C3AED | 첫 기여자에게 적합                          |
+| help wanted           | 8B5CF6 | 컨트리뷰션 환영                             |
+
 ### 라벨 변경이 필요할 때
 
-1. [`scripts/setup-labels.sh`](scripts/setup-labels.sh)의 `LABELS` 배열을 수정
-2. 이 문서의 표도 함께 업데이트
-3. `./scripts/setup-labels.sh`로 동기화
-4. 위 변경사항을 하나의 PR로 커밋
+1. 위 매니페스트 표를 수정
+2. GitHub Settings → Labels 또는 `gh label create/edit` 명령으로 레포에 반영
+3. 변경사항을 PR로 커밋
 
 ## 이슈 컨벤션
 
