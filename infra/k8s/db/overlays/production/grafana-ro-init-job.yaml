@@ -60,9 +60,9 @@ spec:
               END
               $$;
               SQL
-              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
-                -v pw="$GRAFANA_RO_PASSWORD" \
-                -c "ALTER ROLE grafana_ro WITH PASSWORD :'pw';"
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 <<SQL
+              ALTER ROLE grafana_ro WITH PASSWORD '$GRAFANA_RO_PASSWORD';
+              SQL
               psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 <<SQL
               GRANT CONNECT ON DATABASE "$POSTGRES_DB" TO grafana_ro;
               GRANT USAGE ON SCHEMA public TO grafana_ro;
