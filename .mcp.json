@@ -26,6 +26,10 @@
     "amang-figma": {
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
+    },
+    "amang-grafana": {
+      "command": "direnv",
+      "args": ["exec", ".", "mcp-grafana"]
     }
   }
 }
