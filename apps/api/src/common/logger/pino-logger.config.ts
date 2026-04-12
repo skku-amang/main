@@ -42,7 +42,12 @@ export const pinoLoggerModuleOption: Params = {
       return mergeObject
     },
     customProps(req: any) {
-      const token = req.headers?.authorization?.split(" ")[1]
+      let token = req.headers?.authorization?.split(" ")[1]
+
+      if (!token) {
+        token = req.body?.refreshToken
+      }
+
       const payload = token ? jwtService.decode<JwtPayload>(token) : null
 
       return payload
