@@ -25,21 +25,23 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - 환경: `production`
 - 상태: `unresolved`
 - 기간: 최근 7일
-- 에러 이슈만 (User Feedback은 별도, 아래 참고)
 
 사용자가 인자로 오버라이드 가능 (예: "dev 환경 14일치"). 파라미터를 파싱해 조회 범위 조정.
 
-`amang-sentry` MCP의 `list_issues` 및 관련 도구 사용. 각 항목에 대해 수집:
+**두 번 호출 — 에러 이슈와 User Feedback은 별도 쿼리**:
 
-- ID, 제목, 메시지, 스택트레이스 상위 10줄
+1. **에러 이슈**: `list_issues(query="is:unresolved environment:production lastSeen:-7d")`
+2. **User Feedback**: `list_issues(query="issue.category:feedback is:unresolved")`
+   - Sentry가 Feedback Widget 제출을 `category=feedback` 이슈로 저장하므로 `list_events`가 아닌 `list_issues`로 조회
+   - 환경·기간 필터는 필요에 따라 추가
+
+두 결과를 합쳐 단일 큐로 처리. Classifier는 항목의 `category`가 `feedback`이면 먼저 💡 기능 요청 기준 검사 → 버그면 일반 플로우로 분기.
+
+각 항목에 대해 수집:
+
+- ID, 제목, 메시지, 스택트레이스 상위 10줄(에러의 경우), 피드백 본문(feedback의 경우)
 - 영향 유저 수, 이벤트 수, first_seen, last_seen
 - tags: url, browser, environment, release
-
-**User Feedback 조회 — 현재 MCP 미지원**:
-
-`amang-sentry` MCP에는 User Feedback 전용 도구가 없습니다 (`has:user_feedback`, `issue.category:feedback` 쿼리 모두 결과 없음). 따라서 현재 스킬은 **에러 이슈만** 처리하며, 💡 기능 요청 트랙은 실질적으로 활성화되지 않은 상태.
-
-추후 해결 경로: (a) Sentry MCP에 user_feedback 리스팅 도구 추가 이슈 등록, 또는 (b) `curl` + `SENTRY_AUTH_TOKEN`으로 `/api/0/organizations/{org}/user-feedback/` 직접 호출하는 보조 스크립트. 현 시점에선 유저 피드백이 들어오면 사용자가 직접 공유하는 방식으로 진행.
 
 ### 2. 자동 분류 (Classifier)
 
