@@ -25,7 +25,7 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - 환경: `production`
 - 상태: `unresolved`
 - 기간: 최근 7일
-- 이슈 + User Feedback 모두
+- 에러 이슈만 (User Feedback은 별도, 아래 참고)
 
 사용자가 인자로 오버라이드 가능 (예: "dev 환경 14일치"). 파라미터를 파싱해 조회 범위 조정.
 
@@ -34,7 +34,12 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - ID, 제목, 메시지, 스택트레이스 상위 10줄
 - 영향 유저 수, 이벤트 수, first_seen, last_seen
 - tags: url, browser, environment, release
-- 연결된 User Feedback (있을 경우 원문)
+
+**User Feedback 조회 — 현재 MCP 미지원**:
+
+`amang-sentry` MCP에는 User Feedback 전용 도구가 없습니다 (`has:user_feedback`, `issue.category:feedback` 쿼리 모두 결과 없음). 따라서 현재 스킬은 **에러 이슈만** 처리하며, 💡 기능 요청 트랙은 실질적으로 활성화되지 않은 상태.
+
+추후 해결 경로: (a) Sentry MCP에 user_feedback 리스팅 도구 추가 이슈 등록, 또는 (b) `curl` + `SENTRY_AUTH_TOKEN`으로 `/api/0/organizations/{org}/user-feedback/` 직접 호출하는 보조 스크립트. 현 시점에선 유저 피드백이 들어오면 사용자가 직접 공유하는 방식으로 진행.
 
 ### 2. 자동 분류 (Classifier)
 
