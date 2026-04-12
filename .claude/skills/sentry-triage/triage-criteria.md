@@ -18,6 +18,8 @@
 - 에러 타입이 알려진 무해: `ChunkLoadError`, `AbortError`, `ResizeObserver loop limit exceeded`, `Network request failed`(취소 컨텍스트)
 - User-Agent에 봇 패턴: `bot`, `crawler`, `spider`, `HeadlessChrome`(테스트 외)
 - 개발 환경(`environment: development` 또는 `local`)
+- **스택트레이스 전체가 서드파티 코드에서만 발생**: `_next-live/feedback/*`(Vercel Live Feedback), `_next/static/chunks/*`에서만 발생하고 우리 소스(`apps/web/**`, `apps/api/**`)는 한 프레임도 포함 안 됨 → 라이브러리 버그, 우리 소관 아님
+- `mechanism: auto.browser.browserapierrors.*` 태그가 붙은 자동 수집 브라우저 API 에러 (대개 사용자 조작 잡음)
 
 ## 💡 기능 요청 (User Feedback 전용)
 
