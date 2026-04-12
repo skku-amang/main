@@ -23,10 +23,14 @@ import {
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
+import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 @Injectable()
 export class TeamService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly objectStorageService: ObjectStorageService
+  ) {}
   async create(createTeamDto: CreateTeamDto) {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
@@ -157,6 +161,8 @@ export class TeamService {
     if (!existingTeam)
       throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
 
+    const oldImageUrl = existingTeam.image
+
     const prismaOperaions: Prisma.PrismaPromise<any>[] = []
 
     // 기존 세션과 새로운 세션 비교
@@ -255,6 +261,10 @@ export class TeamService {
     try {
       if (prismaOperaions.length > 0)
         await this.prisma.$transaction(prismaOperaions)
+
+      if (image !== undefined && oldImageUrl && oldImageUrl !== image)
+        this.objectStorageService.deleteObjectSafely(oldImageUrl)
+
       return this.findOne(id)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
