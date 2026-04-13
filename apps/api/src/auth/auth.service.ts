@@ -13,6 +13,9 @@ import { createHash, timingSafeEqual } from "crypto"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { UsersService } from "../users/users.service"
+
+const REFRESH_TOKEN_GRACE_PERIOD_MS = 30_000
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -109,17 +112,33 @@ export class AuthService {
 
     const incomingHash = createHash("sha256").update(refreshToken).digest("hex")
 
-    if (incomingHash.length !== user.hashedRefreshToken.length)
-      throw new RefreshTokenExpiredError("리프레시 토큰이 유효하지 않습니다.")
-
-    const refreshTokenMatches = timingSafeEqual(
-      Buffer.from(incomingHash),
-      Buffer.from(user.hashedRefreshToken)
-    )
-    if (!refreshTokenMatches) {
-      throw new RefreshTokenExpiredError(
-        "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+    const matchesCurrent =
+      incomingHash.length === user.hashedRefreshToken.length &&
+      timingSafeEqual(
+        Buffer.from(incomingHash),
+        Buffer.from(user.hashedRefreshToken)
       )
+
+    if (!matchesCurrent) {
+      const withinGracePeriod =
+        user.previousHashedRefreshToken &&
+        user.refreshTokenRotatedAt &&
+        Date.now() - user.refreshTokenRotatedAt.getTime() <
+          REFRESH_TOKEN_GRACE_PERIOD_MS
+
+      const matchesPrevious =
+        withinGracePeriod &&
+        incomingHash.length === user.previousHashedRefreshToken!.length &&
+        timingSafeEqual(
+          Buffer.from(incomingHash),
+          Buffer.from(user.previousHashedRefreshToken!)
+        )
+
+      if (!matchesPrevious) {
+        throw new RefreshTokenExpiredError(
+          "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+        )
+      }
     }
 
     const tokens = await this.getTokens(
