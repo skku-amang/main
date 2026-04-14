@@ -140,7 +140,7 @@ export default function RentalDetailModal({
               {rental.users.map((user) => (
                 <div
                   key={user.id}
-                  className="flex flex-1 min-w-[120px] basis-[140px] items-center gap-1 rounded-lg border px-2 py-1.5"
+                  className="flex w-[140px] items-center gap-1 rounded-lg border px-2 py-1.5"
                   style={{
                     borderColor: "rgba(197, 197, 197, 0.5)",
                     borderWidth: "0.5px"
