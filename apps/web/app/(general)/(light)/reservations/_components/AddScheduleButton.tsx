@@ -309,7 +309,13 @@ export default function AddScheduleButton({
                 <Calendar
                   mode="single"
                   selected={startDate}
-                  onSelect={setStartDate}
+                  onSelect={(date) => {
+                    setStartDate(date)
+                    // 종료일이 비어있거나 시작일보다 이전이면 자동으로 시작일과 동일하게 맞춤
+                    if (date && (!endDate || endDate < date)) {
+                      setEndDate(date)
+                    }
+                  }}
                   disabled={disablePastDates}
                   className="rounded-md border p-1"
                   classNames={{
