@@ -3,7 +3,7 @@ import { z } from "zod"
 
 /**
  * @description 세션 생성 Zod 스키마
- * 세션 이름과 아이콘, 팀장 ID를 포함합니다.
+ * 세션 이름과 아이콘, 세션장 ID를 포함합니다.
  */
 export const CreateSessionSchema = z
   .object({
@@ -19,8 +19,8 @@ export const CreateSessionSchema = z
       .optional(),
 
     leaderId: z
-      .number({ invalid_type_error: "팀장 ID는 숫자여야 합니다." })
-      .int("팀장 ID는 정수여야 합니다.")
+      .number({ invalid_type_error: "세션장 ID는 숫자여야 합니다." })
+      .int("세션장 ID는 정수여야 합니다.")
       .optional()
   })
   .strict()
