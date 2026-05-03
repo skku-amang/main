@@ -21,7 +21,8 @@ argument-hint: "[이전 회의 노션 URL (생략 시 자동 탐색)]"
 - **Notion 회의록 DB**: `29a779af-a9b3-44a1-954a-bc780abc9cfc` / data_source_id `34d38c39-7d5d-4862-b061-46f226a3da31` (이름: "일정")
 - **GitHub 레포**: `skku-amang/main`
 - **Sentry org**: `amang-23` (프로젝트: web, api)
-- **작업 영역 분류**: 기획, 디자인, 프론트, 백엔드, 인프라, AX(AI Experience) — `scope:` 라벨이 SSOT
+- **개념 영역 (보고서 분류)**: 기획·디자인·프론트·백엔드·인프라·AX(AI Experience) — 보고서에서 본인 영역 구분용
+- **GitHub 라벨 정책 (2026-04 재편 후)**: `type:` / `scope:` 라벨 폐지. 영역은 **PR 제목의 Conventional Commits scope**(`fix(web): ...`)와 변경 파일 경로로 판정. 라벨은 `kind:`/`priority:`/`from:`/`resolution:` 4축만 (이슈 위주) — 영역 판정에 사용 안 함. 정책 SSOT는 [CONTRIBUTING.md](file:///home/json/amang-worktrees/main/CONTRIBUTING.md)
 
 ## 실행 단계
 
@@ -77,11 +78,25 @@ PR body에서 `#숫자` 패턴으로 연결 이슈 추출.
 - 같은 기간 resolved 이슈도 포함 (PR 매핑용)
 - 이벤트 1-2건 노이즈는 생략 가능
 
-### 5단계: 영역별 분류
+### 5단계: 영역별 분류 (CC 제목 + 변경 파일 경로 기반)
 
-`scope:` 라벨 그대로 사용 (frontend/backend/infra/ax/design/planning).
+GitHub `scope:` 라벨이 폐지(2026-04 재편)되었으므로 영역은 다음 순서로 판정한다.
 
-라벨 누락된 항목은 "추정" 표시 후 본인 영역 추정. 회의 준비 보고서에 **"라벨 누락 PR 목록"**을 별도 표시 — 라벨 보강이 필요한 항목.
+1. **PR 제목의 CC scope** (`fix(web): ...` 형태)
+   - `web` → 프론트
+   - `api` → 백엔드
+   - `db`, `types`, `api-client`, `ui` → 백엔드
+   - `infra` → 인프라
+2. **CC scope 없거나 모호하면 변경 파일 경로로 추정**
+   - `apps/web/**` → 프론트
+   - `apps/api/**`, `packages/database/**`, `packages/shared-types/**`, `packages/api-client/**`, `packages/ui/**` → 백엔드
+   - `infra/**`, `k8s/**`, `*.tf`, `Dockerfile*`, `.github/workflows/**` → 인프라
+   - `.claude/**`, `docs/superpowers/**`, `scripts/**` → AX/도구 (보고서에선 AX 섹션)
+3. **CC 형식 위반 PR**: 별도 섹션 "⚠️ CC 형식 위반 PR"로 표시 — 제목 정정 권장
+
+`kind:` / `priority:` / `from:` / `resolution:` 라벨은 영역 판정에 사용 안 함. 다만 `priority: high`/`critical`은 보고서에서 중요도 🔴 가산점에 활용 가능.
+
+이슈는 PR과 달리 CC 형식 안 따름(자연어 제목). 이슈 영역은 본인 assignee 여부 + 본문 내용 + 라벨(`kind:` 등)로 추정.
 
 ### 6단계: 텍스트 보고서 출력
 
@@ -95,7 +110,7 @@ PR body에서 `#숫자` 패턴으로 연결 이슈 추출.
 - **진행 아이콘**: ✅ 완료 / 🔧 진행 중 / ⏸️ 미착수 / ⚠️ 미해결
 - **정렬**: ✅ → 🔧 → ⏸️ → ⚠️
 - **이슈-PR 연결**: `#이슈 → PR #번호` 형태
-- **Insight 섹션**: 패턴(예: 미이행 작업, 라벨 누락, 영역 편중)을 뽑아 회의에서 짚을 만한 포인트 1-3개 제시
+- **Insight 섹션**: 패턴(예: 미이행 작업, CC 형식 위반, 영역 편중)을 뽑아 회의에서 짚을 만한 포인트 1-3개 제시
 
 ### 7단계: 마무리
 
