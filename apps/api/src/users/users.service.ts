@@ -249,7 +249,7 @@ export class UsersService {
 
           if (constraint === "teams_leaderId_fkey")
             throw new ConflictError(
-              "팀의 리더를 맡고 있는 사용자는 삭제할 수 없습니다. 먼저 팀 리더를 변경해주세요."
+              "팀장을 맡고 있는 사용자는 삭제할 수 없습니다. 먼저 팀장을 변경해주세요."
             )
         }
       }

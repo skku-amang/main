@@ -2,7 +2,7 @@ import { z } from "zod"
 
 /**
  * @description 기수 생성 Zod 스키마
- * 기수 순서와 리더 ID를 포함합니다.
+ * 기수 순서와 기장 ID를 포함합니다.
  */
 export const CreateGenerationSchema = z
   .object({
@@ -11,8 +11,8 @@ export const CreateGenerationSchema = z
       .multipleOf(0.5, { message: "기수는 0.5 단위여야 합니다." }),
 
     leaderId: z
-      .number({ invalid_type_error: "리더 ID는 숫자여야 합니다." })
-      .int("리더 ID는 정수여야 합니다.")
+      .number({ invalid_type_error: "기장 ID는 숫자여야 합니다." })
+      .int("기장 ID는 정수여야 합니다.")
       .optional()
   })
   .strict()

@@ -221,7 +221,7 @@ export class DuplicateTeamSessionError extends ApiError {
 }
 
 /**
- * 존재하지 않는 엔티티(리더, 세션, 사용자 등)를 참조하려고 할 때 발생하는 오류입니다.
+ * 존재하지 않는 엔티티(팀장, 세션, 사용자 등)를 참조하려고 할 때 발생하는 오류입니다.
  */
 export class ReferencedEntityNotFoundError extends ApiError {
   readonly type = "/errors/team/referenced-entity-not-found"
@@ -230,7 +230,7 @@ export class ReferencedEntityNotFoundError extends ApiError {
 
   constructor(detail?: string, instance?: string) {
     super(
-      "존재하지 않는 리소스(리더, 세션, 사용자 등)를 참조하고 있습니다.",
+      "존재하지 않는 리소스(팀장, 세션, 사용자 등)를 참조하고 있습니다.",
       detail,
       instance
     )

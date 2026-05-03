@@ -121,7 +121,7 @@ export function SessionFormDialog({
               name="leaderId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>리더</FormLabel>
+                  <FormLabel>팀장</FormLabel>
                   <Select
                     value={field.value?.toString() ?? "none"}
                     onValueChange={(v) =>
@@ -130,7 +130,7 @@ export function SessionFormDialog({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="리더 선택 (선택사항)" />
+                        <SelectValue placeholder="팀장 선택 (선택사항)" />
                       </SelectTrigger>
                     </FormControl>
                     <UserSelectContent users={users} allowNone />

@@ -19,7 +19,7 @@ export class TeamOwnerGuard implements CanActivate {
     const team = await this.teamService.findOne(+teamId)
 
     const isOwner = team.leaderId === user.sub
-    if (!isOwner) throw new ForbiddenError("팀 리더만 접근할 수 있습니다.")
+    if (!isOwner) throw new ForbiddenError("팀장만 접근할 수 있습니다.")
 
     return true
   }

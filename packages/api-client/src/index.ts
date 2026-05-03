@@ -349,7 +349,7 @@ export default class ApiClient {
    * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
    * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
    * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
-   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 리더, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가하는 경우
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
@@ -396,7 +396,7 @@ export default class ApiClient {
    * @throws {DuplicateMemberIndexError} 세션 내에 중복된 멤버 인덱스가 존재하는 경우
    * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
    * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
-   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 리더, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {ReferencedEntityNotFoundError} 존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가하는 경우
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
@@ -901,7 +901,7 @@ export default class ApiClient {
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
    * @throws {ForbiddenError} 유저 수정 권한이 없는 경우 (요청을 보내는 사용자가 관리자 권한이 없을 때 발생)
    * @throws {NotFoundError} id에 해당하는 유저를 찾을 수 없을 때
-   * @throws {ConflictError} 팀에서 리더를 맡고 있는 사용자를 삭제하려고 할 때 발생합니다.
+   * @throws {ConflictError} 팀에서 팀장을 맡고 있는 사용자를 삭제하려고 할 때 발생합니다.
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public deleteUser(id: number) {
