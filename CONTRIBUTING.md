@@ -17,14 +17,12 @@
 
 ### 축별 라벨
 
-| 축              | 값                                               | 대상         | 필수           |
-| --------------- | ------------------------------------------------ | ------------ | -------------- |
-| `kind:`         | `bug`, `enhancement`, `question`, `task`         | 이슈         | ✅             |
-| `priority:`     | `critical`, `high`, `low`                        | 이슈 + PR    | 맥락에 따라    |
-| `status:`       | `needs-triage`, `observing`, `confirmed`, `blocked` | 이슈 + PR | 맥락에 따라    |
-| `from:`         | `sentry`, `user-feedback`                        | 이슈         | 자동 유입일 때 |
-| `resolution:`   | `duplicate`, `wontfix`, `invalid`                | 이슈 Close 시 | Close 사유 필요 시 |
-| (단일)          | `good first issue`, `help wanted`                | 이슈         | 해당 시        |
+| 축            | 값                                       | 대상          | 필수               |
+| ------------- | ---------------------------------------- | ------------- | ------------------ |
+| `kind:`       | `bug`, `enhancement`, `question`, `task` | 이슈          | ✅                 |
+| `priority:`   | `critical`, `high`, `low`                | 이슈 + PR     | 맥락에 따라        |
+| `from:`       | `sentry`, `user-feedback`                | 이슈          | 자동 유입일 때     |
+| `resolution:` | `duplicate`, `wontfix`, `invalid`        | 이슈 Close 시 | Close 사유 필요 시 |
 
 ### 사용 규칙
 
@@ -32,37 +30,30 @@
 
 - `kind:*` 1개 **필수** (템플릿에서 자동 설정)
 - 긴급도 판단 후 `priority:*` 추가
-- 트리아지 대기 상태면 `status: needs-triage`
 - Sentry나 유저 피드백에서 유입됐으면 `from:*`
+- 처리 상태는 라벨이 아닌 **이슈 자체의 open/closed** + 코멘트로 표현 (재현 확인, 외부 의존성 대기 등)
 
 **PR**:
 
 - 기본적으로 라벨 없이 제출 (제목이 SSOT)
 - 머지 순서 중요하면 `priority:*`
-- 리뷰·배포 블로킹 상태면 `status:*`
 
 ### 라벨 매니페스트
 
-| 이름                  | 색상   | 설명                                        |
-| --------------------- | ------ | ------------------------------------------- |
-| kind: bug             | 3B82F6 | 버그 — 작동하지 않거나 기대와 다르게 동작   |
-| kind: enhancement     | 60A5FA | 기능 추가 또는 기존 기능 개선               |
-| kind: question        | 93C5FD | 질문 — 사용법 / 안내 요청                   |
-| kind: task            | BFDBFE | 일반 작업 (리팩토링, 문서, 의존성 등)       |
-| priority: critical    | B91C1C | 즉시 수정 필요 (프로덕션 장애 / 다수 영향)  |
-| priority: high        | DC2626 | 이번 스프린트 내 처리                       |
-| priority: low         | FCA5A5 | 여유 있을 때 처리                           |
-| status: needs-triage  | FBBF24 | 트리아지 대기                               |
-| status: observing     | FCD34D | 재발 모니터링 중                            |
-| status: confirmed     | FDE68A | 재현 확인됨                                 |
-| status: blocked       | F59E0B | 진행 불가 — 외부 의존성 대기                |
-| from: sentry          | 10B981 | Sentry 자동 유입                            |
-| from: user-feedback   | 34D399 | 유저 피드백                                 |
-| resolution: duplicate | 9CA3AF | 중복                                        |
-| resolution: wontfix   | 6B7280 | 수정하지 않음                               |
-| resolution: invalid   | D1D5DB | 유효하지 않음                               |
-| good first issue      | 7C3AED | 첫 기여자에게 적합                          |
-| help wanted           | 8B5CF6 | 컨트리뷰션 환영                             |
+| 이름                  | 색상   | 설명                                       |
+| --------------------- | ------ | ------------------------------------------ |
+| kind: bug             | 3B82F6 | 버그 — 작동하지 않거나 기대와 다르게 동작  |
+| kind: enhancement     | 60A5FA | 기능 추가 또는 기존 기능 개선              |
+| kind: question        | 93C5FD | 질문 — 사용법 / 안내 요청                  |
+| kind: task            | BFDBFE | 일반 작업 (리팩토링, 문서, 의존성 등)      |
+| priority: critical    | B91C1C | 즉시 수정 필요 (프로덕션 장애 / 다수 영향) |
+| priority: high        | DC2626 | 이번 스프린트 내 처리                      |
+| priority: low         | FCA5A5 | 여유 있을 때 처리                          |
+| from: sentry          | 10B981 | Sentry 자동 유입                           |
+| from: user-feedback   | 34D399 | 유저 피드백                                |
+| resolution: duplicate | 9CA3AF | 중복                                       |
+| resolution: wontfix   | 6B7280 | 수정하지 않음                              |
+| resolution: invalid   | D1D5DB | 유효하지 않음                              |
 
 ### 라벨 변경이 필요할 때
 

@@ -13,7 +13,7 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 - `amang-sentry` MCP 연결됨 (org: `amang-23`, projects: `web`, `api`)
 - `gh` CLI 인증됨 (skku-amang/main 접근 권한)
-- 레포 라벨 체계가 새 prefix 방식으로 설정되어 있어야 함: `kind:*`, `priority:*`, `status:*`, `from:*`. 라벨 정의는 [CONTRIBUTING.md](../../../CONTRIBUTING.md)의 "라벨 매니페스트" 섹션 참고
+- 레포 라벨 체계가 새 prefix 방식으로 설정되어 있어야 함: `kind:*`, `priority:*`, `from:*`. 라벨 정의는 [CONTRIBUTING.md](../../../CONTRIBUTING.md)의 "라벨 매니페스트" 섹션 참고
 
 ## 실행 흐름
 
@@ -77,7 +77,7 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 | --- | --- |
 | 🔥 | `gh issue create` — `kind: bug` + `priority: critical` + `from: sentry` 또는 `from: user-feedback`. body는 [.github/ISSUE_TEMPLATE/sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md) 적용. **제목은 자연어** (CC 포맷 금지) |
 | 📝 | `gh issue create` — `kind: bug` + `priority: high`(영향 유저 ≥3) 또는 `priority: low` + `from:*` |
-| 👀 | Sentry MCP `update_issue`로 `triaged` + `observing` 태그 부착만 |
+| 👀 | **별도 액션 없음** — Sentry는 unresolved 상태 유지. 다음 트리아지 라운드에 자연스레 다시 검토됨. (선택: 코멘트로 "observing - 다음 라운드 재평가" 추적 메모) |
 | 🚫 | **출력만** — "Sentry 웹에서 Archive 권장" 메시지. 자동 실행 안 함 |
 | 💡 | 사용자에게 대상 선택 프롬프트 (`g`=GH 이슈 / `n`=Notion / `s`=건너뜀). GH면 `kind: enhancement` + `from: user-feedback` + `priority: low`. Notion이면 `amang-notion` MCP로 아이디어 DB에 row 추가 |
 
@@ -87,7 +87,7 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 요약: 처리 완료 N건 / 보류 M건 / 실패 K건
 - 🔥 N1건 → GH 이슈 #AAA, #BBB 생성됨
 - 📝 N2건 → GH 이슈 #CCC~#DDD 생성됨
-- 👀 N3건 → Sentry 태그 부착됨
+- 👀 N3건 → 액션 없음 (다음 라운드 재검토)
 - 🚫 N4건 → 수동 archive 권장 목록 (링크)
 - 💡 N5건 → GH N개, Notion N개
 ```
