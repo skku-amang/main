@@ -27,7 +27,8 @@ import {
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
-import { cn } from "@/lib/utils"
+import MemberPicker from "@/components/MemberPicker"
+import { cn, formatGenerationOrder } from "@/lib/utils"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import { Equipment } from "@repo/shared-types"
@@ -195,8 +196,7 @@ export default function AddScheduleButton({
     resetForm()
   }
 
-  const addUser = (userId: string) => {
-    const id = Number(userId)
+  const addUser = (id: number) => {
     if (!selectedUserIds.includes(id)) {
       setSelectedUserIds((prev) => [...prev, id])
     }
@@ -208,8 +208,6 @@ export default function AddScheduleButton({
 
   const selectedUsers =
     users?.filter((u) => selectedUserIds.includes(u.id)) ?? []
-  const availableUsers =
-    users?.filter((u) => !selectedUserIds.includes(u.id)) ?? []
 
   return (
     <Dialog
@@ -528,18 +526,11 @@ export default function AddScheduleButton({
 
             <div className="space-y-1.5">
               <label className="text-sm text-muted-foreground">Members</label>
-              <Select onValueChange={addUser} value={undefined}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MemberPicker
+                users={users ?? []}
+                excludeIds={selectedUserIds}
+                onSelect={(user) => addUser(user.id)}
+              />
             </div>
 
             {/* Selected members as avatar chips */}
@@ -556,9 +547,14 @@ export default function AddScheduleButton({
                         {user.name?.slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="max-w-[60px] truncate text-xs">
+                    <span className="max-w-[80px] truncate text-xs">
                       {user.name}
                     </span>
+                    {user.generation && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatGenerationOrder(user.generation.order)}기
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => removeUser(user.id)}
