@@ -735,9 +735,43 @@ PR 페이지에서 체크 통과 확인. 실패 시 원인 분석하여 수정.
 
 ## 완료 기준
 
-- [ ] `scripts/setup-labels.sh`, `scripts/migrate-old-labels.sh` 작성 및 실행 완료
-- [ ] `CONTRIBUTING.md` 라벨 섹션 업데이트
-- [ ] skku-amang/main 레포에 신규 라벨 18개 존재, 기존 type:/scope:/v0 제거됨
-- [ ] `.claude/skills/sentry-triage/` 3개 파일 작성
-- [ ] 드라이런 + 실 실행으로 스킬 동작 검증
-- [ ] PR 생성, CI 통과
+- [x] `CONTRIBUTING.md` 라벨 매니페스트 섹션 + 이슈 제목 컨벤션 추가
+- [x] skku-amang/main 레포에 신규 라벨 적용, 기존 type:/scope:/v0 제거 (수동, REST API)
+- [x] `.claude/skills/sentry-triage/SKILL.md`, `triage-criteria.md` 작성
+- [x] `.github/ISSUE_TEMPLATE/sentry_auto.md` 추가 + 기존 템플릿 라벨 갱신
+- [x] 드라이런으로 스킬 동작 검증 (실 데이터 22건 처리, 4건 resolve, 1건 duplicate 처리)
+- [x] PR 생성 (#456), 머지 대기 중
+
+## Divergence Log
+
+플랜 작성 후 실제 진행 중 변경된 결정사항. 후일 이 플랜으로 작업을 추적할 때 혼란 방지용.
+
+### 라벨 자동화 폐기 (Task 1·2 삭제)
+
+- **원래 계획**: `scripts/setup-labels.sh`(선언적 sync) + `scripts/migrate-old-labels.sh`(일회성 마이그레이션) 두 스크립트 작성·커밋
+- **실제 결정**: 두 스크립트 모두 삭제. **CONTRIBUTING.md의 "라벨 매니페스트" 표를 SSOT**로 삼고 GitHub UI/`gh label`/REST API 수동 관리
+- **이유**: 라벨 변경 빈도가 매우 낮고(연 1-2회) drift 복구 비용도 낮음. 자동화 ROI 사실상 0. 업계 관행도 소규모 팀은 수동 관리 (kubernetes 같은 다중 레포 대형 org만 자동화)
+- **영향**: Task 4(스크립트 실행)는 일회성 `curl` 호출로 대체 (`SENTRY_ACCESS_TOKEN` + `gh label create/edit/delete`)
+
+### 이슈 템플릿 위치 변경 (Task 6 재배치)
+
+- **원래 계획**: `.claude/skills/sentry-triage/issue-template.md`
+- **실제 결정**: `.github/ISSUE_TEMPLATE/sentry_auto.md`로 이동. 스킬은 참조만
+- **이유**: SSOT — GitHub 관례상 이슈 템플릿은 `.github/ISSUE_TEMPLATE/`. 스킬이 별도 보관하면 drift 발생. 부수 효과로 사람이 GitHub UI에서 New Issue → Sentry Auto 선택해 수동 작성도 가능
+
+### SKILL.md / triage-criteria.md 보강 (드라이런 발견사항)
+
+실 데이터 검증 중 발견한 추가 규칙·세부사항. 모두 머지 전 반영됨:
+
+- **User Feedback 조회**: `list_events`가 아닌 `list_issues(query="issue.category:feedback")` 사용
+- **원문 위치**: 이슈 `description`은 Sentry AI 자동 생성 영문 요약. 분류·제목 용도로 쓰지 말고 `event.contexts.feedback.message`(원문, 대부분 한국어) 사용
+- **서드파티 전용 스택 무시**: 스택 전체가 `_next-live/feedback/*` 등 라이브러리에서만 발생 시 🚫 (WEB-11 케이스에서 발견)
+- **"좋을 듯" 요청 패턴**: 💡 분류 키워드 추가 (WEB-Y 케이스)
+- **보정 규칙 (post-classification)**:
+  - 다른 유저가 같은 요청 독립 제기 → priority 상향, Sentry duplicate 처리 (WEB-12 ≈ WEB-14)
+  - 외부 실유저 제보 → priority 상향
+  - 한 피드백에 여러 요청 묶임 → GH 이슈 분리 (WEB-15)
+
+### 누락된 작업 (별도 PR 후속)
+
+- **Sentry-GH 양방향 자동 링크**(C 옵션): 트리아지 시 매번 "이미 처리된 것" 노이즈가 올라오는 문제 해결용. 현 PR에선 보류. 별도 작업으로 분리
