@@ -1,110 +1,82 @@
-# meeting-prep 출력 예시
+# meeting-prep 출력 예시 (보고서 모드)
 
 > 이 파일은 스킬이 생성해야 하는 출력물의 few-shot 예시이다.
-> 실제 데이터(2026-03-28 ~ 2026-04-04, 손장수)로 작성됨.
+> **노션에 쓰지 않고 Claude 텍스트로만 출력한다.** 사용자가 회의 시작 전 본인의 진행을 누락 없이 보고하기 위한 개인 준비 자료.
+> 실제 데이터(2026-04-11 ~ 2026-04-27, 손장수)로 작성됨.
 
 ---
 
-## `meeting-prep` 실행 결과
+## 📋 meeting-prep 보고서 — 26-1 7차 회의 준비
 
-> **기간**: 2026-03-28 (4차 회의) ~ 2026-04-04 (현재)
+> **기간**: 2026-04-11 (6차 회의) ~ 2026-04-27 (오늘)
 > **대상**: manamana32321 (손장수)
-> **소스**: GitHub Issues/PR, Sentry, Notion 4차 회의록
+> **본인 영역**: 인프라 / 프론트 / AX
 
 ---
 
-# 진행 상황 공유
-
-## 프론트
-### > @손장수
+### 인프라
 
 | # | 내용 | 진행 | 중요도 | 링크 | 상세 |
-|--:|------|:---:|:-----:|------|------|
-| 1 | YouTube URL 검증 강화 | ✅ | ⚪ | [#365](https://github.com/skku-amang/main/issues/365) → [PR #366](https://github.com/skku-amang/main/pull/366) | |
-| 2 | YouTube 유틸 SSOT 통합 | ✅ | ⚪ | [#369](https://github.com/skku-amang/main/issues/369) → [PR #372](https://github.com/skku-amang/main/pull/372) | |
-| 3 | Prisma engine enum entrypoint 분리 | ✅ | 🟡 | [PR #380](https://github.com/skku-amang/main/pull/380) | Vercel 배포 시 Query Engine 누락 해결 |
-| 4 | 에러 메시지 개선 + 팀 지원 에러 표시 | 🔧 | 🟡 | [#382](https://github.com/skku-amang/main/issues/382), [#384](https://github.com/skku-amang/main/issues/384) → [PR #383](https://github.com/skku-amang/main/pull/383) | |
-| 5 | 로그인 재요구 버그 | ⏸️ | 🔴 | [#358](https://github.com/skku-amang/main/issues/358) | ← 4차 분배, 미착수 |
-| 6 | 모바일 회원가입 불가 | ⏸️ | 🔴 | [#359](https://github.com/skku-amang/main/issues/359) | ← 4차 분배, 미착수 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | grafana_ro 역할 + AMANG DB datasource 노출 | ✅ | 🟡 | [#454](https://github.com/skku-amang/main/issues/454) → [PR #461](https://github.com/skku-amang/main/pull/461), [#463](https://github.com/skku-amang/main/pull/463), [#464](https://github.com/skku-amang/main/pull/464), [#465](https://github.com/skku-amang/main/pull/465) | NetworkPolicy/Init Job 이슈 잡으며 4 PR로 진행 |
+| 2 | Grafana MCP(mcp-grafana) 추가 | ✅ | ⚪ | [PR #459](https://github.com/skku-amang/main/pull/459) | 외부 homelab#103 연계 |
 
-## 인프라
-### > @손장수
+### 프론트
 
 | # | 내용 | 진행 | 중요도 | 링크 | 상세 |
-|--:|------|:---:|:-----:|------|------|
-| 1 | Sentry 도입 | ✅ | ⚪ | [#361](https://github.com/skku-amang/main/issues/361) → [PR #370](https://github.com/skku-amang/main/pull/370) | ← 4차 분배 |
-| 2 | 임베디드 → 유저 QA | ✅ | ⚪ | [#360](https://github.com/skku-amang/main/issues/360) | ← 4차 분배 |
-| 3 | DB CronJob → ArgoCD PreSync Hook 전환 | ✅ | ⚪ | [PR #377](https://github.com/skku-amang/main/pull/377) | |
-| 4 | Job 파드 라벨 충돌 502 해소 | ✅ | 🟡 | [PR #378](https://github.com/skku-amang/main/pull/378) | |
-| 5 | 헬스체크 Sentry 에러 캡처 제외 | ✅ | ⚪ | [PR #387](https://github.com/skku-amang/main/pull/387) | |
-| 6 | 온보딩 자동화 셋업 스크립트 | ✅ | ⚪ | [PR #374](https://github.com/skku-amang/main/pull/374) | |
-| 7 | deps 업데이트 + ESLint 9 마이그레이션 | ✅ | ⚪ | [PR #376](https://github.com/skku-amang/main/pull/376) | |
-| 8 | Jest → Vitest 마이그레이션 | ✅ | ⚪ | [#367](https://github.com/skku-amang/main/issues/367) | |
-| 9 | DB 마이그레이션 Job 생성 | 🔧 | 🟡 | [#362](https://github.com/skku-amang/main/issues/362) | ← 4차 분배, 진행 중 |
-| 10 | CI 테스트 워크플로우 분리 및 병렬화 | 🔧 | ⚪ | [#368](https://github.com/skku-amang/main/issues/368) | |
-| 11 | seed 스크립트 멱등성 확보 | 🔧 | 🟡 | [#379](https://github.com/skku-amang/main/issues/379) → [PR #381](https://github.com/skku-amang/main/pull/381) | |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 어드민 유저 테이블 기수·프로필 인라인 편집 | ✅ | ⚪ | [#455](https://github.com/skku-amang/main/issues/455) → [PR #457](https://github.com/skku-amang/main/pull/457) |  |
+| 2 | 동방 예약 모달 참여자 칩 오버플로우 수정 | ✅ | 🟡 | [#440](https://github.com/skku-amang/main/issues/440) → [PR #466](https://github.com/skku-amang/main/pull/466) |  |
+| 3 | Sentry FAB 동적 위치 (기본 우상단) | ⏸️ | 🔴 | — | ← 6차 분배, 미착수 |
 
-## 직전(4차) 작업 분배 이행
+### AX (AI Experience)
 
-| 분배 작업 | 영역 | 결과 | 링크 |
-|---|---|---|---|
-| 임베디드 → 유저 QA | 인프라 | ✅ 완료 | [#360](https://github.com/skku-amang/main/issues/360) |
-| Sentry 도입 | 인프라 | ✅ 완료 | [#361](https://github.com/skku-amang/main/issues/361) → [PR #370](https://github.com/skku-amang/main/pull/370) |
-| DB 마이그레이션 Job 생성 | 인프라 | 🔧 진행 중 | [#362](https://github.com/skku-amang/main/issues/362) |
-| 로그인 재요구 버그 | 프론트 | ⏸️ 미착수 | [#358](https://github.com/skku-amang/main/issues/358) |
-| 모바일 회원가입 불가 | 프론트 | ⏸️ 미착수 | [#359](https://github.com/skku-amang/main/issues/359) |
+| # | 내용 | 진행 | 중요도 | 링크 | 상세 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | meeting-prep 스킬 출력 테이블 형식 전환 | ✅ | ⚪ | [PR #453](https://github.com/skku-amang/main/pull/453) | 이번 회의 준비에 사용 중 |
+| 2 | Sentry 트리아지 자동화 스킬 + 라벨 체계 재편 | 🔧 | 🟡 | [PR #456](https://github.com/skku-amang/main/pull/456) | OPEN, 머지 일정 확정 필요 |
 
 ---
 
-# 논의 안건
-
-*진행 상황에 포함되지 않은 새로운 제안/의사결정 필요 항목만*
-
-## 프론트
-### > @손장수
-
-| # | 내용 | 중요도 | 링크 | 상세 |
-|--:|------|:-----:|------|------|
-| 1 | NFC 기반 악기/장비 대여·반납 자동화 | ⚪ | [#373](https://github.com/skku-amang/main/issues/373) | 신규 제안 |
-| 2 | 긍정 피드백 위젯 + Slack 알림 파이프라인 | 🟡 | [#385](https://github.com/skku-amang/main/issues/385) | |
-| 3 | Vercel 배포 시 Prisma Query Engine 누락 | 🟡 | [#375](https://github.com/skku-amang/main/issues/375) | |
-| 4 | 에러 타입 매핑 exhaustive switch 전환 | ⚪ | [#388](https://github.com/skku-amang/main/issues/388) | |
-
-## 인프라
-### > @손장수
-
-| # | 내용 | 중요도 | 링크 | 상세 |
-|--:|------|:-----:|------|------|
-| 1 | 주간 활동 리포트 Slack 자동 발송 | ⚪ | [#386](https://github.com/skku-amang/main/issues/386) | |
-
----
-
-# Sentry 에러 현황
+### Sentry 에러 현황
 
 | 상태 | 에러 | 프로젝트 | 이벤트 | 링크 | 처리 |
-|:---:|------|:------:|------:|------|------|
-| ✅ | PrismaClientInitializationError | web | 54건 | [PR #380](https://github.com/skku-amang/main/pull/380) | 해결 |
-| ✅ | 헬스체크 503 | api | 2건 | [PR #387](https://github.com/skku-amang/main/pull/387) | 필터링 처리 |
-| ✅ | PrismaKnownRequestError (rentals) | api | 15건 | | resolved |
-| ⚠️ | 서버 에러 /performances/1/teams | web | 1건 | [WEB-9](https://amang-23.sentry.io/issues/WEB-9) | **미해결** |
+| --- | --- | --- | --- | --- | --- |
+| ⚠️ | TypeError: Load failed (`/performances/1/teams`) | web | 2건 (users 2) | [WEB-T](https://amang-23.sentry.io/issues/WEB-T) | 관찰 — 사파리/모바일 네트워크 단절 가능성 |
+
+---
+
+### ⚠️ 라벨 누락 PR
+
+다음 PR은 `scope:` 라벨이 없어 영역 분류를 추정으로 처리. 회의 전 라벨 보강 권장:
+
+- [PR #453](https://github.com/skku-amang/main/pull/453) — AX 추정 (스킬 도구)
+- [PR #456](https://github.com/skku-amang/main/pull/456) — AX 추정 (스킬 도구)
+
+---
+
+### 💡 회의에서 짚을 포인트
+
+1. **6차 분배 미이행 1건**: Sentry FAB 동적 위치. 인프라 작업(grafana_ro 6 PR)에 시간 쏠리며 프론트 분배가 밀림 → 7차에서 재분배 vs drop 결정 필요
+2. **AX 영역 라벨 부재**: PR #453, #456 모두 라벨 없음. `scope: ax` 라벨 신설 + 기존 PR 소급 적용 검토
+3. **Sentry WEB-T**: 영향 작지만 lastSeen 갱신 → 재현 OS/브라우저 확인 후 등급 재조정 필요
 
 ---
 
 ## 형식 규칙
 
-1. **테이블 형식**: 진행 상황·논의 안건 모두 테이블(`table` + `table_row`) 사용, `has_column_header: true`
-2. **컬럼 구성**:
-   - 진행 상황: `#` | `내용` | `진행` | `중요도` | `링크` | `상세`
-   - 논의 안건: `#` | `내용` | `중요도` | `링크` | `상세` (진행 컬럼 없음)
-   - Sentry: `상태` | `에러` | `프로젝트` | `이벤트` | `링크` | `처리`
-3. **중요도 기준**:
+1. **출력 매체**: Claude 텍스트 출력 only — 노션 작성 절대 금지
+2. **영역 순서**: 본인 우선 영역 순으로 (인프라/프론트/AX). 영역에 항목 없으면 그 영역 표 자체 생략
+3. **컬럼 구성**: `#` | `내용` | `진행` | `중요도` | `링크` | `상세` (Sentry는 별도)
+4. **Sentry 컬럼**: `상태` | `에러` | `프로젝트` | `이벤트` | `링크` | `처리`
+5. **중요도**:
    - 🔴 높음: Sentry 에러 연관, 직전 분배 미이행, 보안 이슈
-   - 🟡 보통: 일반 버그픽스, 진행 중 작업, 배포 관련
+   - 🟡 보통: 일반 버그픽스, 진행 중, 배포 관련
    - ⚪ 낮음: chore, 리팩토링, 제안 단계
-4. **진행 아이콘**: ✅ 완료, 🔧 진행 중, ⏸️ 미착수, ⚠️ 미해결
-5. **정렬**: ✅ → 🔧 → ⏸️ 순서
-6. **링크 필수**: 모든 이슈/PR/Sentry 이슈에 클릭 가능한 링크 포함
-7. **이슈-PR 연결**: 링크 컬럼에서 `#이슈 → PR #번호` 형태
-8. **직전 분배 표시**: 상세 컬럼에 `← 직전(N차) 분배` 부기
-9. **중복 제거**: 진행 상황에 있는 항목은 논의 안건에 포함하지 않음
-10. **토글 헤딩**: `### > @이름`은 노션에서 `is_toggleable: true` heading_3, children으로 테이블 삽입
+6. **진행 아이콘**: ✅ 완료 / 🔧 진행 중 / ⏸️ 미착수 / ⚠️ 미해결
+7. **정렬**: ✅ → 🔧 → ⏸️ 순서, 미이행 항목은 표 끝
+8. **링크 필수**: 모든 이슈/PR/Sentry 이슈에 클릭 가능한 마크다운 링크
+9. **이슈-PR 연결**: `#이슈 → PR #번호` 형태, 다중 PR은 콤마로 나열
+10. **직전 분배 표시**: 상세 컬럼에 `← N차 분배` 부기
+11. **라벨 누락 PR 섹션**: `scope:` 라벨 없는 PR을 별도 목록으로 — 본인 라벨 보강 액션 유도
+12. **Insight 섹션**: 회의에서 짚을 만한 패턴 1-3개 (미이행, 영역 편중, 라벨 누락 등)
