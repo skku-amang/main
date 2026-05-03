@@ -1,11 +1,9 @@
-# TODO: namespace를 ArgoCD Application에서 지정하고 여기서 제거 검토
+# namespace는 ArgoCD Application의 destination.namespace에서 결정 (SSOT)
 # ref: https://github.com/manamana32321/homelab/tree/main/k8s/argocd/applications/apps/amang
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: amang-redis-production
 
 resources:
-  - namespace.yaml
   - ../../base
   - network-policy.yaml
   - sealed-redis-password.yaml

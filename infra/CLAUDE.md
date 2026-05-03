@@ -33,6 +33,19 @@ ArgoCD Application 정의는 **별도 레포**([homelab](https://github.com/mana
 
 **왜 컴포넌트별 분리인가**: NetworkPolicy의 `namespaceSelector` cross-namespace 참조를 명시적으로 만들어 권한 경계를 ns 단위로 관리. 단일 ns에 모두 두면 모든 pod가 모든 Service에 접근 가능해짐.
 
+### Namespace SSOT는 ArgoCD `destination.namespace`
+
+Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하지 않는다**. namespace 결정은 ArgoCD Application의 `destination.namespace`가 SSOT이며, ArgoCD가 sync 시 모든 namespaced 리소스에 자동 적용한다 (`syncOptions: CreateNamespace=true`로 ns 자체도 자동 생성).
+
+이렇게 하면:
+- "어디 배포되는지"를 한 곳(homelab repo의 ArgoCD Application)에서만 변경 가능
+- amang repo의 Kustomize는 컴포넌트가 어떤 ns에 가는지 모름 — 재사용성 ↑
+- ApplicationSet generator로 staging/production 환경 매트릭스 깔끔
+
+**예외 — SealedSecret은 sealing 시 metadata.namespace가 cert에 박힘**: sealed-secrets controller가 strict scope로 동작하므로 sealing 시 명시한 namespace에서만 복호화. 따라서 SealedSecret YAML에는 namespace가 박혀있고, **ArgoCD destination.namespace와 일치해야 함** (불일치 시 controller가 reject). 환경별로 별도 sealing 필요.
+
+> **현재 상태**: redis는 이 룰을 따른다. db/api는 아직 `kustomization.yaml`에 `namespace:` 필드 명시 + `namespace.yaml` 별도 — 후속 리팩토링 필요 ([infra/k8s/db/](k8s/db/), [infra/k8s/api/](k8s/api/) overlays).
+
 ## 이미지 버전 정책
 
 ### 자체 빌드 이미지 (api, web)
