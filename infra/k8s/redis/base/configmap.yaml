@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data:
+  redis.conf: |
+    # Persistence
+    appendonly yes
+    appendfsync everysec
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    save 3600 1 300 100 60 10000
+
+    # Memory
+    maxmemory 200mb
+    maxmemory-policy allkeys-lru
+
+    # Network
+    bind 0.0.0.0
+    protected-mode yes
+
+    # Logging
+    loglevel notice
