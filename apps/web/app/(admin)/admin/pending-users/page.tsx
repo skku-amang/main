@@ -134,7 +134,14 @@ export default function PendingUsersAdminPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">승인 대기 회원</h1>
+      <div className="mb-6 flex items-baseline gap-3">
+        <h1 className="text-2xl font-bold">승인 대기 회원</h1>
+        {!isLoading && (
+          <span className="text-muted-foreground text-sm">
+            {pendingUsers?.length ?? 0}명
+          </span>
+        )}
+      </div>
 
       <DataTable
         columns={columns}
