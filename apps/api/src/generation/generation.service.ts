@@ -35,14 +35,14 @@ export class GenerationService {
             }
             if (target.includes("leaderId")) {
               throw new ConflictError(
-                `해당 유저(ID: ${createGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
+                `해당 유저(ID: ${createGenerationDto.leaderId})는 이미 다른 기수의 기장입니다.`
               )
             }
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
             throw new UnprocessableEntityError(
-              "존재하지 않는 리더 ID 혹은 사용자 ID가 포함되어 있습니다."
+              "존재하지 않는 기장 ID 혹은 사용자 ID가 포함되어 있습니다."
             )
         }
       }
@@ -114,14 +114,14 @@ export class GenerationService {
             }
             if (target.includes("leaderId")) {
               throw new ConflictError(
-                `해당 유저(ID: ${updateGenerationDto.leaderId})는 이미 다른 기수의 리더입니다.`
+                `해당 유저(ID: ${updateGenerationDto.leaderId})는 이미 다른 기수의 기장입니다.`
               )
             }
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
             throw new UnprocessableEntityError(
-              "존재하지 않는 리더 ID 혹은 사용자 ID가 포함되어 있습니다."
+              "존재하지 않는 기장 ID 혹은 사용자 ID가 포함되어 있습니다."
             )
         }
         throw error

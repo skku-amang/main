@@ -118,7 +118,7 @@ export class TeamService {
           case "P2003":
           case "P2025":
             throw new ReferencedEntityNotFoundError(
-              "존재하지 않는 리더, 세션, 공연, 또는 유저를 팀에 추가할 수 없습니다."
+              "존재하지 않는 팀장, 세션, 공연, 또는 유저를 팀에 추가할 수 없습니다."
             )
         }
       }
@@ -281,7 +281,7 @@ export class TeamService {
           case "P2003":
           case "P2025":
             throw new ReferencedEntityNotFoundError(
-              "존재하지 않는 리더, 세션, 또는 유저를 팀에 추가할 수 없습니다."
+              "존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가할 수 없습니다."
             )
         }
       }

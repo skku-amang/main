@@ -49,7 +49,7 @@ const ProfileTeamsPage = () => {
     )
   }
 
-  // 내가 참여 중인 팀 필터링 (리더이거나 멤버인 팀)
+  // 내가 참여 중인 팀 필터링 (팀장이거나 멤버인 팀)
   const myTeams =
     allTeams?.filter((team) => {
       if (team.leader.id === userId) return true

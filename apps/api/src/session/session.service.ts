@@ -35,13 +35,13 @@ export class SessionService {
             }
             if (target.includes("leaderId")) {
               throw new ConflictError(
-                `해당 유저(ID: ${createSessionDto.leaderId})는 이미 다른 세션의 리더입니다.`
+                `해당 유저(ID: ${createSessionDto.leaderId})는 이미 다른 세션의 세션장입니다.`
               )
             }
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
-            throw new UnprocessableEntityError("리더 ID가 유효하지 않습니다.")
+            throw new UnprocessableEntityError("세션장 ID가 유효하지 않습니다.")
         }
       }
       throw error
@@ -110,14 +110,14 @@ export class SessionService {
             }
             if (target.includes("leaderId")) {
               throw new ConflictError(
-                `해당 유저(ID: ${updateSessionDto.leaderId})는 이미 다른 세션의 리더입니다.`
+                `해당 유저(ID: ${updateSessionDto.leaderId})는 이미 다른 세션의 세션장입니다.`
               )
             }
             break
           case "P2025":
             // P2025: An operation failed because it depends on one or more records that were required but not found.
             throw new UnprocessableEntityError(
-              "리더 ID 혹은 사용자 ID가 유효하지 않습니다."
+              "세션장 ID 혹은 사용자 ID가 유효하지 않습니다."
             )
         }
       }
