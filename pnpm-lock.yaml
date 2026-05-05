@@ -111,9 +111,6 @@ importers:
       sql-formatter:
         specifier: ^15.7.3
         version: 15.7.3
-      zod:
-        specifier: ^3.25.76
-        version: 3.25.76
       zod-validation-error:
         specifier: ^4.0.2
         version: 4.0.2(zod@3.25.76)
