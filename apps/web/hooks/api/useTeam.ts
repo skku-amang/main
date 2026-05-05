@@ -1,5 +1,7 @@
 import { createMutationHook, createQueryHook } from "@/hooks/useCustomQuery"
+import { getTeamsByPerformanceOptions } from "@repo/api-client/generated/react-query"
 import ApiClient from "@repo/api-client"
+import { useQuery } from "@tanstack/react-query"
 
 export const useAllTeams = createQueryHook(ApiClient.prototype.getTeams, () => [
   "teams",
@@ -8,10 +10,9 @@ export const useAllTeams = createQueryHook(ApiClient.prototype.getTeams, () => [
 
 export const useCreateTeam = createMutationHook(ApiClient.prototype.createTeam)
 
-export const useTeams = createQueryHook(
-  ApiClient.prototype.getTeamsByPerformance,
-  (performanceId: number) => ["teams", "performance", performanceId]
-)
+// Performance endpoint(/performances/:id/teams)는 spec-derived로 마이그레이션 완료.
+export const useTeams = (performanceId: number) =>
+  useQuery(getTeamsByPerformanceOptions({ path: { id: performanceId } }))
 
 export const useTeam = createQueryHook(
   ApiClient.prototype.getTeamById,

@@ -1,0 +1,729 @@
+openapi: 3.1.0
+info:
+  title: AMANG API
+  version: 0.1.0
+  description: |
+    성균관대학교 밴드 동아리 AMANG의 운영 시스템 REST API.
+
+    이 spec은 SSOT입니다. BE/FE 양쪽 모두 이 파일에서 derive됩니다.
+  license:
+    name: Internal Use Only
+servers:
+  - url: http://localhost:8000
+    description: 로컬 개발 서버
+  - url: https://amang.staging.json-server.win
+    description: 스테이징 서버
+  - url: https://amang.json-server.win
+    description: 프로덕션 서버
+security:
+  - bearerAuth: []
+tags:
+  - name: Performance
+    description: 공연 (Performance) 관리
+paths:
+  /performances:
+    get:
+      operationId: getPerformances
+      tags:
+        - Performance
+      summary: 공연 목록 조회
+      security: []
+      responses:
+        '200':
+          description: 공연 목록
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Performance'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+    post:
+      operationId: createPerformance
+      tags:
+        - Performance
+      summary: 공연 생성 (운영진)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerformanceCreate'
+      responses:
+        '201':
+          description: 공연 생성 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceDetail'
+        '400':
+          description: 입력값 검증 실패 또는 도메인 규칙 위반
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblem'
+                  - $ref: '#/components/schemas/InvalidPerformanceDateProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '403':
+          $ref: '#/components/responses/Forbidden403'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+  /performances/{id}:
+    parameters:
+      - $ref: '#/components/parameters/PerformanceId'
+    get:
+      operationId: getPerformanceById
+      tags:
+        - Performance
+      summary: 공연 상세 조회
+      security: []
+      responses:
+        '200':
+          description: 공연 상세
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceDetail'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+    patch:
+      operationId: updatePerformance
+      tags:
+        - Performance
+      summary: 공연 수정 (운영진)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerformanceUpdate'
+      responses:
+        '200':
+          description: 수정된 공연
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceDetail'
+        '400':
+          description: 입력값 검증 실패 또는 도메인 규칙 위반
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblem'
+                  - $ref: '#/components/schemas/InvalidPerformanceDateProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '403':
+          $ref: '#/components/responses/Forbidden403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+    delete:
+      operationId: deletePerformance
+      tags:
+        - Performance
+      summary: 공연 삭제 (운영진)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 삭제된 공연
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '403':
+          $ref: '#/components/responses/Forbidden403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+  /performances/{id}/teams:
+    parameters:
+      - $ref: '#/components/parameters/PerformanceId'
+    get:
+      operationId: getTeamsByPerformance
+      tags:
+        - Performance
+      summary: 공연에 속한 팀 목록 조회 (세션·멤버 포함)
+      security: []
+      responses:
+        '200':
+          description: 팀 목록
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamWithSessionsAndMembers'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '500':
+          $ref: '#/components/responses/InternalServer500'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token (`/auth/login` 응답으로 발급)
+  schemas:
+    Performance:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        image:
+          type:
+            - string
+            - 'null'
+        location:
+          type:
+            - string
+            - 'null'
+        startAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        endAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProblemBase:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          description: 에러 식별 URI (discriminator)
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+    InternalServerProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/internal-server-error
+            status:
+              type: integer
+              const: 500
+    PerformanceCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type:
+            - string
+            - 'null'
+        image:
+          type:
+            - string
+            - 'null'
+        location:
+          type:
+            - string
+            - 'null'
+        startAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        endAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+    Team:
+      type: object
+      required:
+        - id
+        - name
+        - songName
+        - songArtist
+        - isFreshmenFixed
+        - isSelfMade
+        - createdAt
+        - updatedAt
+        - performanceId
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        image:
+          type:
+            - string
+            - 'null'
+        songName:
+          type: string
+        songArtist:
+          type: string
+        isFreshmenFixed:
+          type: boolean
+        isSelfMade:
+          type: boolean
+        songYoutubeVideoUrl:
+          type:
+            - string
+            - 'null'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        performanceId:
+          type: integer
+        leaderId:
+          type: integer
+    PublicUserGeneration:
+      type: object
+      required:
+        - id
+        - order
+      properties:
+        id:
+          type: integer
+        order:
+          type: integer
+    SessionName:
+      type: string
+      enum:
+        - VOCAL
+        - GUITAR
+        - BASS
+        - SYNTH
+        - DRUM
+        - STRINGS
+        - WINDS
+    PublicUserSession:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          $ref: '#/components/schemas/SessionName'
+    PublicUser:
+      type: object
+      required:
+        - id
+        - name
+        - nickname
+        - sessions
+        - generation
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        nickname:
+          type: string
+        bio:
+          type:
+            - string
+            - 'null'
+        image:
+          type:
+            - string
+            - 'null'
+        generation:
+          $ref: '#/components/schemas/PublicUserGeneration'
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicUserSession'
+    TeamSession:
+      type: object
+      required:
+        - id
+        - capacity
+        - teamId
+        - sessionId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        capacity:
+          type: integer
+        teamId:
+          type: integer
+        sessionId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TeamWithLeader:
+      allOf:
+        - $ref: '#/components/schemas/Team'
+        - type: object
+          required:
+            - leader
+            - teamSessions
+          properties:
+            leader:
+              $ref: '#/components/schemas/PublicUser'
+            teamSessions:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamSession'
+    PerformanceDetail:
+      allOf:
+        - $ref: '#/components/schemas/Performance'
+        - type: object
+          required:
+            - teams
+          properties:
+            teams:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamWithLeader'
+    ValidationProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/validation-error
+            status:
+              type: integer
+              const: 400
+    InvalidPerformanceDateProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/performance/invalid-performance-date
+            status:
+              type: integer
+              const: 400
+    AuthProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/authentication-error
+            status:
+              type: integer
+              const: 401
+    AccessTokenExpiredProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/token/access-token-expired
+            status:
+              type: integer
+              const: 401
+    AccessTokenNotFoundProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/token/access-token-not-found
+            status:
+              type: integer
+              const: 401
+    RefreshTokenExpiredProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/token/refresh-token-expired
+            status:
+              type: integer
+              const: 401
+    RefreshTokenNotFoundProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/token/refresh-token-not-found
+            status:
+              type: integer
+              const: 401
+    ForbiddenProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/forbidden
+            status:
+              type: integer
+              const: 403
+    UserNotApprovedProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/user/not-approved
+            status:
+              type: integer
+              const: 403
+    NotFoundProblem:
+      allOf:
+        - $ref: '#/components/schemas/ProblemBase'
+        - type: object
+          required:
+            - type
+            - status
+          properties:
+            type:
+              type: string
+              const: /errors/not-found
+            status:
+              type: integer
+              const: 404
+    PerformanceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type:
+            - string
+            - 'null'
+        image:
+          type:
+            - string
+            - 'null'
+        location:
+          type:
+            - string
+            - 'null'
+        startAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        endAt:
+          type:
+            - string
+            - 'null'
+          format: date-time
+    Session:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          $ref: '#/components/schemas/SessionName'
+        icon:
+          type:
+            - string
+            - 'null'
+        leaderId:
+          type:
+            - integer
+            - 'null'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TeamMember:
+      type: object
+      required:
+        - id
+        - index
+        - teamSessionId
+        - userId
+        - createdAt
+        - updatedAt
+        - user
+      properties:
+        id:
+          type: integer
+        index:
+          type: integer
+        teamSessionId:
+          type: integer
+        userId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/PublicUser'
+    TeamSessionWithSessionAndMembers:
+      allOf:
+        - $ref: '#/components/schemas/TeamSession'
+        - type: object
+          required:
+            - session
+            - members
+          properties:
+            session:
+              $ref: '#/components/schemas/Session'
+            members:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamMember'
+    TeamWithSessionsAndMembers:
+      allOf:
+        - $ref: '#/components/schemas/Team'
+        - type: object
+          required:
+            - leader
+            - teamSessions
+          properties:
+            leader:
+              $ref: '#/components/schemas/PublicUser'
+            teamSessions:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamSessionWithSessionAndMembers'
+  responses:
+    InternalServer500:
+      description: 서버 오류
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerProblem'
+    Unauthorized401:
+      description: 인증 필요 또는 토큰 문제
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/AuthProblem'
+              - $ref: '#/components/schemas/AccessTokenExpiredProblem'
+              - $ref: '#/components/schemas/AccessTokenNotFoundProblem'
+              - $ref: '#/components/schemas/RefreshTokenExpiredProblem'
+              - $ref: '#/components/schemas/RefreshTokenNotFoundProblem'
+    Forbidden403:
+      description: 접근 권한 없음
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ForbiddenProblem'
+              - $ref: '#/components/schemas/UserNotApprovedProblem'
+    NotFound404:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundProblem'
+  parameters:
+    PerformanceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1

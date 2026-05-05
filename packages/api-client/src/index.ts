@@ -1004,3 +1004,22 @@ export default class ApiClient {
 
 export * from "./api-result"
 export * from "./errors"
+
+// Spec-derived layer — generated 코드를 main entry에서 re-export.
+// apps/api(legacy node resolution)도 `@repo/api-client`로 접근 가능.
+export {
+  setAccessToken,
+  getAccessToken,
+  setOnTokenExpired,
+  refreshAccessToken,
+  createClientConfig
+} from "./client"
+export { createErrorFromProblemDocument as mapProblemDocumentToError } from "./problem-mapper"
+// Generated SDK / queryOptions / Zod schemas 네임스페이스 묶음 re-export.
+export * as ApiSdk from "./generated/sdk.gen"
+export * as ApiSchemas from "./generated/zod.gen"
+export * as ApiQueries from "./generated/@tanstack/react-query.gen"
+export type * as ApiTypes from "./generated/types.gen"
+
+// 자주 쓰는 개별 schema는 named export로도 노출.
+export { zPerformanceCreate, zPerformanceUpdate } from "./generated/zod.gen"

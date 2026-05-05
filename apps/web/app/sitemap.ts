@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next"
 
 import { SEO } from "@/constants/seo"
-import { apiClient } from "@/lib/apiClient"
+import { ApiSdk } from "@repo/api-client"
+import "@repo/api-client/spec-client"
 
 export const dynamic = "force-dynamic"
 
@@ -37,7 +38,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let performancePages: MetadataRoute.Sitemap = []
   try {
-    const performances = await apiClient.getPerformances()
+    const { data: performances } = await ApiSdk.getPerformances({
+      throwOnError: true
+    })
     performancePages = performances.map((p) => ({
       url: `${BASE_URL}/performances/${p.id}`,
       lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),

@@ -2,32 +2,63 @@
   "name": "@repo/api-client",
   "version": "0.0.0",
   "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*"
-      ]
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    },
+    "./spec-client": {
+      "types": "./dist/spec-client.d.ts",
+      "default": "./dist/spec-client.js"
+    },
+    "./generated": {
+      "types": "./dist/generated/index.d.ts",
+      "default": "./dist/generated/index.js"
+    },
+    "./generated/zod": {
+      "types": "./dist/generated/zod.gen.d.ts",
+      "default": "./dist/generated/zod.gen.js"
+    },
+    "./generated/react-query": {
+      "types": "./dist/generated/@tanstack/react-query.gen.d.ts",
+      "default": "./dist/generated/@tanstack/react-query.gen.js"
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "bundle": "redocly bundle --config redocly.yaml amang@v1 -o src/openapi.bundled.yaml",
+    "lint:spec": "redocly lint --config redocly.yaml amang@v1",
+    "generate": "pnpm bundle && openapi-ts",
+    "generate:watch": "openapi-ts --watch",
+    "build": "pnpm generate && tsc",
+    "dev": "pnpm generate && tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
+    "@hey-api/client-fetch": "^0.13.0",
     "@repo/shared-types": "workspace:*",
     "http-problem-details": "^0.1.7",
     "http-status-codes": "^2.3.0"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.86.0",
+    "@redocly/cli": "^2.30.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^24.12.0"
+    "@tanstack/react-query": "^5.96.1",
+    "@types/node": "^24.12.0",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.96.0",
+    "zod": "^3.25.0"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }
