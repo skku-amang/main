@@ -1,7 +1,9 @@
 import * as Sentry from "@sentry/nextjs"
 
 // replayIntegration/feedbackIntegration은 브라우저 전용 — SSR에서 존재하지 않음
-const integrations = []
+const integrations = [
+  Sentry.captureConsoleIntegration({ levels: ["error", "warn"] })
+]
 
 if (typeof window !== "undefined" && Sentry.replayIntegration) {
   integrations.push(Sentry.replayIntegration())
