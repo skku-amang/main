@@ -43,8 +43,10 @@ model User {
   image              String?
   isAdmin            Boolean  @default(false)
   isApproved         Boolean  @default(false)
-  hashedRefreshToken String?
-  createdAt          DateTime @default(now())
+  hashedRefreshToken         String?
+  previousHashedRefreshToken String?
+  refreshTokenRotatedAt      DateTime?
+  createdAt                  DateTime  @default(now())
   updatedAt          DateTime @updatedAt
 
   generationId      Int

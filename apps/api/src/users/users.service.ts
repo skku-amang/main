@@ -90,10 +90,30 @@ export class UsersService {
     const hashedRefreshToken = refreshToken
       ? createHash("sha256").update(refreshToken).digest("hex")
       : null
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { hashedRefreshToken: hashedRefreshToken }
-    })
+
+    if (refreshToken) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { hashedRefreshToken: true }
+      })
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          hashedRefreshToken,
+          previousHashedRefreshToken: user?.hashedRefreshToken ?? null,
+          refreshTokenRotatedAt: new Date()
+        }
+      })
+    } else {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          hashedRefreshToken: null,
+          previousHashedRefreshToken: null,
+          refreshTokenRotatedAt: null
+        }
+      })
+    }
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
