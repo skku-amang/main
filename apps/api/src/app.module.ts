@@ -5,7 +5,6 @@ import { AppService } from "./app.service"
 import { ConfigModule } from "@nestjs/config"
 import { LoggerModule } from "nestjs-pino"
 import { pinoLoggerModuleOption } from "./common/logger/pino-logger.config"
-import { validateEnv } from "./common/config/env.schema"
 import { PrismaModule } from "./prisma/prisma.module"
 import { UsersModule } from "./users/users.module"
 import { AuthModule } from "./auth/auth.module"
@@ -24,8 +23,7 @@ import { HealthModule } from "./health/health.module"
     SentryModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      cache: true,
-      validate: validateEnv
+      cache: true
     }),
     LoggerModule.forRoot(pinoLoggerModuleOption),
     PrismaModule,

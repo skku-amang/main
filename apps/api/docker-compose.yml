@@ -42,29 +42,7 @@ services:
       - minio_data:/data
     command: server /data --console-address ":9001"
 
-  # 캐시/큐/세션 등 in-memory data structure server
-  redis:
-    image: redis:8.4-alpine
-    container_name: redis
-    restart: unless-stopped
-    command:
-      - redis-server
-      - --requirepass
-      - ${REDIS_PASSWORD:-redis}
-      - --appendonly
-      - "yes"
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis}", "--no-auth-warning", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
 volumes:
   postgres_data:
   pgadmin_data:
   minio_data:
-  redis_data:
