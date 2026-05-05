@@ -25,6 +25,10 @@ const sentryClient = Sentry.init({
 
   skipOpenTelemetrySetup: true,
 
+  // SentrySampler.shouldSample()가 client options.tracesSampleRate를 읽어
+  // hasSpansEnabled 판정 → 미설정 시 모든 span을 NOT_RECORDING으로 drop함.
+  // skipOpenTelemetrySetup=true여도 본 값은 SentrySampler에서 읽히므로 필수.
+  tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
 
   integrations: [nodeProfilingIntegration()],
@@ -60,7 +64,11 @@ if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
       getNodeAutoInstrumentations({
         "@opentelemetry/instrumentation-fs": { enabled: false },
         "@opentelemetry/instrumentation-net": { enabled: false },
-        "@opentelemetry/instrumentation-dns": { enabled: false }
+        "@opentelemetry/instrumentation-dns": { enabled: false },
+        "@opentelemetry/instrumentation-http": {
+          ignoreIncomingRequestHook: (req) =>
+            req.url?.endsWith("/health") ?? false
+        }
       })
     ]
   })
