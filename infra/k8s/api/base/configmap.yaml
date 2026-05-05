@@ -7,3 +7,6 @@ data:
   REFRESH_TOKEN_EXPIRES_IN_SECONDS: "604800"
   S3_REGION: ap-northeast-2
   S3_BUCKET: amang
+  # ADR-0001 Phase 1: traces → 홈랩 OTel Collector
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
+  OTEL_SERVICE_NAME: amang-api

@@ -18,6 +18,9 @@ patches:
       - op: add
         path: /data/NODE_ENV
         value: "development"
+      - op: add
+        path: /data/DEPLOYMENT_ENVIRONMENT
+        value: "staging"
     target:
       kind: ConfigMap
       name: api-config
