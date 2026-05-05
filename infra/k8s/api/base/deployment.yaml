@@ -29,6 +29,8 @@ spec:
                 name: amang-db-credentials
             - secretRef:
                 name: minio-s3-credentials
+            - secretRef:
+                name: redis-credentials
           livenessProbe:
             httpGet:
               path: /health
