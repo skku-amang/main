@@ -72,6 +72,9 @@ importers:
       '@opentelemetry/sdk-node':
         specifier: ^0.217.0
         version: 0.217.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/semantic-conventions':
+        specifier: ^1.40.0
+        version: 1.40.0
       '@repo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
