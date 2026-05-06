@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: AMANG API
+  version: 0.1.0
+  description: |
+    성균관대학교 밴드 동아리 AMANG의 운영 시스템 REST API.
+
+    이 spec은 SSOT입니다. BE/FE 양쪽 모두 이 파일에서 derive됩니다.
+  license:
+    name: Internal Use Only
+
+servers:
+  - url: http://localhost:8000
+    description: 로컬 개발 서버
+  - url: https://amang.staging.json-server.win
+    description: 스테이징 서버
+  - url: https://amang.json-server.win
+    description: 프로덕션 서버
+
+# 기본은 인증 필요 — 공개 endpoint는 operation에서 `security: []`로 명시 override.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Performance
+    description: 공연 (Performance) 관리
+
+paths:
+  /performances:
+    $ref: v1/performance.yaml#/paths/~1performances
+  /performances/{id}:
+    $ref: v1/performance.yaml#/paths/~1performances~1{id}
+  /performances/{id}/teams:
+    $ref: v1/performance.yaml#/paths/~1performances~1{id}~1teams
+
+components:
+  securitySchemes:
+    bearerAuth:
+      $ref: _shared.yaml#/components/securitySchemes/bearerAuth

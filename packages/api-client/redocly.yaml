@@ -1,0 +1,22 @@
+# Redocly 설정 — spec linting + bundling.
+# 명령:
+#   pnpm bundle  → spec/openapi.yaml의 $ref 다 합쳐서 src/openapi.bundled.yaml로 출력
+#   pnpm lint    → 도메인 yaml 전체 lint
+extends:
+  - recommended
+
+apis:
+  amang@v1:
+    root: ./spec/openapi.yaml
+
+rules:
+  # 운영 ID 필수 (Hey API SDK 함수 이름의 source)
+  operation-operationId: error
+  # 응답 description 필수
+  operation-4xx-response: warn
+  # tags 일관성
+  operation-singular-tag: warn
+  # 경로 파라미터 타입 명시
+  path-parameters-defined: error
+  # security 정의 검증
+  security-defined: error

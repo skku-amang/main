@@ -22,7 +22,8 @@ interface PerformanceCardProp {
   posterSrc: string | null
   description?: string
   location: string | null
-  startAt: Date | null
+  // Spec-derived 타입은 ISO string. 호출부에서 string 또는 Date 둘 다 들어올 수 있음.
+  startAt: Date | string | null
   className?: string
 }
 
@@ -68,7 +69,10 @@ const PerformanceCard = ({
         <CardTitle className="truncate">{name}</CardTitle>
         <CardDescription>
           {startAt
-            ? `${startAt.getFullYear()}년 ${startAt.getMonth() + 1}월 ${startAt.getDate()}일`
+            ? (() => {
+                const d = startAt instanceof Date ? startAt : new Date(startAt)
+                return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
+              })()
             : "미정"}
         </CardDescription>
       </CardHeader>

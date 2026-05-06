@@ -1,0 +1,243 @@
+openapi: 3.1.0
+info:
+  title: AMANG API Shared Schemas
+  version: 0.1.0
+
+# Cross-cutting schemas + 표준 status 별 response envelope.
+# 도메인 yaml에서 $ref로만 사용. 직접 paths 정의 없음.
+#
+# 디자인 결정: spec은 *logical contract*만 기술 (envelope 미선언).
+#   - BE는 ApiResultInterceptor로 모든 응답을 {isSuccess, isFailure, data|error} 봉투로 감쌈 (legacy 호환).
+#   - FE의 spec-client.ts interceptor가 봉투를 strip → SDK 함수가 반환하는 data == spec의 응답 타입.
+#   - 결과: types == runtime 일치, 호출부 `.data` 중첩 접근 불필요.
+# 트레이드오프: 외부 도구(Postman, Stoplight)는 envelope을 못 봄. PoC 단계에선 수용.
+components:
+  schemas:
+    # ─── RFC 7807 ProblemDocument ─────────────────────────────────
+    ProblemBase:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          description: 에러 식별 URI (discriminator)
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+
+    # ─── 일반 Problem variants ────────────────────────────────────
+    ValidationProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/validation-error
+            status:
+              type: integer
+              const: 400
+
+    AuthProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/authentication-error
+            status:
+              type: integer
+              const: 401
+
+    ForbiddenProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/forbidden
+            status:
+              type: integer
+              const: 403
+
+    NotFoundProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/not-found
+            status:
+              type: integer
+              const: 404
+
+    ConflictProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/conflict
+            status:
+              type: integer
+              const: 409
+
+    UnprocessableEntityProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/unprocessable-entity
+            status:
+              type: integer
+              const: 422
+
+    InternalServerProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/internal-server-error
+            status:
+              type: integer
+              const: 500
+
+    # ─── Token 관련 (모든 인증 필요 endpoint에서 401로 발생 가능) ──
+    AccessTokenExpiredProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/token/access-token-expired
+            status:
+              type: integer
+              const: 401
+
+    AccessTokenNotFoundProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/token/access-token-not-found
+            status:
+              type: integer
+              const: 401
+
+    RefreshTokenExpiredProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/token/refresh-token-expired
+            status:
+              type: integer
+              const: 401
+
+    RefreshTokenNotFoundProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/token/refresh-token-not-found
+            status:
+              type: integer
+              const: 401
+
+    UserNotApprovedProblem:
+      allOf:
+        - $ref: "#/components/schemas/ProblemBase"
+        - type: object
+          required: [type, status]
+          properties:
+            type:
+              type: string
+              const: /errors/user/not-approved
+            status:
+              type: integer
+              const: 403
+
+  # ─── 표준 Response components ──────────────────────────────────
+  # 도메인 yaml에서 `responses: '404': $ref: '../_shared.yaml#/components/responses/NotFound404'` 형태로 재사용.
+  # 도메인 specific 에러가 추가되는 status는 도메인 yaml에서 inline override.
+  responses:
+    Validation400:
+      description: 입력값 검증 실패
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationProblem"
+
+    Unauthorized401:
+      description: 인증 필요 또는 토큰 문제
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/AuthProblem"
+              - $ref: "#/components/schemas/AccessTokenExpiredProblem"
+              - $ref: "#/components/schemas/AccessTokenNotFoundProblem"
+              - $ref: "#/components/schemas/RefreshTokenExpiredProblem"
+              - $ref: "#/components/schemas/RefreshTokenNotFoundProblem"
+
+    Forbidden403:
+      description: 접근 권한 없음
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/ForbiddenProblem"
+              - $ref: "#/components/schemas/UserNotApprovedProblem"
+
+    NotFound404:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotFoundProblem"
+
+    InternalServer500:
+      description: 서버 오류
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InternalServerProblem"
+
+  # ─── 표준 securityScheme ───────────────────────────────────────
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token (`/auth/login` 응답으로 발급)

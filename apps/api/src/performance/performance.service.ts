@@ -18,6 +18,18 @@ export class PerformanceService {
   ) {}
 
   async create(createPerformanceDto: CreatePerformanceDto) {
+    // Spec-derived Zod에는 cross-field refinement가 없으므로 비즈니스 규칙은 service에서 검증.
+    // (이전 hand-written schema의 .refine() 대체 — 동일 검증을 InvalidPerformanceDateError로 표면화.)
+    if (
+      createPerformanceDto.startAt &&
+      createPerformanceDto.endAt &&
+      createPerformanceDto.startAt > createPerformanceDto.endAt
+    ) {
+      throw new InvalidPerformanceDateError(
+        "공연의 시작 일시는 종료 일시보다 이전이어야 합니다."
+      )
+    }
+
     const performance = await this.prisma.performance.create({
       data: createPerformanceDto
     })
