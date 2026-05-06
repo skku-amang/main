@@ -6,14 +6,21 @@ import {
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_NAMESPACE
 } from "@opentelemetry/semantic-conventions"
+import {
+  ATTR_DEPLOYMENT_ENVIRONMENT_NAME,
+  ATTR_K8S_NAMESPACE_NAME,
+  ATTR_K8S_POD_NAME
+} from "@opentelemetry/semantic-conventions/incubating"
 
 if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
   const sdk = new NodeSDK({
     resource: resourceFromAttributes({
       [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "amang-api",
       [ATTR_SERVICE_NAMESPACE]: "amang",
-      "deployment.environment.name":
-        process.env.DEPLOYMENT_ENVIRONMENT ?? "production"
+      [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]:
+        process.env.DEPLOYMENT_ENVIRONMENT ?? "production",
+      [ATTR_K8S_NAMESPACE_NAME]: process.env.K8S_NAMESPACE ?? "",
+      [ATTR_K8S_POD_NAME]: process.env.K8S_POD_NAME ?? ""
     }),
     traceExporter: new OTLPTraceExporter(),
     instrumentations: [
