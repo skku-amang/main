@@ -11,7 +11,7 @@ import {
   Query,
   Req
 } from "@nestjs/common"
-import { Request } from "express"
+import type { Request } from "express"
 import { RentalService } from "./rental.service"
 import { CreateRentalDto } from "./dto/create-rental.dto"
 import { UpdateRentalDto } from "./dto/update-rental.dto"

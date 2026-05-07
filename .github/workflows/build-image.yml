@@ -23,7 +23,8 @@ jobs:
           #     NEXT_PUBLIC_API_URL=https://api.amang.json-server.win
           - name: api
             dockerfile: apps/api/Dockerfile
-            build-args: ""
+            build-args: |
+              IMAGE_TAG=${{ github.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
