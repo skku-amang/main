@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards
 } from "@nestjs/common"
-import { Request } from "express"
+import type { Request } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { AuthService } from "./auth.service"

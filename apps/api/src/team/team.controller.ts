@@ -17,7 +17,7 @@ import { UpdateTeamDto } from "./dto/update-team.dto"
 import { TeamApplicationDto } from "./dto/team-application.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { TeamOwnerGuard } from "../auth/guards/team-owner.guard"
-import { Request } from "express"
+import type { Request } from "express"
 import { JwtPayload } from "@repo/shared-types"
 import { Public } from "../auth/decorators/public.decorator"
 

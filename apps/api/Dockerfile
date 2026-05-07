@@ -30,6 +30,8 @@ USER nestjs
 
 COPY --from=installer /app .
 
+ARG IMAGE_TAG=unknown
+ENV IMAGE_TAG=${IMAGE_TAG}
 ENV NODE_ENV=production
 EXPOSE 8000
 CMD ["node", "apps/api/dist/main.js"]

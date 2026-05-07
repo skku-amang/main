@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common"
-import { SentryModule } from "@sentry/nestjs/setup"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { ConfigModule } from "@nestjs/config"
@@ -20,7 +19,6 @@ import { HealthModule } from "./health/health.module"
 
 @Module({
   imports: [
-    SentryModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true
