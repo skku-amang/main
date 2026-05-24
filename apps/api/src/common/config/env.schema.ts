@@ -3,13 +3,6 @@ import { fromError } from "zod-validation-error"
 
 /**
  * 부팅 시점 env 검증 schema (fail-fast).
- *
- * 정책:
- * - 알려진 키만 strict 검증, 모르는 키는 통과 (`passthrough()`).
- *   기존 .env에 schema 미정의 키들(NODE_ENV, S3_*, SENTRY_DSN, PINO_* 등)이
- *   많아 strict()로 가면 부팅 실패. 단계적 strict화는 별도 작업.
- * - REDIS_*는 use case 미정 상태라 optional. 의존성 + NestJS 모듈 등록
- *   PR에서 required로 전환.
  */
 export const envSchema = z
   .object({
