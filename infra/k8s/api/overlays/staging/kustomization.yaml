@@ -18,6 +18,12 @@ patches:
       - op: add
         path: /data/NODE_ENV
         value: "development"
+      - op: add
+        path: /data/REDIS_HOST
+        value: "redis.amang-redis-staging.svc.cluster.local"
+      - op: add
+        path: /data/REDIS_PORT
+        value: "6379"
     target:
       kind: ConfigMap
       name: api-config
