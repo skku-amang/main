@@ -7,8 +7,9 @@ Sentry.init({
 
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
+  enableLogs: true,
 
-  integrations: [nodeProfilingIntegration()],
+  integrations: [nodeProfilingIntegration(), Sentry.pinoIntegration()],
 
   // 헬스체크 503은 Blackbox Exporter에서 모니터링하므로 Sentry 노이즈 방지 (API-4)
   beforeSend(event) {
