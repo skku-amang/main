@@ -23,6 +23,7 @@ import {
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 @Injectable()
@@ -100,6 +101,13 @@ export class TeamService {
     try {
       const team = await this.prisma.team.create({
         data: createPayload
+      })
+
+      Sentry.metrics.count("team.formed", 1, {
+        attributes: {
+          performanceId: performanceId,
+          sessionCount: memberSessions?.length ?? 0
+        }
       })
 
       return this.findOne(team.id)

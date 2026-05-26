@@ -8,6 +8,7 @@ import {
   UserNotApprovedError
 } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 import * as bcrypt from "bcrypt"
 import { createHash, timingSafeEqual } from "crypto"
 import { CreateUserDto } from "../users/dto/create-user.dto"
@@ -23,6 +24,9 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     await this.usersService.create(createUserDto)
+    Sentry.metrics.count("signup.completed", 1, {
+      attributes: { provider: "credentials" }
+    })
   }
 
   async login(loginDto: LoginUserDto) {
