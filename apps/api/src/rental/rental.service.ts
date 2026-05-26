@@ -9,6 +9,7 @@ import {
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import { rentalLogWithUserInlcude } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 
 @Injectable()
 export class RentalService {
@@ -27,7 +28,7 @@ export class RentalService {
       throw new ConflictError("해당 시간에 이미 예약된 장비입니다.")
 
     try {
-      return await this.prisma.equipmentRental.create({
+      const rental = await this.prisma.equipmentRental.create({
         data: {
           startAt,
           endAt,
@@ -46,6 +47,16 @@ export class RentalService {
         },
         include: rentalLogWithUserInlcude
       })
+
+      if (rental.equipment.category === "ROOM") {
+        Sentry.metrics.count("room.reserved", 1)
+      } else {
+        Sentry.metrics.count("rental.created", 1, {
+          attributes: { category: rental.equipment.category }
+        })
+      }
+
+      return rental
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2003" || err.code === "P2025")
