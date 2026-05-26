@@ -187,6 +187,7 @@ export default class ApiClient {
   ): Promise<PromiseWithError<T, E>> {
     const options: RequestInit = {
       method,
+      credentials: "include",
       headers: {
         ...headers,
         ...(this.accessToken && { Authorization: `Bearer ${this.accessToken}` })
@@ -208,7 +209,6 @@ export default class ApiClient {
           "Content-Type": "application/json"
         }
         options.body = JSON.stringify(body)
-        options.credentials = "include"
       }
     }
 
