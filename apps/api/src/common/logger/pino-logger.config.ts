@@ -6,6 +6,7 @@ import PinoPretty from "pino-pretty"
 import { format } from "sql-formatter"
 import { JwtService } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 
 const jwtService = new JwtService()
 
@@ -38,6 +39,10 @@ export const pinoLoggerModuleOption: Params = {
     mixin(mergeObject: any) {
       if (!mergeObject.msg && mergeObject.message) {
         mergeObject = { ...mergeObject, msg: mergeObject.message }
+      }
+      const traceId = Sentry.getActiveSpan()?.spanContext().traceId
+      if (traceId) {
+        mergeObject = { ...mergeObject, trace_id: traceId }
       }
       return mergeObject
     },
