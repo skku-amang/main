@@ -1,7 +1,7 @@
 # ADR-0002: 인증 토큰 관리 — next-auth 제거 + 백엔드 cookie 발급
 
 **작성일**: 2026-05-26
-**상태**: Draft
+**상태**: Accepted
 **작성자**: JSON (+ Claude Code 협업)
 **관련 이슈**: [#358](https://github.com/skku-amang/main/issues/358)
 **선행 폐기 PR/이슈**: [#444](https://github.com/skku-amang/main/pull/444), [#443](https://github.com/skku-amang/main/issues/443), [#506](https://github.com/skku-amang/main/issues/506)
@@ -53,53 +53,49 @@ ApiClient 401 → onTokenExpired() → next-auth update()
 
 - **bcrypt 72-byte 절삭**: refresh token rotation이 사실상 무력화되어 있던 문제 — [#392](https://github.com/skku-amang/main/issues/392) / [#395](https://github.com/skku-amang/main/issues/395)에서 SHA-256으로 수정 완료
 - **next-auth 구조 미스매치**: OAuth 흐름에 최적화된 next-auth를 Credentials 단일 provider로 사용 중. 불필요한 추상화 계층
-- **Capacitor 앱 포팅 제약**: next-auth의 JWT cookie 구조는 브라우저 전용. 모바일 앱(Capacitor)에서는 Secure Storage + Authorization 헤더 방식 필요
 
 ## Decision
 
 ### 핵심 원칙
 
-> 인증 토큰 발급·검증·갱신을 **백엔드(NestJS)가 단독 책임**진다. 프론트는 cookie/Secure Storage를 통해 토큰을 운반하는 transport 역할만 한다. next-auth는 제거한다.
+> 인증 토큰 발급·검증·갱신을 **백엔드(NestJS)가 단독 책임**진다. 프론트는 httpOnly cookie를 통해 토큰을 운반하는 transport 역할만 한다. next-auth는 제거한다.
 
 ### 아키텍처
 
 ```text
-                      ┌─────────────────────────────────┐
-                      │  Backend (NestJS)                │
-                      │  - POST /auth/login              │
-                      │  - POST /auth/refresh            │
-                      │  - POST /auth/logout             │
-                      │  - GET  /auth/me                 │
-                      │  - AT/RT 발급 + httpOnly cookie  │
-                      │  - 헤더/쿠키 양방향 AT 검증      │
-                      └────────────┬─────────────────────┘
-                                   │
-              ┌────────────────────┴────────────────────┐
-              │                                         │
-        ┌─────▼─────┐                            ┌──────▼──────┐
-        │ Web 브라우저 │                          │ Capacitor 앱 │
-        │  (Phase 1) │                          │  (Phase 4)  │
-        │           │                            │             │
-        │ AT/RT     │                            │ AT/RT       │
-        │ httpOnly  │                            │ Secure      │
-        │ Cookie    │                            │ Storage     │
-        │           │                            │             │
-        │ React     │                            │ Authorization│
-        │ Context로 │                            │ Bearer 헤더 │
-        │ user 정보 │                            │             │
-        └───────────┘                            └─────────────┘
+┌─────────────────────────────────┐
+│  Backend (NestJS)                │
+│  - POST /auth/login              │
+│  - POST /auth/refresh            │
+│  - POST /auth/logout             │
+│  - GET  /auth/me                 │
+│  - AT/RT 발급 + httpOnly cookie  │
+│  - 헤더/쿠키 양방향 AT 검증      │
+└────────────┬─────────────────────┘
+             │
+       ┌─────▼─────┐
+       │ Web 브라우저 │
+       │           │
+       │ AT/RT     │
+       │ httpOnly  │
+       │ Cookie    │
+       │           │
+       │ React     │
+       │ Context로 │
+       │ user 정보 │
+       └───────────┘
 ```
 
 ### 토큰 관리
 
-| 항목         | Web                                                                          | Capacitor 앱 (Phase 4)             |
-| ------------ | ---------------------------------------------------------------------------- | ---------------------------------- |
-| AT 저장      | httpOnly cookie                                                              | Secure Storage (Keychain/Keystore) |
-| RT 저장      | httpOnly cookie                                                              | Secure Storage                     |
-| AT 전달      | cookie 자동 전송                                                             | `Authorization: Bearer`            |
-| RT 전달      | cookie 자동 전송                                                             | body `/auth/refresh`               |
-| CSRF         | **SameSite=Lax + Origin 검증**                                               | N/A (cookie 미사용)                |
-| Cookie 속성  | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age` (AT=1h, RT=7d)     | N/A                                |
+| 항목         | 값                                                                       |
+| ------------ | ------------------------------------------------------------------------ |
+| AT 저장      | httpOnly cookie                                                          |
+| RT 저장      | httpOnly cookie                                                          |
+| AT 전달      | cookie 자동 전송                                                         |
+| RT 전달      | cookie 자동 전송                                                         |
+| CSRF         | **SameSite=Lax + Origin 검증**                                           |
+| Cookie 속성  | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age` (AT=1h, RT=7d) |
 
 ### CSRF 보호 (D1)
 
@@ -154,22 +150,14 @@ ApiClient.refreshPromise (싱글톤) — 단일 탭
 
 Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 복잡도 대비 효익 없음.
 
-### Capacitor 앱 (D4)
-
-**Phase 1에서 설계만 cover, 실구현은 Phase 4 (별도 PR)** 채택.
-
-- 본 ADR이 모바일 앱 transport 차이(Secure Storage + Authorization 헤더)를 설계 단계에서 명시
-- 백엔드 API는 처음부터 양쪽(cookie / Bearer 헤더) 다 지원하도록 구현
-- 실제 Capacitor 앱 도입 시점에 Phase 4 진행. 현재 우선순위 낮음
-
 ## 오픈 결정 (백엔드 영역)
 
-### D5. 백엔드 endpoint 명세
+### D4. 백엔드 endpoint 명세
 
 **[오픈 결정 — 남승민 (백엔드 영역)]**
 
 - `Set-Cookie` 형식 (도메인, path, SameSite, Secure, HttpOnly, Max-Age 정확한 값)
-- `/auth/refresh` 응답: 새 토큰 body 반환 vs Set-Cookie only (Capacitor 앱 호환성 위해 양쪽 다 필요할 수 있음)
+- `/auth/refresh` 응답: 새 토큰 body 반환 vs Set-Cookie only
 - `/auth/me` 응답 schema (`@repo/shared-types`에 새 타입 추가)
 - 로그아웃 시 RT 무효화 시점 (DB delete 시점)
 - Origin 검증 화이트리스트 (production / preview / localhost)
@@ -180,8 +168,8 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 
 ### Phase 1: 백엔드 cookie 발급 (남승민)
 
-- [ ] D5 결정 사항 반영해 `/auth/login` 응답에 `Set-Cookie` 추가
-- [ ] `/auth/refresh` 도 `Set-Cookie` (+ body는 옵션, Capacitor 대비)
+- [ ] D4 결정 사항 반영해 `/auth/login` 응답에 `Set-Cookie` 추가
+- [ ] `/auth/refresh` 도 `Set-Cookie`
 - [ ] `/auth/logout` endpoint 추가 (cookie 삭제 + RT DB delete)
 - [ ] `/auth/me` endpoint 추가
 - [ ] AT 검증 미들웨어를 헤더/쿠키 양방향으로 수정
@@ -202,17 +190,11 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 - [ ] 배포 시 next-auth cookie 무효화 (next-auth cookie name이 사라지므로 자동)
 - [ ] 모니터링 (Sentry: refresh 실패율, 강제 로그아웃 빈도 24h)
 
-### Phase 4: Capacitor 앱 (별도 PR, 우선순위 낮음)
-
-- [ ] Secure Storage 어댑터
-- [ ] Authorization Bearer 헤더 전송
-
 ## Consequences
 
 ### 긍정
 
 - **Race condition 근본 해결** — refresh trigger source 단일화
-- **Capacitor 포팅 대응** — cookie 의존 제거 (Phase 4)
 - **소셜로그인 확장 용이** — 백엔드 Passport strategy 추가만으로 가능
 - **디버깅 용이** — 토큰이 next-auth JWT 내부에 암호화되지 않음
 - **레이어 단순화** — next-auth 추상화 제거, 직접적 fetch + cookie
@@ -243,7 +225,6 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 ### Alt-3. next-auth 유지 + JWT 콜백 refresh 제거만
 
 - ❌ next-auth 내부 동작에 의존한 hack — 미래 버전 업그레이드 위험
-- ❌ Capacitor 포팅 대응 안 됨
 
 ## 참고 자료
 
