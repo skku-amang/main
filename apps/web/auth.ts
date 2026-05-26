@@ -11,6 +11,10 @@ import {
   UserNotApprovedSigninError
 } from "@/lib/auth/errors"
 
+// ADR-0002: JWT 콜백의 auto-refresh 로직 제거됨.
+// refresh는 ApiClient interceptor + TokenManager (Web Locks)로 단일화.
+// 본 파일 전체는 Phase 2.6에서 제거 예정.
+
 const authOptions: NextAuthConfig = {
   providers: [
     Credentials({
@@ -78,36 +82,11 @@ const authOptions: NextAuthConfig = {
         }
       }
 
-      // 백엔드 액세스 토큰 만료 여부 확인 (여유 시간 10초)
-      if (token.expiresIn && Date.now() < (token.expiresIn as number) - 10000) {
-        return token
-      }
-
-      // refreshToken이 없으면 갱신 불가 (비로그인 상태)
-      if (!token.refreshToken) {
-        return token
-      }
-
-      // 토큰 갱신 시도
-      try {
-        const {
-          accessToken,
-          refreshToken: newRefreshToken,
-          expiresIn
-        } = await refreshAccessToken(token.refreshToken as string)
-        return {
-          ...token,
-          accessToken,
-          refreshToken: newRefreshToken,
-          expiresIn: Date.now() + expiresIn * 1000
-        }
-      } catch (error) {
-        console.error("Error refreshing access token", error)
-        if (error instanceof UserNotApprovedError) {
-          return { ...token, error: "UserNotApprovedError" }
-        }
-        return { ...token, error: "RefreshAccessTokenError" }
-      }
+      // ADR-0002: JWT 콜백 auto-refresh 제거.
+      // 5개 분산 trigger source (RSC auth() / middleware / useSession poll / update() / RSC streaming)가
+      // 각자 refresh 시도하던 race를 ApiClient interceptor 단일 진입점으로 통합.
+      // 만료된 토큰은 그대로 반환 — ApiClient가 401 받으면 TokenManager가 cookie 갱신.
+      return token
     },
     /**
      * 2. 세션 콜백은 클라이언트에 반환되는 세션 객체를 구성합니다.
@@ -172,6 +151,3 @@ async function login({ email, password }: LoginUser) {
   }
 }
 
-async function refreshAccessToken(refreshToken: string) {
-  return apiClient.refreshToken(refreshToken)
-}
