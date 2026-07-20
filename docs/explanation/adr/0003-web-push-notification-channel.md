@@ -1,8 +1,8 @@
 # ADR-0003: 알림 모바일 도달 채널 — Web Push (PWA), 앱 래핑 없이
 
 **작성일**: 2026-07-21
-**상태**: Proposed
-**작성자**: JSON (+ Claude Code 협업)
+**상태**: Accepted
+**작성자**: 손장수 (+ Claude Code 협업)
 **관련 이슈**: [#347](https://github.com/skku-amang/main/issues/347) (알림 시스템 구축)
 
 ## Context
