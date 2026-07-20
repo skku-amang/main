@@ -47,7 +47,7 @@
 - K8s 클러스터, ArgoCD GitOps, MinIO·DB·인증 등 인프라
 - Next.js 웹 구현 (디자인 시안 기반)
 - **AX (AI Experience)** — AI 활용 차원. feature별 정의 다름:
-  - 피드백 시스템: 이상 피드백 탐지, 코멘트 요약 등 ([명세 4.11](design/specs/2026-05-05-amang-feedback-system-design.md))
+  - 피드백 시스템: 이상 피드백 탐지, 코멘트 요약 등
   - 향후: 운영 판단·도메인 융합·딥링크 자동화 등
 
 ---

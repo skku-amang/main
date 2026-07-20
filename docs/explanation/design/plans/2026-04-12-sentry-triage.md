@@ -8,7 +8,6 @@
 
 **Tech Stack:** Bash + `gh` CLI (라벨 관리·이슈 생성), Claude Code Skill (Markdown), `amang-sentry` MCP (Sentry 접근).
 
-**Spec:** [docs/explanation/design/specs/2026-04-12-sentry-triage-design.md](../specs/2026-04-12-sentry-triage-design.md)
 
 ---
 
@@ -711,7 +710,7 @@ gh pr create --title "feat(skill): Sentry 트리아지 자동화 스킬 + 라벨
 - Conventional Commits와 중복되던 `type:/scope:` 라벨 제거, `kind:/priority:/status:/from:` prefix 체계로 전환
 - `sentry-triage` Claude Code 스킬 추가 — Sentry 이슈·피드백을 5단계(🔥📝👀🚫💡)로 자동 분류, 승인 게이트로 GH 이슈 생성·Sentry 태그 부착
 
-자세한 배경·설계는 [스펙](../specs/2026-04-12-sentry-triage-design.md) 참고.
+자세한 배경·설계는 위 계획 문서를 참고.
 
 ## Test plan
 

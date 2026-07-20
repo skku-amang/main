@@ -35,7 +35,7 @@
 
 ## 피드백 시스템 도메인
 
-본 도메인은 **개발 중**. 명세 v0.1: [docs/explanation/design/specs/2026-05-05-amang-feedback-system-design.md](../explanation/design/specs/2026-05-05-amang-feedback-system-design.md).
+본 도메인은 **개발 중**.
 
 ### 곡 (Song)
 팀이 무대에 연주하기로 선정한 음악. **메타데이터로만 표현** — 제목, 원곡 아티스트, 장르, 길이 등.
