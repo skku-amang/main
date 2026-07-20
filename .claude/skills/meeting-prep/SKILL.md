@@ -91,7 +91,7 @@ GitHub `scope:` 라벨이 폐지(2026-04 재편)되었으므로 영역은 다음
    - `apps/web/**` → 프론트
    - `apps/api/**`, `packages/database/**`, `packages/shared-types/**`, `packages/api-client/**`, `packages/ui/**` → 백엔드
    - `infra/**`, `k8s/**`, `*.tf`, `Dockerfile*`, `.github/workflows/**` → 인프라
-   - `.claude/**`, `docs/superpowers/**`, `scripts/**` → AX/도구 (보고서에선 AX 섹션)
+   - `.claude/**`, `docs/explanation/design/**`, `scripts/**` → AX/도구 (보고서에선 AX 섹션)
 3. **CC 형식 위반 PR**: 별도 섹션 "⚠️ CC 형식 위반 PR"로 표시 — 제목 정정 권장
 
 `kind:` / `priority:` / `from:` / `resolution:` 라벨은 영역 판정에 사용 안 함. 다만 `priority: high`/`critical`은 보고서에서 중요도 🔴 가산점에 활용 가능.
