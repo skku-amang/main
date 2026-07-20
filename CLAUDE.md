@@ -6,6 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance), 팀(Team), 세션(Session), 장비(Equipment) 관리 및 예약 기능 제공.
 
+## 도메인 컨텍스트
+
+@docs/reference/glossary.md
+@docs/explanation/team.md
+
+> 새 feature·문서·코드 작성 시 위 두 파일을 먼저 참조. 도메인 용어 추가는 [docs/reference/glossary.md](docs/reference/glossary.md), 영역 분담 변경은 [docs/explanation/team.md](docs/explanation/team.md)를 SSOT로 업데이트한 뒤 회의에서 확정.
+
+## 문서
+
+문서는 [Diátaxis](https://diataxis.fr/) 체계로 [`docs/`](docs/README.md)에 정리되어 있다. 새 문서 추가 시 목적에 맞는 칸(tutorials/how-to/reference/explanation)을 고른다. 설계 명세(spec)·계획(plan)은 [docs/explanation/design/](docs/explanation/design/)에 쓴다.
+
 ## Conventions
 
 - **이슈, 브랜치, PR, 커밋**: [CONTRIBUTING.md](CONTRIBUTING.md)의 컨벤션을 따른다.

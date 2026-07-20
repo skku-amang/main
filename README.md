@@ -30,111 +30,27 @@ packages/
 └── typescript-config/
 ```
 
-## 시작하기
-
-### 사전 요구사항
-
-- **Node.js** >= 20.9.0
-- **Docker** (PostgreSQL, MinIO 실행용)
-- **direnv** (선택 — MCP 도구 연동 시 필요)
-
-### 원커맨드 셋업
+## 빠른 시작
 
 ```bash
 git clone https://github.com/skku-amang/main.git
 cd main
 ./scripts/setup.sh
+pnpm dev
 ```
 
-pnpm 설치, 환경변수 복사, Docker 컨테이너 기동, DB 마이그레이션·시드까지 자동으로 처리됩니다.
+자세한 안내는 [처음 시작하기](docs/tutorials/getting-started.md)를 참고하세요.
 
-완료 후 `pnpm dev`로 개발 서버를 실행합니다.
+## 문서
 
-- 웹: http://localhost:3000
-- API: http://localhost:8000
-- MinIO 콘솔: http://localhost:9001
+문서는 [Diátaxis](https://diataxis.fr/) 체계로 [`docs/`](docs/)에 정리되어 있습니다.
 
-<details>
-<summary>수동 셋업 (참고용)</summary>
+- 📖 [처음 시작하기](docs/tutorials/getting-started.md) — 개발 환경 세팅
+- 🔧 [기여하기](docs/how-to/contributing.md) — 이슈 → 브랜치 → PR 워크플로
+- 📚 [명령어](docs/reference/commands.md) · [도메인 모델](docs/reference/domain-model.md) · [용어집](docs/reference/glossary.md)
+- 💡 [팀 분담](docs/explanation/team.md) · [아키텍처 결정(ADR)](docs/explanation/adr/) · [설계 문서](docs/explanation/design/)
 
-```bash
-# 1. pnpm 활성화 및 의존성 설치
-corepack enable
-pnpm install
-
-# 2. 환경변수 복사 (기본값이 로컬 개발에 맞게 설정되어 있음)
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env.local
-cp packages/database/.env.example packages/database/.env
-
-# 3. Docker 컨테이너 실행 (PostgreSQL, MinIO)
-docker compose -f apps/api/docker-compose.yml up -d
-
-# 4. DB 셋업
-cd packages/database
-pnpm db:generate    # Prisma 클라이언트 생성
-cd ../..
-pnpm db:deploy      # 마이그레이션 적용
-cd packages/database
-pnpm db:seed        # 시드 데이터 삽입
-```
-
-</details>
-
-## 자주 쓰는 명령어
-
-```bash
-pnpm dev                              # 모든 앱 개발 서버
-pnpm dev --filter=web                 # 웹만 실행
-pnpm dev --filter=api                 # API만 실행
-pnpm build                            # 전체 빌드
-pnpm lint                             # ESLint
-pnpm format                           # Prettier 체크
-pnpm check-types                      # 타입 체크
-
-# 데이터베이스
-cd packages/database
-pnpm db:migrate                       # 개발 마이그레이션 생성
-pnpm db:generate                      # Prisma 클라이언트 재생성
-pnpm db:seed                          # 시드 데이터
-
-# 테스트
-cd apps/api && pnpm test              # 단위 테스트
-cd apps/api && pnpm test:e2e          # E2E 테스트
-
-# Storybook
-cd apps/web && pnpm storybook         # 포트 6006
-```
-
-## 도메인 모델
-
-```
-Performance (공연)
-└── Team (밴드 팀)
-    ├── Song (곡 정보)
-    └── TeamSession (세션 슬롯)
-        ├── Session (악기: VOCAL, GUITAR, BASS, SYNTH, DRUM 등)
-        └── TeamMember (참여자)
-
-User (사용자)
-├── Generation (기수)
-└── Sessions (연주 가능한 세션들)
-
-Equipment (장비/동아리방 예약)
-```
-
-## 데이터 흐름
-
-```
-Web (TanStack Query) → ApiClient (@repo/api-client) → API (NestJS) → Prisma → PostgreSQL
-```
-
-- **인증**: next-auth v5 → JWT access/refresh 토큰 → ApiClient가 토큰 자동 갱신
-- **타입 안전성**: `@repo/shared-types`의 Zod 스키마를 프론트/백엔드에서 공유
-
-## 기여 방법
-
-[CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요. 이슈 → 브랜치 → PR 워크플로우를 따릅니다.
+전체 목차는 [docs/README.md](docs/README.md)에 있습니다.
 
 ## 커뮤니케이션
 
