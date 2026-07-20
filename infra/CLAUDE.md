@@ -7,7 +7,7 @@ AMANG 인프라 매니페스트 디렉토리. K8s 매니페스트(Kustomize)와 
 ```
 infra/
 ├── k8s/
-│   └── {component}/                    # api, db, web, redis, ...
+│   └── {component}/                    # api, db, redis, ... (web은 Vercel 배포, K8s manifest 없음)
 │       ├── base/                       # 공통 매니페스트 (deployment, service, pvc, configmap)
 │       └── overlays/
 │           ├── staging/                # 환경별 namespace, ingress, NetworkPolicy, SealedSecret
@@ -26,8 +26,9 @@ ArgoCD Application 정의는 **별도 레포**([homelab](https://github.com/mana
 | ---------------------------------- | --------------------------------------- |
 | `amang-api-{staging,production}`   | NestJS API + migrate/seed Job           |
 | `amang-db-{staging,production}`    | PostgreSQL                              |
-| `amang-web-{staging,production}`   | Next.js 웹 (Vercel 배포 시 미사용 가능) |
 | `amang-redis-{staging,production}` | Redis                                   |
+
+> **web은 K8s로 배포하지 않는다** — Next.js 웹은 Vercel에 배포([infra/terraform/vercel/](../terraform/vercel/)). `AUTH_SECRET` 등 시크릿은 Terraform이 생성해 Vercel env로 주입(state 저장, 커밋 안 함)한다. 과거 `infra/k8s/web/` overlay가 있었으나 ArgoCD Application 없이 방치된 dead config였고 평문 시크릿까지 커밋돼 제거([#524](https://github.com/skku-amang/main/issues/524)). 추후 K8s 배포가 필요하면 SealedSecret으로 새로 작성한다.
 
 **왜 컴포넌트별 분리인가**: NetworkPolicy의 `namespaceSelector` cross-namespace 참조를 명시적으로 만들어 권한 경계를 ns 단위로 관리. 단일 ns에 모두 두면 모든 pod가 모든 Service에 접근 가능해짐.
 
