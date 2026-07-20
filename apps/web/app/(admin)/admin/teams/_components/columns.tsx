@@ -17,6 +17,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import {
+  SESSION_DISPLAY_NAME,
+  SESSION_NAMES,
+  type SessionNameValue
+} from "@/constants/session"
 import { TeamList } from "@repo/shared-types"
 
 type TeamItem = TeamList[number]
@@ -24,6 +29,31 @@ type TeamItem = TeamList[number]
 interface ColumnActions {
   onDelete: (team: TeamItem) => void
 }
+
+// 팀의 특정 세션에 배정된 멤버 이름을 index 순으로 나열 (CSV 정산·명단 대조용)
+function sessionRoster(team: TeamItem, sessionName: SessionNameValue): string {
+  return team.teamSessions
+    .filter((ts) => ts.session.name === sessionName)
+    .flatMap((ts) => ts.members)
+    .map((m) => m.user.name)
+    .join(", ")
+}
+
+// 세션별 참여자 명단 컬럼 — 테이블에서는 기본 숨김, CSV export에는 항상 포함
+const sessionColumns: ColumnDef<TeamItem>[] = Object.values(SESSION_NAMES).map(
+  (sessionName) => ({
+    id: `session_${sessionName}`,
+    accessorFn: (row) => sessionRoster(row, sessionName),
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title={SESSION_DISPLAY_NAME[sessionName]}
+      />
+    ),
+    meta: { label: SESSION_DISPLAY_NAME[sessionName], alwaysExport: true },
+    cell: ({ getValue }) => (getValue() as string) || "-"
+  })
+)
 
 export function getColumns(
   actions: ColumnActions,
@@ -181,6 +211,7 @@ export function getColumns(
         )
       }
     },
+    ...sessionColumns,
     {
       accessorKey: "isFreshmenFixed",
       header: ({ column }) => (

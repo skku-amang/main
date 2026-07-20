@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
+import { SESSION_NAMES } from "@/constants/session"
 import { formatGenerationOrder } from "@/lib/utils"
 import { TeamList } from "@repo/shared-types"
 
@@ -172,7 +173,11 @@ export default function TeamsAdminPage() {
         initialColumnVisibility={{
           name: false,
           isFreshmenFixed: false,
-          isSelfMade: false
+          isSelfMade: false,
+          // 세션별 참여자 컬럼: 테이블 기본 숨김, CSV export에는 항상 포함
+          ...Object.fromEntries(
+            Object.values(SESSION_NAMES).map((s) => [`session_${s}`, false])
+          )
         }}
         filters={[
           {
