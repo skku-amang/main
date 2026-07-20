@@ -20,7 +20,6 @@ import {
   Performance,
   PerformanceDetail,
   PerformanceTeamsList,
-  RefreshTokenResponse,
   SessionDetail,
   SessionList,
   SignUpResponse,
@@ -138,7 +137,6 @@ export type PromiseWithError<T, TError> = Promise<T> & {
 
 export default class ApiClient {
   private static instance: ApiClient | null = null
-  private accessToken: string | null = null
   private onTokenExpired: (() => Promise<boolean>) | null = null
   private refreshPromise: Promise<boolean> | null = null
 
@@ -156,15 +154,6 @@ export default class ApiClient {
       )
     }
     return ApiClient.instance
-  }
-
-  /**
-   * 액세스 토큰을 설정합니다.
-   * 설정된 토큰은 이후 모든 API 요청의 Authorization 헤더에 포함됩니다.
-   * @param token 액세스 토큰
-   */
-  public setAccessToken(token: string | null): void {
-    this.accessToken = token
   }
 
   /**
@@ -192,8 +181,7 @@ export default class ApiClient {
       method,
       credentials: "include",
       headers: {
-        ...headers,
-        ...(this.accessToken && { Authorization: `Bearer ${this.accessToken}` })
+        ...headers
       }
     }
 
@@ -999,25 +987,6 @@ export default class ApiClient {
       PresignedUrlResponse,
       AuthError | ValidationError | InternalServerError
     >(`/uploads/presigned-url`, "POST", request)
-  }
-
-  /**
-   * 토큰 갱신
-   * @throws {RefreshTokenExpiredError} 리프레시 토큰이 만료되었거나 유효하지 않은 경우
-   * @throws {RefreshTokenNotFoundError} 리프레시 토큰이 존재하지 않는 경우 (로그아웃 상태)
-   * @throws {AuthError} 토큰 형식이 올바르지 않은 경우
-   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public refreshToken(refreshToken: string) {
-    return this._request<
-      RefreshTokenResponse,
-      | RefreshTokenExpiredError
-      | RefreshTokenNotFoundError
-      | AuthError
-      | UserNotApprovedError
-      | InternalServerError
-    >("/auth/refresh", "POST", { refreshToken })
   }
 }
 
