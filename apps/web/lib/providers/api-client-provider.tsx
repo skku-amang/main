@@ -39,13 +39,15 @@ export const ApiClientProvider = ({ children }: { children: ReactNode }) => {
     apiClient.setOnTokenExpired(async () => {
       try {
         await TokenManager.getInstance().refresh()
-        return "cookie-refreshed"
+        // 만료된 legacy 헤더 토큰 제거 — 이후 요청은 cookie가 인증 운반
+        apiClient.setAccessToken(null)
+        return true
       } catch (error) {
         console.error("[ApiClientProvider] refresh 실패, signOut 처리", error)
         signOut({
           redirectTo: `${ROUTES.LOGIN}?callbackUrl=${window.location.pathname}`
         })
-        return null
+        return false
       }
     })
   }, [])
