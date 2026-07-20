@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { EquipCategory } from "@repo/database/enums"
 import { Equipment } from "@repo/shared-types"
@@ -34,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { useEquipments, useDeleteEquipment } from "@/hooks/api/useEquipment"
 import { useToast } from "@/components/hooks/use-toast"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 import EquipmentCard from "./EquipmentCard"
 import FilterContent, { FILTER_CATEGORIES } from "./FilterModal"
@@ -43,8 +43,8 @@ const ITEMS_PER_PAGE = 9
 const categoryValues = FILTER_CATEGORIES.map((c) => c.value)
 
 export default function EquipmentListPage() {
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.isAdmin ?? false
+  const { user } = useAuth()
+  const isAdmin = user?.isAdmin ?? false
   const { data: equipments, isLoading, isError, error } = useEquipments("item")
   const deleteEquipment = useDeleteEquipment()
   const queryClient = useQueryClient()

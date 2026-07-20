@@ -16,6 +16,7 @@ import {
   GetRentalsQuery,
   LoginUser,
   LogoutResponse,
+  MeResponse,
   Performance,
   PerformanceDetail,
   PerformanceTeamsList,
@@ -972,6 +973,18 @@ export default class ApiClient {
     return this._request<LogoutResponse, AuthError | InternalServerError>(
       "/auth/logout",
       "POST"
+    )
+  }
+
+  /**
+   * 현재 로그인된 사용자 조회 (cookie 기반, ADR-0002)
+   * @throws {AuthError} 로그인하지 않은 경우
+   * @throws {InternalServerError}
+   */
+  public getMe() {
+    return this._request<MeResponse, AuthError | InternalServerError>(
+      "/auth/me",
+      "GET"
     )
   }
 

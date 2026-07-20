@@ -21,6 +21,7 @@ describe("auth-cookie.util", () => {
       { accessToken: 3600, refreshToken: 604800 }
     )
 
+    // AT cookie 수명은 RT TTL — JWT 만료는 서버 exp 검증이 담당
     expect(res.cookie).toHaveBeenCalledWith(
       ACCESS_TOKEN_COOKIE,
       "at",
@@ -28,7 +29,7 @@ describe("auth-cookie.util", () => {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        maxAge: 3600 * 1000
+        maxAge: 604800 * 1000
       })
     )
     expect(res.cookie).toHaveBeenCalledWith(

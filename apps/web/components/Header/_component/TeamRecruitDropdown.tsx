@@ -1,7 +1,6 @@
 "use client"
 
 import { ChevronDown, Plus } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import { usePerformances } from "@/hooks/api/usePerformance"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
 import { HeaderMode } from ".."
@@ -54,7 +54,7 @@ const headerColorClass = ({
 
 const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const { data: performances } = usePerformances()
   const isCurrentPathname = pathname.includes("/performances/")
   const isEmpty = !performances || performances.length === 0
@@ -82,7 +82,7 @@ const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
             </DropdownMenuItem>
           ))
         )}
-        {session?.user?.isAdmin && (
+        {user?.isAdmin && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="cursor-pointer">

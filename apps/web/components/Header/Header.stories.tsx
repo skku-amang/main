@@ -1,27 +1,42 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import type { Session } from "next-auth"
-import { SessionProvider } from "next-auth/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
+import { ME_QUERY_KEY } from "@/hooks/api/useAuth"
+import { AuthProvider } from "@/lib/providers/auth-provider"
+import { ApiClientProvider } from "@/lib/providers/api-client-provider"
+import type { DetailedUser } from "@repo/shared-types"
 
 import Header from "./index"
 
-const mockSession: Session = {
-  user: {
-    id: "1",
-    name: "홍길동",
-    email: "hong@skku.edu",
-    image: null,
-    nickname: "길동",
-    isAdmin: false
-  },
-  accessToken: "mock-token",
-  expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+const mockUser: DetailedUser = {
+  id: 1,
+  name: "홍길동",
+  email: "hong@skku.edu",
+  image: null,
+  nickname: "길동",
+  bio: null,
+  isAdmin: false,
+  isApproved: true,
+  generation: { id: 1, order: 34 },
+  sessions: []
 }
 
-const withSession = (session: Session) => (Story: React.ComponentType) => (
-  <SessionProvider session={session}>
-    <Story />
-  </SessionProvider>
-)
+const withUser = (user: DetailedUser | null) => {
+  const Decorator = (Story: React.ComponentType) => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(ME_QUERY_KEY, user)
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ApiClientProvider>
+          <AuthProvider>
+            <Story />
+          </AuthProvider>
+        </ApiClientProvider>
+      </QueryClientProvider>
+    )
+  }
+  return Decorator
+}
 
 const meta: Meta<typeof Header> = {
   title: "Components/Header",
@@ -118,21 +133,21 @@ export const LoggedIn: Story = {
   args: {
     mode: "dark"
   },
-  decorators: [withSession(mockSession)]
+  decorators: [withUser(mockUser)]
 }
 
 export const LoggedInLightMode: Story = {
   args: {
     mode: "light"
   },
-  decorators: [withSession(mockSession)]
+  decorators: [withUser(mockUser)]
 }
 
 export const MobileLoggedIn: Story = {
   args: {
     mode: "dark"
   },
-  decorators: [withSession(mockSession)],
+  decorators: [withUser(mockUser)],
   parameters: {
     viewport: {
       defaultViewport: "mobile1"

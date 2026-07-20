@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
-import { auth } from "@/auth"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
+import { getServerUser } from "@/lib/auth/server"
 
 import TeamForm from "../_components/TeamForm"
 
@@ -17,8 +17,8 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
   const params = await props.params
   const performanceId = params.id
 
-  const session = await auth()
-  if (!session) redirect(ROUTES.LOGIN)
+  const user = await getServerUser()
+  if (!user) redirect(ROUTES.LOGIN)
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">

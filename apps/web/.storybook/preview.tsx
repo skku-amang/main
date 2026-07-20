@@ -1,9 +1,9 @@
 import type { Preview } from "@storybook/react"
 import { withThemeByClassName } from "@storybook/addon-themes"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { SessionProvider } from "next-auth/react"
 import React from "react"
 
+import { AuthProvider } from "../lib/providers/auth-provider"
 import { ApiClientProvider } from "@/lib/providers/api-client-provider"
 
 const queryClient = new QueryClient({
@@ -34,11 +34,11 @@ const preview: Preview = {
     }),
     (Story) => (
       <QueryClientProvider client={queryClient}>
-        <SessionProvider session={null}>
-          <ApiClientProvider>
+        <ApiClientProvider>
+          <AuthProvider>
             <Story />
-          </ApiClientProvider>
-        </SessionProvider>
+          </AuthProvider>
+        </ApiClientProvider>
       </QueryClientProvider>
     )
   ]

@@ -1,4 +1,7 @@
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@repo/shared-types"
 import { CookieOptions, Response } from "express"
+
+export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE }
 
 /**
  * ADR-0002 D4 cookie 속성.
@@ -7,16 +10,21 @@ import { CookieOptions, Response } from "express"
  *   same-site(json-server.win)라 cross-subdomain 요청에도 전송됨.
  *   *.vercel.app preview는 cross-site라 미전송 — staging에서 검증.
  * - RT는 Path=/auth로 좁혀 일반 API 요청에 노출되지 않게 함.
- * - Domain 미지정(host-only): 모든 인증 요청이 api 호스트로만 가므로 충분.
+ * - Domain=COOKIE_DOMAIN (prod: amang.json-server.win): api 서브도메인이 발급한
+ *   cookie를 web 호스트(Next middleware·RSC)에서도 볼 수 있게 함.
+ *   json-server.win 전체가 아니라 amang 스코프라 타 서비스 미노출.
+ *   로컬 개발은 미설정(host-only) — localhost는 포트 무관 공유됨.
  * - secure는 로컬 http 개발을 위해 production에서만 강제.
+ * - AT cookie의 Max-Age는 RT TTL로 설정: JWT 만료(1h)와 cookie 수명을 분리해
+ *   만료된 AT가 401 → refresh 흐름을 타게 하고, 프론트 middleware의
+ *   presence 체크가 세션 지속 기간 내내 유효하게 함. 토큰 유효성은 항상
+ *   서버의 JWT exp 검증이 결정.
  */
-export const ACCESS_TOKEN_COOKIE = "accessToken"
-export const REFRESH_TOKEN_COOKIE = "refreshToken"
-
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax"
+  sameSite: "lax",
+  ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
 }
 
 export function setAuthCookies(
@@ -27,7 +35,7 @@ export function setAuthCookies(
   res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
     ...baseCookieOptions,
     path: "/",
-    maxAge: maxAgeSeconds.accessToken * 1000
+    maxAge: maxAgeSeconds.refreshToken * 1000
   })
   res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
     ...baseCookieOptions,

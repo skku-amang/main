@@ -1,7 +1,6 @@
 "use client"
 
 import { LoaderCircle, LogOut, Settings, Users } from "lucide-react"
-import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React from "react"
@@ -16,6 +15,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
 interface MenuItemProps {
@@ -42,12 +42,12 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
 
 const Profile = () => {
   const router = useRouter()
-  const { status, data: session } = useSession()
+  const { user, isLoading, logout } = useAuth()
 
-  if (!session) {
+  if (!user) {
     return (
       <>
-        {status === "loading" ? (
+        {isLoading ? (
           <LoaderCircle className="animate-spin text-white" size={30} />
         ) : (
           <Button
@@ -64,8 +64,8 @@ const Profile = () => {
 
   const iconSize = 20
   const profileImage =
-    session.user?.image ??
-    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
+    user.image ??
+    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(user.email)}`
 
   return (
     <DropdownMenu>
@@ -85,8 +85,8 @@ const Profile = () => {
             <AvatarFallback>A</AvatarFallback>
           </Avatar>
           <div>
-            <div>{session.user?.name}</div>
-            <div className="font-normal">{session.user?.email}</div>
+            <div>{user.name}</div>
+            <div className="font-normal">{user.email}</div>
           </div>
         </DropdownMenuItem>
 
@@ -95,7 +95,7 @@ const Profile = () => {
           참여 중인 팀
         </MenuItem>
 
-        {session.user?.isAdmin && (
+        {user.isAdmin && (
           <>
             <DropdownMenuSeparator />
             <MenuItem
@@ -109,7 +109,7 @@ const Profile = () => {
 
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onSelect={() => signOut()}
+          onSelect={() => logout().then(() => (window.location.href = "/"))}
           className="flex h-full w-full items-center justify-start gap-x-3 p-2 hover:cursor-pointer"
         >
           <LogOut size={iconSize} />

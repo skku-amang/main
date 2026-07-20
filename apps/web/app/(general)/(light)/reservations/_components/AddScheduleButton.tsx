@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter, usePathname } from "next/navigation"
 import dayjs from "dayjs"
@@ -29,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import MemberPicker from "@/components/MemberPicker"
 import { cn, formatGenerationOrder } from "@/lib/utils"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import { Equipment } from "@repo/shared-types"
@@ -56,7 +56,7 @@ export default function AddScheduleButton({
   label
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const { data: users } = useUsers()
   const createRental = useCreateRental()
   const queryClient = useQueryClient()
@@ -64,7 +64,7 @@ export default function AddScheduleButton({
   const router = useRouter()
   const pathname = usePathname()
 
-  const currentUserId = session?.user?.id ? Number(session.user.id) : null
+  const currentUserId = user?.id ?? null
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const disablePastDates = { before: today }
@@ -213,7 +213,7 @@ export default function AddScheduleButton({
     <Dialog
       open={open}
       onOpenChange={(v) => {
-        if (v && !session) {
+        if (v && !user) {
           router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
           return
         }
