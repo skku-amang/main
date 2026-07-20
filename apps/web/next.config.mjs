@@ -41,7 +41,26 @@ const nextConfig = {
     ],
     unoptimized: true
   },
-  output: "standalone"
+  output: "standalone",
+  async headers() {
+    const securityHeaders = [
+      {
+        key: "Strict-Transport-Security",
+        value: "max-age=31536000; includeSubDomains"
+      },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()"
+      },
+      // 전체 CSP(script-src 등)는 Sentry·next-auth·인라인과 충돌 위험 → 후속 이슈에서 Report-Only로 도입.
+      // 지금은 클릭재킹 방어(frame-ancestors)만 안전하게 적용.
+      { key: "Content-Security-Policy", value: "frame-ancestors 'self'" }
+    ]
+    return [{ source: "/:path*", headers: securityHeaders }]
+  }
 }
 
 export default withSentryConfig(nextConfig, {
