@@ -61,6 +61,27 @@ export class AuthService {
     return this.usersService.updateRefreshToken(userId, null)
   }
 
+  tokenTtls() {
+    return {
+      accessToken: parseInt(
+        this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN_SECONDS")!,
+        10
+      ),
+      refreshToken: parseInt(
+        this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN_SECONDS")!,
+        10
+      )
+    }
+  }
+
+  async me(userId: number) {
+    const user = await this.usersService.findDetailedById(userId)
+    if (!user) {
+      throw new AuthError("존재하지 않는 사용자입니다.")
+    }
+    return user
+  }
+
   private async getTokens(
     userId: number,
     email: string,
@@ -74,14 +95,10 @@ export class AuthService {
       isAdmin
     }
 
-    const accessTokenExpiresIn = parseInt(
-      this.configService.get<string>("ACCESS_TOKEN_EXPIRES_IN_SECONDS")!,
-      10
-    )
-    const refreshTokenExpiresIn = parseInt(
-      this.configService.get<string>("REFRESH_TOKEN_EXPIRES_IN_SECONDS")!,
-      10
-    )
+    const {
+      accessToken: accessTokenExpiresIn,
+      refreshToken: refreshTokenExpiresIn
+    } = this.tokenTtls()
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {

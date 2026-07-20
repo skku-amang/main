@@ -270,4 +270,11 @@ export class UsersService {
   async findOneById(id: number) {
     return this.prisma.user.findUnique({ where: { id } })
   }
+
+  async findDetailedById(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: detailedUserSelector
+    })
+  }
 }
