@@ -8,7 +8,6 @@
 
 **Tech Stack:** Bash + `gh` CLI (라벨 관리·이슈 생성), Claude Code Skill (Markdown), `amang-sentry` MCP (Sentry 접근).
 
-
 ---
 
 ## File Structure
@@ -31,6 +30,7 @@ skku-amang/main/
 ```
 
 **파일별 책임**:
+
 - `setup-labels.sh`: 선언적 라벨 매니페스트 정의 + `gh label create/edit`로 동기화. 멱등성 보장.
 - `migrate-old-labels.sh`: 기존 `type:*`, `scope:*`, `v0` 라벨을 이슈/PR에서 제거 후 삭제.
 - `CONTRIBUTING.md`: 새 라벨 체계 + 이슈/PR별 라벨 사용 규칙 문서화.
@@ -45,6 +45,7 @@ skku-amang/main/
 ### Task 1: 선언적 라벨 매니페스트 스크립트 작성
 
 **Files:**
+
 - Create: `scripts/setup-labels.sh`
 
 - [ ] **Step 1: 스크립트 작성**
@@ -144,6 +145,7 @@ git commit -m "chore(infra): 라벨 선언적 관리 스크립트 추가 (setup-
 ### Task 2: 기존 라벨 마이그레이션 스크립트
 
 **Files:**
+
 - Create: `scripts/migrate-old-labels.sh`
 
 - [ ] **Step 1: 스크립트 작성**
@@ -239,6 +241,7 @@ git commit -m "chore(infra): 기존 라벨 마이그레이션 스크립트 추�
 ### Task 3: CONTRIBUTING.md 라벨 섹션 재작성
 
 **Files:**
+
 - Modify: `CONTRIBUTING.md` (라벨 섹션 전체 교체)
 
 - [ ] **Step 1: 기존 "라벨" 섹션을 아래로 교체**
@@ -362,6 +365,7 @@ Expected: 기존 type:/scope:/v0 라벨 10개 제거 + 관련 이슈/PR에서도
 ### Task 5: 스킬 디렉토리 + triage-criteria.md 작성
 
 **Files:**
+
 - Create: `.claude/skills/sentry-triage/triage-criteria.md`
 
 - [ ] **Step 1: 디렉토리 생성**
@@ -441,6 +445,7 @@ git commit -m "feat(skill): sentry-triage 분류 기준 문서 추가"
 ### Task 6: issue-template.md 작성
 
 **Files:**
+
 - Create: `.claude/skills/sentry-triage/issue-template.md`
 
 - [ ] **Step 1: 템플릿 파일 작성**
@@ -497,6 +502,7 @@ git commit -m "feat(skill): sentry-triage GH 이슈 템플릿 추가"
 ### Task 7: SKILL.md 작성
 
 **Files:**
+
 - Create: `.claude/skills/sentry-triage/SKILL.md`
 
 - [ ] **Step 1: SKILL.md 작성**
@@ -570,12 +576,15 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 ### 5. 종료 요약
 
 ```
+
 요약: 처리 완료 N건 / 보류 M건 / 실패 K건
+
 - 🔥 N1건 → GH 이슈 #AAA, #BBB 생성됨
 - 📝 N2건 → GH 이슈 #CCC~#DDD 생성됨
 - 👀 N3건 → Sentry 태그 부착됨
 - 🚫 N4건 → 수동 archive 권장 목록 (아래 링크)
 - 💡 N5건 → GH N개, Notion N개
+
 ```
 
 ## 출력 형식
@@ -641,6 +650,7 @@ git commit -m "feat(skill): sentry-triage SKILL.md 추가 — 5단계 트리아�
 - [ ] **Step 1: 드라이런으로 스킬 호출**
 
 대화 창에서 다음 입력:
+
 ```
 /sentry-triage 드라이런
 ```
@@ -650,11 +660,12 @@ Expected: Collector가 Sentry MCP로 조회, Classifier가 라벨 붙여 출력,
 - [ ] **Step 2: 분류 결과 샘플 검증**
 
 출력된 5섹션에서:
+
 - 🔥/📝/👀/🚫/💡 각각이 최소 1건 있는지 확인 (실제 분포에 따라 없을 수 있음 — OK)
 - 각 항목에 "근거" 줄이 2-3줄로 첨부됐는지 확인
 - URL/링크가 모두 클릭 가능한지 확인
 
-불일치 발견 시 [triage-criteria.md](.claude/skills/sentry-triage/triage-criteria.md) 조정하고 재실행.
+불일치 발견 시 `.claude/skills/sentry-triage/triage-criteria.md` 조정하고 재실행.
 
 - [ ] **Step 3: 실 실행 모드로 1-2건만 처리**
 
@@ -663,7 +674,7 @@ Expected: Collector가 Sentry MCP로 조회, Classifier가 라벨 붙여 출력,
 ```
 
 - 📝 또는 👀 중 **1-2건만** 승인하여 실제 액션 테스트
-- GH 이슈 생성 시 [issue-template.md](.claude/skills/sentry-triage/issue-template.md) 그대로 렌더됐는지 확인
+- GH 이슈 생성 시 `.claude/skills/sentry-triage/` 이슈 템플릿 그대로 렌더됐는지 확인
 - Sentry 태그 부착 시 Sentry 웹에서 `observing` 태그 확인
 
 - [ ] **Step 4: 검증 결과 기록**
