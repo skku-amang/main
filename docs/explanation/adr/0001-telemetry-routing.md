@@ -77,7 +77,7 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 - **sentry-triage 스킬 ([#456](https://github.com/skku-amang/main/pull/456))이 FE+BE 모두에 적용**: BE error도 자동 트리아지
 - **N+1 / slow endpoint 자동 감지**: Sentry Performance가 trace 패턴 분석. NestJS+Prisma 환경에서 직접적 가치
 - **production stack trace symbolication 유지** ([#499](https://github.com/skku-amang/main/issues/499))
-- **NSM 측정 path 열림**: PostHog 보류 결정 ([project_analytics_epic.md](memory)) 우회 가능 — `Sentry.metrics.increment("team.formed")` 같은 1줄 추가로 측정 시작
+- **NSM 측정 path 열림**: PostHog 보류 결정 (`project_analytics_epic.md`) 우회 가능 — `Sentry.metrics.increment("team.formed")` 같은 1줄 추가로 측정 시작
 
 ### 잃는 것 (의식적)
 
@@ -125,7 +125,7 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 본 ADR v3가 Accepted된 후:
 
 - [x] PR #502 (v2) close as superseded — 완료
-- [ ] **신규 이슈 — Sentry Application Metrics 도입** (`team.formed`, `signup.completed` counter 2개). [project_analytics_epic.md](memory) 분석 인프라 에픽 부분 재오픈
+- [ ] **신규 이슈 — Sentry Application Metrics 도입** (`team.formed`, `signup.completed` counter 2개). `project_analytics_epic.md` 분석 인프라 에픽 부분 재오픈
 - [ ] **신규 이슈 — Trace-log correlation 봉합**: pino mixin에 `Sentry.getActiveSpan()?.spanContext().traceId` 자동 첨부 → Loki query시 trace_id 라벨로 Sentry jump 가능
 - [ ] **신규 이슈 — sentry-triage 스킬 BE 적용 확장**: 현재 FE 위주 자동화를 BE 에러까지
 - [x] [#494 OTelcol Sentry exporter](https://github.com/skku-amang/main/issues/494) → close as not-planned (v2 잔재, 이미 close됨)

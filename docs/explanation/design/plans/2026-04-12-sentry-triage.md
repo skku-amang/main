@@ -665,7 +665,7 @@ Expected: Collector가 Sentry MCP로 조회, Classifier가 라벨 붙여 출력,
 - 각 항목에 "근거" 줄이 2-3줄로 첨부됐는지 확인
 - URL/링크가 모두 클릭 가능한지 확인
 
-불일치 발견 시 [triage-criteria.md](.claude/skills/sentry-triage/triage-criteria.md) 조정하고 재실행.
+불일치 발견 시 `.claude/skills/sentry-triage/triage-criteria.md` 조정하고 재실행.
 
 - [ ] **Step 3: 실 실행 모드로 1-2건만 처리**
 
@@ -674,7 +674,7 @@ Expected: Collector가 Sentry MCP로 조회, Classifier가 라벨 붙여 출력,
 ```
 
 - 📝 또는 👀 중 **1-2건만** 승인하여 실제 액션 테스트
-- GH 이슈 생성 시 [issue-template.md](.claude/skills/sentry-triage/issue-template.md) 그대로 렌더됐는지 확인
+- GH 이슈 생성 시 `.claude/skills/sentry-triage/` 이슈 템플릿 그대로 렌더됐는지 확인
 - Sentry 태그 부착 시 Sentry 웹에서 `observing` 태그 확인
 
 - [ ] **Step 4: 검증 결과 기록**
