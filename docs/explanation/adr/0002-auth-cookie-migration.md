@@ -88,14 +88,14 @@ ApiClient 401 → onTokenExpired() → next-auth update()
 
 ### 토큰 관리
 
-| 항목         | 값                                                                       |
-| ------------ | ------------------------------------------------------------------------ |
-| AT 저장      | httpOnly cookie                                                          |
-| RT 저장      | httpOnly cookie                                                          |
-| AT 전달      | cookie 자동 전송                                                         |
-| RT 전달      | cookie 자동 전송                                                         |
-| CSRF         | **SameSite=Lax + Origin 검증**                                           |
-| Cookie 속성  | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age` (AT=1h, RT=7d) |
+| 항목        | 값                                                                       |
+| ----------- | ------------------------------------------------------------------------ |
+| AT 저장     | httpOnly cookie                                                          |
+| RT 저장     | httpOnly cookie                                                          |
+| AT 전달     | cookie 자동 전송                                                         |
+| RT 전달     | cookie 자동 전송                                                         |
+| CSRF        | **SameSite=Lax + Origin 검증**                                           |
+| Cookie 속성 | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age` (AT=1h, RT=7d) |
 
 ### CSRF 보호 (D1)
 
@@ -154,13 +154,26 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 
 ### D4. 백엔드 endpoint 명세
 
-**[오픈 결정 — 남승민 (백엔드 영역)]**
+**[확정 — 손장수, 2026-07-21, PR #515 구현 기준]**
 
-- `Set-Cookie` 형식 (도메인, path, SameSite, Secure, HttpOnly, Max-Age 정확한 값)
-- `/auth/refresh` 응답: 새 토큰 body 반환 vs Set-Cookie only
-- `/auth/me` 응답 schema (`@repo/shared-types`에 새 타입 추가)
-- 로그아웃 시 RT 무효화 시점 (DB delete 시점)
-- Origin 검증 화이트리스트 (production / preview / localhost)
+**Set-Cookie 형식**:
+
+| Cookie         | 속성                                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| `accessToken`  | `HttpOnly; Secure(prod); SameSite=Lax; Path=/; Max-Age=604800; Domain=$COOKIE_DOMAIN`     |
+| `refreshToken` | `HttpOnly; Secure(prod); SameSite=Lax; Path=/auth; Max-Age=604800; Domain=$COOKIE_DOMAIN` |
+
+- **AT cookie Max-Age = RT TTL(7d)**: cookie 수명과 JWT 유효성(1h)을 분리. 만료 AT는 401 → refresh 흐름을 타고, 프론트 middleware의 presence 체크가 세션 내내 유효. 토큰 유효성 판정은 항상 서버의 JWT exp 검증.
+- **RT `Path=/auth`**: 일반 API 요청에 RT 미전송 — 노출면 최소화.
+- **`Domain=$COOKIE_DOMAIN`** (prod `amang.json-server.win`, staging `amang.staging.json-server.win`, 로컬 미설정): host-only cookie는 api 서브도메인 전용이라 web 호스트의 middleware·RSC가 못 보므로 amang 스코프로 확장. `json-server.win` 전체가 아니라 타 서비스 미노출.
+- 트레이드오프: `*.vercel.app` preview는 cross-site(SameSite=Lax)라 로그인 불가 — staging으로 검증 (수용).
+
+**나머지 결정**:
+
+- `/auth/refresh` 응답: Set-Cookie + 전환기 동안 body 토큰 병행 (Phase 2.6 완료 후 body는 `{ success: true }`만)
+- `/auth/me` 응답: `MeResponse` (`@repo/shared-types`, `detailedUserSelector` 기반 — password 미포함)
+- 로그아웃: 요청 즉시 RT DB delete + 두 cookie 만료
+- Origin 검증 화이트리스트: CORS 허용 목록과 단일 상수 공유 (`apps/api/src/common/allowed-origins.ts`) — localhost 임의 포트 / production / staging / `*.vercel.app`
 
 ## Migration Plan
 
@@ -181,7 +194,7 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 - [ ] `AuthProvider` (React Context) + `useAuth` 훅 구현
 - [ ] `apiClient` interceptor에 `refreshPromise` + `Web Locks API` 적용
 - [ ] `useSession()` 사용처 모두 `useAuth()`로 마이그레이션
-- [ ] `await auth()` 3곳을 middleware/cookie check로 대체 ([proxy.ts:11](../../../apps/web/proxy.ts#L11), [(admin)/layout.tsx:19](../../../apps/web/app/(admin)/layout.tsx#L19), [teams/create/page.tsx:20](../../../apps/web/app/(general)/(dark)/performances/[id]/teams/create/page.tsx#L20))
+- [ ] `await auth()` 3곳을 middleware/cookie check로 대체 ([proxy.ts:11](../../../apps/web/proxy.ts#L11), [(admin)/layout.tsx:19](<../../../apps/web/app/(admin)/layout.tsx#L19>), [teams/create/page.tsx:20](<../../../apps/web/app/(general)/(dark)/performances/[id]/teams/create/page.tsx#L20>))
 - [ ] `apps/web/auth.ts`, `apps/web/app/api/auth/[...nextauth]` 제거
 - [ ] `next-auth`, `@auth/*` 의존성 제거
 
