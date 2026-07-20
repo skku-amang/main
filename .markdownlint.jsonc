@@ -1,0 +1,29 @@
+// AMANG docs markdown lint 룰
+{
+  "default": true,
+
+  // MD013 (line-length): 한국어 + table 셀에서 80자 한계는 비현실적. 잡음.
+  "MD013": false,
+
+  // MD024 (no-duplicate-heading): 섹션 내 sibling 중복만 금지 (ADR의 ## Context 등 재사용 허용)
+  "MD024": { "siblings_only": true },
+
+  // MD033 (no-inline-html): table 셀 안 <br> 등 필요. 비활성.
+  "MD033": false,
+
+  // MD034 (no-bare-urls): prettier가 자동 링크화. 충돌 회피.
+  "MD034": false,
+
+  // MD036 (no-emphasis-as-heading): 짧은 강조에 **굵게** 다수 사용. 정식 heading 강제 비현실.
+  "MD036": false,
+
+  // MD040 (fenced-code-language): plain output(diff/tree dump) 블록에 언어 미지정 허용.
+  "MD040": false,
+
+  // MD049/MD050 (emphasis/strong-style): _ vs * 선택은 prettier 영역. 충돌 회피.
+  "MD049": false,
+  "MD050": false,
+
+  // MD060 (table-column-style): pipe 좌우 공백 스타일은 prettier 영역. 잡음.
+  "MD060": false
+}

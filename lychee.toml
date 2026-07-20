@@ -1,0 +1,22 @@
+# lychee — 마크다운 안 깨진 링크 자동 검출
+# docs: https://lychee.cli.rs/usage/config/
+
+# 검사 대상
+include_verbatim = true     # 코드 블록 안 링크도 검사
+include_mail = false        # mailto: 검사 제외
+
+# 동작
+max_redirects = 5
+max_concurrency = 32
+timeout = 20
+
+# HTTP: 외부 SaaS가 익명에 4xx 응답하는 경우 false-fail 방지
+accept = [200, 204, 206, 301, 302, 304, 307, 308, 401, 403, 429]
+
+# 반복 run 시 외부 호출 캐시
+cache = true
+max_cache_age = "1d"
+
+# 출력
+no_progress = true
+verbose = "warn"

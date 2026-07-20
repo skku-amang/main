@@ -1,0 +1,17 @@
+# lychee.toml 보조 — 정규식으로 검사 제외 도메인 명시.
+# 이유: 아래는 링크가 살아있으나 익명 접근 시 인증 wall로 4xx 응답 → false-fail 방지.
+
+# 인증 wall — 워크스페이스/계정 로그인 필요 (SaaS 콘솔)
+^https://amang-23\.sentry\.io
+^https://([a-z0-9-]+\.)?notion\.so
+^https://app\.slack\.com/client
+^https://www\.figma\.com/(design|board|file)
+
+# 로컬 개발 URL — CI 환경에서 검증 의미 없음
+^https?://localhost
+^https?://127\.0\.0\.1
+^https?://0\.0\.0\.0
+
+# placeholder URL (실제 도메인 아님 — 템플릿/예시 안)
+^https://github\.com/skku-amang/main/issues/000
+^https://github\.com/(owner|org)/repo

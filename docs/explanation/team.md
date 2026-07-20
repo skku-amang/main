@@ -18,21 +18,25 @@
 ## 영역별 상세
 
 ### 기획 (윤규성)
+
 - 사용자 시나리오 정의, 기능명세서 작성, 와이어프레임 (Figma)
 - 운영 정책 결정 (강제도, 알림 빈도 등)
 - 디자인·백엔드의 input
 
 ### 디자인 (김수연)
+
 - UI 디자인 (Figma)
 - 인터랙션·시각 일관성
 - 디자인 시스템 SSOT
 
 ### 백엔드 (남승민)
+
 - Prisma schema·ERD
 - NestJS API 구현
 - 데이터 모델 결정 (정규화·polymorphism·index 전략)
 
 ### 인프라 + 프론트 + AX (손장수)
+
 - K8s 클러스터, ArgoCD GitOps, MinIO·DB·인증 등 인프라
 - Next.js 웹 구현 (디자인 시안 기반)
 - **AX (AI Experience)** — AI 활용 차원. feature별 정의 다름:
