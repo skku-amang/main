@@ -48,4 +48,4 @@
 
 - **좋은 결과**: 팀 전원이 Notion에서 아이디어 제안·우선순위 참여. 자동 랭킹으로 "무엇부터" 판단 용이. 구현은 GitHub 네이티브(이슈·PR·Milestone)로 유지.
 - **나쁜 결과**: Notion 상태와 GitHub 진행이 걸쳐, 진행 중→완료 전이를 수동으로 맞춰야 함(Milestone 완료율을 보고 Notion을 옮김). 완전 자동 동기화는 하지 않는다.
-- **중립적 결과**: 기존 [GitHub Projects 보드](https://github.com/orgs/skku-amang/projects/1)는 이 흐름에서 쓰지 않는다. 향후 스프린트·자동화가 필요해지면 재검토 대상.
+- **중립적 결과**: 기존 GitHub Projects 보드(`skku-amang` 조직 프로젝트)는 이 흐름에서 쓰지 않는다. 향후 스프린트·자동화가 필요해지면 재검토 대상.
