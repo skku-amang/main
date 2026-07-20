@@ -39,18 +39,21 @@ interface DataTableToolbarProps<TData> {
 }
 
 function exportToCsv<TData>(table: Table<TData>) {
-  const visibleColumns = table
+  const exportColumns = table
     .getAllColumns()
     .filter(
-      (col) => col.getIsVisible() && col.id !== "select" && col.id !== "actions"
+      (col) =>
+        col.id !== "select" &&
+        col.id !== "actions" &&
+        (col.getIsVisible() || col.columnDef.meta?.alwaysExport)
     )
 
-  const headers = visibleColumns.map(
+  const headers = exportColumns.map(
     (col) => col.columnDef.meta?.label ?? col.id
   )
 
   const rows = table.getFilteredRowModel().rows.map((row) =>
-    visibleColumns.map((col) => {
+    exportColumns.map((col) => {
       const value = row.getValue(col.id)
       if (value == null) return ""
       const str = String(value)

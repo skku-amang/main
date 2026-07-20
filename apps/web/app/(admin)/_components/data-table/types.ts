@@ -15,6 +15,8 @@ declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string
+    // Include this column in CSV export even when hidden from the table.
+    alwaysExport?: boolean
     editable?: {
       type:
         | "text"

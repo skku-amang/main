@@ -180,11 +180,40 @@ function DataTableInner<TData, TValue>({
   useEffect(() => {
     try {
       const stored = localStorage.getItem(visibilityStorageKey)
-      if (stored) setColumnVisibility(JSON.parse(stored))
+      // Merge (not replace) so columns absent from stored state keep their
+      // defaults — e.g. alwaysExport columns added after this key was saved.
+      if (stored)
+        setColumnVisibility((prev) => ({
+          ...prev,
+          ...(JSON.parse(stored) as VisibilityState)
+        }))
     } catch {
       /* ignore */
     }
   }, [visibilityStorageKey])
+
+  // alwaysExport columns are meant for CSV only — hide them from the table by
+  // default. Runs on column changes too, so dynamically added export columns
+  // (e.g. per-session roster slots) also start hidden.
+  useEffect(() => {
+    setColumnVisibility((prev) => {
+      const next = { ...prev }
+      let changed = false
+      for (const col of columns) {
+        const id =
+          "id" in col && col.id
+            ? col.id
+            : "accessorKey" in col && typeof col.accessorKey === "string"
+              ? col.accessorKey
+              : undefined
+        if (id && col.meta?.alwaysExport && !(id in next)) {
+          next[id] = false
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+  }, [columns])
 
   const handleColumnVisibilityChange: OnChangeFn<VisibilityState> = useCallback(
     (updaterOrValue) => {

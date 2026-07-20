@@ -17,6 +17,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import {
+  SESSION_DISPLAY_NAME,
+  SESSION_NAMES,
+  type SessionNameValue
+} from "@/constants/session"
 import { TeamList } from "@repo/shared-types"
 
 type TeamItem = TeamList[number]
@@ -25,8 +30,47 @@ interface ColumnActions {
   onDelete: (team: TeamItem) => void
 }
 
+// 팀의 특정 세션에 배정된 멤버를 index 순으로 (여러 TeamSession이 같은 세션명일 수 있어 합산)
+function sessionMembers(team: TeamItem, sessionName: SessionNameValue) {
+  return team.teamSessions
+    .filter((ts) => ts.session.name === sessionName)
+    .flatMap((ts) => ts.members)
+}
+
+/**
+ * 세션별 참여자 명단을 슬롯 단위 컬럼으로 (보컬1·보컬2·기타1…).
+ * 슬롯 수는 전체 팀 중 해당 세션 최대 인원으로 결정 — 데이터 손실 없이 간부진 시트 레이아웃과 일치.
+ * 최대 1명이면 번호 생략(베이스·드럼), 2명 이상이면 번호 부여.
+ * 테이블에서는 기본 숨김(alwaysExport), CSV export에만 항상 포함.
+ */
+function buildSessionColumns(teams: TeamItem[]): ColumnDef<TeamItem>[] {
+  return Object.values(SESSION_NAMES).flatMap((sessionName) => {
+    const maxSlots = teams.reduce(
+      (max, team) => Math.max(max, sessionMembers(team, sessionName).length),
+      0
+    )
+    return Array.from({ length: maxSlots }, (_, i) => {
+      const label =
+        maxSlots === 1
+          ? SESSION_DISPLAY_NAME[sessionName]
+          : `${SESSION_DISPLAY_NAME[sessionName]}${i + 1}`
+      return {
+        id: `session_${sessionName}_${i}`,
+        accessorFn: (row: TeamItem) =>
+          sessionMembers(row, sessionName)[i]?.user.name ?? "",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={label} />
+        ),
+        meta: { label, alwaysExport: true },
+        cell: ({ getValue }) => (getValue() as string) || "-"
+      } satisfies ColumnDef<TeamItem>
+    })
+  })
+}
+
 export function getColumns(
   actions: ColumnActions,
+  teams: TeamItem[],
   performanceMap?: Map<number, string>
 ): ColumnDef<TeamItem>[] {
   return [
@@ -181,6 +225,7 @@ export function getColumns(
         )
       }
     },
+    ...buildSessionColumns(teams),
     {
       accessorKey: "isFreshmenFixed",
       header: ({ column }) => (

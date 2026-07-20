@@ -83,9 +83,10 @@ export default function TeamsAdminPage() {
             setDeleteOpen(true)
           }
         },
+        teams ?? [],
         performanceMap
       ),
-    [performanceMap]
+    [teams, performanceMap]
   )
 
   const handleCellUpdate = async (
