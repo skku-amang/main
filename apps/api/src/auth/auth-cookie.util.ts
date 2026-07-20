@@ -20,10 +20,15 @@ export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE }
  *   presence 체크가 세션 지속 기간 내내 유효하게 함. 토큰 유효성은 항상
  *   서버의 JWT exp 검증이 결정.
  */
+// COOKIE_SAMESITE=none은 staging 전용 — *.vercel.app preview(cross-site)에서
+// 로그인 허용. None은 브라우저가 Secure를 강제하므로 secure도 함께 켠다.
+// production은 Lax 고정 (CSRF 2중 방어 유지).
+const sameSite = process.env.COOKIE_SAMESITE === "none" ? "none" : "lax"
+
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production" || sameSite === "none",
+  sameSite,
   ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
 }
 

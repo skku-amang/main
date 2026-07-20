@@ -166,7 +166,7 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 - **AT cookie Max-Age = RT TTL(7d)**: cookie 수명과 JWT 유효성(1h)을 분리. 만료 AT는 401 → refresh 흐름을 타고, 프론트 middleware의 presence 체크가 세션 내내 유효. 토큰 유효성 판정은 항상 서버의 JWT exp 검증.
 - **RT `Path=/auth`**: 일반 API 요청에 RT 미전송 — 노출면 최소화.
 - **`Domain=$COOKIE_DOMAIN`** (prod `amang.json-server.win`, staging `amang.staging.json-server.win`, 로컬 미설정): host-only cookie는 api 서브도메인 전용이라 web 호스트의 middleware·RSC가 못 보므로 amang 스코프로 확장. `json-server.win` 전체가 아니라 타 서비스 미노출.
-- 트레이드오프: `*.vercel.app` preview는 cross-site(SameSite=Lax)라 로그인 불가 — staging으로 검증 (수용).
+- **Vercel preview 로그인**: preview(`*.vercel.app`)는 staging API 기준 cross-site라 Lax cookie 미전송. **staging에만 `COOKIE_SAMESITE=none`** 적용해 로그인 허용 (None은 Secure 강제 동반, CSRF는 Origin 검증이 담당). production은 Lax 고정. 한계: Safari 등 3rd-party cookie 차단 브라우저에선 여전히 불가, preview의 Next middleware는 staging 도메인 cookie를 못 보므로 보호 라우트(/admin, /profile 등)는 로그인 상태여도 /login으로 튕김 — preview에서는 로그인 + 일반 화면·API 호출까지만 검증 가능.
 
 **나머지 결정**:
 
