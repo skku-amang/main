@@ -32,7 +32,7 @@ ApiClient 401 → onTokenExpired() → next-auth update()
 
 #### 1. Race condition — JWT 콜백 auto-refresh
 
-[apps/web/auth.ts:91-110](../../../apps/web/auth.ts#L91-L110)의 JWT 콜백이 자동 refresh를 포함. 이 콜백은 아래 5개 context에서 **독립적으로** 실행된다:
+[apps/web/auth.ts:91-110](https://github.com/skku-amang/main/blob/265ee36a/apps/web/auth.ts#L91-L110)(당시 스냅샷 — 본 마이그레이션에서 파일 삭제됨)의 JWT 콜백이 자동 refresh를 포함. 이 콜백은 아래 5개 context에서 **독립적으로** 실행된다:
 
 | Trigger             | 실행 context               |
 | ------------------- | -------------------------- |
