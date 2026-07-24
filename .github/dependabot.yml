@@ -1,9 +1,14 @@
 version: 2
 
 updates:
-  # pnpm workspace 전체 (루트 pnpm-lock.yaml 하나가 apps/*, packages/* 를 모두 관장)
+  # 알림 스캐너는 루트 pnpm-lock.yaml 하나만 읽지만, 수정 PR을 만드는 업데이터는
+  # package.json이 있는 디렉토리마다 별도 job을 띄운다. 루트만 선언하면 워크스페이스
+  # 패키지의 job이 설정 없는 기본값(그룹핑·prefix 없음)으로 돌아간다.
   - package-ecosystem: "npm"
-    directory: "/"
+    directories:
+      - "/"
+      - "/apps/*"
+      - "/packages/*"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -59,3 +64,8 @@ updates:
     groups:
       docker:
         patterns: ["*"]
+    ignore:
+      # Node 베이스 이미지 메이저는 런타임 교체다. LTS 여부 확인과 CI(node-version)·
+      # engines 동시 변경이 필요하므로 사람이 별도 PR로 진행한다.
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
