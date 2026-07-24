@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run Lighthouse
         id: lighthouse
@@ -28,7 +28,7 @@ jobs:
 
       - name: Format Lighthouse Score
         id: format
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           LIGHTHOUSE_MANIFEST: ${{ steps.lighthouse.outputs.manifest }}
         with:
@@ -52,7 +52,7 @@ jobs:
             core.setOutput('comment', body);
 
       - name: Comment on PR
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: lighthouse
           message: ${{ steps.format.outputs.comment }}
