@@ -1,0 +1,61 @@
+version: 2
+
+updates:
+  # pnpm workspace 전체 (루트 pnpm-lock.yaml 하나가 apps/*, packages/* 를 모두 관장)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build"
+      prefix-development: "chore"
+      include: "scope"
+    groups:
+      # 보안 업데이트는 open-pull-requests-limit 적용 대상이 아니므로 반드시 그룹핑한다.
+      # 프로덕션/개발을 나누는 이유: 프로덕션 PR은 작고 급하며, 개발 도구 PR은 크고 급하지 않다.
+      security-production:
+        applies-to: "security-updates"
+        dependency-type: "production"
+        patterns: ["*"]
+      security-development:
+        applies-to: "security-updates"
+        dependency-type: "development"
+        patterns: ["*"]
+      minor-and-patch:
+        applies-to: "version-updates"
+        update-types: ["minor", "patch"]
+    # 메이저는 그룹에 넣지 않고 개별 PR로 남긴다 (breaking change는 따로 검토).
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/apps/api"
+      - "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    groups:
+      docker:
+        patterns: ["*"]
