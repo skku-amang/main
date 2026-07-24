@@ -1,11 +1,11 @@
 "use client"
 
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
 
 import { HeaderMode } from "@/components/Header"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
 const headerColorClass = ({
@@ -68,10 +68,10 @@ const NavLink = ({
   isAdminOnly = false
 }: NavLinkProps) => {
   const pathname = usePathname()
-  const { data } = useSession()
-  const isAvailable = data?.user?.isAdmin || (!isAdminOnly && isActive)
+  const { user } = useAuth()
+  const isAvailable = user?.isAdmin || (!isAdminOnly && isActive)
 
-  if (isAdminOnly && !data?.user?.isAdmin) {
+  if (isAdminOnly && !user?.isAdmin) {
     return null
   }
 

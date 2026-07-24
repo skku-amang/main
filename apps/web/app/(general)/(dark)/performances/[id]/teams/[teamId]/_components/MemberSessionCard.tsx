@@ -1,11 +1,11 @@
 import { Minus } from "lucide-react"
-import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getSessionDisplayName } from "@/constants/session"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { formatGenerationOrder } from "@/lib/utils"
 import type { SessionNameValue } from "@/constants/session"
 import { TeamDetail } from "@repo/shared-types"
@@ -31,7 +31,7 @@ const MemberSessionCard = ({
   user,
   onUnapplySuccess
 }: MemberSessionCardProps) => {
-  const authSession = useSession()
+  const { user: authUser } = useAuth()
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
@@ -93,7 +93,7 @@ const MemberSessionCard = ({
         </div>
 
         {/* 탈퇴 버튼 */}
-        {user.id.toString() === authSession.data?.user.id && (
+        {user.id === authUser?.id && (
           <button
             className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
             onClick={handleUnapply}

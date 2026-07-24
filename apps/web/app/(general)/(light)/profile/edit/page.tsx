@@ -27,8 +27,8 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
-import { useSession } from "next-auth/react"
 
+import { ME_QUERY_KEY } from "@/hooks/api/useAuth"
 import { useUpdatePassword, useUpdateProfile } from "@/hooks/api/useUser"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useImageUpload } from "@/hooks/useImageUpload"
@@ -61,8 +61,7 @@ const EditSkeleton = () => (
 )
 
 const ProfileEditPage = () => {
-  const { session, user, isLoading, isAuthenticated } = useCurrentUser()
-  const { update } = useSession()
+  const { user, isLoading, isAuthenticated } = useCurrentUser()
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const updateProfileMutation = useUpdateProfile()
@@ -76,10 +75,10 @@ const ProfileEditPage = () => {
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(ProfileFormSchema),
     values: {
-      name: session?.user?.name ?? "",
-      nickname: session?.user?.nickname ?? "",
+      name: user?.name ?? "",
+      nickname: user?.nickname ?? "",
       bio: user?.bio ?? "",
-      image: session?.user?.image ?? undefined
+      image: user?.image ?? undefined
     }
   })
 
@@ -95,12 +94,8 @@ const ProfileEditPage = () => {
   const handleProfileSubmit = (data: ProfileFormValues) => {
     updateProfileMutation
       .mutateAsync([data])
-      .then(async () => {
-        await update({
-          name: data.name,
-          nickname: data.nickname,
-          image: data.image ?? null
-        })
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: ["users"] })
         toast({ title: "프로필이 수정되었습니다." })
       })
@@ -132,7 +127,7 @@ const ProfileEditPage = () => {
 
   if (isLoading) return <EditSkeleton />
 
-  if (!isAuthenticated || !session) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="mb-4 text-lg text-slate-500">로그인이 필요합니다.</p>
@@ -147,7 +142,7 @@ const ProfileEditPage = () => {
   const profileImage =
     imageUpload.preview ??
     currentImage ??
-    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
+    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(user.email)}`
 
   return (
     <div>
@@ -184,7 +179,7 @@ const ProfileEditPage = () => {
               <Avatar className="size-16 border-2 border-slate-100">
                 <AvatarImage src={profileImage} />
                 <AvatarFallback className="text-xl">
-                  {session.user?.name?.[0]}
+                  {user.name?.[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">

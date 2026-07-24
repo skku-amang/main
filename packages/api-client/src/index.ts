@@ -16,10 +16,10 @@ import {
   GetRentalsQuery,
   LoginUser,
   LogoutResponse,
+  MeResponse,
   Performance,
   PerformanceDetail,
   PerformanceTeamsList,
-  RefreshTokenResponse,
   SessionDetail,
   SessionList,
   SignUpResponse,
@@ -137,9 +137,8 @@ export type PromiseWithError<T, TError> = Promise<T> & {
 
 export default class ApiClient {
   private static instance: ApiClient | null = null
-  private accessToken: string | null = null
-  private onTokenExpired: (() => Promise<string | null>) | null = null
-  private refreshPromise: Promise<string | null> | null = null
+  private onTokenExpired: (() => Promise<boolean>) | null = null
+  private refreshPromise: Promise<boolean> | null = null
 
   constructor(private baseUrl: string) {}
 
@@ -158,20 +157,12 @@ export default class ApiClient {
   }
 
   /**
-   * 액세스 토큰을 설정합니다.
-   * 설정된 토큰은 이후 모든 API 요청의 Authorization 헤더에 포함됩니다.
-   * @param token 액세스 토큰
-   */
-  public setAccessToken(token: string | null): void {
-    this.accessToken = token
-  }
-
-  /**
    * 토큰이 만료되었을 때 호출할 콜백을 설정합니다.
-   * 콜백은 새로운 액세스 토큰을 반환하거나, 갱신에 실패하면 null을 반환해야 합니다.
+   * 콜백은 갱신 성공 시 true를 반환해야 합니다. 갱신된 토큰은 httpOnly cookie로
+   * 운반되므로 콜백이 토큰 값을 반환하지 않습니다 (ADR-0002).
    * @param handler 토큰 만료 핸들러
    */
-  public setOnTokenExpired(handler: () => Promise<string | null>): void {
+  public setOnTokenExpired(handler: () => Promise<boolean>): void {
     this.onTokenExpired = handler
   }
 
@@ -183,13 +174,14 @@ export default class ApiClient {
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    isRetry = false
   ): Promise<PromiseWithError<T, E>> {
     const options: RequestInit = {
       method,
+      credentials: "include",
       headers: {
-        ...headers,
-        ...(this.accessToken && { Authorization: `Bearer ${this.accessToken}` })
+        ...headers
       }
     }
 
@@ -208,7 +200,6 @@ export default class ApiClient {
           "Content-Type": "application/json"
         }
         options.body = JSON.stringify(body)
-        options.credentials = "include"
       }
     }
 
@@ -224,8 +215,13 @@ export default class ApiClient {
         data.error as ProblemDocument
       )
 
-      // 액세스 토큰이 만료되었고 핸들러가 등록되어 있는 경우 갱신 시도
-      if (error instanceof AccessTokenExpiredError && this.onTokenExpired) {
+      // 액세스 토큰이 만료되었고 핸들러가 등록되어 있는 경우 갱신 시도.
+      // 재시도는 1회만 — 갱신 후에도 만료 응답이 반복되면 그대로 throw (무한 재귀 방지)
+      if (
+        error instanceof AccessTokenExpiredError &&
+        this.onTokenExpired &&
+        !isRetry
+      ) {
         // 여러 요청이 동시에 만료되었을 때 한 번만 갱신하도록 promise 공유
         if (!this.refreshPromise) {
           this.refreshPromise = this.onTokenExpired().finally(() => {
@@ -233,12 +229,11 @@ export default class ApiClient {
           })
         }
 
-        const newToken = await this.refreshPromise
+        const refreshed = await this.refreshPromise
 
-        if (newToken) {
-          this.setAccessToken(newToken)
-          // 새로운 토큰으로 재시도
-          return this._request<T, E>(endpoint, method, body, headers)
+        if (refreshed) {
+          // 갱신된 토큰은 httpOnly cookie가 운반 — 헤더 토큰 갱신 없이 재시도
+          return this._request<T, E>(endpoint, method, body, headers, true)
         }
       }
 
@@ -970,6 +965,18 @@ export default class ApiClient {
   }
 
   /**
+   * 현재 로그인된 사용자 조회 (cookie 기반, ADR-0002)
+   * @throws {AuthError} 로그인하지 않은 경우
+   * @throws {InternalServerError}
+   */
+  public getMe() {
+    return this._request<MeResponse, AuthError | InternalServerError>(
+      "/auth/me",
+      "GET"
+    )
+  }
+
+  /**
    * Presigned URL 요청
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
@@ -980,25 +987,6 @@ export default class ApiClient {
       PresignedUrlResponse,
       AuthError | ValidationError | InternalServerError
     >(`/uploads/presigned-url`, "POST", request)
-  }
-
-  /**
-   * 토큰 갱신
-   * @throws {RefreshTokenExpiredError} 리프레시 토큰이 만료되었거나 유효하지 않은 경우
-   * @throws {RefreshTokenNotFoundError} 리프레시 토큰이 존재하지 않는 경우 (로그아웃 상태)
-   * @throws {AuthError} 토큰 형식이 올바르지 않은 경우
-   * @throws {UserNotApprovedError} 아직 승인되지 않은 계정인 경우
-   * @throws {InternalServerError} 서버 오류 발생 시
-   */
-  public refreshToken(refreshToken: string) {
-    return this._request<
-      RefreshTokenResponse,
-      | RefreshTokenExpiredError
-      | RefreshTokenNotFoundError
-      | AuthError
-      | UserNotApprovedError
-      | InternalServerError
-    >("/auth/refresh", "POST", { refreshToken })
   }
 }
 

@@ -11,13 +11,13 @@ import {
   Users,
   Youtube
 } from "lucide-react"
-import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { FaCircle } from "react-icons/fa"
 
 import { Separator } from "@/components/ui/separator"
 import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
 import SOCIAL from "@/constants/social"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 import NavLink from "./NavLink"
 import NavLinkHeader from "./NavLinkHeader"
@@ -30,16 +30,16 @@ const SheetInnerContent = ({
 }: {
   setIsOpen: (state: boolean) => void
 }) => {
-  const { data: session } = useSession()
+  const { user, logout } = useAuth()
 
   return (
     <div className="flex h-full flex-col justify-between">
       <Link
-        href={!session ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
+        href={!user ? ROUTES.LOGIN : ROUTES.PROFILE.INDEX}
         className="flex w-full items-center justify-start py-3"
         onClick={() => setIsOpen(false)}
       >
-        {!session ? (
+        {!user ? (
           <>
             <FaCircle className="h-14 w-14 text-gray-100"></FaCircle>
             <div className="w-full">
@@ -53,15 +53,15 @@ const SheetInnerContent = ({
             <Avatar className="h-13 w-16 overflow-hidden rounded-full">
               <AvatarImage
                 src={
-                  session.user?.image ??
-                  `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
+                  user?.image ??
+                  `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(user?.email ?? "")}`
                 }
               />
               <AvatarFallback>A</AvatarFallback>
             </Avatar>
             <div className="w-full">
               <div className="h-5 w-full pl-3 text-left text-lg font-semibold text-black">
-                {session.user?.name}
+                {user?.name}
               </div>
               <div className="h-1/6 w-full pl-3 pt-2 text-left text-sm text-gray-400 underline">
                 <span>&gt;</span> 마이페이지
@@ -73,7 +73,7 @@ const SheetInnerContent = ({
       <Separator />
       <div className="flex-auto ">
         {/* Admin */}
-        {session?.user?.isAdmin && (
+        {user?.isAdmin && (
           <>
             <div className="my-6">
               <NavLinkHeader className="mb-4">ADMIN</NavLinkHeader>
@@ -153,7 +153,7 @@ const SheetInnerContent = ({
 
       {/* Login & Logout */}
       <div className="flex w-full items-center justify-center gap-4">
-        {!session ? (
+        {!user ? (
           <>
             <LogIn size={iconSize} className="text-primary" />
             <Link
@@ -168,7 +168,7 @@ const SheetInnerContent = ({
           <button
             type="button"
             className="flex cursor-pointer items-center gap-4 text-red-600"
-            onClick={() => signOut()}
+            onClick={() => logout().then(() => (window.location.href = "/"))}
           >
             <LogIn size={iconSize} />
             <span className="text-xl font-medium">Logout Account</span>

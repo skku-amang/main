@@ -1,6 +1,5 @@
 "use client"
 
-import { useSession } from "next-auth/react"
 import { useParams } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
@@ -19,13 +18,14 @@ import { getSessionDisplayName } from "@/constants/session"
 import Link from "next/link"
 import { useTeam } from "@/hooks/api/useTeam"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/components/YoutubePlayer"
 import useTeamApplication from "../_hooks/useTeamApplication"
 
 const TeamDetailClient = () => {
   const params = useParams()
-  const session = useSession()
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth()
 
   const performanceId = Number(params.id)
   const id = Number(params.teamId)
@@ -167,7 +167,7 @@ const TeamDetailClient = () => {
             }
             className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            {session.status === "unauthenticated" ? (
+            {!isAuthLoading && !isAuthenticated ? (
               <div className="py-8 text-center">
                 <p className="mb-4 text-sm text-gray-500">
                   로그인 후 세션에 지원할 수 있습니다.

@@ -47,11 +47,11 @@ const InfoRow = ({
 )
 
 const ProfilePage = () => {
-  const { session, user, isLoading, isAuthenticated } = useCurrentUser()
+  const { user, isLoading, isAuthenticated } = useCurrentUser()
 
   if (isLoading) return <ProfileSkeleton />
 
-  if (!isAuthenticated || !session) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="mb-4 text-lg text-slate-500">로그인이 필요합니다.</p>
@@ -63,8 +63,8 @@ const ProfilePage = () => {
   }
 
   const profileImage =
-    session.user?.image ??
-    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(session.user?.email ?? "")}`
+    user.image ??
+    `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(user.email)}`
 
   return (
     <div>
@@ -84,15 +84,13 @@ const ProfilePage = () => {
             <Avatar className="size-24 border-2 border-slate-100">
               <AvatarImage src={profileImage} />
               <AvatarFallback className="text-2xl">
-                {session.user?.name?.[0]}
+                {user.name?.[0]}
               </AvatarFallback>
             </Avatar>
 
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-xl font-semibold">{session.user?.name}</h2>
-              <p className="text-sm text-slate-400">
-                @{session.user?.nickname}
-              </p>
+              <h2 className="text-xl font-semibold">{user.name}</h2>
+              <p className="text-sm text-slate-400">@{user.nickname}</p>
 
               {user?.bio && (
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -121,7 +119,7 @@ const ProfilePage = () => {
             <InfoRow
               icon={<Mail className="size-4" />}
               label="이메일"
-              value={session.user?.email}
+              value={user.email}
             />
 
             {user?.generation && (

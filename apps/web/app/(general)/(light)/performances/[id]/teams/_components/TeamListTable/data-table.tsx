@@ -12,7 +12,6 @@ import {
   useReactTable
 } from "@tanstack/react-table"
 import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import {
   parseAsArrayOf,
@@ -52,6 +51,7 @@ import {
   getSessionDisplayName,
   SESSION_DISPLAY_NAME
 } from "@/constants/session"
+import { useAuth } from "@/lib/providers/auth-provider"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
@@ -93,13 +93,11 @@ export function TeamListDataTable<TValue>({
   relatedPerformances,
   performanceId
 }: DataTableProps<TValue>) {
-  const { status } = useSession()
+  const { isAuthenticated } = useAuth()
   const visibleColumns = useMemo(
     () =>
-      status === "authenticated"
-        ? columns
-        : columns.filter((c) => c.id !== "actions"),
-    [status, columns]
+      isAuthenticated ? columns : columns.filter((c) => c.id !== "actions"),
+    [isAuthenticated, columns]
   )
   // nuqs 쿼리 동기화
   const [sortQuery, setSortQuery] = useQueryState(

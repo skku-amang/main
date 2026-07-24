@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { useEffect } from "react"
@@ -10,6 +9,7 @@ import { z } from "zod"
 
 import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { cn, getSessionIdBySessionName } from "@/lib/utils"
 import { CreateTeam, TeamDetail, UpdateTeam } from "@repo/shared-types"
 
@@ -37,7 +37,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     "step",
     parseAsInteger.withDefault(1)
   )
-  const session = useSession()
+  const { user, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -289,7 +289,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       }
     })
 
-    const userId = session?.data?.user?.id
+    const userId = user?.id
     if (!userId) {
       toast({
         title: "오류",
@@ -302,7 +302,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     if (isCreate) {
       const createData: CreateTeam = {
         name: firstPageForm.getValues("songName"),
-        leaderId: Number(userId),
+        leaderId: userId,
         performanceId: firstPageForm.getValues("performanceId"),
         songName: firstPageForm.getValues("songName"),
         songArtist: firstPageForm.getValues("songArtist"),
@@ -372,8 +372,8 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     console.warn("FormInvalid:", errors)
   }
 
-  if (session.status === "loading") return <TeamFormSkeleton />
-  if (!session.data) router.push(ROUTES.HOME)
+  if (isAuthLoading) return <TeamFormSkeleton />
+  if (!user) router.push(ROUTES.HOME)
 
   return (
     <div className={cn(`mb-20 rounded-2xl shadow-2xl`, className)}>
