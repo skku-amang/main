@@ -41,12 +41,15 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 - ID, 제목, 영향 유저 수, 이벤트 수, first_seen, last_seen
 - tags: url, browser, environment, release
+- 프로젝트 식별: `web` → FE 이슈, `api` → BE 이슈. 스택프레임 경로(`apps/web/**` vs `apps/api/**`)로 검증 가능
 - 에러의 경우: 메시지, 스택트레이스 상위 10줄
+- **BE 이슈의 경우**: `release` 태그가 git SHA로 박힘 (`apps/api/Dockerfile`이 `IMAGE_TAG` env로 주입 → `Sentry.init.release`). GH 이슈 생성 시 `sentry_auto.md` 템플릿이 commit URL을 자동 첨부
 - **User Feedback의 경우**: `event.contexts.feedback.message` 필드(= 유저가 입력한 **원문**)를 사용. 이슈 `description` 필드는 Sentry가 AI로 자동 생성한 영문 요약이므로 **분류·제목 용도로 쓰지 말 것**. 원문은 대부분 한국어
 
 ### 🌐 언어 주의
 
 amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘둘리지 말고 `feedback.message` 원문 기준으로:
+
 - 분류(💡 vs 📝) 판단
 - GH 이슈 제목 생성 시 원문 그대로 (또는 원문 요약) 사용 — 유저 목소리 번역 손실 방지
 
@@ -73,13 +76,13 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 
 각 항목마다 `[y/n/s]` 프롬프트 (y=실행 / n=건너뜀 / s=skip all). **승인받은 항목만** 실행.
 
-| 라벨 | 액션 |
-| --- | --- |
-| 🔥 | `gh issue create` — `kind: bug` + `priority: critical` + `from: sentry` 또는 `from: user-feedback`. body는 [.github/ISSUE_TEMPLATE/sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md) 적용. **제목은 자연어** (CC 포맷 금지) |
-| 📝 | `gh issue create` — `kind: bug` + `priority: high`(영향 유저 ≥3) 또는 `priority: low` + `from:*` |
-| 👀 | **별도 액션 없음** — Sentry는 unresolved 상태 유지. 다음 트리아지 라운드에 자연스레 다시 검토됨. (선택: 코멘트로 "observing - 다음 라운드 재평가" 추적 메모) |
-| 🚫 | **출력만** — "Sentry 웹에서 Archive 권장" 메시지. 자동 실행 안 함 |
-| 💡 | 사용자에게 대상 선택 프롬프트 (`g`=GH 이슈 / `n`=Notion / `s`=건너뜀). GH면 `kind: enhancement` + `from: user-feedback` + `priority: low`. Notion이면 `amang-notion` MCP로 아이디어 DB에 row 추가 |
+| 라벨 | 액션                                                                                                                                                                                                                                      |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🔥   | `gh issue create` — `kind: bug` + `priority: critical` + `from: sentry` 또는 `from: user-feedback`. body는 [.github/ISSUE_TEMPLATE/sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md) 적용. **제목은 자연어** (CC 포맷 금지) |
+| 📝   | `gh issue create` — `kind: bug` + `priority: high`(영향 유저 ≥3) 또는 `priority: low` + `from:*`                                                                                                                                          |
+| 👀   | **별도 액션 없음** — Sentry는 unresolved 상태 유지. 다음 트리아지 라운드에 자연스레 다시 검토됨. (선택: 코멘트로 "observing - 다음 라운드 재평가" 추적 메모)                                                                              |
+| 🚫   | **출력만** — "Sentry 웹에서 Archive 권장" 메시지. 자동 실행 안 함                                                                                                                                                                         |
+| 💡   | 사용자에게 대상 선택 프롬프트 (`g`=GH 이슈 / `n`=Notion / `s`=건너뜀). GH면 `kind: enhancement` + `from: user-feedback` + `priority: low`. Notion이면 `amang-notion` MCP로 아이디어 DB에 row 추가                                         |
 
 ### 5. 종료 요약
 
@@ -94,7 +97,7 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 
 ## 출력 형식
 
-~~~markdown
+```markdown
 ## Sentry Triage (YYYY-MM-DD)
 
 조회: web + api / prod / 7d / unresolved — 총 N건
@@ -107,19 +110,22 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
    - [y/n/s] GH 이슈 생성 (`kind: bug`, `priority: critical`, `from: sentry`)
 
 ### 📝 이슈 등록 (N건)
+
 ...
 
 ### 👀 관찰 (N건)
+
 ...
 
 ### 🚫 무시 추천 (N건)
+
 ...
 
 ### 💡 기능 요청 (N건)
 
 1. "예약 목록을 엑셀로 내보낼 수 있었으면 좋겠어요" ([feedback link])
    - [g/n/s] g=GH 이슈 / n=Notion DB / s=건너뜀
-~~~
+```
 
 ## 에러 처리
 

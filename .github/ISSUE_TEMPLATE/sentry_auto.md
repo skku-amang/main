@@ -31,7 +31,7 @@ assignees: ""
 - URL: {{url}}
 - 브라우저: {{browser}}
 - 환경: {{environment}}
-- 릴리스: {{release}}
+- 릴리스: [`{{release}}`](https://github.com/skku-amang/main/commit/{{release}})
 
 ## User Feedback (있을 경우)
 

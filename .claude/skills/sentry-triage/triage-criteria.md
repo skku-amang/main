@@ -10,6 +10,7 @@
 - 최근 24시간 이벤트 수가 기저(지난 7일 평균) 대비 5배 이상
 - 핵심 flow 키워드가 스택트레이스·URL·메시지에 포함:
   `login`, `auth`, `signup`, `payment`, `reservation`, `booking`, `equipment`
+- **BE 시스템 결함**: 프로젝트 `api` + 스택프레임이 `apps/api/**`에서 발생한 unhandled exception (NestJS HttpException으로 명시 throw 안 한 케이스). 사용자 의도와 무관 → 즉시 조치
 
 ## 🚫 무시 추천 (priority: 없음, 사용자가 수동 archive)
 
@@ -20,6 +21,9 @@
 - 개발 환경(`environment: development` 또는 `local`)
 - **스택트레이스 전체가 서드파티 코드에서만 발생**: `_next-live/feedback/*`(Vercel Live Feedback), `_next/static/chunks/*`에서만 발생하고 우리 소스(`apps/web/**`, `apps/api/**`)는 한 프레임도 포함 안 됨 → 라이브러리 버그, 우리 소관 아님
 - `mechanism: auto.browser.browserapierrors.*` 태그가 붙은 자동 수집 브라우저 API 에러 (대개 사용자 조작 잡음)
+- **BE `/health` 503**: URL 끝이 `/health` (Blackbox Exporter가 별도 모니터링. `apps/api/src/instrument.ts`의 `beforeSend`가 막지만 safety net으로 명시)
+- **BE NestJS HttpException 4xx**: 우리가 명시 throw한 사용자 입력 검증·권한 에러 (`UnprocessableEntityError`, `BadRequestError`, `NotFoundError`, `ConflictError`, `ForbiddenError` 등). 시스템 결함 아니라 사용자 오작용
+- **BE Prisma `P2002` 단독 `ConflictError`**: 사용자가 중복 입력한 케이스 (이미 사용중인 이메일/닉네임 등). 도메인 정상 흐름
 
 ## 💡 기능 요청 (User Feedback 전용)
 
