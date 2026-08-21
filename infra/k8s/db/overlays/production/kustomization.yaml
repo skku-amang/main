@@ -9,3 +9,5 @@ resources:
   - sealed-credentials.yaml
   - sealed-grafana-ro.yaml
   - network-policy.yaml
+  - sealed-backup-credentials.yaml
+  - backup-cronjob.yaml

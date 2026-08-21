@@ -1,0 +1,110 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: amang-db-backup
+  namespace: amang-db-production
+  labels:
+    app: db-backup
+spec:
+  # 03:20 KST. 홈랩 백업 슬롯 컨벤션(20분 간격)에 맞춘 빈 자리.
+  # immich-db 02:00 / health-hub 02:20 / seafile-db 02:40 / immich-media 03:00
+  # / amang-minio 03:40 과 겹치지 않는다.
+  schedule: "20 18 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            # NetworkPolicy postgres-allow-api-only 가 이 라벨로 :5432 접근을 허용한다.
+            app: db-backup
+        spec:
+          restartPolicy: Never
+          # pg_dump 와 rclone 을 각자의 공식 이미지에서 실행한다. 한 컨테이너에서
+          # 둘 다 쓰려면 실행 시점에 패키지를 받아와야 하는데, 그러면 Alpine 미러
+          # 장애나 노드 egress 문제로 백업이 실패하는 경로가 생긴다.
+          # postgres 이미지는 서버(postgres:16.10-alpine)와 같은 태그로 고정해
+          # pg_dump 버전 불일치를 원천 차단한다.
+          initContainers:
+            - name: dump
+              image: postgres:16.10-alpine
+              command:
+                - sh
+                - -c
+                - |
+                  set -eo pipefail
+                  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+                  DUMP_FILE="/dump/amang-db-${TIMESTAMP}.sql.gz"
+
+                  PGPASSWORD="${POSTGRES_PASSWORD}" pg_dump \
+                    -h postgres-svc -p 5432 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
+                    --no-owner --no-privileges \
+                    | gzip > "${DUMP_FILE}"
+
+                  # pg_dump 가 0 을 반환하면서 빈 파일을 남기는 경우를 걸러낸다.
+                  # 이걸 안 하면 업로드는 성공하고 복구 시점에야 빈 걸 알게 된다.
+                  SIZE=$(stat -c %s "${DUMP_FILE}")
+                  if [ "${SIZE}" -lt 1024 ]; then
+                    echo "dump too small (${SIZE} bytes) — aborting" >&2
+                    exit 1
+                  fi
+                  echo "dumped: ${DUMP_FILE##*/} (${SIZE} bytes)"
+              envFrom:
+                - secretRef:
+                    name: amang-db-credentials
+              volumeMounts:
+                - name: dump
+                  mountPath: /dump
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          containers:
+            - name: upload
+              image: rclone/rclone:1.75.0
+              command:
+                - sh
+                - -c
+                - |
+                  set -eo pipefail
+                  mkdir -p /root/.config/rclone
+                  cat > /root/.config/rclone/rclone.conf <<CONF
+                  [s3]
+                  type = s3
+                  provider = AWS
+                  access_key_id = ${AWS_ACCESS_KEY_ID}
+                  secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+                  region = ap-northeast-2
+                  location_constraint = ap-northeast-2
+                  no_check_bucket = true
+                  CONF
+
+                  # copy(sync 아님) — 과거 덤프를 지우지 않는다.
+                  # 보존은 버킷의 db/ 30일 라이프사이클 규칙이 담당한다.
+                  rclone copy /dump s3:amang-backup-json-server/db/ \
+                    --s3-no-check-bucket \
+                    --stats-one-line
+
+                  echo "db backup uploaded: $(ls /dump)"
+              envFrom:
+                - secretRef:
+                    name: amang-backup-credentials
+              volumeMounts:
+                - name: dump
+                  mountPath: /dump
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+          volumes:
+            - name: dump
+              emptyDir: {}
