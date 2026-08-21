@@ -36,6 +36,20 @@ spec:
                 - -c
                 - |
                   set -eo pipefail
+
+                  # 파드가 막 생성된 직후에는 NetworkPolicy 규칙이 아직
+                  # 프로그래밍되지 않아 첫 연결이 거부된다 (실측: t=2s 실패,
+                  # t=4s 부터 성공). init 컨테이너는 시작하자마자 접속하므로
+                  # 매번 그 창에 걸린다. 준비될 때까지 기다린다.
+                  for i in $(seq 1 30); do
+                    pg_isready -h postgres-svc -p 5432 -t 3 >/dev/null 2>&1 && break
+                    if [ "$i" = "30" ]; then
+                      echo "postgres-svc unreachable after 90s" >&2
+                      exit 1
+                    fi
+                    sleep 3
+                  done
+
                   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
                   DUMP_FILE="/dump/amang-db-${TIMESTAMP}.sql.gz"
 
