@@ -28,6 +28,10 @@ spec:
         - podSelector:
             matchLabels:
               app: api-job
+        # DB 백업 CronJob (같은 ns 내, pg_dump → S3)
+        - podSelector:
+            matchLabels:
+              app: db-backup
         # CloudBeaver (DB 관리 UI)
         - namespaceSelector:
             matchLabels:
