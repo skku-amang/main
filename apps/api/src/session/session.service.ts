@@ -9,9 +9,9 @@ import {
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
-  sessionWithBasicUsers,
-  sessionWithPublicUsers
-} from "../prisma/selectors/session.selector"
+  sessionWithBasicUsersSelector,
+  sessionWithPublicUsersSelector
+} from "@repo/shared-types"
 
 @Injectable()
 export class SessionService {
@@ -50,7 +50,7 @@ export class SessionService {
 
   findAll() {
     return this.prisma.session.findMany({
-      select: sessionWithBasicUsers,
+      select: sessionWithBasicUsersSelector,
       orderBy: {
         name: "asc"
       }
@@ -60,7 +60,7 @@ export class SessionService {
   async findOne(id: number) {
     const session = await this.prisma.session.findUnique({
       where: { id },
-      select: sessionWithPublicUsers
+      select: sessionWithPublicUsersSelector
     })
     if (!session) {
       throw new NotFoundError(`${id}에 해당하는 세션을 찾을 수 없습니다.`)
