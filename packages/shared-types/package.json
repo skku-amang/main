@@ -28,7 +28,7 @@
     "@repo/database": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.11"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }
