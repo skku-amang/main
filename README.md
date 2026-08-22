@@ -6,13 +6,13 @@
 
 ## 기술 스택
 
-| 영역 | 기술 |
-|------|------|
+| 영역         | 기술                                                                      |
+| ------------ | ------------------------------------------------------------------------- |
 | **Frontend** | Next.js 16, React 19, TailwindCSS, Radix UI, TanStack Query, next-auth v5 |
-| **Backend** | NestJS 11, Passport (JWT), Prisma ORM |
-| **Database** | PostgreSQL 15 |
-| **Storage** | MinIO (S3 호환) |
-| **Infra** | Turborepo, pnpm, Docker Compose, Storybook |
+| **Backend**  | NestJS 11, Passport (JWT), Prisma ORM                                     |
+| **Database** | PostgreSQL 15                                                             |
+| **Storage**  | MinIO (S3 호환)                                                           |
+| **Infra**    | Turborepo, pnpm, Docker Compose, Storybook                                |
 
 ## 프로젝트 구조
 
@@ -54,9 +54,9 @@ pnpm dev
 
 ## 커뮤니케이션
 
-| 채널 | 용도 |
-|------|------|
+| 채널                                                       | 용도                   |
+| ---------------------------------------------------------- | ---------------------- |
 | [GitHub Issues](https://github.com/skku-amang/main/issues) | 버그 리포트, 기능 제안 |
-| Slack (Amang-Homepage) | 실시간 소통 |
-| Notion (아망 워크스페이스) | 기획, 회의록, 문서 |
-| Figma | UI/UX 디자인 |
+| Slack (Amang-Homepage)                                     | 실시간 소통            |
+| Notion (아망 워크스페이스)                                 | 기획, 회의록, 문서     |
+| Figma                                                      | UI/UX 디자인           |
