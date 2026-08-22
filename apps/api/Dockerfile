@@ -1,5 +1,5 @@
 FROM node:22-alpine AS base
-RUN npm install -g pnpm turbo@^2
+RUN npm install -g pnpm@10.13.1 turbo@^2
 
 FROM base AS builder
 RUN apk update
