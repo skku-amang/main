@@ -127,15 +127,35 @@ export const reducer = (state: State, action: Action): State => {
   }
 }
 
-const listeners: Array<(state: State) => void> = []
+const listeners: Array<() => void> = []
 
-let memoryState: State = { toasts: [] }
+const EMPTY_STATE: State = { toasts: [] }
+
+let memoryState: State = EMPTY_STATE
 
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action)
   listeners.forEach((listener) => {
-    listener(memoryState)
+    listener()
   })
+}
+
+function subscribe(listener: () => void) {
+  listeners.push(listener)
+  return () => {
+    const index = listeners.indexOf(listener)
+    if (index > -1) {
+      listeners.splice(index, 1)
+    }
+  }
+}
+
+function getSnapshot() {
+  return memoryState
+}
+
+function getServerSnapshot() {
+  return EMPTY_STATE
 }
 
 type Toast = Omit<ToasterToast, "id">
@@ -170,21 +190,14 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
-
-  React.useEffect(() => {
-    listeners.push(setState)
-    // 구독 전에 dispatch된 toast는 listeners가 비어 있어 통지를 못 받는다.
-    // 마운트 순서상 Toaster보다 먼저 실행되는 effect에서 toast()를 부르면
-    // 그대로 유실되므로, 구독 직후 현재 상태를 한 번 맞춘다.
-    setState(memoryState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    }
-  }, [state])
+  // 구독 등록과 값 읽기를 원자적으로 처리한다. useState + useEffect 조합은
+  // 초기값을 읽은 뒤 구독되기까지 틈이 생겨, 그 사이 dispatch된 toast가
+  // 유실된다 — Toaster가 레이아웃에서 children 뒤에 있어 항상 이 틈에 걸린다.
+  const state = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  )
 
   return {
     ...state,
