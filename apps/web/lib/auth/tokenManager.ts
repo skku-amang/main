@@ -9,8 +9,10 @@
  * Cookie 기반 인증이라 토큰 값 자체는 보관하지 않음.
  * httpOnly cookie가 운반. TokenManager는 refresh 호출 순서만 관리.
  *
- * 관련: ADR-0002 (`docs/architecture/adr/0002-auth-cookie-migration.md`)
+ * 관련: ADR-0002 (`docs/explanation/adr/0002-auth-cookie-migration.md`)
  */
+
+import { apiClient } from "@/lib/apiClient"
 
 const LOCK_NAME = "auth-refresh"
 const STORAGE_KEY_LAST_REFRESH = "auth.lastRefresh"
@@ -31,15 +33,7 @@ export class TokenManager {
       )
       if (Date.now() - lastRefresh < SKIP_THRESHOLD_MS) return
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-        { method: "POST", credentials: "include" }
-      )
-      if (!response.ok) {
-        throw new Error(
-          `refresh failed: ${response.status} ${response.statusText}`
-        )
-      }
+      await apiClient.refreshSession()
 
       localStorage.setItem(STORAGE_KEY_LAST_REFRESH, String(Date.now()))
     })

@@ -964,6 +964,24 @@ export default class ApiClient {
   }
 
   /**
+   * 세션 갱신 — cookie의 RT로 새 AT/RT를 Set-Cookie 받는다.
+   * `_request`를 거치지 않는 raw 호출: 401 시 refresh를 다시 타는 재귀를 막고,
+   * 호출자(TokenManager)가 Web Locks 잠금 안에서 실행할 수 있게 한다.
+   * @throws {Error} 갱신 실패 (응답 status 포함)
+   */
+  public async refreshSession(): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+      method: "POST",
+      credentials: "include"
+    })
+    if (!response.ok) {
+      throw new Error(
+        `refresh failed: ${response.status} ${response.statusText}`
+      )
+    }
+  }
+
+  /**
    * 현재 로그인된 사용자 조회 (cookie 기반, ADR-0002)
    * @throws {AuthError} 로그인하지 않은 경우
    * @throws {InternalServerError}
