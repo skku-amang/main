@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { GenerationController } from "./generation.controller"
 import { GenerationService } from "./generation.service"
 
@@ -20,7 +21,10 @@ describe("GenerationController", () => {
           }
         }
       ]
-    }).compile()
+    })
+      .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<GenerationController>(GenerationController)
   })

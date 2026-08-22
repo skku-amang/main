@@ -7,6 +7,7 @@ import {
 } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import { PrismaService } from "../../prisma/prisma.service"
+import { isUserAdmin } from "../is-admin.util"
 
 @Injectable()
 export class RentalOwnerGuard implements CanActivate {
@@ -22,7 +23,7 @@ export class RentalOwnerGuard implements CanActivate {
     if (Number.isNaN(rentalId))
       throw new ValidationError("유효하지 않은 대여 ID입니다.")
 
-    if (user.isAdmin) return true
+    if (await isUserAdmin(this.prisma, user.sub)) return true
 
     const rental = await this.prisma.equipmentRental.findUnique({
       where: { id: rentalId },

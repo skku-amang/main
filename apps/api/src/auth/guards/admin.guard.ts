@@ -1,14 +1,18 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common"
 import { ForbiddenError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+import { PrismaService } from "../../prisma/prisma.service"
+import { isUserAdmin } from "../is-admin.util"
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
     const user = request.user as JwtPayload
 
-    if (user && user.isAdmin) {
+    if (user && (await isUserAdmin(this.prisma, user.sub))) {
       return true
     }
 

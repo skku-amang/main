@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { TeamOwnerGuard } from "../auth/guards/team-owner.guard"
 import { TeamController } from "./team.controller"
 import { TeamService } from "./team.service"
 
@@ -20,7 +21,10 @@ describe("TeamController", () => {
           }
         }
       ]
-    }).compile()
+    })
+      .overrideGuard(TeamOwnerGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<TeamController>(TeamController)
   })

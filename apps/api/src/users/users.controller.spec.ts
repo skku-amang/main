@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { UsersController } from "./users.controller"
 import { UsersService } from "./users.service"
 
@@ -16,7 +17,10 @@ describe("UsersController", () => {
           }
         }
       ]
-    }).compile()
+    })
+      .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<UsersController>(UsersController)
   })
