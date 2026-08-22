@@ -4,26 +4,8 @@ export type SignUpResponse = {
   message: string
 }
 
-// =============================================================================
-// ADR-0002 Cookie 기반 인증 schema
-// =============================================================================
-//
-// 토큰(AT/RT)은 httpOnly cookie로만 전송됨 (Set-Cookie 헤더).
-// 응답 body는 user 정보 또는 success indicator만 포함.
-//
-// 백엔드는 다음 endpoint를 구현:
-// - POST /auth/login    → LoginResponse + Set-Cookie (AT, RT)
-// - POST /auth/refresh  → body 없음, Set-Cookie (새 AT, RT)
-// - POST /auth/logout   → body 없음, Set-Cookie (만료 처리) + RT DB delete
-// - GET  /auth/me       → MeResponse
-//
-// 모든 요청은 `credentials: 'include'` 필수.
-// 백엔드는 Origin 헤더 검증 + SameSite=Lax cookie로 CSRF 보호.
-//
-// 관련: ADR-0002 (`docs/architecture/adr/0002-auth-cookie-migration.md`)
-
 /**
- * Auth cookie 이름 (ADR-0002 D4).
+ * Auth cookie 이름
  * 백엔드 Set-Cookie와 프론트 middleware presence 체크가 공유하는 SSOT.
  */
 export const ACCESS_TOKEN_COOKIE = "accessToken"
