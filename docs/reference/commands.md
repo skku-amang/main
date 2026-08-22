@@ -29,9 +29,3 @@ cd apps/api && pnpm test              # 단위 테스트
 cd apps/api && pnpm test:watch        # 감시 모드
 cd apps/api && pnpm test:e2e          # E2E 테스트
 ```
-
-## Storybook
-
-```bash
-cd apps/web && pnpm storybook         # 포트 6006
-```
