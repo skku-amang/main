@@ -5,10 +5,7 @@ import { AuthError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import { Request } from "express"
 import { Strategy } from "passport-jwt"
-import { REFRESH_TOKEN_COOKIE } from "../auth-cookie.util"
-
-const extractRefreshToken = (req: Request): string | null =>
-  req.cookies?.[REFRESH_TOKEN_COOKIE] ?? null
+import { extractRefreshToken } from "../auth-cookie.util"
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(

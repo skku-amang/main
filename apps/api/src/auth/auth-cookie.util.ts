@@ -4,6 +4,22 @@ import { CookieOptions, Response } from "express"
 export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE }
 
 /**
+ * cookie를 담고 있는 요청. express `Request`와 pino-http가 넘기는
+ * `IncomingMessage`를 모두 받기 위해 구조적 타입으로 좁게 정의한다.
+ */
+type RequestWithCookies = {
+  cookies?: Record<string, string | undefined>
+}
+
+export function extractAccessToken(req: RequestWithCookies): string | null {
+  return req.cookies?.[ACCESS_TOKEN_COOKIE] ?? null
+}
+
+export function extractRefreshToken(req: RequestWithCookies): string | null {
+  return req.cookies?.[REFRESH_TOKEN_COOKIE] ?? null
+}
+
+/**
  * ADR-0002 D4 cookie 속성.
  *
  * - SameSite=Lax: web(amang.json-server.win)과 api(api.amang.json-server.win)는
