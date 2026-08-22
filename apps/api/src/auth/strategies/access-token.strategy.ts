@@ -1,8 +1,13 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { PassportStrategy } from "@nestjs/passport"
-import { JwtPayload } from "@repo/shared-types" // Adjust the import path as necessary
-import { ExtractJwt, Strategy } from "passport-jwt"
+import { JwtPayload } from "@repo/shared-types"
+import { Request } from "express"
+import { Strategy } from "passport-jwt"
+import { ACCESS_TOKEN_COOKIE } from "../auth-cookie.util"
+
+const fromCookie = (req: Request): string | null =>
+  req.cookies?.[ACCESS_TOKEN_COOKIE] ?? null
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -11,7 +16,7 @@ export class AccessTokenStrategy extends PassportStrategy(
 ) {
   constructor(configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: fromCookie,
       secretOrKey: configService.getOrThrow<string>("ACCESS_TOKEN_SECRET")
     })
   }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
-import { auth } from "@/auth"
 import ROUTES from "@/constants/routes"
+import { getServerUser } from "@/lib/auth/server"
 
 import { AdminSidebar } from "./_components/AdminSidebar"
 import { UnsavedChangesProvider } from "./_components/UnsavedChangesContext"
@@ -16,9 +16,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const user = await getServerUser()
 
-  if (!session?.user?.isAdmin) {
+  if (!user?.isAdmin) {
     redirect(ROUTES.LOGIN)
   }
 

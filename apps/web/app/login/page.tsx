@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
@@ -15,12 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import ROUTES from "@/constants/routes"
-import {
-  InvalidSigninCredentialsErrorCode,
-  InvalidSigninErrorCode,
-  UserNotApprovedErrorCode
-} from "@/lib/auth/errors"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
+import { AuthError, UserNotApprovedError } from "@repo/api-client"
 import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
@@ -38,6 +34,7 @@ const Login = () => {
   const searchParams = useSearchParams()
   const signupSuccess = searchParams.get("signup") === "success"
   const { toast } = useToast()
+  const { login } = useAuth()
 
   const {
     register,
@@ -49,16 +46,22 @@ const Login = () => {
   })
 
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
-    const res = await signIn("credentials", { ...formData, redirect: false })
-    if (!res?.error) {
+    try {
+      await login(formData)
       const raw = searchParams.get("callbackUrl")
       const callbackUrl = raw?.startsWith("/") ? raw : ROUTES.HOME
-      return router.push(callbackUrl)
-    }
+      router.push(callbackUrl)
+    } catch (error) {
+      if (error instanceof UserNotApprovedError) {
+        toast({
+          title: "로그인 실패",
+          description: "관리자 승인 후 로그인이 가능합니다.",
+          variant: "destructive"
+        })
+        return
+      }
 
-    switch (res.code) {
-      case InvalidSigninErrorCode:
-      case InvalidSigninCredentialsErrorCode:
+      if (error instanceof AuthError) {
         setError("email", {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
@@ -67,22 +70,14 @@ const Login = () => {
           type: "manual",
           message: "이메일 또는 비밀번호가 일치하지 않습니다."
         })
-        break
+        return
+      }
 
-      case UserNotApprovedErrorCode:
-        toast({
-          title: "로그인 실패",
-          description: "관리자 승인 후 로그인이 가능합니다.",
-          variant: "destructive"
-        })
-        break
-
-      default:
-        toast({
-          title: "로그인 실패",
-          description: "알 수 없는 에러 발생!",
-          variant: "destructive"
-        })
+      toast({
+        title: "로그인 실패",
+        description: "알 수 없는 에러 발생!",
+        variant: "destructive"
+      })
     }
   }
 

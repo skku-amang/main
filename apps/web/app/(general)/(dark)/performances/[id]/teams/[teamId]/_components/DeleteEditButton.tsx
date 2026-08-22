@@ -12,7 +12,6 @@ interface DeleteEditButtonProps {
   performanceId: number
   team: TeamDetail
   className?: string
-  accessToken?: string
 }
 
 const DeleteEditButton = ({ team, className }: DeleteEditButtonProps) => {

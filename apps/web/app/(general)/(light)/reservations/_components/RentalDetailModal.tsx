@@ -3,7 +3,6 @@
 import { useState } from "react"
 import dayjs from "dayjs"
 import { ArrowRight, Clock, Trash2 } from "lucide-react"
-import { useSession } from "next-auth/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/hooks/use-toast"
 import { useDeleteRental } from "@/hooks/api/useRental"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface RentalDetailModalProps {
   rental: RentalDetail | null
@@ -38,7 +38,7 @@ export default function RentalDetailModal({
   open,
   onOpenChange
 }: RentalDetailModalProps) {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const deleteRental = useDeleteRental()
   const queryClient = useQueryClient()
   const { toast } = useToast()
@@ -46,10 +46,9 @@ export default function RentalDetailModal({
 
   if (!rental) return null
 
-  const currentUserId = session?.user?.id ? Number(session.user.id) : null
+  const currentUserId = user?.id ?? null
   const canDelete =
-    rental.users.some((u) => u.id === currentUserId) ||
-    session?.user?.isAdmin === true
+    rental.users.some((u) => u.id === currentUserId) || user?.isAdmin === true
 
   const handleDelete = () => {
     deleteRental.mutate([rental.id], {

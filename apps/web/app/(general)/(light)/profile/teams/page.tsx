@@ -29,16 +29,16 @@ const TeamsSkeleton = () => (
 )
 
 const ProfileTeamsPage = () => {
-  const { session, isLoading: userLoading, isAuthenticated } = useCurrentUser()
+  const { user, isLoading: userLoading, isAuthenticated } = useCurrentUser()
   const { data: allTeams, status: teamsStatus } = useAllTeams()
   const { data: performances } = usePerformances()
 
   const isLoading = userLoading || teamsStatus === "pending"
-  const userId = session?.user?.id ? Number(session.user.id) : null
+  const userId = user?.id ?? null
 
   if (isLoading) return <TeamsSkeleton />
 
-  if (!isAuthenticated || !session) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="mb-4 text-lg text-slate-500">로그인이 필요합니다.</p>

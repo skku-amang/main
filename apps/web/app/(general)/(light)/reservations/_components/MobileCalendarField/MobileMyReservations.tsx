@@ -1,9 +1,9 @@
 "use client"
 
 import dayjs from "dayjs"
-import { useSession } from "next-auth/react"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileMyReservationsProps {
   rentals: RentalDetail[]
@@ -14,8 +14,8 @@ export default function MobileMyReservations({
   rentals,
   onRentalClick
 }: MobileMyReservationsProps) {
-  const { data: session } = useSession()
-  const userId = session?.user?.id ? Number(session.user.id) : null
+  const { user } = useAuth()
+  const userId = user?.id ?? null
 
   const myRentals = userId
     ? rentals

@@ -1,13 +1,10 @@
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 export const useTeamPermission = (team: { leaderId: number } | undefined) => {
-  const { data: session } = useSession()
+  const { user } = useAuth()
 
   const canEdit =
-    !!session?.user &&
-    !!team &&
-    (session.user.isAdmin ||
-      (!!session.user.id && +session.user.id === team.leaderId))
+    !!user && !!team && (user.isAdmin || user.id === team.leaderId)
 
   return { canEdit }
 }

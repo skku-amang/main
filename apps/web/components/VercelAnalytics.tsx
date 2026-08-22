@@ -1,7 +1,8 @@
 "use client"
 
 import { Analytics } from "@vercel/analytics/react"
-import { useSession } from "next-auth/react"
+
+import { useAuth } from "@/lib/providers/auth-provider"
 
 const developerEmails = new Set(
   (process.env.NEXT_PUBLIC_DEVELOPER_EMAILS ?? "")
@@ -11,12 +12,12 @@ const developerEmails = new Set(
 )
 
 export default function VercelAnalytics() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
 
   return (
     <Analytics
       beforeSend={(event) => {
-        if (session?.user?.email && developerEmails.has(session.user.email)) {
+        if (user?.email && developerEmails.has(user.email)) {
           return null
         }
         return event

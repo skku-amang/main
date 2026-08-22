@@ -16,6 +16,9 @@ patches:
         path: /data/S3_ENDPOINT
         value: "https://s3.amang.json-server.win"
       - op: add
+        path: /data/COOKIE_DOMAIN
+        value: "amang.json-server.win"
+      - op: add
         path: /data/NODE_ENV
         value: "production"
       - op: add
