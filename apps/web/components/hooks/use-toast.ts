@@ -127,7 +127,6 @@ export const reducer = (state: State, action: Action): State => {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
 const listeners: Array<(state: State) => void> = []
 
 let memoryState: State = { toasts: [] }
@@ -175,6 +174,10 @@ function useToast() {
 
   React.useEffect(() => {
     listeners.push(setState)
+    // 구독 전에 dispatch된 toast는 listeners가 비어 있어 통지를 못 받는다.
+    // 마운트 순서상 Toaster보다 먼저 실행되는 effect에서 toast()를 부르면
+    // 그대로 유실되므로, 구독 직후 현재 상태를 한 번 맞춘다.
+    setState(memoryState)
     return () => {
       const index = listeners.indexOf(setState)
       if (index > -1) {

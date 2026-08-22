@@ -45,6 +45,21 @@ export class InternalServerError extends ApiError {
   }
 }
 
+/**
+ * 서버가 JSON이 아닌 응답(게이트웨이 오류 페이지 등)을 돌려준 경우.
+ * 원본 상태 코드를 `upstreamStatus`에 보존한다 — 502·503·504를 구분해야
+ * 장애 원인을 추적할 수 있는데, `status`는 500으로 고정되기 때문.
+ */
+export class UpstreamError extends InternalServerError {
+  readonly upstreamStatus: number
+
+  constructor(upstreamStatus: number, detail?: string, instance?: string) {
+    super(detail, instance)
+    this.upstreamStatus = upstreamStatus
+    this.message = "서버와 연결하지 못했습니다"
+  }
+}
+
 export class ValidationError extends ApiError {
   readonly type = "/errors/validation-error"
   readonly status = 400
