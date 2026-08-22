@@ -9,7 +9,12 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common"
-import { MeResponse } from "@repo/shared-types"
+import {
+  LoginResponse,
+  LogoutResponse,
+  MeResponse,
+  RefreshResponse
+} from "@repo/shared-types"
 import { Request, Response } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -32,27 +37,28 @@ export class AuthController {
     }
   }
 
-  // 전환기: 토큰을 Set-Cookie(ADR-0002)와 응답 body(legacy next-auth 경로)로
-  // 함께 내려준다. body 토큰은 Phase 2.6에서 next-auth 제거 시 함께 제거.
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Res({ passthrough: true }) res: Response
-  ) {
-    const result = await this.authService.login(loginUserDto)
-    setAuthCookies(res, result, this.authService.tokenTtls())
-    return result
+  ): Promise<LoginResponse> {
+    const { user, ...tokens } = await this.authService.login(loginUserDto)
+    setAuthCookies(res, tokens, this.authService.tokenTtls())
+    return { user }
   }
 
   @Post("logout")
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<LogoutResponse> {
     const { sub: userId } = req.user as { sub: number }
     await this.authService.logout(userId)
     clearAuthCookies(res)
-    return { message: "성공적으로 로그아웃되었습니다." }
+    return { success: true }
   }
 
   @Post("refresh")
@@ -61,14 +67,14 @@ export class AuthController {
   async refreshTokens(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
-  ) {
+  ): Promise<RefreshResponse> {
     const { sub: userId, refreshToken } = req.user as {
       sub: number
       refreshToken: string
     }
     const tokens = await this.authService.refreshTokens(userId, refreshToken)
     setAuthCookies(res, tokens, this.authService.tokenTtls())
-    return tokens
+    return { success: true }
   }
 
   @Get("me")

@@ -1,5 +1,4 @@
 import {
-  AuthResponse,
   CreateEquipment,
   CreateGeneration,
   CreatePerformance,
@@ -14,6 +13,7 @@ import {
   GenerationDetail,
   GenerationList,
   GetRentalsQuery,
+  LoginResponse,
   LoginUser,
   LogoutResponse,
   MeResponse,
@@ -948,7 +948,7 @@ export default class ApiClient {
    */
   public login(loginUser: LoginUser) {
     return this._request<
-      AuthResponse,
+      LoginResponse,
       AuthError | UserNotApprovedError | InternalServerError
     >("/auth/login", "POST", loginUser)
   }

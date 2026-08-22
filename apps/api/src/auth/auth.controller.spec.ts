@@ -33,7 +33,7 @@ describe("AuthController", () => {
     controller = module.get<AuthController>(AuthController)
   })
 
-  it("login은 Set-Cookie(AT, RT)와 legacy body를 함께 반환한다", async () => {
+  it("login은 Set-Cookie(AT, RT)를 설정하고 body엔 user만 반환한다", async () => {
     const res = makeRes()
     const result = await controller.login(
       { email: "a@b.c", password: "pw" },
@@ -50,7 +50,7 @@ describe("AuthController", () => {
       "rt",
       expect.objectContaining({ path: "/auth" })
     )
-    expect(result).toEqual({ ...tokens, user })
+    expect(result).toEqual({ user })
   })
 
   it("refresh는 새 토큰을 Set-Cookie로 갱신한다", async () => {

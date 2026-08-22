@@ -1,29 +1,5 @@
 import { DetailedUser } from "../user/user.types"
 
-/**
- * @deprecated next-auth 시대 schema. ADR-0002 마이그레이션 완료 시 제거.
- * 새 코드는 cookie 방식 schema (`LoginResponse` 등) 사용.
- *
- * 인증 응답(RFC 6749 기준)
- * https://datatracker.ietf.org/doc/html/rfc6749#appendix-A
- * snake_case가 표준이지만 편의를 위해 camelCase 사용
- */
-export type AuthResponse = {
-  accessToken: string
-  refreshToken: string
-  expiresIn: number
-  user: DetailedUser
-}
-
-/**
- * @deprecated next-auth 시대 schema. ADR-0002 마이그레이션 완료 시 제거.
- */
-export type RefreshTokenResponse = {
-  accessToken: string
-  refreshToken: string
-  expiresIn: number
-}
-
 export type SignUpResponse = {
   message: string
 }
