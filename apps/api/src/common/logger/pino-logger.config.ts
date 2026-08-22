@@ -7,6 +7,7 @@ import { format } from "sql-formatter"
 import { JwtService } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
+import { extractAccessToken } from "../../auth/auth-cookie.util"
 
 const jwtService = new JwtService()
 
@@ -47,15 +48,12 @@ export const pinoLoggerModuleOption: Params = {
       return mergeObject
     },
     customProps(req: any) {
-      let token = req.headers?.authorization?.split(" ")[1]
-
-      if (!token) {
-        token = req.body?.refreshToken
-      }
-
+      // 인증(passport strategy)과 같은 곳에서 토큰을 읽는다 — 추출 경로가
+      // 갈라지면 인증 방식이 바뀔 때 로그만 뒤처진다 (#458, #572)
+      const token = extractAccessToken(req)
       const payload = token ? jwtService.decode<JwtPayload>(token) : null
 
-      return payload ? { userId: payload.sub } : { userId: "anonymous" }
+      return payload?.sub ? { userId: payload.sub } : { userId: "anonymous" }
     },
     genReqId(req, res) {
       const id = randomUUID()
@@ -71,7 +69,8 @@ export const pinoLoggerModuleOption: Params = {
     redact: [
       "req.body.password",
       "req.body.refreshToken",
-      "req.headers.authorization"
+      "req.headers.authorization",
+      "req.headers.cookie"
     ]
   }
 }
