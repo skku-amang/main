@@ -12,7 +12,7 @@
 | **Backend**  | NestJS 11, Passport (JWT), Prisma ORM                                     |
 | **Database** | PostgreSQL 15                                                             |
 | **Storage**  | MinIO (S3 호환)                                                           |
-| **Infra**    | Turborepo, pnpm, Docker Compose, Storybook                                |
+| **Infra**    | Turborepo, pnpm, Docker Compose                                           |
 
 ## 프로젝트 구조
 

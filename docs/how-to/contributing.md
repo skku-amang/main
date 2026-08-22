@@ -170,7 +170,7 @@ chore/upgrade-dependencies
 ```txt
 feat(web): 공연 목록 페이지 무한 스크롤 추가
 fix(api): 팀 삭제 시 세션 cascade 누락 수정
-docs: README에 Storybook 실행 방법 추가
+docs: README에 온보딩 스크립트 실행 방법 추가
 refactor(db): 마이그레이션 파일 정리
 feat(web,api): 장비 예약 기능 구현
 ```

@@ -56,8 +56,6 @@ tmp/
 *.pem
 *:Zone.Identifier
 
-# Storybook
-storybook-static
 .env*.local
 *.code-workspace
 !*.code-workspace.example
