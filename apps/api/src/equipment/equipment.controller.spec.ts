@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { EquipmentController } from "./equipment.controller"
 import { EquipmentService } from "./equipment.service"
 
@@ -20,7 +21,10 @@ describe("EquipmentController", () => {
           }
         }
       ]
-    }).compile()
+    })
+      .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<EquipmentController>(EquipmentController)
   })

@@ -44,12 +44,7 @@ export class AuthService {
       throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
-    const tokens = await this.getTokens(
-      user.id,
-      user.email,
-      user.name,
-      user.isAdmin
-    )
+    const tokens = await this.getTokens(user.id)
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -82,18 +77,8 @@ export class AuthService {
     return user
   }
 
-  private async getTokens(
-    userId: number,
-    email: string,
-    name: string,
-    isAdmin: boolean
-  ) {
-    const jwtPayload: JwtPayload = {
-      sub: userId,
-      email,
-      name,
-      isAdmin
-    }
+  private async getTokens(userId: number) {
+    const jwtPayload: JwtPayload = { sub: userId }
 
     const {
       accessToken: accessTokenExpiresIn,
@@ -143,12 +128,7 @@ export class AuthService {
       )
     }
 
-    const tokens = await this.getTokens(
-      user.id,
-      user.email,
-      user.name,
-      user.isAdmin
-    )
+    const tokens = await this.getTokens(user.id)
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
     return tokens
   }

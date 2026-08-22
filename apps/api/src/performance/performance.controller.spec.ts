@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { PerformanceController } from "./performance.controller"
 import { PerformanceService } from "./performance.service"
 
@@ -21,7 +22,10 @@ describe("PerformanceController", () => {
           }
         }
       ]
-    }).compile()
+    })
+      .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<PerformanceController>(PerformanceController)
   })

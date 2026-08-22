@@ -55,9 +55,7 @@ export const pinoLoggerModuleOption: Params = {
 
       const payload = token ? jwtService.decode<JwtPayload>(token) : null
 
-      return payload
-        ? { userId: payload.sub, username: payload.name }
-        : { userId: "anonymous", username: "anonymous" }
+      return payload ? { userId: payload.sub } : { userId: "anonymous" }
     },
     genReqId(req, res) {
       const id = randomUUID()
