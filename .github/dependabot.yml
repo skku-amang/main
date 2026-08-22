@@ -1,14 +1,8 @@
 version: 2
 
 updates:
-  # 알림 스캐너는 루트 pnpm-lock.yaml 하나만 읽지만, 수정 PR을 만드는 업데이터는
-  # package.json이 있는 디렉토리마다 별도 job을 띄운다. 루트만 선언하면 워크스페이스
-  # 패키지의 job이 설정 없는 기본값(그룹핑·prefix 없음)으로 돌아간다.
   - package-ecosystem: "npm"
-    directories:
-      - "/"
-      - "/apps/*"
-      - "/packages/*"
+    directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
