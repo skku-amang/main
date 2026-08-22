@@ -5,8 +5,8 @@ import { PrismaService } from "../prisma/prisma.service"
 import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
-  performanceFindOneInclude,
-  performanceTeamsInclude
+  performanceWithTeamsInclude,
+  performanceWithTeamMembersInclude
 } from "@repo/shared-types"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 
@@ -33,7 +33,7 @@ export class PerformanceService {
   async findTeamsByPerformanceId(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
-      include: performanceTeamsInclude
+      include: performanceWithTeamMembersInclude
     })
 
     if (!performance)
@@ -44,7 +44,7 @@ export class PerformanceService {
   async findOne(id: number) {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
-      include: performanceFindOneInclude
+      include: performanceWithTeamsInclude
     })
 
     if (!performance)
