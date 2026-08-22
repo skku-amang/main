@@ -171,7 +171,7 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 **나머지 결정**:
 
 - 토큰 추출: **cookie 전용** — 헤더(Bearer)/body 추출은 next-auth 제거로 소비 주체가 사라져 함께 제거 (2026-07-21 확정)
-- 응답 body에 토큰 없음 — login `{ user }`, refresh/logout `{ success: true }` (shared-types `LoginResponse`/`RefreshResponse`/`LogoutResponse`). 전환기 병행 없이 일괄 전환 (사용자 수 적어 비용 무시 가능)
+- 응답 body에 토큰 없음 — login `{ user }`(`LoginResponse`), refresh/logout은 body 없음 (성공 여부는 공통 응답 봉투 `isSuccess`가 SSOT). 전환기 병행 없이 일괄 전환 (사용자 수 적어 비용 무시 가능)
 - `/auth/me` 응답: `MeResponse` (`@repo/shared-types`, `detailedUserSelector` 기반 — password 미포함)
 - 로그아웃: 요청 즉시 RT DB delete + 두 cookie 만료
 - Origin 검증 화이트리스트: CORS 허용 목록과 단일 상수 공유 (`apps/api/src/common/allowed-origins.ts`) — localhost 임의 포트 / production / staging / `*.vercel.app`

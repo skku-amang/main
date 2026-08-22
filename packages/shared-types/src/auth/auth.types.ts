@@ -13,8 +13,8 @@ export type SignUpResponse = {
 //
 // 백엔드는 다음 endpoint를 구현:
 // - POST /auth/login    → LoginResponse + Set-Cookie (AT, RT)
-// - POST /auth/refresh  → RefreshResponse + Set-Cookie (새 AT, RT)
-// - POST /auth/logout   → LogoutResponse + Set-Cookie (만료 처리)
+// - POST /auth/refresh  → body 없음, Set-Cookie (새 AT, RT)
+// - POST /auth/logout   → body 없음, Set-Cookie (만료 처리) + RT DB delete
 // - GET  /auth/me       → MeResponse
 //
 // 모든 요청은 `credentials: 'include'` 필수.
@@ -35,22 +35,6 @@ export const REFRESH_TOKEN_COOKIE = "refreshToken"
  */
 export type LoginResponse = {
   user: DetailedUser
-}
-
-/**
- * POST /auth/refresh 응답.
- * 새 AT/RT는 Set-Cookie로만 갱신 — body는 성공 표시.
- */
-export type RefreshResponse = {
-  success: true
-}
-
-/**
- * POST /auth/logout 응답.
- * Set-Cookie로 cookie 만료 처리. 백엔드는 RT를 DB에서 즉시 delete.
- */
-export type LogoutResponse = {
-  success: true
 }
 
 /**

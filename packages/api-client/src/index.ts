@@ -15,7 +15,6 @@ import {
   GetRentalsQuery,
   LoginResponse,
   LoginUser,
-  LogoutResponse,
   MeResponse,
   Performance,
   PerformanceDetail,
@@ -958,7 +957,7 @@ export default class ApiClient {
    * @throws {InternalServerError}
    */
   public logout() {
-    return this._request<LogoutResponse, AuthError | InternalServerError>(
+    return this._request<void, AuthError | InternalServerError>(
       "/auth/logout",
       "POST"
     )

@@ -9,12 +9,7 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common"
-import {
-  LoginResponse,
-  LogoutResponse,
-  MeResponse,
-  RefreshResponse
-} from "@repo/shared-types"
+import { LoginResponse, MeResponse } from "@repo/shared-types"
 import { Request, Response } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -54,11 +49,10 @@ export class AuthController {
   async logout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
-  ): Promise<LogoutResponse> {
+  ): Promise<void> {
     const { sub: userId } = req.user as { sub: number }
     await this.authService.logout(userId)
     clearAuthCookies(res)
-    return { success: true }
   }
 
   @Post("refresh")
@@ -67,14 +61,13 @@ export class AuthController {
   async refreshTokens(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
-  ): Promise<RefreshResponse> {
+  ): Promise<void> {
     const { sub: userId, refreshToken } = req.user as {
       sub: number
       refreshToken: string
     }
     const tokens = await this.authService.refreshTokens(userId, refreshToken)
     setAuthCookies(res, tokens, this.authService.tokenTtls())
-    return { success: true }
   }
 
   @Get("me")
