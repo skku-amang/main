@@ -27,7 +27,9 @@ updates:
       minor-and-patch:
         applies-to: "version-updates"
         update-types: ["minor", "patch"]
-    # 메이저는 그룹에 넣지 않고 개별 PR로 남긴다 (breaking change는 따로 검토).
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

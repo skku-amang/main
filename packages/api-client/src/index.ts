@@ -65,6 +65,7 @@ import {
   RefreshTokenNotFoundError,
   SessionNotFoundError,
   UnprocessableEntityError,
+  UpstreamError,
   ValidationError,
   UserNotApprovedError
 } from "./errors"
@@ -204,6 +205,18 @@ export default class ApiClient {
 
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, options)
+
+      // 게이트웨이 오류 페이지 등 JSON이 아닌 응답을 그대로 파싱하면
+      // 브라우저마다 다른 파싱 에러로 바뀌어 원래 상태 코드가 사라진다.
+      const contentType = response.headers.get("content-type") ?? ""
+      if (!contentType.includes("json")) {
+        const detail = (await response.text()).slice(0, 200)
+        console.error(
+          `[ApiClient] Non-JSON response - URL: ${this.baseUrl}${endpoint}, Status: ${response.status}`
+        )
+        throw new UpstreamError(response.status, detail)
+      }
+
       const data = (await response.json()) as ApiResult<T>
 
       if (data.isSuccess) {
