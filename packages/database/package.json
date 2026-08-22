@@ -33,7 +33,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bcrypt": "^5.0.2",
-    "@types/node": "^24.12.0",
+    "@types/node": "^20.19.43",
     "prisma": "^6.19.3",
     "ts-node": "^10.9.2"
   },
