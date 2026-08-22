@@ -6,13 +6,13 @@
 
 ## 기술 스택
 
-| 영역         | 기술                                                                      |
-| ------------ | ------------------------------------------------------------------------- |
-| **Frontend** | Next.js 16, React 19, TailwindCSS, Radix UI, TanStack Query, next-auth v5 |
-| **Backend**  | NestJS 11, Passport (JWT), Prisma ORM                                     |
-| **Database** | PostgreSQL 15                                                             |
-| **Storage**  | MinIO (S3 호환)                                                           |
-| **Infra**    | Turborepo, pnpm, Docker Compose                                           |
+| 영역         | 기술                                                        |
+| ------------ | ----------------------------------------------------------- |
+| **Frontend** | Next.js 16, React 19, TailwindCSS, Radix UI, TanStack Query |
+| **Backend**  | NestJS 11, Passport (JWT), Prisma ORM                       |
+| **Database** | PostgreSQL 15                                               |
+| **Storage**  | MinIO (S3 호환)                                             |
+| **Infra**    | Turborepo, pnpm, Kubernetes (k3s, 홈랩)                     |
 
 ## 프로젝트 구조
 
