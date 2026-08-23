@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 "use client"
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
