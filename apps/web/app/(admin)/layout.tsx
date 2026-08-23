@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 import ROUTES from "@/constants/routes"
-import { isPreviewDeployment } from "@/lib/auth/previewDeployment"
+import { isAuthCookieBlindHost } from "@/lib/auth/authCookieScope"
 import { getServerUser } from "@/lib/auth/server"
 
 import { AdminSidebar } from "./_components/AdminSidebar"
@@ -18,8 +19,9 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   const user = await getServerUser()
+  const host = (await headers()).get("host")
 
-  if (!isPreviewDeployment && !user?.isAdmin) {
+  if (!isAuthCookieBlindHost(host) && !user?.isAdmin) {
     redirect(ROUTES.LOGIN)
   }
 

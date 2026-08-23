@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
 import ROUTES from "@/constants/routes"
-import { isPreviewDeployment } from "@/lib/auth/previewDeployment"
+import { isAuthCookieBlindHost } from "@/lib/auth/authCookieScope"
 import { ACCESS_TOKEN_COOKIE } from "@repo/shared-types"
 
 /**
@@ -14,7 +14,7 @@ export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   if (
-    !isPreviewDeployment &&
+    !isAuthCookieBlindHost(req.headers.get("host")) &&
     !req.cookies.has(ACCESS_TOKEN_COOKIE) &&
     pathname !== ROUTES.LOGIN
   ) {
