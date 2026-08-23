@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 import ROUTES from "@/constants/routes"
+import { isPreviewDeployment } from "@/lib/auth/previewDeployment"
 import { getServerUser } from "@/lib/auth/server"
 
 import { AdminSidebar } from "./_components/AdminSidebar"
@@ -18,7 +19,7 @@ export default async function AdminLayout({
 }) {
   const user = await getServerUser()
 
-  if (!user?.isAdmin) {
+  if (!isPreviewDeployment && !user?.isAdmin) {
     redirect(ROUTES.LOGIN)
   }
 

@@ -166,7 +166,8 @@ Grace period(양쪽 인식) 또는 자동 마이그레이션 endpoint는 구현 
 - **AT cookie Max-Age = RT TTL(7d)**: cookie 수명과 JWT 유효성(1h)을 분리. 만료 AT는 401 → refresh 흐름을 타고, 프론트 middleware의 presence 체크가 세션 내내 유효. 토큰 유효성 판정은 항상 서버의 JWT exp 검증.
 - **RT `Path=/auth`**: 일반 API 요청에 RT 미전송 — 노출면 최소화.
 - **`Domain=$COOKIE_DOMAIN`** (prod `amang.json-server.win`, staging `amang.staging.json-server.win`, 로컬 미설정): host-only cookie는 api 서브도메인 전용이라 web 호스트의 middleware·RSC가 못 보므로 amang 스코프로 확장. `json-server.win` 전체가 아니라 타 서비스 미노출.
-- **Vercel preview 로그인**: preview(`*.vercel.app`)는 staging API 기준 cross-site라 Lax cookie 미전송. **staging에만 `COOKIE_SAMESITE=none`** 적용해 로그인 허용 (None은 Secure 강제 동반, CSRF는 Origin 검증이 담당). production은 Lax 고정. 한계: Safari 등 3rd-party cookie 차단 브라우저에선 여전히 불가, preview의 Next middleware는 staging 도메인 cookie를 못 보므로 보호 라우트(/admin, /profile 등)는 로그인 상태여도 /login으로 튕김 — preview에서는 로그인 + 일반 화면·API 호출까지만 검증 가능.
+- **Vercel preview 로그인**: preview(`*.vercel.app`)는 staging API 기준 cross-site라 Lax cookie 미전송. **staging에만 `COOKIE_SAMESITE=none`** 적용해 로그인 허용 (None은 Secure 강제 동반, CSRF는 Origin 검증이 담당). production은 Lax 고정. 한계: Safari 등 3rd-party cookie 차단 브라우저에선 여전히 불가.
+- **preview의 서버측 인증 게이트 우회**: cookie의 `Domain`이 staging 스코프라 preview 오리진으로 오는 요청에는 브라우저가 cookie를 붙이지 않는다 — preview의 proxy(Edge)·RSC는 로그인 상태를 볼 방법 자체가 없다. 게이트를 그대로 두면 로그인해도 보호 라우트(/admin, /profile 등)가 /login으로 튕겨 preview 검토가 막히므로, `VERCEL_ENV === "preview"`일 때 서버측 게이트를 건너뛰고 판정을 클라이언트(`useAuth`)에 위임한다 ([apps/web/lib/auth/previewDeployment.ts](../../../apps/web/lib/auth/previewDeployment.ts)). 권한 방어는 API의 `JwtAuthGuard`·`AdminGuard`가 담당하므로 우회로 열리는 것은 UI 껍데기뿐 — 데이터 요청은 401/403. 대신 preview에서는 리다이렉트 동작 자체를 검증할 수 없다.
 
 **나머지 결정**:
 
