@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  lint-and-test:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,3 +40,12 @@ jobs:
         run: pnpm turbo test
 
       # Web은 Vercel에서 빌드 및 배포를 처리하므로 여기서는 제외
+
+  build-image:
+    needs: verify
+    # PR에서는 이미지를 만들지 않는다 (main에 들어간 결과물만 배포 대상)
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-image.yml
