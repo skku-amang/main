@@ -41,7 +41,6 @@ const nextConfig = {
     ],
     unoptimized: true
   },
-  output: "standalone",
   async headers() {
     const securityHeaders = [
       {
