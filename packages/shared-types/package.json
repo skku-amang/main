@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@repo/database": "workspace:*",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@repo/database": "workspace:*",

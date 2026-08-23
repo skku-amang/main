@@ -2,6 +2,27 @@ packages:
   - "apps/*"
   - "packages/*"
 
+# 두 곳 이상의 workspace가 공유하는 의존성의 버전 SSOT (#595).
+# 각 package.json은 "catalog:" 로만 참조하며, 버전 숫자는 이 블록에만 존재한다.
+# 한 곳에서만 쓰는 의존성은 대상이 아니다 — 통일할 것이 없어 관리 지점만 늘어난다.
+catalog:
+  # 툴체인 — api, web, api-client, database, ui / root, api, web, eslint-config
+  "@types/node": ^20.19.43
+  typescript: ^5.9.3
+  ts-node: ^10.9.2
+
+  # React — web, ui
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.4
+
+  # 도메인 공용 — api/database, web/api-client, types/web/api
+  bcrypt: ^6.0.0
+  "@types/bcrypt": ^5.0.2
+  http-status-codes: ^2.3.0
+  zod: ^3.25.76
+
 ignoredBuiltDependencies:
   - '@nestjs/core'
   - '@swc/core'
