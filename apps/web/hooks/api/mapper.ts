@@ -24,10 +24,9 @@ type FieldTransformer<TInput = any, TOutput = any> = (value: TInput) => TOutput
  * `null`이 `string | null`로 잘못 변환되는 문제가 있었음)
  */
 type SerializedType<T> = Date extends T
-  ?
-      | string
-      | (null extends T ? null : never)
-      | (undefined extends T ? undefined : never)
+  ? | string
+    | (null extends T ? null : never)
+    | (undefined extends T ? undefined : never)
   : T
 
 /**

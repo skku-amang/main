@@ -60,9 +60,7 @@ const UserSelect = <T extends FieldValues>({
 
   const [open, setOpen] = useState(false)
   const watchedUserId = form.watch(fieldName as Path<T>) as
-    | number
-    | null
-    | undefined
+    number | null | undefined
   const selectedUser = users.find((user) => user.id === watchedUserId)
 
   const isSmall = size === "small"
