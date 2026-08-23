@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
@@ -83,6 +84,10 @@ export default function RentalDetailModal({
           >
             {rental.title}
           </DialogTitle>
+          {/* 시안에 설명 자리가 없어 화면에는 숨기고 스크린리더에만 전달 */}
+          <DialogDescription className="sr-only">
+            예약 시간과 예약자 정보입니다. 본인 예약이면 삭제할 수 있습니다.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Time section */}

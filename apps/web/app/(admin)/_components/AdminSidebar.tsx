@@ -17,7 +17,12 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -123,12 +128,17 @@ export function AdminSidebar() {
               <Menu className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-60 p-0">
+          {/* 내비게이션 패널이라 설명할 본문이 없다 — Radix에 없음을 명시 */}
+          <SheetContent
+            side="left"
+            className="w-60 p-0"
+            aria-describedby={undefined}
+          >
             <div className="flex h-full flex-col">
               <div className="border-b border-neutral-200 px-4 py-5">
-                <span className="text-lg font-bold tracking-tight">
+                <SheetTitle className="text-lg font-bold tracking-tight">
                   AMANG Admin
-                </span>
+                </SheetTitle>
               </div>
               <div className="flex-1 px-3 py-4">
                 <NavLinks onNavigate={() => setOpen(false)} />
