@@ -16,7 +16,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.6",
     "turbo": "^2.10.11",
-    "typescript": "5.9.3"
+    "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.13.1",
   "engines": {
@@ -25,9 +25,6 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
     "*.{js,jsx,ts,tsx,json,css,md}": "prettier --check"
-  },
-  "dependencies": {
-    "zod": "^3.25.76"
   },
   "pnpm": {
     "overrides": {}

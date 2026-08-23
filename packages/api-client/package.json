@@ -22,12 +22,12 @@
   "dependencies": {
     "@repo/shared-types": "workspace:*",
     "http-problem-details": "^0.1.7",
-    "http-status-codes": "^2.3.0"
+    "http-status-codes": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.19.43"
+    "@types/node": "catalog:"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }

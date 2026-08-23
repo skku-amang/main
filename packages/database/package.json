@@ -27,15 +27,15 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
-    "bcrypt": "^6.0.0"
+    "bcrypt": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/bcrypt": "^5.0.2",
-    "@types/node": "^20.19.43",
+    "@types/bcrypt": "catalog:",
+    "@types/node": "catalog:",
     "prisma": "^6.19.3",
-    "ts-node": "^10.9.2"
+    "ts-node": "catalog:"
   },
   "prettier": "@repo/eslint-config/prettier.config"
 }
