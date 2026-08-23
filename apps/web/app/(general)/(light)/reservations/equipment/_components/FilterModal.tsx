@@ -7,7 +7,6 @@ import {
   FilterPopoverContent,
   FilterSection
 } from "@/components/FilterPopover"
-import { Separator } from "@/components/ui/separator"
 
 const FILTER_CATEGORIES: { value: EquipCategory; label: string }[] = [
   { value: EquipCategory.GUITAR, label: "기타" },

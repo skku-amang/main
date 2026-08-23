@@ -74,8 +74,6 @@ import {
   DrawerTrigger
 } from "./drawer"
 
-type StatusFilter = "all" | "active" | "inactive"
-
 const SESSION_LABELS = Object.values(SESSION_DISPLAY_NAME)
 
 interface DataTableProps<TValue> {

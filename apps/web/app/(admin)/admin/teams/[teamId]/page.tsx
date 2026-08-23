@@ -18,7 +18,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
 import { useTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import { useUsers } from "@/hooks/api/useUser"
-import { TeamDetail, UpdateTeam } from "@repo/shared-types"
+import { UpdateTeam } from "@repo/shared-types"
 
 import { TeamSessionsEditor } from "./_components/TeamSessionsEditor"
 

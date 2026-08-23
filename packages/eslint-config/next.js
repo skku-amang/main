@@ -82,7 +82,10 @@ export default [
   // 커스텀 규칙 및 TypeScript 규칙 오버라이드
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { ignoreRestSiblings: true }
+      ],
       "no-unused-vars": "off", // @typescript-eslint/no-unused-vars와 중복되므로 비활성화
       "no-undef": "off", // TypeScript 컴파일러가 처리하므로 비활성화
       "react/no-unknown-property": [

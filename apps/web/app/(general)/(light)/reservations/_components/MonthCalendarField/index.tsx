@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from "dayjs"
+import { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import MonthBlock from "./MonthBlock"
 
