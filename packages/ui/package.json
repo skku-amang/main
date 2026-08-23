@@ -16,7 +16,8 @@
     "dev": "tsc --watch",
     "check-types": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",
-    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {

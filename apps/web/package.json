@@ -7,8 +7,9 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev",
     "start": "next start",
-    "format": "prettier --check \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\"",
-    "lint": "eslint \"{app,component,constants,hooks,lib,types}/**/*.{ts,tsx}\" --fix"
+    "format": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
