@@ -24,9 +24,7 @@ const SheetInnerContentNavLink = ({
       target={target}
       rel={rel}
       className="flex w-full items-center text-gray-500 gap-x-4"
-      onClick={() => {
-        onClick && onClick()
-      }}
+      onClick={() => onClick?.()}
     >
       {icon}
       <div className="text-lg font-medium">{children}</div>
