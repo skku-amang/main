@@ -1,9 +1,10 @@
 name: Build and Push Docker Images
 
 on:
-  push:
-    branches:
-      - main
+  # CI(lint/type/test) 통과 후 ci.yml이 호출한다. 직접 push 트리거를 걸면
+  # 검사 결과와 무관하게 이미지가 만들어져 :latest로 프로덕션까지 흘러간다.
+  workflow_call:
+  # 레지스트리 일시 장애 등으로 push만 실패했을 때 검사 재실행 없이 재시도
   workflow_dispatch:
 
 jobs:
