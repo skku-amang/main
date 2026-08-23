@@ -55,8 +55,7 @@ export function createQueryHook<
 
     let args: TArgs
     let options:
-      | Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">
-      | undefined
+      Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn"> | undefined
 
     if (isLastArgOptions) {
       // 마지막 인자가 options라면 분리
