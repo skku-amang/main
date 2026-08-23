@@ -18,6 +18,8 @@ spec:
         job-type: migrate
     spec:
       restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: migrate
           image: ghcr.io/skku-amang/amang-api:latest
