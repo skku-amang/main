@@ -15,6 +15,8 @@ spec:
         job-type: seed
     spec:
       restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: seed
           image: ghcr.io/skku-amang/amang-api:latest
