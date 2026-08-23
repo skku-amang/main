@@ -93,7 +93,7 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex flex-wrap items-center gap-4 pb-4">
       {onSearchChange && (
-        <div className="relative max-w-sm flex-1">
+        <div className="relative w-full max-w-sm sm:min-w-[220px] sm:flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <Input
             placeholder={searchPlaceholder}
@@ -160,21 +160,21 @@ export function DataTableToolbar<TData>({
         </Button>
       )}
 
-      <div className="flex-1" />
-
-      <Button variant="outline" size="sm" onClick={() => exportToCsv(table)}>
-        <Download className="mr-1 h-4 w-4" />
-        CSV
-      </Button>
-
-      <DataTableViewOptions table={table} />
-
-      {onCreateClick && (
-        <Button onClick={onCreateClick}>
-          <Plus className="mr-1 h-4 w-4" />
-          {createLabel}
+      <div className="ml-auto flex items-center gap-4">
+        <Button variant="outline" size="sm" onClick={() => exportToCsv(table)}>
+          <Download className="mr-1 h-4 w-4" />
+          CSV
         </Button>
-      )}
+
+        <DataTableViewOptions table={table} />
+
+        {onCreateClick && (
+          <Button onClick={onCreateClick}>
+            <Plus className="mr-1 h-4 w-4" />
+            {createLabel}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
