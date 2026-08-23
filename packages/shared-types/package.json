@@ -22,7 +22,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@repo/database": "workspace:*"
+    "@repo/database": "workspace:*",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@repo/database": "workspace:*",
