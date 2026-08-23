@@ -43,9 +43,10 @@ jobs:
 
   build-image:
     needs: verify
-    # PR에서는 이미지를 만들지 않는다 (main에 들어간 결과물만 배포 대상)
-    if: github.event_name == 'push'
     permissions:
       contents: read
       packages: write
     uses: ./.github/workflows/build-image.yml
+    with:
+      # PR에서는 빌드 검증만 하고 레지스트리에는 올리지 않는다
+      push: ${{ github.event_name == 'push' }}
