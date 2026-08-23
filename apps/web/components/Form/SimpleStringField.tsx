@@ -25,7 +25,6 @@ const SimpleStringField = ({
   <FormField
     control={form.control}
     name={name}
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     render={({ field: { value, ...fieldProps } }) => (
       <FormItem>
         <SimpleLabel required={required}>{label}</SimpleLabel>

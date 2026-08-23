@@ -37,7 +37,6 @@ const SimpleImageField = ({
     <FormField
       control={form.control}
       name={name}
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render={({ field: { value, onChange, ...fieldProps } }) => (
         <FormItem>
           <SimpleLabel required={required}>{label}</SimpleLabel>
