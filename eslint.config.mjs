@@ -9,6 +9,16 @@ export default [
     files: ["apps/web/**/*.{js,jsx,ts,tsx}"],
   })),
 
+  // shadcn/ui 원본 컴포넌트는 children을 `{...props}`로 넘겨받는 pass-through라
+  // 정적 분석으로 콘텐츠 유무를 판정할 수 없다 (실제 콘텐츠는 호출부에 있다)
+  {
+    files: ["apps/web/components/ui/**/*.{jsx,tsx}"],
+    rules: {
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
+    },
+  },
+
   // React UI 패키지에만 react-internal 설정 적용
   ...reactInternalConfig.map((cfg) => ({
     ...cfg,

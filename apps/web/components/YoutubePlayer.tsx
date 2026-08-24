@@ -3,10 +3,12 @@ import { extractYoutubeVideoId, getYoutubeEmbedUrl } from "@repo/shared-types"
 
 interface YoutubePlayerProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   videoUrl: string
+  title: string
 }
 
 const YoutubePlayer: React.FC<YoutubePlayerProps> = ({
   videoUrl,
+  title,
   ...iframeProps
 }) => {
   const videoId = extractYoutubeVideoId(videoUrl)
@@ -15,6 +17,7 @@ const YoutubePlayer: React.FC<YoutubePlayerProps> = ({
   return (
     <iframe
       src={getYoutubeEmbedUrl(videoId)}
+      title={title}
       allowFullScreen
       {...iframeProps}
     />

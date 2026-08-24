@@ -74,6 +74,7 @@ const TeamDetailClient = () => {
         {team.songYoutubeVideoUrl && (
           <YoutubePlayer
             videoUrl={team.songYoutubeVideoUrl}
+            title={`${team.songName} 연주 영상`}
             className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
           />
         )}
