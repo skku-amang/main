@@ -25,5 +25,10 @@
     "typescript": "catalog:",
     "typescript-eslint": "^8.67.0"
   },
-  "prettier": "@repo/eslint-config/prettier.config"
+  "prettier": "@repo/eslint-config/prettier.config",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check ."
+  }
 }
