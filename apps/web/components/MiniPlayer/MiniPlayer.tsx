@@ -100,6 +100,7 @@ const MiniPlayer = () => {
       <div className="aspect-video">
         <iframe
           src={`https://www.youtube.com/embed/${current.videoId}?autoplay=1&rel=0`}
+          title={current.title}
           allow="autoplay; encrypted-media"
           allowFullScreen
           className="size-full"

@@ -89,6 +89,7 @@ const YoutubeInput = ({
       {validation.valid && !isPending && (
         <YoutubePlayer
           videoUrl={debouncedUrl}
+          title="입력한 유튜브 영상 미리보기"
           className={cn("mt-3 w-full", playerClassName)}
           allowFullScreen
         />
