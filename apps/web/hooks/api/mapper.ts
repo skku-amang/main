@@ -283,7 +283,7 @@ export const mapEquipmentWithRentalLog = createConfigBasedMapper<
   typeof equipmentWithRentalLogConfig
 >(equipmentWithRentalLogConfig)
 
-// Rental (RentalDetail = RentalLogWithUsers) 매퍼
+// Rental (RentalDetail = RentalWithUsers) 매퍼
 const rentalConfig = {
   ...TRANSFORM_CONFIGS.rentalLog,
   equipment: FIELD_TRANSFORMERS.mapNested(mapEquipment)
