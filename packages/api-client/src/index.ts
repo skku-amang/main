@@ -980,18 +980,37 @@ export default class ApiClient {
    * 세션 갱신 — cookie의 RT로 새 AT/RT를 Set-Cookie 받는다.
    * `_request`를 거치지 않는 raw 호출: 401 시 refresh를 다시 타는 재귀를 막고,
    * 호출자(TokenManager)가 Web Locks 잠금 안에서 실행할 수 있게 한다.
-   * @throws {Error} 갱신 실패 (응답 status 포함)
+   * @throws {RefreshTokenExpiredError} RT 수명이 다한 경우 (정상적인 세션 종료)
+   * @throws {RefreshTokenNotFoundError} RT cookie가 없는 경우 (정상적인 세션 종료)
+   * @throws {UpstreamError} 그 밖의 실패 (5xx·게이트웨이 오류 등)
    */
   public async refreshSession(): Promise<void> {
     const response = await fetch(`${this.baseUrl}/auth/refresh`, {
       method: "POST",
       credentials: "include"
     })
-    if (!response.ok) {
-      throw new Error(
+    if (response.ok) return
+
+    // 호출자가 "정상적인 세션 종료(RT 만료·부재)"와 "예상 못 한 실패(5xx·게이트웨이)"를
+    // 구분할 수 있어야 로그 레벨을 나눌 수 있다.
+    // throw는 try 밖에서 — 안에서 던지면 아래 catch가 삼켜 전부 UpstreamError가 된다.
+    let error: Error | null = null
+    try {
+      const data = (await response.json()) as ApiResult<never>
+      if (!data.isSuccess && data.error) {
+        error = createErrorFromProblemDocument(data.error as ProblemDocument)
+      }
+    } catch {
+      // JSON이 아닌 응답(게이트웨이 오류 페이지 등)
+    }
+
+    throw (
+      error ??
+      new UpstreamError(
+        response.status,
         `refresh failed: ${response.status} ${response.statusText}`
       )
-    }
+    )
   }
 
   /**
