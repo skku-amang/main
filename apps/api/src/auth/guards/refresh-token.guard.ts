@@ -7,6 +7,8 @@ import {
 } from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
+import { Response } from "express"
+import { clearAuthCookies } from "../auth-cookie.util"
 
 @Injectable()
 export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
@@ -18,6 +20,10 @@ export class RefreshTokenGuard extends AuthGuard("jwt-refresh") {
     status?: any
   ): TUser {
     if (info) {
+      // 갱신에 실패한 세션은 복구할 수 없다. AT cookie를 남겨두면 다음 요청이
+      // 다시 "갱신 가능한 만료"로 응답되어 무한 루프가 된다.
+      clearAuthCookies(context.switchToHttp().getResponse<Response>())
+
       if (info instanceof TokenExpiredError) {
         throw new RefreshTokenExpiredError("리프레쉬 토큰이 만료되었습니다.")
       }

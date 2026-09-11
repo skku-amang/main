@@ -21,6 +21,18 @@ import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
+/**
+ * 로그인 후 돌아갈 경로. 앱 내부 경로가 아니거나 로그인 페이지 자신이면 홈으로 보낸다.
+ * `/login`을 그대로 받으면 로그인 직후 다시 로그인 페이지로 돌아간다.
+ */
+const resolveCallbackUrl = (raw: string | null) => {
+  if (!raw?.startsWith("/") || raw.startsWith("//")) return ROUTES.HOME
+  if (raw === ROUTES.LOGIN || raw.startsWith(`${ROUTES.LOGIN}?`)) {
+    return ROUTES.HOME
+  }
+  return raw
+}
+
 export default function LoginPage() {
   return (
     <Suspense>
@@ -48,9 +60,7 @@ const Login = () => {
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     try {
       await login(formData)
-      const raw = searchParams.get("callbackUrl")
-      const callbackUrl = raw?.startsWith("/") ? raw : ROUTES.HOME
-      router.push(callbackUrl)
+      router.push(resolveCallbackUrl(searchParams.get("callbackUrl")))
     } catch (error) {
       if (error instanceof UserNotApprovedError) {
         toast({
