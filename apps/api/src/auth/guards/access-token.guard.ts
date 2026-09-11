@@ -9,6 +9,8 @@ import {
 } from "@repo/api-client"
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
+import { Request, Response } from "express"
+import { clearAuthCookies, extractRefreshToken } from "../auth-cookie.util"
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {
@@ -41,6 +43,16 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
   ): TUser {
     if (info) {
       if (info instanceof TokenExpiredError) {
+        const req = context.switchToHttp().getRequest<Request>()
+
+        // RT가 없으면 refresh로 복구할 수 없다. 그런데도 "만료"로 응답하면
+        // 프론트가 refresh를 시도 → 실패 → /login 이동 → 재시도를 무한 반복한다.
+        // 복구 불가능한 AT cookie를 지워 트리거 조건 자체를 없앤다.
+        if (!extractRefreshToken(req)) {
+          clearAuthCookies(context.switchToHttp().getResponse<Response>())
+          throw new AuthError("세션이 만료되었습니다. 다시 로그인해주세요.")
+        }
+
         throw new AccessTokenExpiredError("액세스 토큰이 만료되었습니다.")
       }
 

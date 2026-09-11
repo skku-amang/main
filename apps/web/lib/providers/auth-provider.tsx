@@ -58,7 +58,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           error
         )
         queryClient.setQueryData(ME_QUERY_KEY, null)
-        window.location.href = `${ROUTES.LOGIN}?callbackUrl=${window.location.pathname}`
+
+        // 이미 로그인 페이지라면 이동하지 않는다. 여기서 이동하면 전체 새로고침 →
+        // AuthProvider 재마운트 → 같은 실패 → 재이동으로 무한 루프가 된다.
+        if (window.location.pathname !== ROUTES.LOGIN) {
+          const callbackUrl = `${window.location.pathname}${window.location.search}`
+          window.location.href = `${ROUTES.LOGIN}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        }
         return false
       }
     })
