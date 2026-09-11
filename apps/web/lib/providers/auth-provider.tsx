@@ -8,7 +8,16 @@ import ROUTES from "@/constants/routes"
 import { ME_QUERY_KEY, useMe } from "@/hooks/api/useAuth"
 import { TokenManager } from "@/lib/auth/tokenManager"
 import { useApiClient } from "@/lib/providers/api-client-provider"
+import {
+  RefreshTokenExpiredError,
+  RefreshTokenNotFoundError
+} from "@repo/api-client"
 import { DetailedUser, LoginUser } from "@repo/shared-types"
+
+/** RT 수명이 다해 세션이 정상 종료된 경우. 장애가 아니라 예정된 상태 전이다. */
+const isSessionEnded = (error: unknown) =>
+  error instanceof RefreshTokenExpiredError ||
+  error instanceof RefreshTokenNotFoundError
 
 /**
  * Cookie 기반 인증 상태 (ADR-0002).
@@ -53,10 +62,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await TokenManager.getInstance().refresh()
         return true
       } catch (error) {
-        console.error(
-          "[AuthProvider] refresh 실패, 로그인 페이지로 이동",
-          error
-        )
+        // RT 수명이 다한 건 설계된 종료지 오류가 아니다. error로 남기면
+        // Sentry가 정상 만료까지 수집해 진짜 이상 신호를 묻는다.
+        if (isSessionEnded(error)) {
+          console.info("[AuthProvider] 세션 만료, 로그인 페이지로 이동")
+        } else {
+          console.error(
+            "[AuthProvider] refresh 실패, 로그인 페이지로 이동",
+            error
+          )
+        }
         queryClient.setQueryData(ME_QUERY_KEY, null)
 
         // 이미 로그인 페이지라면 이동하지 않는다. 여기서 이동하면 전체 새로고침 →
