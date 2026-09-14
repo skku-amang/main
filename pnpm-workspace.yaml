@@ -12,10 +12,10 @@ catalog:
   ts-node: ^10.9.2
 
   # React — web, ui
-  react: ^19.2.8
-  react-dom: ^19.2.8
-  "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.4
+  react: ^19.3.0
+  react-dom: ^19.3.0
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
 
   # 도메인 공용 — api/database, web/api-client, types/web/api
   bcrypt: ^6.0.0
