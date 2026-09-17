@@ -31,7 +31,7 @@ import { cn, formatGenerationOrder } from "@/lib/utils"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
-import { DEFAULT_RENTAL_TITLE, Equipment } from "@repo/shared-types"
+import { Equipment } from "@repo/shared-types"
 import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options
@@ -41,6 +41,8 @@ const HOURS = Array.from({ length: 24 }, (_, i) =>
 const MINUTES = Array.from({ length: 4 }, (_, i) =>
   (i * 15).toString().padStart(2, "0")
 )
+
+const DEFAULT_TITLE = "개인 연습"
 
 interface AddScheduleButtonProps {
   className?: string
@@ -164,7 +166,7 @@ export default function AddScheduleButton({
       [
         {
           equipmentId,
-          title,
+          title: title.trim() || DEFAULT_TITLE,
           startAt,
           endAt,
           userIds: selectedUserIds
@@ -281,7 +283,7 @@ export default function AddScheduleButton({
               Title
             </label>
             <Input
-              placeholder={DEFAULT_RENTAL_TITLE}
+              placeholder={DEFAULT_TITLE}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
