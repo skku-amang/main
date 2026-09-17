@@ -81,8 +81,9 @@ const SignupForm = () => {
           )
         })
         toast({
-          title: "회원가입 실패",
-          description: "이미 가입된 회원 정보입니다.",
+          title: "이미 가입된 회원 정보입니다",
+          description:
+            "이미 가입하셨다면 로그인해주세요. 운영진 승인 전이라면 승인 후 로그인할 수 있습니다.",
           variant: "destructive"
         })
       } else if (error instanceof ValidationError) {
