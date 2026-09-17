@@ -1,6 +1,7 @@
 "use client"
 
 import "../../sentry.client.config"
+import "../patchDomForTranslation"
 
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ApiClientProvider } from "./api-client-provider"
