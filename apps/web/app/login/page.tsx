@@ -5,7 +5,7 @@ import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -45,6 +45,7 @@ const Login = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const signupSuccess = searchParams.get("signup") === "success"
+  const [isPendingApproval, setIsPendingApproval] = useState(false)
   const { toast } = useToast()
   const { login } = useAuth()
 
@@ -63,11 +64,7 @@ const Login = () => {
       router.push(resolveCallbackUrl(searchParams.get("callbackUrl")))
     } catch (error) {
       if (error instanceof UserNotApprovedError) {
-        toast({
-          title: "로그인 실패",
-          description: "관리자 승인 후 로그인이 가능합니다.",
-          variant: "destructive"
-        })
+        setIsPendingApproval(true)
         return
       }
 
@@ -131,9 +128,14 @@ const Login = () => {
           <h5 className="mb-8 text-sm font-normal text-slate-400">
             계속하려면 로그인해주세요
           </h5>
-          {signupSuccess && (
-            <div className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm">
-              회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다.
+          {(signupSuccess || isPendingApproval) && (
+            <div
+              role="status"
+              className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm"
+            >
+              {isPendingApproval
+                ? "가입은 완료된 계정입니다. 운영진 승인을 기다리는 중이며, 승인 후 로그인할 수 있습니다."
+                : "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."}
             </div>
           )}
           {/* 일반 로그인 */}
