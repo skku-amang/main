@@ -19,17 +19,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { publicUser } from "@repo/shared-types"
+import { PublicUser } from "@repo/shared-types"
 
 interface ColumnCallbacks {
-  onEdit: (user: publicUser) => void
-  onDelete: (user: publicUser) => void
+  onEdit: (user: PublicUser) => void
+  onDelete: (user: PublicUser) => void
 }
 
 export function getColumns({
   onEdit,
   onDelete
-}: ColumnCallbacks): ColumnDef<publicUser>[] {
+}: ColumnCallbacks): ColumnDef<PublicUser>[] {
   return [
     {
       accessorKey: "id",

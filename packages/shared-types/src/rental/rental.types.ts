@@ -3,7 +3,7 @@ import { publicUserSelector, basicUserSelector } from "../user/user.types"
 
 export type { EquipmentRental }
 
-export const rentalLogWithUserInlcude = {
+export const rentalWithUsersInclude = {
   equipment: true,
   users: {
     select: publicUserSelector
@@ -13,9 +13,9 @@ export const rentalLogWithUserInlcude = {
   }
 } satisfies Prisma.EquipmentRentalInclude
 
-type RentalLogWithUsers = Prisma.EquipmentRentalGetPayload<{
-  include: typeof rentalLogWithUserInlcude
+type RentalWithUsers = Prisma.EquipmentRentalGetPayload<{
+  include: typeof rentalWithUsersInclude
 }>
 
-export type RentalList = RentalLogWithUsers[]
-export type RentalDetail = RentalLogWithUsers
+export type RentalList = RentalWithUsers[]
+export type RentalDetail = RentalWithUsers

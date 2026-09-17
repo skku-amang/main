@@ -3,7 +3,7 @@ import { publicUserSelector } from "../user/user.types"
 
 export type { Performance }
 
-export const performanceFindOneInclude = {
+export const performanceWithTeamsInclude = {
   teams: {
     include: {
       teamSessions: true,
@@ -15,10 +15,10 @@ export const performanceFindOneInclude = {
 } satisfies Prisma.PerformanceInclude
 
 export type PerformanceDetail = Prisma.PerformanceGetPayload<{
-  include: typeof performanceFindOneInclude
+  include: typeof performanceWithTeamsInclude
 }>
 
-export const performanceTeamsInclude = {
+export const performanceWithTeamMembersInclude = {
   teams: {
     include: {
       teamSessions: {
@@ -40,7 +40,7 @@ export const performanceTeamsInclude = {
 } satisfies Prisma.PerformanceInclude
 
 type PerformanceWithTeams = Prisma.PerformanceGetPayload<{
-  include: typeof performanceTeamsInclude
+  include: typeof performanceWithTeamMembersInclude
 }>
 
 export type PerformanceTeamsList = PerformanceWithTeams["teams"]

@@ -36,8 +36,8 @@ import {
   RentalList,
   UpdateSession,
   UpdateTeam,
-  publicUser,
-  publicUserList,
+  PublicUser,
+  PublicUserList,
   PresignedUrlRequest,
   PresignedUrlResponse
 } from "@repo/shared-types"
@@ -809,7 +809,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUsers() {
-    return this._request<publicUserList, InternalServerError>(`/users`, "GET")
+    return this._request<PublicUserList, InternalServerError>(`/users`, "GET")
   }
 
   /**
@@ -842,7 +842,7 @@ export default class ApiClient {
    * @throws {InternalServerError} 서버 오류 발생 시
    */
   public getUserById(id: number) {
-    return this._request<publicUser, NotFoundError | InternalServerError>(
+    return this._request<PublicUser, NotFoundError | InternalServerError>(
       `/users/${id}`,
       "GET"
     )

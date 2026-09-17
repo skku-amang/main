@@ -25,10 +25,10 @@ export const detailedUserSelector = {
   isApproved: true
 } satisfies Prisma.UserSelect
 
-export type publicUser = Prisma.UserGetPayload<{
+export type PublicUser = Prisma.UserGetPayload<{
   select: typeof publicUserSelector
 }>
-export type publicUserList = publicUser[]
+export type PublicUserList = PublicUser[]
 
 export type DetailedUser = Prisma.UserGetPayload<{
   select: typeof detailedUserSelector

@@ -11,7 +11,7 @@ import { useSessions } from "@/hooks/api/useSession"
 import { useDeleteUser, useUpdateUser, useUsers } from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { getSessionDisplayName } from "@/constants/session"
-import { publicUser } from "@repo/shared-types"
+import { PublicUser } from "@repo/shared-types"
 import { ApiError } from "@repo/api-client"
 
 import { getColumns } from "./_components/columns"
@@ -26,8 +26,8 @@ export default function UsersAdminPage() {
 
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [editing, setEditing] = useState<publicUser | null>(null)
-  const [deleting, setDeleting] = useState<publicUser | null>(null)
+  const [editing, setEditing] = useState<PublicUser | null>(null)
+  const [deleting, setDeleting] = useState<PublicUser | null>(null)
 
   const updateMutation = useUpdateUser()
   const deleteMutation = useDeleteUser()
