@@ -42,6 +42,8 @@ const MINUTES = Array.from({ length: 4 }, (_, i) =>
   (i * 15).toString().padStart(2, "0")
 )
 
+const DEFAULT_TITLE = "개인 연습"
+
 interface AddScheduleButtonProps {
   className?: string
   equipments: Equipment[]
@@ -117,7 +119,6 @@ export default function AddScheduleButton({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!equipmentId) newErrors.equipmentId = "장비를 선택해주세요."
-    if (!title.trim()) newErrors.title = "예약 제목은 필수입니다."
     if (!startDate) newErrors.startDate = "시작 날짜를 선택해주세요."
     if (!endDate) newErrors.endDate = "종료 날짜를 선택해주세요."
     if (!startHour || !startMinute)
@@ -165,7 +166,7 @@ export default function AddScheduleButton({
       [
         {
           equipmentId,
-          title,
+          title: title.trim() || DEFAULT_TITLE,
           startAt,
           endAt,
           userIds: selectedUserIds
@@ -282,13 +283,10 @@ export default function AddScheduleButton({
               Title
             </label>
             <Input
-              placeholder="Input Text"
+              placeholder={DEFAULT_TITLE}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title}</p>
-            )}
           </div>
 
           {/* Date & Time */}
