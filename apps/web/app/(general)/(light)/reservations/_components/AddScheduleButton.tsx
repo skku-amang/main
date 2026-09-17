@@ -31,7 +31,7 @@ import { cn, formatGenerationOrder } from "@/lib/utils"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
-import { Equipment } from "@repo/shared-types"
+import { DEFAULT_RENTAL_TITLE, Equipment } from "@repo/shared-types"
 import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options
@@ -117,7 +117,6 @@ export default function AddScheduleButton({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!equipmentId) newErrors.equipmentId = "장비를 선택해주세요."
-    if (!title.trim()) newErrors.title = "예약 제목은 필수입니다."
     if (!startDate) newErrors.startDate = "시작 날짜를 선택해주세요."
     if (!endDate) newErrors.endDate = "종료 날짜를 선택해주세요."
     if (!startHour || !startMinute)
@@ -282,13 +281,10 @@ export default function AddScheduleButton({
               Title
             </label>
             <Input
-              placeholder="Input Text"
+              placeholder={DEFAULT_RENTAL_TITLE}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title}</p>
-            )}
           </div>
 
           {/* Date & Time */}

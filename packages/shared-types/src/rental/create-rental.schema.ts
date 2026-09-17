@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export const DEFAULT_RENTAL_TITLE = "개인 연습"
+
 /**
  * @description 대여 기록 원본 Zod 스키마
  * 장비 ID와 대여 명, 대여 시작 시간 및 종료 시간과 함께 대여하는 유저를 포함합니다.
@@ -9,7 +11,13 @@ export const RentalSchema = z.object({
     .number({ invalid_type_error: "장비 ID는 숫자여야 합니다." })
     .int("장비 아이디는 정수여야 합니다.")
     .positive(),
-  title: z.string().min(1, "장비 대여 명은 필수입니다."),
+  title: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === ""
+        ? DEFAULT_RENTAL_TITLE
+        : value,
+    z.string()
+  ),
   startAt: z.coerce.date({
     required_error: "대여 시작 시간은 필수입니다."
   }),
