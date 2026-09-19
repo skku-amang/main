@@ -8,8 +8,12 @@ import { JwtService } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import { extractAccessToken } from "../../auth/auth-cookie.util"
+import { isHealthCheckPath } from "../../health/health-path"
 
 const jwtService = new JwtService()
+
+// W3C trace-flags sampled 비트 — 켜진 트레이스만 Sentry·Tempo에 저장된다
+const TRACE_FLAG_SAMPLED = 0x01
 
 const pinoPrettyOptions: PrettyOptions = {
   messageFormat: (log, messageKey) => {
@@ -28,8 +32,12 @@ const pinoPrettyOptions: PrettyOptions = {
 export const pinoLoggerModuleOption: Params = {
   pinoHttp: {
     level: process.env.NODE_ENV === "production" ? "info" : "trace",
-    autoLogging: {
-      ignore: (req) => req.url === "/health"
+    // 성공한 kubelet probe는 노이즈라 생략, 실패는 장애 조사용으로 남긴다
+    customLogLevel(req, res, err) {
+      if (isHealthCheckPath(req.url) && !err && res.statusCode < 400) {
+        return "silent"
+      }
+      return "info"
     },
     formatters: {
       level(label) {
@@ -41,9 +49,10 @@ export const pinoLoggerModuleOption: Params = {
       if (!mergeObject.msg && mergeObject.message) {
         mergeObject = { ...mergeObject, msg: mergeObject.message }
       }
-      const traceId = Sentry.getActiveSpan()?.spanContext().traceId
-      if (traceId) {
-        mergeObject = { ...mergeObject, trace_id: traceId }
+      // 샘플링 안 된 trace_id는 어디에도 없는 트레이스를 가리키므로 남기지 않는다
+      const spanContext = Sentry.getActiveSpan()?.spanContext()
+      if (spanContext && spanContext.traceFlags & TRACE_FLAG_SAMPLED) {
+        mergeObject = { ...mergeObject, trace_id: spanContext.traceId }
       }
       return mergeObject
     },
