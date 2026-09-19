@@ -141,8 +141,7 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 v3.1 이후:
 
 - [x] BE trace → Tempo fan-out — [#641](https://github.com/skku-amang/main/pull/641), health probe 제외 [#645](https://github.com/skku-amang/main/pull/645)
-- [ ] **OTel Collector·Tempo 자체 메트릭 수집** — 현재 `otelcol_*`, `tempo_*` 메트릭이 Prometheus에 없어 파이프라인이 끊겨도 알 수 없음. ServiceMonitor + 수신 0·전송 실패 알림 (홈랩)
-- [ ] **API graceful shutdown** — SIGTERM 처리가 없어 배포 때 처리 중인 요청과 아직 안 보낸 스팬(최대 5초치)이 유실됨. `enableShutdownHooks` + 종료 시 `Sentry.close()`
+- [x] **API graceful shutdown** — 종료 훅이 없어 PID 1이 SIGTERM을 무시하고 30초 뒤 SIGKILL됨. [#650](https://github.com/skku-amang/main/pull/650), [#651](https://github.com/skku-amang/main/pull/651)
 
 ## 부활 트리거 (재오픈 조건)
 
