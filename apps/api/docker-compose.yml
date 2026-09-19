@@ -54,7 +54,7 @@ services:
       - --appendonly
       - "yes"
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:

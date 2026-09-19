@@ -19,4 +19,3 @@ configMapGenerator:
       - COOKIE_DOMAIN=amang.staging.json-server.win
       - NODE_ENV=development
       - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
-      - REDIS_PORT=6379

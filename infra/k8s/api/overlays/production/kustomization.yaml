@@ -19,7 +19,6 @@ configMapGenerator:
       - NODE_ENV=production
       - SENTRY_DSN=https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824
       - REDIS_HOST=redis.amang-redis-production.svc.cluster.local
-      - REDIS_PORT=6379
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
       - OTEL_SERVICE_NAME=amang-api
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=production

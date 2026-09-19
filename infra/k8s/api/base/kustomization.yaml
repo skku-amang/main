@@ -11,5 +11,4 @@ configMapGenerator:
     literals:
       - ACCESS_TOKEN_EXPIRES_IN_SECONDS=3600
       - REFRESH_TOKEN_EXPIRES_IN_SECONDS=604800
-      - S3_REGION=ap-northeast-2
       - S3_BUCKET=amang
