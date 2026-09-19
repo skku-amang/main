@@ -10,26 +10,13 @@ resources:
   - ingress.yaml
   - sealed-secret.yaml
 
-patches:
-  - patch: |-
-      - op: add
-        path: /data/S3_ENDPOINT
-        value: "https://s3.amang.staging.json-server.win"
-      - op: add
-        path: /data/COOKIE_SAMESITE
-        value: "none"
-      - op: add
-        path: /data/COOKIE_DOMAIN
-        value: "amang.staging.json-server.win"
-      - op: add
-        path: /data/NODE_ENV
-        value: "development"
-      - op: add
-        path: /data/REDIS_HOST
-        value: "redis.amang-redis-staging.svc.cluster.local"
-      - op: add
-        path: /data/REDIS_PORT
-        value: "6379"
-    target:
-      kind: ConfigMap
-      name: api-config
+configMapGenerator:
+  - name: api-config
+    behavior: merge
+    literals:
+      - S3_ENDPOINT=https://s3.amang.staging.json-server.win
+      - COOKIE_SAMESITE=none
+      - COOKIE_DOMAIN=amang.staging.json-server.win
+      - NODE_ENV=development
+      - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
+      - REDIS_PORT=6379
