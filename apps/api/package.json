@@ -29,6 +29,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.2.1",
     "@nestjs/terminus": "^11.1.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
+    "@opentelemetry/sdk-trace-base": "^2.10.0",
     "@repo/api-client": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/shared-types": "workspace:*",
