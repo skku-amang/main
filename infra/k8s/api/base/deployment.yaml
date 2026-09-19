@@ -18,6 +18,11 @@ spec:
         - name: api
           image: ghcr.io/skku-amang/amang-api:latest
           imagePullPolicy: IfNotPresent
+          lifecycle:
+            # Service endpoint에서 빠질 시간을 준 뒤 SIGTERM 전달 (그 사이 요청 계속 처리)
+            preStop:
+              sleep:
+                seconds: 5
           ports:
             - name: http
               containerPort: 8000
