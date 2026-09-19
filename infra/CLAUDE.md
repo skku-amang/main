@@ -22,11 +22,11 @@ ArgoCD Application 정의는 **별도 레포**([homelab](https://github.com/mana
 
 **`amang-{component}-{env}`** 패턴. 컴포넌트별로 namespace를 분리한다.
 
-| Namespace                          | 용도                                    |
-| ---------------------------------- | --------------------------------------- |
-| `amang-api-{staging,production}`   | NestJS API + migrate/seed Job           |
-| `amang-db-{staging,production}`    | PostgreSQL                              |
-| `amang-redis-{staging,production}` | Redis                                   |
+| Namespace                          | 용도                          |
+| ---------------------------------- | ----------------------------- |
+| `amang-api-{staging,production}`   | NestJS API + migrate/seed Job |
+| `amang-db-{staging,production}`    | PostgreSQL                    |
+| `amang-redis-{staging,production}` | Redis                         |
 
 > **web은 K8s로 배포하지 않는다** — Next.js 웹은 Vercel에 배포([infra/terraform/vercel/](../terraform/vercel/)). `AUTH_SECRET` 등 시크릿은 Terraform이 생성해 Vercel env로 주입(state 저장, 커밋 안 함)한다. 과거 `infra/k8s/web/` overlay가 있었으나 ArgoCD Application 없이 방치된 dead config였고 평문 시크릿까지 커밋돼 제거([#524](https://github.com/skku-amang/main/issues/524)). 추후 K8s 배포가 필요하면 SealedSecret으로 새로 작성한다.
 
@@ -96,7 +96,9 @@ Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하�
 
 ### Liveness / Readiness Probe
 
-- **자체 앱**: `/health` HTTP 엔드포인트 구현 후 둘 다 등록 (api는 `@nestjs/terminus`)
+- **자체 앱**: liveness와 readiness 엔드포인트를 분리한다 (api: liveness `/health/live`, readiness `/health`)
+  - **liveness는 프로세스 생존만** 확인. DB 등 외부 의존성을 넣으면 의존성 장애 때 kubelet이 앱을 무한 재시작한다 (Sentry API-5)
+  - **readiness는 의존성 포함** (api는 `@nestjs/terminus` Prisma ping). 실패 시 트래픽에서만 빠지고 의존성 복구 시 자동 복귀
 - **공식 이미지**: 이미지가 제공하는 헬스체크 활용. 없으면 스킵 (Postgres `pg_isready`, Redis `redis-cli ping` 등 exec probe 가능하나 필수 아님)
 
 ### Resources
