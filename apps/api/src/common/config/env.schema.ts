@@ -17,7 +17,6 @@ export const envSchema = z
 
     // Redis — use case 미정이라 optional. 의존성/모듈 등록 PR에서 required 전환
     REDIS_HOST: z.string().min(1).optional(),
-    REDIS_PORT: z.coerce.number().int().min(1).max(65535).optional(),
     REDIS_PASSWORD: z.string().min(1).optional()
   })
   .passthrough()

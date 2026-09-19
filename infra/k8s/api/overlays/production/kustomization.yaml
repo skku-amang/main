@@ -10,35 +10,15 @@ resources:
   - ingress.yaml
   - sealed-secret.yaml
 
-patches:
-  - patch: |-
-      - op: add
-        path: /data/S3_ENDPOINT
-        value: "https://s3.amang.json-server.win"
-      - op: add
-        path: /data/COOKIE_DOMAIN
-        value: "amang.json-server.win"
-      - op: add
-        path: /data/NODE_ENV
-        value: "production"
-      - op: add
-        path: /data/SENTRY_DSN
-        value: "https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824"
-      - op: add
-        path: /data/REDIS_HOST
-        value: "redis.amang-redis-production.svc.cluster.local"
-      - op: add
-        path: /data/REDIS_PORT
-        value: "6379"
-      - op: add
-        path: /data/OTEL_EXPORTER_OTLP_ENDPOINT
-        value: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318"
-      - op: add
-        path: /data/OTEL_SERVICE_NAME
-        value: "amang-api"
-      - op: add
-        path: /data/OTEL_RESOURCE_ATTRIBUTES
-        value: "service.namespace=amang,deployment.environment.name=production"
-    target:
-      kind: ConfigMap
-      name: api-config
+configMapGenerator:
+  - name: api-config
+    behavior: merge
+    literals:
+      - S3_ENDPOINT=https://s3.amang.json-server.win
+      - COOKIE_DOMAIN=amang.json-server.win
+      - NODE_ENV=production
+      - SENTRY_DSN=https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824
+      - REDIS_HOST=redis.amang-redis-production.svc.cluster.local
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
+      - OTEL_SERVICE_NAME=amang-api
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=production
