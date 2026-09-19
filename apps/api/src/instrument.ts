@@ -7,19 +7,18 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: process.env.NODE_ENV === "production",
 
-  tracesSampleRate: 1.0,
+  // kubelet probe(5~10초 주기)는 루트에서 샘플링 제외 → 하위 Nest·Prisma 스팬까지 함께 빠짐
+  tracesSampler: ({ normalizedRequest, inheritOrSampleWith }) => {
+    const path = normalizedRequest?.url
+      ? new URL(normalizedRequest.url, "http://localhost").pathname
+      : undefined
+    if (path === "/health" || path?.startsWith("/health/")) return 0
+    return inheritOrSampleWith(1.0)
+  },
   profilesSampleRate: 1.0,
   enableLogs: true,
 
-  integrations: [
-    nodeProfilingIntegration(),
-    Sentry.pinoIntegration(),
-    // kubelet probe(5~10초 주기)가 트레이스를 채우지 않도록 스팬 미생성
-    Sentry.httpIntegration({
-      ignoreIncomingRequests: (urlPath) =>
-        urlPath === "/health" || urlPath.startsWith("/health/")
-    })
-  ],
+  integrations: [nodeProfilingIntegration(), Sentry.pinoIntegration()],
 
   // Sentry가 만든 OTel 스팬을 Tempo(OTel Collector 경유)로도 복제 전송
   openTelemetrySpanProcessors: process.env.OTEL_EXPORTER_OTLP_ENDPOINT
