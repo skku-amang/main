@@ -1,4 +1,5 @@
-import { Module } from "@nestjs/common"
+import { Module, OnApplicationShutdown } from "@nestjs/common"
+import * as Sentry from "@sentry/nestjs"
 import { SentryModule } from "@sentry/nestjs/setup"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
@@ -44,4 +45,9 @@ import { HealthModule } from "./health/health.module"
   controllers: [AppController],
   providers: [AppService]
 })
-export class AppModule {}
+export class AppModule implements OnApplicationShutdown {
+  // 연결이 모두 닫힌 뒤, 버퍼에 남은 Sentry 이벤트와 Tempo로 보낼 스팬을 전송
+  async onApplicationShutdown() {
+    await Sentry.close(2000)
+  }
+}
