@@ -30,6 +30,15 @@ patches:
       - op: add
         path: /data/REDIS_PORT
         value: "6379"
+      - op: add
+        path: /data/OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318"
+      - op: add
+        path: /data/OTEL_SERVICE_NAME
+        value: "amang-api"
+      - op: add
+        path: /data/OTEL_RESOURCE_ATTRIBUTES
+        value: "service.namespace=amang,deployment.environment.name=production"
     target:
       kind: ConfigMap
       name: api-config
