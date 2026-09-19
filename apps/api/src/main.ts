@@ -36,7 +36,8 @@ async function bootstrap() {
     new ApiResultInterceptor()
   )
   // SIGTERM 시 처리 중인 요청을 마무리하고 onModuleDestroy 등 종료 훅 실행 (기본값 off)
-  app.enableShutdownHooks()
+  // useProcessExit: 컨테이너 PID 1은 자기 자신에게 다시 보낸 SIGTERM을 무시하므로 exit로 종료
+  app.enableShutdownHooks(undefined, { useProcessExit: true })
   const configService = app.get(ConfigService)
   await app.listen(configService.get<number>("PORT") ?? 8000)
 }
