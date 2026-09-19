@@ -1,6 +1,7 @@
 // Import this first!
 import "./instrument"
 
+import * as Sentry from "@sentry/nestjs"
 import { ConfigService } from "@nestjs/config"
 import { HttpAdapterHost, NestFactory } from "@nestjs/core"
 import cookieParser from "cookie-parser"
@@ -37,4 +38,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
   await app.listen(configService.get<number>("PORT") ?? 8000)
 }
-bootstrap()
+bootstrap().catch(async (error: unknown) => {
+  console.error(error)
+  Sentry.captureException(error)
+  await Sentry.flush(2000)
+  process.exit(1)
+})
