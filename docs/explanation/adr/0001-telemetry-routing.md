@@ -1,6 +1,6 @@
 # ADR-0001: 텔레메트리 라우팅 — Signal split (incident analysis = Sentry / infra = 홈랩)
 
-**작성일**: 2026-05-05 (v3 재작성)
+**작성일**: 2026-05-05 (v3 재작성), 2026-09-19 (v3.1 개정)
 **상태**: Accepted
 **작성자**: JSON (+ Claude Code 협업)
 **관련 이슈**: [#490](https://github.com/skku-amang/main/issues/490) (원안)
@@ -21,6 +21,8 @@ AMANG은 두 관측 스택을 보유:
 2. **BE Sentry traces가 production에서 이미 작동 중** ([Trace Explorer](https://amang-23.sentry.io/explore/traces/?project=4511134425677824)에서 검증). 한 HTTP 요청당 12+ span 자동 캡처 (middleware, controller, Prisma SQL 포함)
 3. **AMANG app 레벨에서 emit하는 metrics는 현재 0개**. 모든 metrics는 인프라 레벨 (node-exporter, kube-state-metrics, Blackbox)에서 Prometheus가 scrape
 4. **Sentry Application Metrics는 2025년 Beta로 부활** — 2024년 deprecation 이후 재출시. counter/distribution/gauge API 사용 가능 (`@sentry/nestjs` ≥10.25.0). 향후 NSM 측정 도구로 활용 가능
+5. **(v3.1) `Sentry.init`의 `openTelemetrySpanProcessors`로 한 TracerProvider 안에서 fan-out 가능** — Sentry가 만든 OTel 스팬에 `BatchSpanProcessor(OTLPTraceExporter)`를 추가하면 같은 스팬이 Sentry와 OTel Collector(→ Tempo) 양쪽으로 간다. OTel 인스턴스는 Sentry 것 하나뿐이고, 샘플링도 `SentrySampler` 하나가 결정해 trace ID가 양쪽에서 같다 ([PR #641](https://github.com/skku-amang/main/pull/641))
+6. **(v3.1) 홈랩에서 Loki·Tempo·Sentry가 trace ID로 서로 연결됨** — pino 로그에 `trace_id` 첨부([#512](https://github.com/skku-amang/main/pull/512), [#648](https://github.com/skku-amang/main/pull/648)) + Grafana datasource 상호 링크([homelab#326](https://github.com/manamana32321/homelab/pull/326)). 로그에서 trace로 한 번에 이동하려면 trace가 Grafana(Tempo) 안에 있어야 한다
 
 ## Decision
 
@@ -35,7 +37,8 @@ AMANG은 두 관측 스택을 보유:
 | 신호                              | Origin                             | Destination                                                         | 이유                                                                                                                                                                                                     |
 | --------------------------------- | ---------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **App errors** (FE + BE)          | `@sentry/nextjs`, `@sentry/nestjs` | Sentry Issues                                                       | dedup, source maps, breadcrumbs, sentry-triage 스킬 자동화                                                                                                                                               |
-| **App traces** (FE + BE)          | Sentry SDK (내부 OTel)             | Sentry Performance                                                  | N+1 자동 감지, slow endpoint, replay/error correlation                                                                                                                                                   |
+| **App traces** (FE)               | `@sentry/nextjs`                   | Sentry Performance                                                  | replay/error correlation, web vitals                                                                                                                                                                     |
+| **App traces** (BE)               | Sentry SDK (내부 OTel)             | Sentry Performance **+** Tempo (via OTel Collector)                 | fan-out (v3.1). Sentry = N+1 자동 감지·slow endpoint·error correlation. Tempo = Loki 로그와 trace ID로 연결, Grafana 안에서 조회. 샘플링은 `tracesSampler` 하나가 양쪽 동시 결정                        |
 | **Session replay** (FE)           | `@sentry/nextjs`                   | Sentry Replay                                                       | 대체 도구 없음                                                                                                                                                                                           |
 | **User feedback widget** (FE)     | `@sentry/nextjs`                   | Sentry                                                              | UI 통합                                                                                                                                                                                                  |
 | **Source maps** (FE + BE)         | sentry-cli (build-time)            | Sentry                                                              | production stack trace symbolication                                                                                                                                                                     |
@@ -43,7 +46,6 @@ AMANG은 두 관측 스택을 보유:
 | **App logs** (BE pino)            | stdout (pino)                      | Loki (via Promtail) **+** Sentry Logs (via `pinoIntegration`, Beta) | dual write. Loki = operational store (30d retention, LogQL aggregation, kubectl logs 지원). Sentry Logs = incident-context store (Issue UI에 inline log timeline). Beta 위험은 Loki fallback이 있어 작음 |
 | **Pod / Node 메트릭**             | kube-state-metrics, node-exporter  | Prometheus → Grafana                                                | Sentry 범위 밖 (인프라 영역)                                                                                                                                                                             |
 | **외부 가용성**                   | Blackbox Exporter                  | Prometheus → Grafana                                                | 외부 prober (Sentry로 갈 일 없음)                                                                                                                                                                        |
-| **분산 trace 장기 보존** (선택)   | 사용 시 OTel SDK + Tempo           | Tempo (Grafana)                                                     | Sentry 90일 한계 넘는 retention 필요 시. **현재는 미사용**                                                                                                                                               |
 
 ### 아키텍처 다이어그램
 
@@ -51,6 +53,7 @@ AMANG은 두 관측 스택을 보유:
 [Application signals → Sentry]
 apps/web ──@sentry/nextjs──→ Sentry SaaS  (errors / traces / replay / feedback / vitals)
 apps/api ──@sentry/nestjs──→ Sentry SaaS  (errors / traces incl. Prisma SQL / metrics(beta))
+            └─ openTelemetrySpanProcessors ──OTLP/HTTP──→ OTel Collector ──→ Tempo  (같은 trace, v3.1)
 CI       ──sentry-cli────→ Sentry        (source maps, build-time)
 
 [Infra signals → 홈랩 Grafana]
@@ -73,7 +76,7 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
   - "사용자가 본 / 사용자에게 영향 미친 신호" → Sentry
   - "시스템 자체의 상태" → Grafana
 - **각 도구 강점 영역에 집중**: Sentry는 incident analysis UI (replay+stack+breadcrumbs 한 화면), Grafana는 PromQL/LogQL aggregation + 장기 보존
-- **`instrument.ts` 단일 라이브러리** (`@sentry/nestjs`): OTel SDK 직접 import 0. v1 PR #498에서 충돌한 "두 OTel 인스턴스 경쟁" 패턴 회피
+- **`instrument.ts` 단일 TracerProvider** (`@sentry/nestjs`): OTel SDK 초기화 0. v3.1에서 exporter용 패키지 2개(`@opentelemetry/sdk-trace-base`, `@opentelemetry/exporter-trace-otlp-http`)만 추가 — Sentry가 만든 provider에 processor를 얹을 뿐이라 v1 PR #498에서 충돌한 "두 OTel 인스턴스 경쟁" 패턴은 여전히 회피
 - **sentry-triage 스킬 ([#456](https://github.com/skku-amang/main/pull/456))이 FE+BE 모두에 적용**: BE error도 자동 트리아지
 - **N+1 / slow endpoint 자동 감지**: Sentry Performance가 trace 패턴 분석. NestJS+Prisma 환경에서 직접적 가치
 - **production stack trace symbolication 유지** ([#499](https://github.com/skku-amang/main/issues/499))
@@ -84,8 +87,9 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 | 항목                                 | 영향                                                                          | 완화                                                                                                                                                           |
 | ------------------------------------ | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **vendor lock-in 고착화**            | Sentry SaaS 의존도 ↑. FE+BE 양쪽에서 핵심 신호가 Sentry 통과                  | 무료 티어 quota 충분 (5k errors + 5M spans / 월). 진짜 lock-in 비용은 미래 마이그레이션 — 그때는 Sentry SDK가 wrap한 OTel을 외부로 뺄 수 있음 (이미 OTel 기반) |
-| **로그-trace correlation 불완전**    | BE pino logs는 Loki, traces는 Sentry → trace_id로 jump하려면 양쪽 라벨링 필요 | 후속 작업: pino mixin에 `Sentry.getActiveSpan()?.spanContext().traceId` 자동 첨부                                                                              |
-| **trace 장기 보존 부재**             | Sentry 90일. Tempo 미사용 (30d retention)                                     | AMANG 트래픽에서 90일이면 충분. 필요시 Tempo 활성화 가능 (홈랩에 이미 가동 중)                                                                                 |
+| ~~로그-trace correlation 불완전~~    | (v3.1 해소) pino `trace_id` 첨부 + BE trace가 Tempo에도 저장됨                | [#512](https://github.com/skku-amang/main/pull/512), [#648](https://github.com/skku-amang/main/pull/648), [homelab#326](https://github.com/manamana32321/homelab/pull/326), [#641](https://github.com/skku-amang/main/pull/641) |
+| **BE trace 이중 저장**               | 같은 스팬이 Sentry(90일)와 Tempo(30d, 10Gi PVC)에 모두 쌓임                   | 비용은 Sentry span quota뿐. 샘플링을 낮추면 양쪽이 같이 줄어든다(샘플러 공유). 따로 조정이 필요해지면 `skipOpenTelemetrySetup` + 직접 구성으로 전환              |
+| **샘플링 규칙이 양쪽에 동시 적용**   | health probe 제외 등은 `tracesSampler`에서만 해야 함. `ignoreIncomingRequests`는 HTTP 스팬만 막아 하위 Nest 스팬이 루트로 샌다 | [#645](https://github.com/skku-amang/main/pull/645)에서 샘플러로 이동                                                                                            |
 | **Grafana Sentry datasource 미도입** | 단일 pane of glass 부재 — Sentry는 Sentry, Grafana는 Grafana                  | 도입 가능 (별도 결정). 현재는 분리 UI 수용                                                                                                                     |
 
 ## Alternatives Considered
@@ -101,6 +105,8 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 - 1인 운영자 mental model 부하 ↑
 
 **부활 조건**: 사실상 없음. Sentry SDK가 내부적으로 OTel을 wrap하고 있어 "Sentry vs OTel" 이분법 자체가 outdated.
+
+> **(v3.1 주석)** 위 거부 이유 중 "fan-out에 브릿지 패키지·두 번째 OTel 인스턴스 필요"는 Sentry의 `openTelemetrySpanProcessors` 옵션으로 해소됐다. v3.1의 BE trace fan-out은 인스턴스를 하나만 쓴다. "모든 신호를 Collector로" 라는 v1 원칙 자체는 여전히 채택하지 않는다.
 
 ### v2 — Tier split (FE Sentry / BE 홈랩) ([PR #502](https://github.com/skku-amang/main/pull/502), closed)
 
@@ -126,18 +132,24 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 
 - [x] PR #502 (v2) close as superseded — 완료
 - [ ] **신규 이슈 — Sentry Application Metrics 도입** (`team.formed`, `signup.completed` counter 2개). `project_analytics_epic.md` 분석 인프라 에픽 부분 재오픈
-- [ ] **신규 이슈 — Trace-log correlation 봉합**: pino mixin에 `Sentry.getActiveSpan()?.spanContext().traceId` 자동 첨부 → Loki query시 trace_id 라벨로 Sentry jump 가능
+- [x] **Trace-log correlation 봉합**: pino mixin에 `trace_id` 자동 첨부 — [#512](https://github.com/skku-amang/main/pull/512), [#648](https://github.com/skku-amang/main/pull/648)
 - [ ] **신규 이슈 — sentry-triage 스킬 BE 적용 확장**: 현재 FE 위주 자동화를 BE 에러까지
 - [x] [#494 OTelcol Sentry exporter](https://github.com/skku-amang/main/issues/494) → close as not-planned (v2 잔재, 이미 close됨)
 - [x] [homelab#198](https://github.com/manamana32321/homelab/issues/198) → close as not-planned (이미 close됨)
 - [ ] [#499 source maps](https://github.com/skku-amang/main/issues/499) → scope 명확화 (FE Vercel 자동 + BE sentry-cli 둘 다 살아있음)
+
+v3.1 이후:
+
+- [x] BE trace → Tempo fan-out — [#641](https://github.com/skku-amang/main/pull/641), health probe 제외 [#645](https://github.com/skku-amang/main/pull/645)
+- [ ] **OTel Collector·Tempo 자체 메트릭 수집** — 현재 `otelcol_*`, `tempo_*` 메트릭이 Prometheus에 없어 파이프라인이 끊겨도 알 수 없음. ServiceMonitor + 수신 0·전송 실패 알림 (홈랩)
+- [ ] **API graceful shutdown** — SIGTERM 처리가 없어 배포 때 처리 중인 요청과 아직 안 보낸 스팬(최대 5초치)이 유실됨. `enableShutdownHooks` + 종료 시 `Sentry.close()`
 
 ## 부활 트리거 (재오픈 조건)
 
 본 v3 모델은 다음 조건에서 재평가:
 
 - **Sentry 무료 quota 초과 가시화** — 5M spans/월 80% 도달 (현재 트래픽 규모에서 안전 영역 충분)
-- **Trace 장기 보존 (90일 초과) 필요성 발생** — 분기·연 단위 incident retro 시 Tempo 활성화 검토
+- **Trace 장기 보존 (90일 초과) 필요성 발생** — Tempo retention(현재 30d)·PVC 확장 검토
 - **Sentry SaaS 외부 사유로 의존 부담** (가격, 정책, 데이터 주권) — 이때 OTel collector 경유 + Tempo로 전환 (Sentry SDK가 이미 OTel 기반이라 마이그레이션 가능)
 
 ## Cross-references
@@ -152,6 +164,10 @@ apps/api ──pinoIntegration (in-process)──→ Sentry   (incident-context 
 
 ## 변경 이력
 
+- **2026-09-19 v3.1**: BE app traces를 Sentry + Tempo로 fan-out ([#641](https://github.com/skku-amang/main/pull/641)). 원칙(signal split)은 유지. 계기는 두 가지:
+  1. Loki↔Tempo↔Sentry trace ID 연결이 갖춰져([#512](https://github.com/skku-amang/main/pull/512), [homelab#326](https://github.com/manamana32321/homelab/pull/326)) 로그에서 trace로 바로 가려면 trace가 Grafana 안에 있어야 함
+  2. `openTelemetrySpanProcessors`로 v1이 거부된 원인(두 OTel 인스턴스 경쟁) 없이 fan-out 가능
+     [#641](https://github.com/skku-amang/main/pull/641)은 본 ADR 개정 없이 먼저 머지됐고, 본 개정으로 문서를 코드에 맞춤
 - **2026-05-05 v3**: Signal split 모델로 재작성. 핵심 인사이트는 두 가지:
   1. `@sentry/nestjs` v10이 내부적으로 OpenTelemetry를 wrap한다는 사실 — "Sentry vs OTel" 이분법 outdated
   2. v1 PR #498의 진짜 비용 원인은 "한 신호 fan-out 설계"였지 "Sentry+OTel 공존"이 아니었음
