@@ -96,9 +96,7 @@ Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하�
 
 ### Liveness / Readiness Probe
 
-- **자체 앱**: liveness와 readiness 엔드포인트를 분리한다 (api: liveness `/health/live`, readiness `/health`)
-  - **liveness는 프로세스 생존만** 확인. DB 등 외부 의존성을 넣으면 의존성 장애 때 kubelet이 앱을 무한 재시작한다 (Sentry API-5)
-  - **readiness는 의존성 포함** (api는 `@nestjs/terminus` Prisma ping). 실패 시 트래픽에서만 빠지고 의존성 복구 시 자동 복귀
+- **자체 앱**: liveness와 readiness 엔드포인트를 분리
 - **공식 이미지**: 이미지가 제공하는 헬스체크 활용. 없으면 스킵 (Postgres `pg_isready`, Redis `redis-cli ping` 등 exec probe 가능하나 필수 아님)
 
 ### Resources

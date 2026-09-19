@@ -14,8 +14,6 @@ export class HealthController {
     private readonly prisma: PrismaService
   ) {}
 
-  // liveness 전용: 외부 의존성을 보면 DB 장애 때 kubelet이 API를 무한 재시작한다 (Sentry API-5).
-  // DB 연결은 readiness인 아래 check()가 확인한다.
   @Get("live")
   live() {
     return { status: "ok" }
