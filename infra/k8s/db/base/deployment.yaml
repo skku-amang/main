@@ -4,6 +4,9 @@ metadata:
   name: postgres
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
+    rollingUpdate: null
   selector:
     matchLabels:
       app: postgres
@@ -12,6 +15,8 @@ spec:
       labels:
         app: postgres
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: postgres
           image: postgres:16.10-alpine
