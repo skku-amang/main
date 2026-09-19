@@ -11,7 +11,15 @@ Sentry.init({
   profilesSampleRate: 1.0,
   enableLogs: true,
 
-  integrations: [nodeProfilingIntegration(), Sentry.pinoIntegration()],
+  integrations: [
+    nodeProfilingIntegration(),
+    Sentry.pinoIntegration(),
+    // kubelet probe(5~10초 주기)가 트레이스를 채우지 않도록 스팬 미생성
+    Sentry.httpIntegration({
+      ignoreIncomingRequests: (urlPath) =>
+        urlPath === "/health" || urlPath.startsWith("/health/")
+    })
+  ],
 
   // Sentry가 만든 OTel 스팬을 Tempo(OTel Collector 경유)로도 복제 전송
   openTelemetrySpanProcessors: process.env.OTEL_EXPORTER_OTLP_ENDPOINT
