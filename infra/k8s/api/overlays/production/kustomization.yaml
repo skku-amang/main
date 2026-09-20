@@ -17,7 +17,7 @@ configMapGenerator:
       - S3_ENDPOINT=https://s3.amang.json-server.win
       - COOKIE_DOMAIN=amang.json-server.win
       - NODE_ENV=production
-      - SENTRY_DSN=https://7f3e7589d4887e3e575dee9efcd44d73@o4511134421286912.ingest.us.sentry.io/4511134425677824
+      - SENTRY_ENVIRONMENT=production
       - REDIS_HOST=redis.amang-redis-production.svc.cluster.local
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
       - OTEL_SERVICE_NAME=amang-api

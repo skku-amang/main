@@ -5,9 +5,6 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node"
 import { isHealthCheckPath } from "./health/health-path"
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  enabled: process.env.NODE_ENV === "production",
-
   // kubelet probe(5~10초 주기)는 루트에서 샘플링 제외 → 하위 Nest·Prisma 스팬까지 함께 빠짐
   tracesSampler: ({ normalizedRequest, inheritOrSampleWith }) => {
     if (isHealthCheckPath(normalizedRequest?.url)) return 0
