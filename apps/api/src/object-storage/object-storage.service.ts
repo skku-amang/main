@@ -3,7 +3,6 @@ import { ConfigService } from "@nestjs/config"
 import {
   CreateBucketCommand,
   HeadBucketCommand,
-  PutBucketCorsCommand,
   PutBucketPolicyCommand,
   PutObjectCommand,
   DeleteObjectCommand,
@@ -50,12 +49,6 @@ export class ObjectStorageService implements OnModuleInit {
       await this.configureBucketPolicy()
     } catch (error) {
       this.logger.warn(`Failed to configure bucket policy: ${error}`)
-    }
-
-    try {
-      await this.configureCors()
-    } catch (error) {
-      this.logger.warn(`Failed to configure bucket CORS: ${error}`)
     }
 
     this.logger.log("Object storage initialization attempt completed")
@@ -153,29 +146,6 @@ export class ObjectStorageService implements OnModuleInit {
       new PutBucketPolicyCommand({
         Bucket: this.bucket,
         Policy: JSON.stringify(policy)
-      })
-    )
-  }
-
-  private async configureCors() {
-    const isProduction = this.configService.get("NODE_ENV") === "production"
-    const allowedOrigins = isProduction
-      ? ["https://json-server.win", "https://*.json-server.win"]
-      : ["*"]
-
-    await this.s3.send(
-      new PutBucketCorsCommand({
-        Bucket: this.bucket,
-        CORSConfiguration: {
-          CORSRules: [
-            {
-              AllowedHeaders: ["*"],
-              AllowedMethods: ["PUT", "GET"],
-              AllowedOrigins: allowedOrigins,
-              ExposeHeaders: []
-            }
-          ]
-        }
       })
     )
   }
