@@ -38,7 +38,7 @@ import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import { useImageUpload } from "@/hooks/useImageUpload"
 import { formatGenerationOrder } from "@/lib/utils"
-import { publicUser } from "@repo/shared-types"
+import { PublicUser } from "@repo/shared-types"
 
 const UserEditSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요."),
@@ -61,7 +61,7 @@ interface UserFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (data: UserEditValues) => void
-  editingUser: publicUser | null
+  editingUser: PublicUser | null
   isPending?: boolean
 }
 

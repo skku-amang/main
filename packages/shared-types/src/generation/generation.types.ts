@@ -3,7 +3,7 @@ import { basicUserSelector, publicUserSelector } from "../user/user.types"
 
 export type { Generation }
 
-export const basicGenerationSelector = {
+const basicGenerationSelector = {
   id: true,
   order: true
 } satisfies Prisma.GenerationSelect

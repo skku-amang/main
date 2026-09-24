@@ -8,7 +8,7 @@ import {
   UnprocessableEntityError
 } from "@repo/api-client"
 import { Prisma } from "@repo/database"
-import { rentalLogWithUserInlcude } from "@repo/shared-types"
+import { rentalWithUsersInclude } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 
 @Injectable()
@@ -45,7 +45,7 @@ export class RentalService {
             connect: { id: userId }
           }
         },
-        include: rentalLogWithUserInlcude
+        include: rentalWithUsersInclude
       })
 
       if (rental.equipment.category === "ROOM") {
@@ -101,7 +101,7 @@ export class RentalService {
 
     return this.prisma.equipmentRental.findMany({
       where: where,
-      include: rentalLogWithUserInlcude,
+      include: rentalWithUsersInclude,
       orderBy: {
         startAt: "asc"
       }
@@ -111,7 +111,7 @@ export class RentalService {
   async findOne(id: number) {
     const rentalLog = await this.prisma.equipmentRental.findUnique({
       where: { id },
-      include: rentalLogWithUserInlcude
+      include: rentalWithUsersInclude
     })
 
     if (!rentalLog)
@@ -170,7 +170,7 @@ export class RentalService {
               }
             : undefined
         },
-        include: rentalLogWithUserInlcude
+        include: rentalWithUsersInclude
       })
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
