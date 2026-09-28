@@ -15,8 +15,8 @@
     "eslint": "^9.39.4",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.9.8",
-    "turbo": "^2.10.13",
+    "prettier": "^3.9.9",
+    "turbo": "^2.11.4",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.13.1",
