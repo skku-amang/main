@@ -15,9 +15,10 @@ export const envSchema = z
     ACCESS_TOKEN_EXPIRES_IN_SECONDS: z.coerce.number().int().positive(),
     REFRESH_TOKEN_EXPIRES_IN_SECONDS: z.coerce.number().int().positive(),
 
-    // Redis — use case 미정이라 optional. 의존성/모듈 등록 PR에서 required 전환
-    REDIS_HOST: z.string().min(1).optional(),
-    REDIS_PASSWORD: z.string().min(1).optional()
+    // Redis (required) — 로그인 세션 저장소 (#541)
+    REDIS_HOST: z.string().min(1),
+    REDIS_PORT: z.coerce.number().int().positive().optional(),
+    REDIS_PASSWORD: z.string().min(1)
   })
   .passthrough()
 

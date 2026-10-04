@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common"
 import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
-import { createHash } from "crypto"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
@@ -84,16 +83,6 @@ export class UsersService {
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
     return user
-  }
-
-  async updateRefreshToken(userId: number, refreshToken: string | null) {
-    const hashedRefreshToken = refreshToken
-      ? createHash("sha256").update(refreshToken).digest("hex")
-      : null
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { hashedRefreshToken: hashedRefreshToken }
-    })
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
