@@ -9,11 +9,15 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common"
-import { LoginResponse, MeResponse } from "@repo/shared-types"
+import { JwtPayload, LoginResponse, MeResponse } from "@repo/shared-types"
 import { Request, Response } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
-import { clearAuthCookies, setAuthCookies } from "./auth-cookie.util"
+import {
+  clearAuthCookies,
+  extractRefreshToken,
+  setAuthCookies
+} from "./auth-cookie.util"
 import { AuthService } from "./auth.service"
 import { AccessTokenGuard } from "./guards/access-token.guard"
 import { RefreshTokenGuard } from "./guards/refresh-token.guard"
@@ -36,9 +40,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginUserDto: LoginUserDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ): Promise<LoginResponse> {
-    const { user, ...tokens } = await this.authService.login(loginUserDto)
+    const { user, ...tokens } = await this.authService.login(loginUserDto, {
+      userAgent: req.headers["user-agent"],
+      previousRefreshToken: extractRefreshToken(req)
+    })
     setAuthCookies(res, tokens, this.authService.tokenTtls())
     return { user }
   }
@@ -50,8 +58,8 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
-    const { sub: userId } = req.user as { sub: number }
-    await this.authService.logout(userId)
+    const { sub: userId, sid } = req.user as JwtPayload
+    await this.authService.logout(userId, sid)
     clearAuthCookies(res)
   }
 
@@ -62,11 +70,16 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
-    const { sub: userId, refreshToken } = req.user as {
-      sub: number
-      refreshToken: string
-    }
-    const tokens = await this.authService.refreshTokens(userId, refreshToken)
+    const {
+      sub: userId,
+      sid,
+      refreshToken
+    } = req.user as JwtPayload & { refreshToken: string }
+    const tokens = await this.authService.refreshTokens(
+      userId,
+      sid,
+      refreshToken
+    )
     setAuthCookies(res, tokens, this.authService.tokenTtls())
   }
 

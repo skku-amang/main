@@ -35,8 +35,10 @@ describe("AuthController", () => {
 
   it("login은 Set-Cookie(AT, RT)를 설정하고 body엔 user만 반환한다", async () => {
     const res = makeRes()
+    const req = { headers: {}, cookies: {} } as unknown as Request
     const result = await controller.login(
       { email: "a@b.c", password: "pw" },
+      req,
       res
     )
 
@@ -56,22 +58,22 @@ describe("AuthController", () => {
   it("refresh는 새 토큰을 Set-Cookie로 갱신한다", async () => {
     const res = makeRes()
     const req = {
-      user: { sub: 1, refreshToken: "old-rt" }
+      user: { sub: 1, sid: "sid-1", refreshToken: "old-rt" }
     } as unknown as Request
 
     await controller.refreshTokens(req, res)
 
-    expect(authService.refreshTokens).toHaveBeenCalledWith(1, "old-rt")
+    expect(authService.refreshTokens).toHaveBeenCalledWith(1, "sid-1", "old-rt")
     expect(res.cookie).toHaveBeenCalledTimes(2)
   })
 
   it("logout은 두 cookie를 만료시킨다", async () => {
     const res = makeRes()
-    const req = { user: { sub: 1 } } as unknown as Request
+    const req = { user: { sub: 1, sid: "sid-1" } } as unknown as Request
 
     await controller.logout(req, res)
 
-    expect(authService.logout).toHaveBeenCalledWith(1)
+    expect(authService.logout).toHaveBeenCalledWith(1, "sid-1")
     expect(res.clearCookie).toHaveBeenCalledWith(
       ACCESS_TOKEN_COOKIE,
       expect.anything()
