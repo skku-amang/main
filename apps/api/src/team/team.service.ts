@@ -17,9 +17,11 @@ import {
   DuplicateMemberIndexError,
   DuplicateSessionUserError,
   DuplicateTeamSessionError,
-  ReferencedEntityNotFoundError
+  ReferencedEntityNotFoundError,
+  PerformanceRecruitmentClosedError
 } from "@repo/api-client"
 import {
+  isPerformanceRecruiting,
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
@@ -35,6 +37,15 @@ export class TeamService {
   async create(createTeamDto: CreateTeamDto) {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
+
+    const performance = await this.prisma.performance.findUnique({
+      where: { id: performanceId },
+      select: { endAt: true }
+    })
+    if (performance && !isPerformanceRecruiting(performance))
+      throw new PerformanceRecruitmentClosedError(
+        "종료 일시가 지난 공연에는 팀을 만들 수 없습니다."
+      )
 
     if (memberSessions.length > 0) {
       for (const session of memberSessions) {
