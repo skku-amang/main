@@ -1,6 +1,7 @@
 import { mapPerformance, mapPerformances } from "@/hooks/api/mapper"
 import { createMutationHook, createQueryHook } from "@/hooks/useCustomQuery"
 import ApiClient from "@repo/api-client"
+import { GetPerformancesQuery } from "@repo/shared-types"
 
 export const useCreatePerformance = createMutationHook(
   ApiClient.prototype.createPerformance,
@@ -9,7 +10,7 @@ export const useCreatePerformance = createMutationHook(
 
 export const usePerformances = createQueryHook(
   ApiClient.prototype.getPerformances,
-  () => ["performances"],
+  (query?: GetPerformancesQuery) => ["performances", query],
   mapPerformances
 )
 

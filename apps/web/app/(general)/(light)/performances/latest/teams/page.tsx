@@ -6,9 +6,11 @@ import { apiClient } from "@/lib/apiClient"
 export const dynamic = "force-dynamic"
 
 export default async function LatestPerformanceTeamsPage() {
-  const performances = await apiClient.getPerformances()
-  if (performances.length === 0) redirect(ROUTES.PERFORMANCE.LIST)
+  // 종료 일시가 가까운 순으로 정렬되어 있어 첫 번째가 지금 모집 중인 공연
+  const [recruiting] = await apiClient.getPerformances({
+    status: "recruiting"
+  })
+  if (!recruiting) redirect(ROUTES.PERFORMANCE.LIST)
 
-  const latestId = Math.max(...performances.map((p) => p.id))
-  redirect(ROUTES.PERFORMANCE.TEAM.LIST(latestId))
+  redirect(ROUTES.PERFORMANCE.TEAM.LIST(recruiting.id))
 }

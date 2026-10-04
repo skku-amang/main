@@ -56,7 +56,7 @@ import {
   getSessionsWithMissingMembers,
   isTeamSatisfied
 } from "@/lib/team/teamSession"
-import { Performance } from "@repo/shared-types"
+import { isPerformanceRecruiting, Performance } from "@repo/shared-types"
 
 import {
   Select,
@@ -92,6 +92,11 @@ export function TeamListDataTable<TValue>({
   performanceId
 }: DataTableProps<TValue>) {
   const { isAuthenticated } = useAuth()
+  const currentPerformance = relatedPerformances.find(
+    (p) => p.id === performanceId
+  )
+  const isRecruiting =
+    !currentPerformance || isPerformanceRecruiting(currentPerformance)
   const visibleColumns = useMemo(
     () =>
       isAuthenticated ? columns : columns.filter((c) => c.id !== "actions"),
@@ -271,15 +276,24 @@ export function TeamListDataTable<TValue>({
           {/* 생성 및 필터 */}
           <div className="flex gap-4">
             {/* 생성 버튼 */}
-            <Button
-              asChild
-              className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
-            >
-              <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
-                <CirclePlus size={24} className="me-[9px]" />
-                Create
-              </Link>
-            </Button>
+            {isRecruiting ? (
+              <Button
+                asChild
+                className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
+              >
+                <Link href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}>
+                  <CirclePlus size={24} className="me-[9px]" />
+                  Create
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
+              >
+                모집 마감
+              </Button>
+            )}
 
             {/* 필터 */}
             <Popover open={filterOpen} onOpenChange={setFilterOpen}>
@@ -497,23 +511,29 @@ export function TeamListDataTable<TValue>({
             />
 
             {/* 생성 버튼 */}
-            <Link
-              href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}
-              className="flex items-center gap-x-1"
-            >
-              <div className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow">
-                <div className="relative h-4 w-4">
-                  <div className="absolute left-0 top-0 h-4 w-4">
-                    <Plus size={18} />
+            {isRecruiting ? (
+              <Link
+                href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}
+                className="flex items-center gap-x-1"
+              >
+                <div className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow">
+                  <div className="relative h-4 w-4">
+                    <div className="absolute left-0 top-0 h-4 w-4">
+                      <Plus size={18} />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="text-sm font-medium leading-tight">
+                      Create
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="text-sm font-medium leading-tight">
-                    Create
-                  </div>
-                </div>
+              </Link>
+            ) : (
+              <div className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-muted px-4 py-2 text-sm font-medium leading-tight text-muted-foreground">
+                모집 마감
               </div>
-            </Link>
+            )}
           </div>
         </div>
 
