@@ -11,6 +11,12 @@ export const PerformanceObjectSchema = z.object({
 
 export const PartialPerformanceObjectSchema = PerformanceObjectSchema.partial()
 
+export const GetPerformancesQuerySchema = z.object({
+  status: z.enum(["recruiting"]).optional()
+})
+
+export type GetPerformancesQuery = z.infer<typeof GetPerformancesQuerySchema>
+
 export const dateValidationRefine = (
   data: z.infer<typeof PartialPerformanceObjectSchema>
 ) => {
