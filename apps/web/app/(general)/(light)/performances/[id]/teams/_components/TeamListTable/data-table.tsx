@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/popover"
 import { ResponsivePagination } from "@/components/ui/responsive-pagination"
 import { Separator } from "@/components/ui/separator"
-import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import ROUTES from "@/constants/routes"
 import {
   getSessionDisplayName,
   SESSION_DISPLAY_NAME
@@ -498,7 +498,7 @@ export function TeamListDataTable<TValue>({
 
             {/* 생성 버튼 */}
             <Link
-              href={ROUTES.PERFORMANCE.TEAM.CREATE(DEFAULT_PERFORMANCE_ID)}
+              href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}
               className="flex items-center gap-x-1"
             >
               <div className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow">
