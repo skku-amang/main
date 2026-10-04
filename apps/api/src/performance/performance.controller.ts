@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
-  ParseIntPipe
+  ParseIntPipe,
+  Query
 } from "@nestjs/common"
 import { PerformanceService } from "./performance.service"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
+import { GetPerformancesQueryDto } from "./dto/get-performances-query.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { Public } from "../auth/decorators/public.decorator"
@@ -29,8 +31,8 @@ export class PerformanceController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.performanceService.findAll()
+  findAll(@Query() query: GetPerformancesQueryDto) {
+    return this.performanceService.findAll(query.status)
   }
 
   @Get(":id/teams")
