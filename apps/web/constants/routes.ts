@@ -1,5 +1,3 @@
-export const DEFAULT_PERFORMANCE_ID = 1
-
 const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
@@ -23,6 +21,7 @@ const ROUTES = {
       CREATE: (performanceId: number) =>
         `/performances/${performanceId}/teams/create`,
       LIST: (id: number) => `/performances/${id}/teams`,
+      LATEST_LIST: "/performances/latest/teams",
       DETAIL: (performanceId: number, teamId: number) =>
         `/performances/${performanceId}/teams/${teamId}`,
       EDIT: (performanceId: number, teamId: number) =>

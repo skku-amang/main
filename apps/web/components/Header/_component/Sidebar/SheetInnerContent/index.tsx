@@ -15,7 +15,7 @@ import Link from "next/link"
 import { FaCircle } from "react-icons/fa"
 
 import { Separator } from "@/components/ui/separator"
-import ROUTES, { DEFAULT_PERFORMANCE_ID } from "@/constants/routes"
+import ROUTES from "@/constants/routes"
 import SOCIAL from "@/constants/social"
 import { useAuth } from "@/lib/providers/auth-provider"
 
@@ -96,7 +96,7 @@ const SheetInnerContent = ({
 
           <div className="space-y-7">
             <NavLink
-              href={ROUTES.PERFORMANCE.TEAM.LIST(DEFAULT_PERFORMANCE_ID)}
+              href={ROUTES.PERFORMANCE.TEAM.LATEST_LIST}
               icon={<Users size={iconSize} className={iconcolor} />}
               onClick={() => setIsOpen(false)}
             >
