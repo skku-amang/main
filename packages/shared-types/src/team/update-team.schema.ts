@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { CreateTeamSchema } from "./create-team.schema"
 
-export const UpdateTeamSchema = CreateTeamSchema.omit({
+export const UpdateTeamSchema = CreateTeamSchema.partial({
   performanceId: true
 })
 
