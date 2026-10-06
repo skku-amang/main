@@ -332,6 +332,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       const updateData: UpdateTeam = {
         name: initialData.name,
         leaderId: initialData.leaderId,
+        performanceId: firstPageForm.getValues("performanceId"),
         songName: firstPageForm.getValues("songName"),
         songArtist: firstPageForm.getValues("songArtist"),
         memberSessions,
