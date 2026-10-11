@@ -32,7 +32,8 @@ declare module "@tanstack/react-table" {
       saveTransform?: (v: number) => number
       options?: { label: string; value: string; disabled?: boolean }[]
       // 편집 값이 표시·정렬·검색·CSV용 accessor 값과 다를 때 (예: 이름 표시, id 편집)
-      getValue?: (row: TData) => unknown
+      // 메서드 문법: EditableCell이 ColumnMeta<unknown>으로 받을 때 매개변수 타입이 호환되도록
+      getValue?(row: TData): unknown
     }
   }
 }
