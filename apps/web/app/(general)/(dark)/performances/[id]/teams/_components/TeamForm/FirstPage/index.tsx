@@ -46,16 +46,10 @@ interface FirstPageProps {
 
   onValid: (formData: z.infer<any>) => void
 
-  onInvalid: (formData: z.infer<any>) => void
   onPrevious?: () => void
 }
 
-const FirstPage = ({
-  form,
-  onValid,
-  onInvalid,
-  onPrevious
-}: FirstPageProps) => {
+const FirstPage = ({ form, onValid, onPrevious }: FirstPageProps) => {
   const { data: performances } = usePerformances()
 
   function handleYoutubeConfirm(url: string) {
@@ -401,7 +395,7 @@ const FirstPage = ({
 
       {/* 페이지 이동 */}
       <Paginator
-        onNext={form.handleSubmit(onValid, onInvalid)}
+        onNext={form.handleSubmit(onValid)}
         totalPage={3}
         currentPage={1}
         onPrevious={onPrevious}
