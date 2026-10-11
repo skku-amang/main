@@ -14,16 +14,10 @@ interface SecondPageProps {
     typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
   >
   onValid: (formData: z.infer<any>) => void
-  onInvalid: (formData: z.infer<any>) => void
   onPrevious: () => void
 }
 
-const SecondPage = ({
-  form,
-  onValid,
-  onInvalid,
-  onPrevious
-}: SecondPageProps) => {
+const SecondPage = ({ form, onValid, onPrevious }: SecondPageProps) => {
   const memberSessionRequiredFormStructure: {
     [label: string]: string[]
   } = {
@@ -76,7 +70,7 @@ const SecondPage = ({
         {/* 페이지 이동 */}
         <Paginator
           onPrevious={onPrevious}
-          onNext={form.handleSubmit(onValid, onInvalid)}
+          onNext={form.handleSubmit(onValid)}
           totalPage={3}
           currentPage={2}
           className="mt-8 md:mt-24"

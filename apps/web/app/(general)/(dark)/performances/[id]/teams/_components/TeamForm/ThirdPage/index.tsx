@@ -1,5 +1,5 @@
 import { CircleAlert } from "lucide-react"
-import { FieldErrors, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Form } from "@/components/ui/form"
@@ -15,17 +15,11 @@ interface ThirdPageProps {
     typeof useForm<z.infer<typeof memberSessionRequiredBaseSchema>>
   >
   onValid: (formData: z.infer<any>) => void
-  onInvalid: (errors: FieldErrors<z.infer<any>>) => void
   onPrevious: () => void
   firstPageForm: ReturnType<typeof useForm<any>>
 }
 
-const ThirdPage = ({
-  form,
-  onValid,
-  onInvalid,
-  onPrevious
-}: ThirdPageProps) => {
+const ThirdPage = ({ form, onValid, onPrevious }: ThirdPageProps) => {
   const { data: users } = useUsers()
 
   return (
@@ -77,7 +71,7 @@ const ThirdPage = ({
         {/* 페이지 이동 */}
         <Paginator
           onPrevious={onPrevious}
-          onNext={form.handleSubmit(onValid, onInvalid)}
+          onNext={form.handleSubmit(onValid)}
           totalPage={3}
           currentPage={3}
           className="mt-8 md:mt-24"

@@ -203,9 +203,21 @@ export default class ApiClient {
       }
     }
 
+    let response: Response
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, options)
+      response = await fetch(`${this.baseUrl}${endpoint}`, options)
+    } catch (error) {
+      // 응답을 받기 전에 끊긴 요청 — 페이지 이동, 앱 전환, 절전 복귀 등 클라이언트 사정이 대부분이다.
+      // error로 남기면 Sentry captureConsole이 이슈로 수집한다. 서버 장애는 게이트웨이 응답(UpstreamError)으로 따로 잡힌다.
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error"
+      console.info(
+        `[ApiClient] Request interrupted - URL: ${this.baseUrl}${endpoint}, Error: ${errorMessage}`
+      )
+      throw new InternalServerError(errorMessage)
+    }
 
+    try {
       // 게이트웨이 오류 페이지 등 JSON이 아닌 응답을 그대로 파싱하면
       // 브라우저마다 다른 파싱 에러로 바뀌어 원래 상태 코드가 사라진다.
       const contentType = response.headers.get("content-type") ?? ""
@@ -255,11 +267,11 @@ export default class ApiClient {
       if (error instanceof ApiError) {
         throw error
       }
-      // 그 외의 경우 InternalServerError로 래핑 (네트워크 오류 등)
+      // 그 외의 경우 InternalServerError로 래핑 (응답 본문 파싱 실패 등)
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error"
       console.error(
-        `[ApiClient] Network error - URL: ${this.baseUrl}${endpoint}, Error: ${errorMessage}`
+        `[ApiClient] Unexpected error - URL: ${this.baseUrl}${endpoint}, Error: ${errorMessage}`
       )
       throw new InternalServerError(errorMessage)
     }

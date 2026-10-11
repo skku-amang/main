@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { useEffect } from "react"
-import { FieldErrors, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { useToast } from "@/components/hooks/use-toast"
@@ -70,11 +70,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       return
     }
     setCurrentPage(2)
-  }
-  function onFirstPageInvalid(
-    errors: FieldErrors<z.infer<typeof basicInfoSchema>>
-  ) {
-    console.warn(errors)
   }
 
   // Second Page
@@ -232,11 +227,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
     }
     setCurrentPage(3)
   }
-  function onSecondPageInvalid(
-    errors: FieldErrors<z.infer<typeof memberSessionRequiredBaseSchema>>
-  ) {
-    console.error(errors)
-  }
 
   // Third Page
   async function onThirdPageValid(
@@ -367,12 +357,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
       }
     }
   }
-  function onThirdPageInvalid(
-    errors: FieldErrors<z.infer<typeof memberSessionRequiredBaseSchema>>
-  ) {
-    console.warn("FormInvalid:", errors)
-  }
-
   if (isAuthLoading) return <TeamFormSkeleton />
   if (!user) router.push(ROUTES.HOME)
 
@@ -382,7 +366,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         <FirstPage
           form={firstPageForm}
           onValid={onFirstPageValid}
-          onInvalid={onFirstPageInvalid}
           onPrevious={
             initialData
               ? () =>
@@ -400,7 +383,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         <SecondPage
           form={secondPageForm}
           onValid={onSecondPageValid}
-          onInvalid={onSecondPageInvalid}
           onPrevious={() => setCurrentPage(1)}
         />
       )}
@@ -408,7 +390,6 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         <ThirdPage
           form={secondPageForm}
           onValid={onThirdPageValid}
-          onInvalid={onThirdPageInvalid}
           onPrevious={() => setCurrentPage(2)}
           firstPageForm={firstPageForm}
         />
