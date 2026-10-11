@@ -15,11 +15,6 @@ import { LoginUserDto } from "../users/dto/login-user.dto"
 import { UsersService } from "../users/users.service"
 import { AuthSessionStore } from "./auth-session.store"
 
-type LoginContext = {
-  userAgent?: string
-  previousRefreshToken?: string | null
-}
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -36,7 +31,10 @@ export class AuthService {
     })
   }
 
-  async login(loginDto: LoginUserDto, context: LoginContext) {
+  async login(
+    loginDto: LoginUserDto,
+    context: { userAgent?: string; previousRefreshToken?: string | null }
+  ) {
     const user = await this.usersService.findOneByEmail(loginDto.email)
     if (!user) {
       throw new AuthError("존재하지 않는 이메일입니다.")
