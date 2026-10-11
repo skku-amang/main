@@ -387,7 +387,11 @@ export function EditableCell<TData extends { id: number }, TValue>({
       cellId={cellId}
       isEditing={isEditing}
       editable={editable}
-      rawValue={row.getValue(column.id)}
+      rawValue={
+        editable.getValue
+          ? editable.getValue(row.original)
+          : row.getValue(column.id)
+      }
       rowId={row.original.id}
       columnId={column.id}
       updateCell={meta.updateCell}

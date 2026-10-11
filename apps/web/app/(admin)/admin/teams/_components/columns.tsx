@@ -95,22 +95,34 @@ export function getColumns(
     },
     {
       id: "performanceId",
-      accessorFn: (row) => row.performanceId,
-      sortingFn: (a, b) =>
-        performanceName(a.original.performanceId).localeCompare(
-          performanceName(b.original.performanceId)
-        ),
+      accessorFn: (row) => performanceName(row.performanceId),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="공연" />
       ),
       meta: {
         label: "공연",
-        editable: { type: "select", options: performanceOptions }
+        editable: {
+          type: "select",
+          options: performanceOptions,
+          getValue: (row) => row.performanceId
+        }
       },
       cell: (ctx) => (
         <EditableCell
           cellContext={ctx}
-          displayValue={performanceName(ctx.row.original.performanceId)}
+          displayValue={
+            <span className="flex items-center gap-1">
+              <span className="truncate">{ctx.getValue() as string}</span>
+              <Link
+                href={`${ROUTES.ADMIN.PERFORMANCES}?rowId=${ctx.row.original.performanceId}`}
+                onClick={(e) => e.stopPropagation()}
+                aria-label="공연 관리에서 보기"
+                className="shrink-0 text-blue-600 hover:text-blue-800"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </span>
+          }
         />
       ),
       filterFn: (row, _columnId, filterValue) =>
