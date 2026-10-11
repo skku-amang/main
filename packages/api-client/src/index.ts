@@ -427,6 +427,7 @@ export default class ApiClient {
    * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
    * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
    * @throws {ReferencedEntityNotFoundError} 존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {PerformanceRecruitmentClosedError} 팀을 팀 모집이 마감된 공연으로 옮기는 경우
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
@@ -440,6 +441,7 @@ export default class ApiClient {
       | DuplicateSessionUserError
       | DuplicateTeamSessionError
       | ReferencedEntityNotFoundError
+      | PerformanceRecruitmentClosedError
       | ConflictError
       | InternalServerError
     >(`/teams/${id}`, "PUT", teamData)
