@@ -1,5 +1,5 @@
 ---
-name: "🤖 Sentry 자동 유입"
+name: "Sentry 자동 유입"
 about: sentry-triage 스킬이 자동 생성하는 이슈 포맷 (사람이 직접 쓸 일은 거의 없음).
 title: ""
 labels: "kind: bug, from: sentry"
