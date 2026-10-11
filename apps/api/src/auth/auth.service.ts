@@ -17,7 +17,6 @@ import { AuthSessionStore } from "./auth-session.store"
 
 type LoginContext = {
   userAgent?: string
-  /** 같은 브라우저에 남아 있던 RT. 있으면 그 세션을 지우고 새로 만든다. */
   previousRefreshToken?: string | null
 }
 

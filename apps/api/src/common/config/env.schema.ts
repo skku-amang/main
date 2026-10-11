@@ -17,7 +17,6 @@ export const envSchema = z
 
     // Redis (required) — 로그인 세션 저장소 (#541)
     REDIS_HOST: z.string().min(1),
-    REDIS_PORT: z.coerce.number().int().positive().optional(),
     REDIS_PASSWORD: z.string().min(1)
   })
   .passthrough()

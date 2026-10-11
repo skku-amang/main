@@ -18,6 +18,9 @@ const authSessionKey = (userId: number, sid: string) =>
 const hashToken = (token: string) =>
   createHash("sha256").update(token).digest("hex")
 
+// 클라이언트가 보낸 헤더라 길이를 믿을 수 없다
+const USER_AGENT_MAX_LENGTH = 512
+
 export type AuthSessionMetadata = { userAgent?: string }
 
 @Injectable()
@@ -41,7 +44,7 @@ export class AuthSessionStore {
       .multi()
       .hset(key, {
         tokenHash: hashToken(refreshToken),
-        userAgent: metadata.userAgent ?? "",
+        userAgent: (metadata.userAgent ?? "").slice(0, USER_AGENT_MAX_LENGTH),
         createdAt: now,
         lastUsedAt: now
       })

@@ -1,7 +1,10 @@
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { Test, TestingModule } from "@nestjs/testing"
-import { RefreshTokenNotFoundError } from "@repo/api-client"
+import {
+  RefreshTokenExpiredError,
+  RefreshTokenNotFoundError
+} from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import RedisMock from "ioredis-mock"
@@ -85,7 +88,7 @@ describe("AuthService", () => {
     expect(sidOf(refreshed.refreshToken)).toBe(sid)
     await expect(
       service.refreshTokens(1, sid, login.refreshToken)
-    ).rejects.toThrow()
+    ).rejects.toThrow(RefreshTokenExpiredError)
   })
 
   it("로그아웃하면 그 기기만 끊기고 다른 기기는 유지된다", async () => {
@@ -112,6 +115,35 @@ describe("AuthService", () => {
     ).rejects.toThrow(RefreshTokenNotFoundError)
   })
 
+  it("서명이 틀린 이전 RT로는 세션을 지우지 않는다", async () => {
+    const victim = await service.login(loginDto, {})
+    const forged = jwtService.sign(
+      { sub: 1, sid: sidOf(victim.refreshToken) },
+      { secret: "wrong-secret" }
+    )
+
+    await service.login(loginDto, { previousRefreshToken: forged })
+
+    await expect(
+      service.refreshTokens(1, sidOf(victim.refreshToken), victim.refreshToken)
+    ).resolves.toHaveProperty("refreshToken")
+  })
+
+  it("sid가 없는 배포 이전 RT는 세션 없음으로 처리해 재로그인시킨다", async () => {
+    const legacy = jwtService.sign(
+      { sub: 1 },
+      { secret: env.REFRESH_TOKEN_SECRET }
+    )
+
+    await expect(
+      service.refreshTokens(
+        1,
+        jwtService.decode<JwtPayload>(legacy).sid,
+        legacy
+      )
+    ).rejects.toThrow(RefreshTokenNotFoundError)
+  })
+
   it("세션에 기기 정보와 시각을 남긴다", async () => {
     const login = await service.login(loginDto, { userAgent: "iPhone Safari" })
 
@@ -122,5 +154,18 @@ describe("AuthService", () => {
     expect(session).toMatchObject({ userAgent: "iPhone Safari" })
     expect(session.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
     expect(session.lastUsedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+  })
+
+  it("user-agent는 512자까지만 저장한다", async () => {
+    const login = await service.login(loginDto, {
+      userAgent: "a".repeat(10_000)
+    })
+
+    const userAgent = await redis.hget(
+      `user:1:auth-session:${sidOf(login.refreshToken)}`,
+      "userAgent"
+    )
+
+    expect(userAgent).toHaveLength(512)
   })
 })
