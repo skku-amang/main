@@ -30,7 +30,7 @@ declare module "@tanstack/react-table" {
       step?: number
       displayTransform?: (v: number) => string
       saveTransform?: (v: number) => number
-      options?: { label: string; value: string }[]
+      options?: { label: string; value: string; disabled?: boolean }[]
     }
   }
 }

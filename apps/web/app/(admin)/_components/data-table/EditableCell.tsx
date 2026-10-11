@@ -95,7 +95,7 @@ function SelectCellEditor({
   isPending
 }: {
   value: string
-  options: { label: string; value: string }[]
+  options: { label: string; value: string; disabled?: boolean }[]
   onSelect: (value: string) => void
   onCancel: () => void
   isPending: boolean
@@ -116,7 +116,11 @@ function SelectCellEditor({
         </SelectTrigger>
         <SelectContent>
           {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
+            <SelectItem
+              key={opt.value}
+              value={opt.value}
+              disabled={opt.disabled}
+            >
               {opt.label}
             </SelectItem>
           ))}

@@ -36,7 +36,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useImageUpload } from "@/hooks/useImageUpload"
-import { ACCEPTED_IMAGE_TYPES } from "@repo/shared-types"
+import {
+  ACCEPTED_IMAGE_TYPES,
+  isPerformanceRecruiting
+} from "@repo/shared-types"
 import Description from "../Description"
 import Paginator from "../Paginator"
 import basicInfoSchema from "./schema"
@@ -48,13 +51,20 @@ interface FirstPageProps {
 
   onPrevious?: () => void
 
-  isCreate: boolean
+  /** 수정 중인 팀의 원래 공연 (생성 시 undefined) */
+  originalPerformanceId?: number
 }
 
-const FirstPage = ({ form, onValid, onPrevious, isCreate }: FirstPageProps) => {
-  // 수정 시에는 마감된 공연에 속한 팀도 현재 공연이 선택된 채로 보여야 함
-  const { data: performances } = usePerformances(
-    isCreate ? { status: "recruiting" } : undefined
+const FirstPage = ({
+  form,
+  onValid,
+  onPrevious,
+  originalPerformanceId
+}: FirstPageProps) => {
+  // 마감된 공연으로는 옮길 수 없지만, 마감된 공연의 팀은 원래 공연을 유지할 수 있어야 함
+  const { data: allPerformances } = usePerformances()
+  const performances = allPerformances?.filter(
+    (p) => isPerformanceRecruiting(p) || p.id === originalPerformanceId
   )
 
   function handleYoutubeConfirm(url: string) {

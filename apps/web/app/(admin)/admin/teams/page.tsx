@@ -10,7 +10,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import { formatGenerationOrder } from "@/lib/utils"
-import { TeamList } from "@repo/shared-types"
+import { isPerformanceRecruiting, TeamList } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
 
@@ -39,6 +39,20 @@ export default function TeamsAdminPage() {
         label: p.name,
         value: String(p.id)
       })) ?? [],
+    [performances]
+  )
+
+  // 마감된 공연은 현재 값으로는 보이되 새로 고를 수는 없음 (서버도 409로 거절)
+  const performanceOptions = useMemo(
+    () =>
+      performances?.map((p) => {
+        const recruiting = isPerformanceRecruiting(p)
+        return {
+          label: recruiting ? p.name : `${p.name} (마감)`,
+          value: String(p.id),
+          disabled: !recruiting
+        }
+      }) ?? [],
     [performances]
   )
 
@@ -84,9 +98,10 @@ export default function TeamsAdminPage() {
           }
         },
         teams ?? [],
-        performanceMap
+        performanceMap,
+        performanceOptions
       ),
-    [teams, performanceMap]
+    [teams, performanceMap, performanceOptions]
   )
 
   const handleCellUpdate = async (
@@ -100,7 +115,9 @@ export default function TeamsAdminPage() {
     const mapped =
       columnId === "leader"
         ? { leaderId: Number(value) }
-        : { [columnId]: value }
+        : columnId === "performanceId"
+          ? { performanceId: Number(value) }
+          : { [columnId]: value }
 
     const payload = {
       name: team.name,

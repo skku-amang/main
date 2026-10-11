@@ -71,8 +71,11 @@ function buildSessionColumns(teams: TeamItem[]): ColumnDef<TeamItem>[] {
 export function getColumns(
   actions: ColumnActions,
   teams: TeamItem[],
-  performanceMap?: Map<number, string>
+  performanceMap?: Map<number, string>,
+  performanceOptions?: { label: string; value: string; disabled?: boolean }[]
 ): ColumnDef<TeamItem>[] {
+  const performanceName = (id: number) => performanceMap?.get(id) ?? String(id)
+
   return [
     {
       accessorKey: "id",
@@ -92,20 +95,23 @@ export function getColumns(
     },
     {
       id: "performanceId",
-      accessorFn: (row) =>
-        performanceMap?.get(row.performanceId) ?? String(row.performanceId),
+      accessorFn: (row) => row.performanceId,
+      sortingFn: (a, b) =>
+        performanceName(a.original.performanceId).localeCompare(
+          performanceName(b.original.performanceId)
+        ),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="공연" />
       ),
-      meta: { label: "공연" },
-      cell: ({ row }) => (
-        <Link
-          href={`${ROUTES.ADMIN.PERFORMANCES}?rowId=${row.original.performanceId}`}
-          className="text-blue-600 hover:underline"
-        >
-          {performanceMap?.get(row.original.performanceId) ??
-            row.original.performanceId}
-        </Link>
+      meta: {
+        label: "공연",
+        editable: { type: "select", options: performanceOptions }
+      },
+      cell: (ctx) => (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={performanceName(ctx.row.original.performanceId)}
+        />
       ),
       filterFn: (row, _columnId, filterValue) =>
         String(row.original.performanceId) === filterValue
