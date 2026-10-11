@@ -253,7 +253,7 @@ export class ReferencedEntityNotFoundError extends ApiError {
 }
 
 /**
- * 팀 모집이 마감된(종료 일시가 지난) 공연에 팀을 생성하려고 할 때 발생하는 오류입니다.
+ * 팀 모집이 마감된(종료 일시가 지난) 공연에 팀을 생성하거나, 팀을 그런 공연으로 옮기려고 할 때 발생하는 오류입니다.
  */
 export class PerformanceRecruitmentClosedError extends ApiError {
   readonly type = "/errors/team/performance-recruitment-closed"
