@@ -31,11 +31,13 @@ export class PerformanceService {
     if (status === "recruiting") {
       return this.prisma.performance.findMany({
         where: recruitingPerformanceWhere(),
-        orderBy: { endAt: { sort: "asc", nulls: "last" } }
+        orderBy: [{ endAt: { sort: "asc", nulls: "last" } }, { id: "asc" }]
       })
     }
 
-    const performances = await this.prisma.performance.findMany()
+    const performances = await this.prisma.performance.findMany({
+      orderBy: { id: "asc" }
+    })
     return performances
   }
 
