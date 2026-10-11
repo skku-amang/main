@@ -366,6 +366,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         <FirstPage
           form={firstPageForm}
           onValid={onFirstPageValid}
+          isCreate={isCreate}
           onPrevious={
             initialData
               ? () =>

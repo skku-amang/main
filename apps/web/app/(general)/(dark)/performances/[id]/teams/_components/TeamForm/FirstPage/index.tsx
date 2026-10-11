@@ -47,10 +47,15 @@ interface FirstPageProps {
   onValid: (formData: z.infer<any>) => void
 
   onPrevious?: () => void
+
+  isCreate: boolean
 }
 
-const FirstPage = ({ form, onValid, onPrevious }: FirstPageProps) => {
-  const { data: performances } = usePerformances()
+const FirstPage = ({ form, onValid, onPrevious, isCreate }: FirstPageProps) => {
+  // 수정 시에는 마감된 공연에 속한 팀도 현재 공연이 선택된 채로 보여야 함
+  const { data: performances } = usePerformances(
+    isCreate ? { status: "recruiting" } : undefined
+  )
 
   function handleYoutubeConfirm(url: string) {
     form.clearErrors("songYoutubeVideoUrl")
