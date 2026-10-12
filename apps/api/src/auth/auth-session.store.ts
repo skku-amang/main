@@ -23,6 +23,13 @@ const USER_AGENT_MAX_LENGTH = 512
 
 export type AuthSessionMetadata = { userAgent?: string }
 
+export type AuthSessionRecord = {
+  sid: string
+  userAgent: string
+  createdAt: string
+  lastUsedAt: string
+}
+
 @Injectable()
 export class AuthSessionStore {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
@@ -88,5 +95,55 @@ export class AuthSessionStore {
 
   async delete(userId: number, sid: string): Promise<void> {
     await this.redis.del(authSessionKey(userId, sid))
+  }
+
+  /** tokenHash는 store 밖으로 내보내지 않는다. */
+  async list(userId: number): Promise<AuthSessionRecord[]> {
+    const sids = await this.sidsOf(userId)
+    if (sids.length === 0) return []
+
+    const pipeline = this.redis.pipeline()
+    sids.forEach((sid) => pipeline.hgetall(authSessionKey(userId, sid)))
+    const results = (await pipeline.exec()) ?? []
+
+    return sids.flatMap((sid, i) => {
+      const [error, hash] = results[i] ?? []
+      const session = hash as Record<string, string> | undefined
+      // SCAN 이후 HGETALL 전에 만료된 키는 빈 Hash로 돌아온다
+      if (error || !session?.tokenHash) return []
+      return [
+        {
+          sid,
+          userAgent: session.userAgent ?? "",
+          createdAt: session.createdAt ?? "",
+          lastUsedAt: session.lastUsedAt ?? ""
+        }
+      ]
+    })
+  }
+
+  async deleteAllExcept(userId: number, keepSid: string): Promise<void> {
+    const keys = (await this.sidsOf(userId))
+      .filter((sid) => sid !== keepSid)
+      .map((sid) => authSessionKey(userId, sid))
+    if (keys.length > 0) await this.redis.del(...keys)
+  }
+
+  private async sidsOf(userId: number): Promise<string[]> {
+    const prefix = authSessionKey(userId, "")
+    const sids = new Set<string>()
+    let cursor = "0"
+    do {
+      const [next, keys] = await this.redis.scan(
+        cursor,
+        "MATCH",
+        `${prefix}*`,
+        "COUNT",
+        100
+      )
+      cursor = next
+      keys.forEach((key) => sids.add(key.slice(prefix.length)))
+    } while (cursor !== "0")
+    return [...sids]
   }
 }

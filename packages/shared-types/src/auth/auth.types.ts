@@ -26,3 +26,19 @@ export type LoginResponse = {
 export type MeResponse = {
   user: DetailedUser
 }
+
+/**
+ * GET /auth/sessions 응답의 로그인 기기 1개 (#668).
+ * userAgent는 원문 그대로이며 표시용 해석은 화면에서 한다.
+ */
+export type AuthSessionInfo = {
+  sid: string
+  userAgent: string
+  createdAt: string
+  lastUsedAt: string
+  current: boolean
+}
+
+export type AuthSessionsResponse = {
+  sessions: AuthSessionInfo[]
+}
