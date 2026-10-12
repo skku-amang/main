@@ -5,10 +5,17 @@ import { UsersModule } from "../users/users.module"
 import { JwtModule } from "@nestjs/jwt"
 import { AccessTokenStrategy } from "./strategies/access-token.strategy"
 import { RefreshTokenStrategy } from "./strategies/refresh-token.strategy"
+import { RedisModule } from "../redis/redis.module"
+import { AuthSessionStore } from "./auth-session.store"
 
 @Module({
-  imports: [UsersModule, JwtModule.register({})],
+  imports: [UsersModule, JwtModule.register({}), RedisModule],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
+  providers: [
+    AuthService,
+    AuthSessionStore,
+    AccessTokenStrategy,
+    RefreshTokenStrategy
+  ]
 })
 export class AuthModule {}
