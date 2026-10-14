@@ -60,3 +60,6 @@ tmp/
 *.code-workspace
 !*.code-workspace.example
 .envrc.local
+
+# Turborepo가 pnpm install·turbo 실행 시 자동 생성
+/AGENTS.md
