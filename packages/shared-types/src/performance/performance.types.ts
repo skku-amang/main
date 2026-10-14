@@ -44,3 +44,18 @@ type PerformanceWithTeams = Prisma.PerformanceGetPayload<{
 }>
 
 export type PerformanceTeamsList = PerformanceWithTeams["teams"]
+
+/**
+ * 팀 모집 중인 공연 판정 — endAt이 지나지 않았거나 비어 있으면 모집 중.
+ * 공연 라이프사이클(PerformanceStatus) 도입 전까지의 기준이며,
+ * recruitingPerformanceWhere와 같은 규칙을 유지해야 한다.
+ */
+export const isPerformanceRecruiting = (
+  performance: Pick<Performance, "endAt">,
+  now: Date = new Date()
+) => performance.endAt === null || performance.endAt > now
+
+export const recruitingPerformanceWhere = (now: Date = new Date()) =>
+  ({
+    OR: [{ endAt: null }, { endAt: { gt: now } }]
+  }) satisfies Prisma.PerformanceWhereInput

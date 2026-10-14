@@ -17,9 +17,11 @@ import {
   DuplicateMemberIndexError,
   DuplicateSessionUserError,
   DuplicateTeamSessionError,
-  ReferencedEntityNotFoundError
+  ReferencedEntityNotFoundError,
+  PerformanceRecruitmentClosedError
 } from "@repo/api-client"
 import {
+  isPerformanceRecruiting,
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
@@ -35,6 +37,11 @@ export class TeamService {
   async create(createTeamDto: CreateTeamDto) {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
+
+    await this.assertPerformanceRecruiting(
+      performanceId,
+      "종료 일시가 지난 공연에는 팀을 만들 수 없습니다."
+    )
 
     if (memberSessions.length > 0) {
       for (const session of memberSessions) {
@@ -169,6 +176,16 @@ export class TeamService {
     })
     if (!existingTeam)
       throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
+
+    // 마감된 공연에서 빼내는 이동은 허용, 마감된 공연으로 들이는 이동만 차단
+    if (
+      performanceId !== undefined &&
+      performanceId !== existingTeam.performanceId
+    )
+      await this.assertPerformanceRecruiting(
+        performanceId,
+        "종료 일시가 지난 공연으로는 팀을 옮길 수 없습니다."
+      )
 
     const oldImageUrl = existingTeam.image
 
@@ -461,5 +478,17 @@ export class TeamService {
     } catch (error) {
       throw error
     }
+  }
+
+  private async assertPerformanceRecruiting(
+    performanceId: number,
+    detail: string
+  ) {
+    const performance = await this.prisma.performance.findUnique({
+      where: { id: performanceId },
+      select: { endAt: true }
+    })
+    if (performance && !isPerformanceRecruiting(performance))
+      throw new PerformanceRecruitmentClosedError(detail)
   }
 }

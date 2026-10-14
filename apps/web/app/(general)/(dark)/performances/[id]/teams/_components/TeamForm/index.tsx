@@ -366,6 +366,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
         <FirstPage
           form={firstPageForm}
           onValid={onFirstPageValid}
+          originalPerformanceId={initialData?.performanceId}
           onPrevious={
             initialData
               ? () =>

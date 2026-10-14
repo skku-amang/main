@@ -5,8 +5,10 @@ import { PrismaService } from "../prisma/prisma.service"
 import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
+  GetPerformancesQuery,
   performanceFindOneInclude,
-  performanceTeamsInclude
+  performanceTeamsInclude,
+  recruitingPerformanceWhere
 } from "@repo/shared-types"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 
@@ -25,8 +27,17 @@ export class PerformanceService {
     return this.findOne(performance.id)
   }
 
-  async findAll() {
-    const performances = await this.prisma.performance.findMany()
+  async findAll(status?: GetPerformancesQuery["status"]) {
+    if (status === "recruiting") {
+      return this.prisma.performance.findMany({
+        where: recruitingPerformanceWhere(),
+        orderBy: [{ endAt: { sort: "asc", nulls: "last" } }, { id: "asc" }]
+      })
+    }
+
+    const performances = await this.prisma.performance.findMany({
+      orderBy: { id: "asc" }
+    })
     return performances
   }
 

@@ -55,7 +55,7 @@ const headerColorClass = ({
 const TeamRecruitDropdown = ({ mode }: { mode: HeaderMode }) => {
   const pathname = usePathname()
   const { user } = useAuth()
-  const { data: performances } = usePerformances()
+  const { data: performances } = usePerformances({ status: "recruiting" })
   const isCurrentPathname = pathname.includes("/performances/")
   const isEmpty = !performances || performances.length === 0
 

@@ -12,6 +12,7 @@ import {
   EquipmentWithRentalLog,
   GenerationDetail,
   GenerationList,
+  GetPerformancesQuery,
   GetRentalsQuery,
   AuthSessionsResponse,
   LoginResponse,
@@ -59,6 +60,7 @@ import {
   InvalidPerformanceDateError,
   NoApplicationFoundError,
   NotFoundError,
+  PerformanceRecruitmentClosedError,
   PositionOccupiedError,
   ProblemDocument,
   ReferencedEntityNotFoundError,
@@ -111,6 +113,8 @@ function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
       return new DuplicateTeamSessionError(detail, instance)
     case "/errors/team/referenced-entity-not-found":
       return new ReferencedEntityNotFoundError(detail, instance)
+    case "/errors/team/performance-recruitment-closed":
+      return new PerformanceRecruitmentClosedError(detail, instance)
     case "/errors/performance/invalid-performance-date":
       return new InvalidPerformanceDateError(detail, instance)
     case "/errors/user/not-approved":
@@ -306,11 +310,16 @@ export default class ApiClient {
 
   /**
    * 공연 목록 조회
+   * @param query.status "recruiting"이면 팀 모집 중인 공연만 종료 일시가 가까운 순으로 반환
    * @throws {InternalServerError} 서버 오류 발생 시
    */
-  public getPerformances() {
+  public getPerformances(query?: GetPerformancesQuery) {
+    const searchParams = new URLSearchParams()
+    if (query?.status) searchParams.append("status", query.status)
+    const queryString = searchParams.toString()
+
     return this._request<Performance[], InternalServerError>(
-      `/performances`,
+      `/performances${queryString ? `?${queryString}` : ""}`,
       "GET"
     )
   }
@@ -370,6 +379,7 @@ export default class ApiClient {
    * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
    * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
    * @throws {ReferencedEntityNotFoundError} 존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {PerformanceRecruitmentClosedError} 팀 모집이 마감된 공연에 팀을 생성하는 경우
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
@@ -382,6 +392,7 @@ export default class ApiClient {
       | DuplicateSessionUserError
       | DuplicateTeamSessionError
       | ReferencedEntityNotFoundError
+      | PerformanceRecruitmentClosedError
       | ConflictError
       | InternalServerError
     >(`/teams`, "POST", teamData)
@@ -417,6 +428,7 @@ export default class ApiClient {
    * @throws {DuplicateSessionUserError} 세션 내에 중복된 사용자가 존재하는 경우
    * @throws {DuplicateTeamSessionError} 한 팀에 동일한 세션을 중복하여 추가하는 경우
    * @throws {ReferencedEntityNotFoundError} 존재하지 않는 팀장, 세션, 또는 유저를 팀에 추가하는 경우
+   * @throws {PerformanceRecruitmentClosedError} 팀을 팀 모집이 마감된 공연으로 옮기는 경우
    * @throws {ConflictError} 이미 존재하는 데이터와 충돌이 발생한 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
@@ -430,6 +442,7 @@ export default class ApiClient {
       | DuplicateSessionUserError
       | DuplicateTeamSessionError
       | ReferencedEntityNotFoundError
+      | PerformanceRecruitmentClosedError
       | ConflictError
       | InternalServerError
     >(`/teams/${id}`, "PUT", teamData)
