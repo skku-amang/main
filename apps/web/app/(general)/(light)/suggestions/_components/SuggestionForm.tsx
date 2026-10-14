@@ -36,33 +36,70 @@ const KINDS = [
 
 type Kind = (typeof KINDS)[number]["value"]
 
-const SuggestionForm = () => {
-  const { user, isLoading } = useAuth()
-  const [kind, setKind] = useState<Kind>("idea")
-  const [message, setMessage] = useState("")
-  const [sent, setSent] = useState(false)
-
-  const trimmed = message.trim()
-  const current = KINDS.find((k) => k.value === kind)!
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (trimmed.length < MIN_LENGTH) return
-
-    Sentry.captureFeedback(
+/**
+ * 전송 성공을 확인한 뒤에만 resolve. Sentry가 꺼진 환경(로컬·미리보기)은
+ * 전송 완료 신호가 오지 않아 30초 타임아웃까지 기다리므로 바로 실패시킨다.
+ */
+const sendSuggestion = ({
+  message,
+  name,
+  email,
+  kind
+}: {
+  message: string
+  name?: string
+  email?: string
+  kind: Kind
+}) => {
+  const client = Sentry.getClient()
+  if (!client?.getDsn() || client.getOptions().enabled === false) {
+    return Promise.reject(new Error("Sentry가 비활성화된 환경"))
+  }
+  // sendFeedback은 tags를 현재 scope에 setTags 하므로, 이후 에러 이벤트에 새지 않게 격리
+  return Sentry.withScope(() =>
+    Sentry.sendFeedback(
       {
-        message: trimmed,
-        name: user?.name,
-        email: user?.email,
+        message,
+        name,
+        email,
         source: "suggestions-page",
         tags: { suggestion_kind: kind }
       },
       { includeReplay: kind === "bug" }
     )
-    setSent(true)
+  )
+}
+
+const SuggestionForm = () => {
+  const { user, isLoading } = useAuth()
+  const [kind, setKind] = useState<Kind>("idea")
+  const [message, setMessage] = useState("")
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle"
+  )
+
+  const trimmed = message.trim()
+  const current = KINDS.find((k) => k.value === kind)!
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (trimmed.length < MIN_LENGTH || status === "sending") return
+
+    setStatus("sending")
+    try {
+      await sendSuggestion({
+        message: trimmed,
+        name: user?.name,
+        email: user?.email,
+        kind
+      })
+      setStatus("sent")
+    } catch {
+      setStatus("error")
+    }
   }
 
-  if (sent) {
+  if (status === "sent") {
     return (
       <div className="flex flex-col items-center gap-4 rounded-xl bg-white p-10 text-center shadow-sm">
         <CheckCircle2 className="size-12 text-primary" />
@@ -77,7 +114,7 @@ const SuggestionForm = () => {
             variant="outline"
             onClick={() => {
               setMessage("")
-              setSent(false)
+              setStatus("idle")
             }}
           >
             하나 더 보내기
@@ -152,12 +189,18 @@ const SuggestionForm = () => {
         )}
       </div>
 
+      {status === "error" && (
+        <p role="alert" className="text-sm text-red-600">
+          전송에 실패했어요. 잠시 후 다시 시도해주세요.
+        </p>
+      )}
+
       <Button
         type="submit"
         className="w-full"
-        disabled={trimmed.length < MIN_LENGTH}
+        disabled={trimmed.length < MIN_LENGTH || status === "sending"}
       >
-        보내기
+        {status === "sending" ? "보내는 중..." : "보내기"}
       </Button>
     </form>
   )
