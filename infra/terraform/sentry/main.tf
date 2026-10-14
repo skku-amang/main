@@ -53,7 +53,8 @@ resource "sentry_alert" "web_feedback" {
     {
       logic_type = "all"
       conditions = [
-        { issue_category = { value = local.feedback_issue_category } },
+        # include를 생략하면 provider가 false("같지 않음")로 보냄 (문서상 기본값 true와 다름) → 반드시 명시
+        { issue_category = { value = local.feedback_issue_category, include = true } },
       ]
       actions = [
         {
