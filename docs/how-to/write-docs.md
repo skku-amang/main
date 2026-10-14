@@ -9,12 +9,12 @@
 
 [Diátaxis](https://diataxis.fr)는 문서를 **읽는 사람의 의도**에 따라 4칸으로 나눈다.
 
-| 칸 | 의도 | AMANG 예시 |
-| --- | --- | --- |
-| **Tutorial** | "처음이라 손잡고 배우고 싶다" | [tutorials/getting-started.md](../tutorials/getting-started.md) |
-| **How-to** | "X를 어떻게 하지?" | [how-to/contributing.md](./contributing.md), 본 문서 |
-| **Reference** | "X의 정확한 정의·규격은?" | [reference/glossary.md](../reference/glossary.md), [reference/commands.md](../reference/commands.md) |
-| **Explanation** | "왜 이렇게 됐지?" | [explanation/team.md](../explanation/team.md), [explanation/adr/](../explanation/adr/) |
+| 칸              | 의도                          | AMANG 예시                                                                                           |
+| --------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Tutorial**    | "처음이라 손잡고 배우고 싶다" | [tutorials/getting-started.md](../tutorials/getting-started.md)                                      |
+| **How-to**      | "X를 어떻게 하지?"            | [how-to/contributing.md](./contributing.md), 본 문서                                                 |
+| **Reference**   | "X의 정확한 정의·규격은?"     | [reference/glossary.md](../reference/glossary.md), [reference/commands.md](../reference/commands.md) |
+| **Explanation** | "왜 이렇게 됐지?"             | [explanation/team.md](../explanation/team.md), [explanation/adr/](../explanation/adr/)               |
 
 **한 문서 = 한 칸.** 두 칸이 섞이면 읽는 사람이 길을 잃는다 (예: 배포 절차를 읽다 갑자기 인프라 선택 이유가 나옴 — How-to를 원했는데 Explanation을 읽게 됨). 한 파일이 두 의도에 걸치면 나눈다.
 
@@ -41,7 +41,7 @@
 이미 SSOT가 있는 내용은 복붙하지 말고 링크한다.
 
 - **이슈·브랜치·PR·커밋 규칙**: [CONTRIBUTING.md](../../CONTRIBUTING.md) (= [how-to/contributing.md](./contributing.md))
-- **외부 도구(Figma·Notion·Slack·Sentry 등) 계정·연동**: 루트 [CLAUDE.md](../../CLAUDE.md)의 외부 도구 컨텍스트 섹션
+- **외부 도구(Figma·Notion·Slack·Sentry 등) 계정·연동**: 루트 [AGENTS.md](../../AGENTS.md)의 외부 도구 컨텍스트 섹션
 - **도메인 용어 정의**: [reference/glossary.md](../reference/glossary.md)
 
 ## 5. ADR 작성
