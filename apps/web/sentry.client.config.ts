@@ -19,7 +19,9 @@ if (typeof window !== "undefined" && Sentry.replayIntegration) {
       messageLabel: "설명",
       messagePlaceholder: "어떤 문제가 있었나요?",
       successMessageText: "버그 제보가 완료되었습니다. 감사합니다!",
-      isRequiredLabel: "(필수)"
+      isRequiredLabel: "(필수)",
+      addScreenshotButtonLabel: "스크린샷 첨부",
+      removeScreenshotButtonLabel: "스크린샷 삭제"
     })
   )
 }
