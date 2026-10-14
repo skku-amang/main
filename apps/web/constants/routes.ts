@@ -31,7 +31,8 @@ const ROUTES = {
   PROFILE: {
     INDEX: "/profile",
     EDIT: "/profile/edit",
-    TEAMS: "/profile/teams"
+    TEAMS: "/profile/teams",
+    DEVICES: "/profile/devices"
   },
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",

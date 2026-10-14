@@ -13,6 +13,7 @@ import {
   GenerationDetail,
   GenerationList,
   GetRentalsQuery,
+  AuthSessionsResponse,
   LoginResponse,
   LoginUser,
   MeResponse,
@@ -1034,6 +1035,42 @@ export default class ApiClient {
     return this._request<MeResponse, AuthError | InternalServerError>(
       "/auth/me",
       "GET"
+    )
+  }
+
+  /**
+   * 내 로그인 기기 목록
+   * @throws {AuthError} 로그인하지 않은 경우
+   * @throws {InternalServerError}
+   */
+  public getAuthSessions() {
+    return this._request<AuthSessionsResponse, AuthError | InternalServerError>(
+      "/auth/sessions",
+      "GET"
+    )
+  }
+
+  /**
+   * 특정 기기 로그아웃. 그 기기의 접속은 최대 1시간 뒤 끊긴다.
+   * @throws {AuthError} 로그인하지 않은 경우
+   * @throws {InternalServerError}
+   */
+  public logoutAuthSession(sid: string) {
+    return this._request<void, AuthError | InternalServerError>(
+      `/auth/sessions/${encodeURIComponent(sid)}`,
+      "DELETE"
+    )
+  }
+
+  /**
+   * 현재 기기를 제외한 모든 기기 로그아웃
+   * @throws {AuthError} 로그인하지 않은 경우
+   * @throws {InternalServerError}
+   */
+  public logoutOtherAuthSessions() {
+    return this._request<void, AuthError | InternalServerError>(
+      "/auth/sessions",
+      "DELETE"
     )
   }
 

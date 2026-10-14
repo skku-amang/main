@@ -1,6 +1,14 @@
 "use client"
 
-import { CalendarDays, Guitar, Mail, Music, Pencil, Users } from "lucide-react"
+import {
+  CalendarDays,
+  Guitar,
+  Mail,
+  Monitor,
+  Music,
+  Pencil,
+  Users
+} from "lucide-react"
 import Link from "next/link"
 
 import DefaultPageHeader, {
@@ -174,6 +182,21 @@ const ProfilePage = () => {
             <div>
               <p className="font-medium">참여 팀</p>
               <p className="text-xs text-slate-400">참여 중인 팀 목록 보기</p>
+            </div>
+          </Link>
+
+          <Link
+            href={ROUTES.PROFILE.DEVICES}
+            className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+          >
+            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+              <Monitor className="size-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium">로그인 기기</p>
+              <p className="text-xs text-slate-400">
+                로그인된 기기 확인·로그아웃
+              </p>
             </div>
           </Link>
         </div>

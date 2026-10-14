@@ -1,15 +1,22 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
   UseGuards
 } from "@nestjs/common"
-import { JwtPayload, LoginResponse, MeResponse } from "@repo/shared-types"
+import {
+  AuthSessionsResponse,
+  JwtPayload,
+  LoginResponse,
+  MeResponse
+} from "@repo/shared-types"
 import { Request, Response } from "express"
 import { CreateUserDto } from "../users/dto/create-user.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -89,5 +96,32 @@ export class AuthController {
     const { sub: userId } = req.user as { sub: number }
     const user = await this.authService.me(userId)
     return { user }
+  }
+
+  @Get("sessions")
+  @UseGuards(AccessTokenGuard)
+  async sessions(@Req() req: Request): Promise<AuthSessionsResponse> {
+    const { sub: userId, sid } = req.user as JwtPayload
+    const sessions = await this.authService.listSessions(userId, sid)
+    return { sessions }
+  }
+
+  @Delete("sessions")
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async logoutOtherSessions(@Req() req: Request): Promise<void> {
+    const { sub: userId, sid } = req.user as JwtPayload
+    await this.authService.logoutOtherSessions(userId, sid)
+  }
+
+  @Delete("sessions/:sid")
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async logoutSession(
+    @Req() req: Request,
+    @Param("sid") sid: string
+  ): Promise<void> {
+    const { sub: userId } = req.user as JwtPayload
+    await this.authService.logout(userId, sid)
   }
 }

@@ -7,7 +7,7 @@ import {
   RefreshTokenNotFoundError,
   UserNotApprovedError
 } from "@repo/api-client"
-import { JwtPayload } from "@repo/shared-types"
+import { AuthSessionInfo, JwtPayload } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import * as bcrypt from "bcrypt"
 import { CreateUserDto } from "../users/dto/create-user.dto"
@@ -70,6 +70,24 @@ export class AuthService {
 
   async logout(userId: number, sid: string) {
     await this.authSessionStore.delete(userId, sid)
+  }
+
+  async logoutOtherSessions(userId: number, currentSid: string) {
+    await this.authSessionStore.deleteAllExcept(userId, currentSid)
+  }
+
+  async listSessions(
+    userId: number,
+    currentSid: string
+  ): Promise<AuthSessionInfo[]> {
+    const sessions = await this.authSessionStore.list(userId)
+    return sessions
+      .map((session) => ({ ...session, current: session.sid === currentSid }))
+      .sort(
+        (a, b) =>
+          Number(b.current) - Number(a.current) ||
+          b.lastUsedAt.localeCompare(a.lastUsedAt)
+      )
   }
 
   tokenTtls() {
