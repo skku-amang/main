@@ -7,16 +7,16 @@
 
 ## Now — 지금 하는 것
 
-### 동방 예약이 다시 쓰이게 만들기
-
-- 근거 (인터뷰 1건): 부원이 예약을 건너뛰고 그냥 쓴다. 예전 엑셀 주간 시간표는 한 주가 한 화면에 보이고 이름만 적으면 됐는데, 지금은 날짜를 하나씩 눌러 보고 폼을 채워야 한다.
-- 이슈: [#687](https://github.com/skku-amang/main/issues/687), [#688](https://github.com/skku-amang/main/issues/688), [#530](https://github.com/skku-amang/main/issues/530)
-- 진행 중: [PR #693](https://github.com/skku-amang/main/pull/693) 아래 탭에 동방 예약 추가, 홈에 내 예약 표시
-
 ### 팀 모집 현황을 한눈에 보기
 
-- 근거 (인터뷰 1건): 팀 목록에서 누가 어디에 들어가 있고 얼마나 찼는지 보이지 않는다. 검색은 곡 제목만 찾는다.
+- 근거 (인터뷰 1건): 예전 팀 모집 시트는 각 팀에 누가 들어가 있는지 한눈에 보여서 더 좋았다. 지금 팀 목록은 비어 있는 자리만 보여 주고, 검색은 곡 제목만 찾는다.
 - 이슈: [#689](https://github.com/skku-amang/main/issues/689), [#690](https://github.com/skku-amang/main/issues/690), [#676](https://github.com/skku-amang/main/issues/676), [#677](https://github.com/skku-amang/main/issues/677)
+
+### 동방 예약의 작은 불편 없애기
+
+- 근거 (인터뷰 1건): 동방 예약은 지금 방식이 가장 좋다는 평가였다. 남은 불편은 시간 목록이 00시부터 시작하는 것, 달력에서 붐비는 날이 구분되지 않는 것이다.
+- 이슈: [#687](https://github.com/skku-amang/main/issues/687), [#688](https://github.com/skku-amang/main/issues/688)
+- 진행 중: [PR #693](https://github.com/skku-amang/main/pull/693) 아래 탭에 동방 예약 추가, 홈에 내 예약 표시
 
 ## Next — 다음 차례
 
