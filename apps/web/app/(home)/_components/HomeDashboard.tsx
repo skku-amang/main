@@ -83,7 +83,10 @@ const Hero = () => (
       <p className="text-sm text-white/80 md:text-base">
         성균관대학교 밴드 동아리
       </p>
-      <Button asChild variant="secondary" className="mt-3">
+      <Button
+        asChild
+        className="mt-3 bg-white font-semibold text-primary hover:bg-white/90"
+      >
         <Link href={ROUTES.LOGIN}>로그인하고 시작하기</Link>
       </Button>
     </div>
