@@ -66,34 +66,29 @@ const EmptyCard = ({ children }: { children: React.ReactNode }) => (
   </div>
 )
 
-const Hero = () => {
-  const { user, isLoading } = useAuth()
+// 로그인 사용자에겐 한 줄 인사만 — 홈의 핵심(모집 공연·내 팀·내 예약)이 첫 화면에 오도록
+const Greeting = ({ name }: { name: string }) => (
+  <p className="text-xl font-semibold md:text-2xl">{name}님, 안녕하세요 👋</p>
+)
 
-  return (
-    <div
-      className="relative overflow-hidden rounded-2xl bg-cover bg-center px-6 py-10 text-white md:px-10 md:py-16"
-      style={{ backgroundImage: `url('/Music band_pixabay 1.png')` }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/20" />
-      <div className="relative space-y-2">
-        <p className={cn(knewave.className, "text-4xl md:text-6xl")}>Amang</p>
-        <p className="text-sm text-white/80 md:text-base">
-          성균관대학교 밴드 동아리
-        </p>
-        {!isLoading &&
-          (user ? (
-            <p className="pt-2 text-lg font-semibold">
-              {user.name}님, 오늘도 즐거운 합주 되세요!
-            </p>
-          ) : (
-            <Button asChild variant="secondary" className="mt-3">
-              <Link href={ROUTES.LOGIN}>로그인하고 시작하기</Link>
-            </Button>
-          ))}
-      </div>
+// 비로그인 방문자용 동아리 소개 + 로그인 입구
+const Hero = () => (
+  <div
+    className="relative overflow-hidden rounded-2xl bg-cover bg-center px-6 py-10 text-white md:px-10 md:py-16"
+    style={{ backgroundImage: `url('/Music band_pixabay 1.png')` }}
+  >
+    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/20" />
+    <div className="relative space-y-2">
+      <p className={cn(knewave.className, "text-4xl md:text-6xl")}>Amang</p>
+      <p className="text-sm text-white/80 md:text-base">
+        성균관대학교 밴드 동아리
+      </p>
+      <Button asChild variant="secondary" className="mt-3">
+        <Link href={ROUTES.LOGIN}>로그인하고 시작하기</Link>
+      </Button>
     </div>
-  )
-}
+  </div>
+)
 
 const RecruitingPerformance = () => {
   const { data: performances, status } = usePerformances()
@@ -308,11 +303,11 @@ const Shortcuts = ({ isAdmin }: { isAdmin: boolean }) => {
 }
 
 const HomeDashboard = () => {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-6 md:py-12">
-      <Hero />
+      {!isLoading && (user ? <Greeting name={user.name} /> : <Hero />)}
       <RecruitingPerformance />
       {user && (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
