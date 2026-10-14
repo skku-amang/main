@@ -39,10 +39,10 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 **User Feedback 입구 2개** (태그로 구분):
 
-| 입구                                    | `source` 태그      | `suggestion_kind` 태그    |
-| --------------------------------------- | ------------------ | ------------------------- |
-| 떠 있는 버그 제보 버튼 (Sentry 기본 폼) | `widget`           | 없음                      |
-| `/suggestions` 의견 보내기 페이지       | `suggestions-page` | `bug` / `idea` / `praise` |
+| 입구                               | `source` 태그      | `suggestion_kind` 태그    |
+| ---------------------------------- | ------------------ | ------------------------- |
+| 떠 있는 의견 버튼 (Sentry 기본 폼) | `widget`           | 없음                      |
+| `/suggestions` 의견 보내기 페이지  | `suggestions-page` | `bug` / `idea` / `praise` |
 
 `suggestion_kind`는 사용자가 직접 고른 값이므로 원문 패턴 매치보다 우선한다 (분류 기준은 [triage-criteria.md](triage-criteria.md)의 "의견 보내기 태그 우선" 참고).
 

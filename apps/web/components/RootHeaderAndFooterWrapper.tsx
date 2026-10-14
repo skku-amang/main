@@ -1,7 +1,7 @@
 import React from "react"
 
 import BottomTabBar from "@/components/BottomTabBar"
-import BugReportButton from "@/components/BugReportButton"
+import SuggestionButton from "@/components/SuggestionButton"
 import Footer from "@/components/Footer"
 import Header from "@/components/Header"
 import { cn } from "@/lib/utils"
@@ -65,7 +65,7 @@ const RootHeaderAndFooterWrapper = ({
 
       <Footer height={toPixelString(footerHeightPixel)} />
       {useHeader && <BottomTabBar />}
-      <BugReportButton />
+      <SuggestionButton />
     </div>
   )
 }

@@ -1,14 +1,14 @@
 "use client"
 
 import * as Sentry from "@sentry/nextjs"
-import { Bug } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { MessageSquareText } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import { useRef, useState } from "react"
 
 import ROUTES from "@/constants/routes"
 import { ClampFn, useDraggable } from "@/hooks/useDraggable"
 
-const STORAGE_KEY = "amang:bug-report-button-position"
+const STORAGE_KEY = "amang:suggestion-button-position"
 const EDGE = 8
 
 // 버튼 전체가 화면 안, 하단 탭바 위에 있도록
@@ -44,16 +44,23 @@ type FeedbackForm = Awaited<
   ReturnType<NonNullable<ReturnType<typeof Sentry.getFeedback>>["createForm"]>
 >
 
-const BugReportButton = () => {
+// 어디서든 바로 의견(버그·건의·칭찬)을 보내는 떠 있는 버튼. Sentry 기본 폼을 연다
+const SuggestionButton = () => {
   const router = useRouter()
+  const pathname = usePathname()
+  // 의견 보내기 페이지 안에선 같은 기능이라 중복
+  const hidden = pathname.startsWith(ROUTES.SUGGESTIONS)
   const [savedPosition] = useState(readSavedPosition)
   const { ref, position, initialized, wasDragged, handlers } =
     useDraggable<HTMLButtonElement>({
+      enabled: !hidden,
       clamp: clampAboveTabBar,
       initialPosition: savedPosition,
       onDragEnd: savePosition
     })
   const form = useRef<FeedbackForm | null>(null)
+
+  if (hidden) return null
 
   const openForm = async () => {
     if (wasDragged()) return
@@ -75,8 +82,8 @@ const BugReportButton = () => {
     <button
       ref={ref}
       type="button"
-      aria-label="버그 제보"
-      title="버그 제보 (끌어서 옮길 수 있어요)"
+      aria-label="의견 보내기"
+      title="의견 보내기 (끌어서 옮길 수 있어요)"
       onClick={openForm}
       {...handlers}
       className="fixed z-40 flex size-11 touch-none items-center justify-center rounded-full bg-white text-slate-600 shadow-lg ring-1 ring-slate-200 transition-colors hover:text-primary active:cursor-grabbing"
@@ -90,9 +97,9 @@ const BugReportButton = () => {
             }
       }
     >
-      <Bug className="size-5" />
+      <MessageSquareText className="size-5" />
     </button>
   )
 }
 
-export default BugReportButton
+export default SuggestionButton

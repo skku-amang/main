@@ -81,7 +81,9 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
 
 사용자가 **홈페이지 자체**에 대해 개발자에게 보내는 버그·건의·칭찬. 팀 피드백과 완전히 다른 기능.
 
-- 화면: `/suggestions` → Sentry User Feedback으로 수집 (`suggestion_kind` 태그: bug/idea/praise)
+- 입구 2개, 둘 다 Sentry User Feedback으로 수집
+  - `/suggestions` 페이지: 종류 선택 (`suggestion_kind` 태그: bug/idea/praise)
+  - 화면 위에 떠 있는 의견 버튼 (`SuggestionButton`, 드래그로 이동): Sentry 기본 폼, 스크린샷 첨부 가능
 - ⚠️ "피드백"이라 부르지 않는다 — 피드백은 녹음본 피드백 시스템 전용 어휘. 코드 식별자도 `suggestion` 사용
 
 ### 공연 라이프사이클 6단계
