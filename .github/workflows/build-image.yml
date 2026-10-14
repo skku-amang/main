@@ -60,6 +60,8 @@ jobs:
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:latest
-          build-args: ${{ matrix.app.build-args }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            ${{ matrix.app.build-args }}
           cache-from: type=gha
           cache-to: ${{ inputs.push && 'type=gha,mode=max' || '' }}

@@ -31,5 +31,8 @@ USER nestjs
 COPY --from=installer /app .
 
 ENV NODE_ENV=production
+# /health 응답의 version. 마지막 스테이지에 둬서 커밋마다 앞 레이어 캐시가 깨지지 않게 함
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
 EXPOSE 8000
 CMD ["node", "apps/api/dist/main.js"]
