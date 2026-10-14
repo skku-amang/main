@@ -71,7 +71,7 @@ const MiniPlayer = () => {
       style={
         initialized
           ? { left: position.x, top: position.y, right: "auto", bottom: "auto" }
-          : { right: 16, bottom: 16 }
+          : { right: 16, bottom: "calc(var(--tabbar-height) + 16px)" }
       }
     >
       {/* 드래그 핸들 헤더 */}

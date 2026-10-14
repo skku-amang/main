@@ -1,5 +1,6 @@
 import React from "react"
 
+import BottomTabBar from "@/components/BottomTabBar"
 import Footer from "@/components/Footer"
 import Header from "@/components/Header"
 import { cn } from "@/lib/utils"
@@ -51,9 +52,9 @@ const RootHeaderAndFooterWrapper = ({
         style={
           {
             "--extra-pt": toPixelString(paddingTopPixel),
-            paddingBottom: toPixelString(
+            paddingBottom: `calc(${toPixelString(
               footerHeightPixel + paddingBottomPixel
-            ),
+            )} + var(--tabbar-height))`,
             ...mainStyle
           } as React.CSSProperties
         }
@@ -62,6 +63,7 @@ const RootHeaderAndFooterWrapper = ({
       </main>
 
       <Footer height={toPixelString(footerHeightPixel)} />
+      {useHeader && <BottomTabBar />}
     </div>
   )
 }
