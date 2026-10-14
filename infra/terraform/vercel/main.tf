@@ -41,7 +41,8 @@ resource "vercel_project" "web" {
 
   enable_affected_projects_deployments = false
 
-  ignore_command = "[ \"$VERCEL_GIT_COMMIT_REF\" = \"gh-pages\" ]"
+  # exit 0 = 빌드 건너뜀. env/*는 Kargo가 렌더링한 K8s 매니페스트 브랜치 (infra/kargo/)
+  ignore_command = "case \"$VERCEL_GIT_COMMIT_REF\" in gh-pages|env/*) exit 0 ;; *) exit 1 ;; esac"
 
   vercel_authentication = {
     deployment_type = "none"

@@ -12,6 +12,7 @@ infra/
 │       └── overlays/
 │           ├── staging/                # 환경별 namespace, ingress, NetworkPolicy, SealedSecret
 │           └── production/
+├── kargo/                              # staging → production 승격 파이프라인 (Kargo Project amang)
 └── terraform/
     └── {provider}/                     # vercel, sentry, ...
 ```
@@ -51,8 +52,24 @@ Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하�
 ### 자체 빌드 이미지 (api, web)
 
 - 레지스트리: **GHCR** (`ghcr.io/skku-amang/amang-{component}`)
-- 태그: `:latest` (Deployment) + ArgoCD Image Updater가 SHA로 write-back
-- 새 이미지는 GitHub Actions에서 빌드 → push → Image Updater가 평균 ~1분 후 감지
+- 태그: `<커밋시각 UTC>-<짧은 SHA>` (예: `20261014093012-9424f62`). [build-image.yml](../.github/workflows/build-image.yml)이 붙이고, 문자열 정렬이 곧 시간순
+- 배포는 아래 [환경 승격 (Kargo)](#환경-승격-kargo) 참조. base의 `:latest`는 렌더링 시 Kargo가 덮어쓰는 자리표시
+
+## 환경 승격 (Kargo)
+
+staging과 production은 **같은 이미지·같은 매니페스트를 시차를 두고** 받는다 ([#603](https://github.com/skku-amang/main/issues/603)). 정의는 [infra/kargo/](kargo/), UI는 https://kargo.json-server.win.
+
+```
+main 머지 → 이미지 빌드 ─┐
+infra/k8s/api 변경 ──────┴→ Warehouse가 Freight(이미지 태그 + 커밋) 생성
+  → staging 자동 승격: overlay 렌더링 → env/staging 브랜치 커밋 → ArgoCD api-staging sync
+  → production 수동 승격 (Kargo UI): 같은 Freight → env/production 브랜치 → ArgoCD api-production
+```
+
+- ArgoCD api 앱은 `main`이 아니라 **`env/<stage>` 브랜치의 렌더링된 매니페스트**를 바라본다. 실제 배포 상태 = 해당 브랜치 내용
+- `env/*` 브랜치는 Kargo만 쓴다. 손으로 커밋하지 말 것 (다음 승격 때 `git-clear`로 덮어씀)
+- overlay 설정 변경도 Freight에 포함되므로 production에는 승격을 거쳐야 반영된다
+- 롤백: Kargo UI에서 이전 Freight를 production에 다시 승격
 
 ### Public 이미지 (postgres, redis 등)
 

@@ -1,0 +1,37 @@
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: staging
+  namespace: amang
+spec:
+  requestedFreight:
+    - origin:
+        kind: Warehouse
+        name: api
+      sources:
+        direct: true
+  promotionTemplate:
+    spec:
+      steps:
+        - task:
+            name: promote-api
+---
+# staging을 통과한 Freight만 승격 가능
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: production
+  namespace: amang
+spec:
+  requestedFreight:
+    - origin:
+        kind: Warehouse
+        name: api
+      sources:
+        stages:
+          - staging
+  promotionTemplate:
+    spec:
+      steps:
+        - task:
+            name: promote-api

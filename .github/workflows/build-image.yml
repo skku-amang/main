@@ -50,6 +50,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Kargo Warehouse가 문자열 정렬로 최신 이미지를 고르도록 <커밋시각 UTC>-<짧은 SHA> 태그를 붙인다
+      # (infra/kargo/warehouse.yaml). 커밋 시각이라 재실행해도 같은 태그
+      - name: Compute sortable tag
+        id: sortable
+        run: echo "tag=$(TZ=UTC git show -s --format=%cd --date=format-local:%Y%m%d%H%M%S HEAD)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push ${{ matrix.app.name }} image
         uses: docker/build-push-action@v7
         with:
@@ -59,6 +65,7 @@ jobs:
           push: ${{ inputs.push }}
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
+            ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ steps.sortable.outputs.tag }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:latest
           build-args: ${{ matrix.app.build-args }}
           cache-from: type=gha
