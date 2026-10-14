@@ -14,9 +14,8 @@ terraform {
   }
 }
 
-provider "sentry" {
-  token = var.sentry_auth_token
-}
+# 토큰은 SENTRY_AUTH_TOKEN 환경변수에서 읽음 (.envrc → .envrc.local)
+provider "sentry" {}
 
 locals {
   organization = "amang-23"
@@ -33,7 +32,7 @@ data "sentry_organization_integration" "slack" {
 # 프로젝트마다 자동 생성되는 기본 모니터 (새 이슈 전체를 추적)
 data "sentry_project_issue_stream_monitor" "web" {
   organization = local.organization
-  project      = "web"
+  project      = sentry_project.web.slug
 }
 
 # 기존 "Web 에러"/"API 에러" 알림은 우선순위 high 조건(new/existing_high_priority_issue)을 쓰는데,
