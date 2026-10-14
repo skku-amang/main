@@ -53,7 +53,7 @@ Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하�
 
 - 레지스트리: **GHCR** (`ghcr.io/skku-amang/amang-{component}`)
 - 태그: `<커밋시각 UTC>-<짧은 SHA>` (예: `20261014093012-9424f62`). [build-image.yml](../.github/workflows/build-image.yml)이 붙이고, 문자열 정렬이 곧 시간순
-- 배포는 아래 [환경 승격 (Kargo)](#환경-승격-kargo) 참조. base의 `:latest`는 승격 시 Kargo가 stage overlay의 `images:`로 덮어쓰는 자리표시
+- 배포는 아래 [환경 승격 (Kargo)](#환경-승격-kargo) 참조. base의 `:kargo-managed`는 승격 시 Kargo가 stage overlay의 `images:`로 덮어쓰는 자리표시 (실재하지 않는 태그라 overlay에 빠지면 바로 실패). `:latest`는 push하지 않음
 
 ## 환경 승격 (Kargo)
 
