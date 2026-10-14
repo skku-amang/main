@@ -14,11 +14,13 @@ import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
 import { originCheck } from "./common/middleware/origin-check.middleware"
+import { PrismaService } from "./prisma/prisma.service"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true })
   app.useLogger(app.get(Logger))
   const httpAdapterHost = app.get(HttpAdapterHost)
+  const prisma = app.get(PrismaService)
   app.enableCors({
     origin: ALLOWED_ORIGINS,
     credentials: true
@@ -27,7 +29,13 @@ async function bootstrap() {
   app.use(cookieParser())
   app.useGlobalPipes(new ZodValidationPipe())
   app.useGlobalFilters(
-    new AllErrorFilter(httpAdapterHost),
+    new AllErrorFilter(httpAdapterHost, async (id) => {
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: { email: true }
+      })
+      return user?.email ?? null
+    }),
     new ZodValidationErrorFilter(httpAdapterHost),
     new ApiErrorFilter(httpAdapterHost)
   )

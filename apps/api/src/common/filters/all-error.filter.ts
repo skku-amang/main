@@ -32,11 +32,16 @@ const ERROR_BY_STATUS: Partial<Record<number, new () => ApiError>> = {
   [HttpStatus.INTERNAL_SERVER_ERROR]: InternalServerError
 }
 
+type FindUserEmail = (userId: number) => Promise<string | null>
+
 @Catch()
 export class AllErrorFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllErrorFilter.name)
 
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    private readonly httpAdapterHost: HttpAdapterHost,
+    private readonly findUserEmail: FindUserEmail
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost
@@ -65,9 +70,7 @@ export class AllErrorFilter implements ExceptionFilter {
     }
 
     if (isServerError) {
-      Sentry.captureException(exception, {
-        extra: { url: request.url }
-      })
+      void this.captureServerError(exception, request.url)
     }
 
     const detail =
@@ -93,5 +96,18 @@ export class AllErrorFilter implements ExceptionFilter {
     } satisfies Failure
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus)
+  }
+
+  // 토큰에는 id만 있어 이메일은 Sentry로 보낼 에러에 한해 조회한다 — 요청마다 DB를 치지 않도록
+  private async captureServerError(exception: unknown, url: string) {
+    const user = Sentry.getIsolationScope().getUser()
+    const email = user?.id
+      ? await this.findUserEmail(Number(user.id)).catch(() => null)
+      : null
+
+    Sentry.captureException(exception, {
+      extra: { url },
+      ...(email && { user: { ...user, email } })
+    })
   }
 }

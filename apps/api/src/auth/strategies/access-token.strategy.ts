@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { PassportStrategy } from "@nestjs/passport"
 import { JwtPayload } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 import { Strategy } from "passport-jwt"
 import { extractAccessToken } from "../auth-cookie.util"
 
@@ -18,6 +19,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   validate(payload: JwtPayload) {
+    Sentry.setUser({ id: String(payload.sub) })
     return payload // req.user에 payload가 주입됨
   }
 }
