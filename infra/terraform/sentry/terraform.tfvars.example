@@ -1,0 +1,1 @@
+sentry_auth_token = "" # Sentry → Settings → Auth Tokens (.envrc.local의 SENTRY_ACCESS_TOKEN과 같은 값 사용 가능)
