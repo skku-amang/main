@@ -22,7 +22,8 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: migrate
-          image: ghcr.io/skku-amang/amang-api:latest
+          # 태그는 Kargo가 env/<stage> 브랜치의 overlay images:로 고정. 없는 태그라 overlay에 빠지면 바로 실패
+          image: ghcr.io/skku-amang/amang-api:kargo-managed
           imagePullPolicy: Always
           command:
             - sh
