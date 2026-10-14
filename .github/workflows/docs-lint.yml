@@ -34,9 +34,11 @@ jobs:
       - name: markdownlint-cli2
         uses: DavidAnson/markdownlint-cli2-action@v24
         with:
+          # AGENTS.md 하단은 turbo가 자동 삽입·재삽입하는 관리 블록(h1 포함) → MD025 회피 위해 제외
           globs: |
             docs/**/*.md
             *.md
+            !AGENTS.md
 
   link-check:
     name: lychee link check
