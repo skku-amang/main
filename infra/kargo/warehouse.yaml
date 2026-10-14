@@ -1,0 +1,22 @@
+# 새 API 이미지 또는 API 매니페스트 변경을 감지해 Freight(이미지 + 커밋 묶음)를 만든다
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: api
+  namespace: amang
+spec:
+  interval: 5m0s
+  subscriptions:
+    - image:
+        repoURL: ghcr.io/skku-amang/amang-api
+        # build-image.yml이 붙이는 <커밋시각 UTC>-<짧은 SHA> 태그. 문자열 정렬 = 시간순
+        imageSelectionStrategy: Lexical
+        allowTagsRegexes:
+          - ^\d{14}-[0-9a-f]{7}$
+        discoveryLimit: 10
+    - git:
+        repoURL: https://github.com/skku-amang/main
+        branch: main
+        includePaths:
+          - infra/k8s/api
+        discoveryLimit: 10

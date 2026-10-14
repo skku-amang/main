@@ -1,0 +1,19 @@
+# Kargo Project = amang 네임스페이스. 나머지 리소스보다 먼저 생성돼야 함
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Project
+metadata:
+  name: amang
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: amang
+  namespace: amang
+spec:
+  # staging은 새 Freight가 생기면 자동 반영, production은 Kargo UI에서 수동 승격
+  promotionPolicies:
+    - stageSelector:
+        name: staging
+      autoPromotionEnabled: true

@@ -1,0 +1,52 @@
+# Freight의 커밋에서 overlay를 꺼내 이미지 태그를 바꾸고, 렌더링 결과를 env/<stage> 브랜치에 커밋한다.
+# ArgoCD 앱 api-<stage>는 env/<stage> 브랜치를 바라본다 (homelab k8s/argocd/applications/apps/amang/api.yaml)
+apiVersion: kargo.akuity.io/v1alpha1
+kind: PromotionTask
+metadata:
+  name: promote-api
+  namespace: amang
+spec:
+  vars:
+    - name: gitRepo
+      value: https://github.com/skku-amang/main
+    - name: imageRepo
+      value: ghcr.io/skku-amang/amang-api
+  steps:
+    - uses: git-clone
+      config:
+        repoURL: ${{ vars.gitRepo }}
+        checkout:
+          - commit: ${{ commitFrom(vars.gitRepo).ID }}
+            path: ./src
+          - branch: env/${{ ctx.stage }}
+            create: true
+            path: ./out
+    - uses: git-clear
+      config:
+        path: ./out
+    - uses: kustomize-set-image
+      as: update-image
+      config:
+        path: ./src/infra/k8s/api/overlays/${{ ctx.stage }}
+        images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+    - uses: kustomize-build
+      config:
+        path: ./src/infra/k8s/api/overlays/${{ ctx.stage }}
+        outPath: ./out
+    - uses: git-commit
+      as: commit
+      config:
+        path: ./out
+        message: ${{ task.outputs['update-image'].commitMessage }}
+    - uses: git-push
+      config:
+        path: ./out
+    - uses: argocd-update
+      config:
+        apps:
+          - name: api-${{ ctx.stage }}
+            sources:
+              - repoURL: ${{ vars.gitRepo }}
+                desiredRevision: ${{ task.outputs.commit.commit }}
