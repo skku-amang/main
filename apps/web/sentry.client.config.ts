@@ -1,26 +1,12 @@
 import * as Sentry from "@sentry/nextjs"
 
-// replayIntegration/feedbackIntegration은 브라우저 전용 — SSR에서 존재하지 않음
+// replayIntegration은 브라우저 전용 — SSR에서 존재하지 않음
+// 사용자 의견은 떠 있는 위젯 대신 /suggestions 페이지에서 Sentry.captureFeedback으로 수집
 const integrations: ReturnType<typeof Sentry.getDefaultIntegrations>[number][] =
   [Sentry.captureConsoleIntegration({ levels: ["error", "warn"] })]
 
 if (typeof window !== "undefined" && Sentry.replayIntegration) {
   integrations.push(Sentry.replayIntegration())
-  integrations.push(
-    Sentry.feedbackIntegration({
-      colorScheme: "system",
-      showName: false,
-      showEmail: false,
-      triggerLabel: "버그 제보",
-      formTitle: "버그 제보",
-      submitButtonLabel: "보내기",
-      cancelButtonLabel: "취소",
-      messageLabel: "설명",
-      messagePlaceholder: "어떤 문제가 있었나요?",
-      successMessageText: "버그 제보가 완료되었습니다. 감사합니다!",
-      isRequiredLabel: "(필수)"
-    })
-  )
 }
 
 Sentry.init({
