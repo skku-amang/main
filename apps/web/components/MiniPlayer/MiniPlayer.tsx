@@ -1,72 +1,32 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
 import { GripHorizontal, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { ClampFn, useDraggable } from "@/hooks/useDraggable"
 
 import { useMiniPlayer } from "./MiniPlayerContext"
 
+// 일부가 화면 밖으로 나가도 40px은 남겨서 다시 잡을 수 있게
+const clampPartiallyVisible: ClampFn = (pos, { width, height }) => {
+  const margin = 40
+  return {
+    x: Math.min(Math.max(pos.x, margin - width), window.innerWidth - margin),
+    y: Math.min(Math.max(pos.y, margin - height), window.innerHeight - margin)
+  }
+}
+
 const MiniPlayer = () => {
   const { current, close } = useMiniPlayer()
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [initialized, setInitialized] = useState(false)
-  const dragging = useRef(false)
-  const offset = useRef({ x: 0, y: 0 })
-
-  // Set initial position after first render
-  useEffect(() => {
-    if (current && containerRef.current && !initialized) {
-      const rect = containerRef.current.getBoundingClientRect()
-      setPosition({ x: rect.left, y: rect.top })
-      setInitialized(true)
-    }
-  }, [current, initialized])
-
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      if (!containerRef.current) return
-      dragging.current = true
-      offset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      }
-      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-    },
-    [position]
+  const { ref, position, initialized, handlers } = useDraggable<HTMLDivElement>(
+    { enabled: !!current, clamp: clampPartiallyVisible }
   )
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging.current) return
-    setPosition({
-      x: e.clientX - offset.current.x,
-      y: e.clientY - offset.current.y
-    })
-  }, [])
-
-  const clampPosition = useCallback((pos: { x: number; y: number }) => {
-    const el = containerRef.current
-    if (!el) return pos
-    const w = el.offsetWidth
-    const h = el.offsetHeight
-    const margin = 40
-    return {
-      x: Math.min(Math.max(pos.x, margin - w), window.innerWidth - margin),
-      y: Math.min(Math.max(pos.y, margin - h), window.innerHeight - margin)
-    }
-  }, [])
-
-  const handlePointerUp = useCallback(() => {
-    dragging.current = false
-    setPosition((prev) => clampPosition(prev))
-  }, [clampPosition])
 
   if (!current) return null
 
   return (
     <div
-      ref={containerRef}
+      ref={ref}
       className="fixed z-50 w-[320px] overflow-hidden rounded-xl bg-black shadow-2xl md:w-[400px]"
       style={
         initialized
@@ -77,9 +37,7 @@ const MiniPlayer = () => {
       {/* 드래그 핸들 헤더 */}
       <div
         className="flex cursor-grab items-center justify-between bg-neutral-900 px-3 py-2 active:cursor-grabbing"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+        {...handlers}
       >
         <div className="flex min-w-0 items-center gap-2">
           <GripHorizontal className="size-3.5 shrink-0 text-neutral-500" />
