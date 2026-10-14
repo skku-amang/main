@@ -33,7 +33,9 @@ describe("AllErrorFilter", () => {
     }).compile()
 
     app = moduleRef.createNestApplication({ logger: false })
-    app.useGlobalFilters(new AllErrorFilter(app.get(HttpAdapterHost)))
+    app.useGlobalFilters(
+      new AllErrorFilter(app.get(HttpAdapterHost), async () => null)
+    )
     await app.init()
   })
 

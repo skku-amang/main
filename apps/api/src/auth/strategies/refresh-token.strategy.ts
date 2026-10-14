@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config"
 import { PassportStrategy } from "@nestjs/passport"
 import { AuthError } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
+import * as Sentry from "@sentry/nestjs"
 import { Request } from "express"
 import { Strategy } from "passport-jwt"
 import { extractRefreshToken } from "../auth-cookie.util"
@@ -25,6 +26,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (!refreshToken) {
       throw new AuthError("Refresh token is malformed.")
     }
+    Sentry.setUser({ id: String(payload.sub) })
 
     // req.user에 아래 객체가 주입됩니다.
     // 이 값은 이후 Controller의 @Req() 데코레이터를 통해 접근할 수 있습니다.
