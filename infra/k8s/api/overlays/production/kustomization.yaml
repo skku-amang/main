@@ -1,0 +1,24 @@
+# TODO: namespace를 ArgoCD Application에서 지정하고 여기서 제거 검토
+# ref: https://github.com/manamana32321/homelab/tree/main/k8s/argocd/applications/apps/amang
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: amang-api-production
+
+resources:
+  - namespace.yaml
+  - ../../base
+  - ingress.yaml
+  - sealed-secret.yaml
+
+configMapGenerator:
+  - name: api-config
+    behavior: merge
+    literals:
+      - S3_ENDPOINT=https://s3.amang.json-server.win
+      - COOKIE_DOMAIN=amang.json-server.win
+      - NODE_ENV=production
+      - SENTRY_ENVIRONMENT=production
+      - REDIS_HOST=redis.amang-redis-production.svc.cluster.local
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
+      - OTEL_SERVICE_NAME=amang-api
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=production
