@@ -37,7 +37,7 @@ const KINDS = [
 type Kind = (typeof KINDS)[number]["value"]
 
 const SuggestionForm = () => {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const [kind, setKind] = useState<Kind>("idea")
   const [message, setMessage] = useState("")
   const [sent, setSent] = useState(false)
@@ -143,11 +143,13 @@ const SuggestionForm = () => {
           rows={6}
           maxLength={2000}
         />
-        <p className="mt-1.5 text-xs text-slate-400">
-          {user
-            ? "답변이 필요할 때 연락드릴 수 있도록 이름과 이메일이 함께 전달돼요."
-            : "로그인하지 않으면 익명으로 전달돼요."}
-        </p>
+        {!isLoading && (
+          <p className="mt-1.5 text-xs text-slate-400">
+            {user
+              ? "답변이 필요할 때 연락드릴 수 있도록 이름과 이메일이 함께 전달돼요."
+              : "로그인하지 않으면 익명으로 전달돼요."}
+          </p>
+        )}
       </div>
 
       <Button

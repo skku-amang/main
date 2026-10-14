@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import ROUTES from "@/constants/routes"
-import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
 type Tab = {
@@ -17,7 +16,6 @@ type Tab = {
 
 const BottomTabBar = () => {
   const pathname = usePathname()
-  const { user } = useAuth()
 
   const tabs: Tab[] = [
     {
@@ -40,7 +38,7 @@ const BottomTabBar = () => {
     },
     {
       label: "내 정보",
-      href: user ? ROUTES.PROFILE.INDEX : ROUTES.LOGIN,
+      href: ROUTES.PROFILE.INDEX,
       icon: UserRound,
       isCurrent: (p) =>
         p.startsWith(ROUTES.PROFILE.INDEX) ||
