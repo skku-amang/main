@@ -11,15 +11,26 @@ import { ClampFn, useDraggable } from "@/hooks/useDraggable"
 const STORAGE_KEY = "amang:suggestion-button-position"
 const EDGE = 8
 
-// 버튼 전체가 화면 안, 하단 탭바 위에 있도록
-const clampAboveTabBar: ClampFn = (pos, { width, height }) => {
-  const tabBar = document.querySelector<HTMLElement>(
-    'nav[aria-label="주요 메뉴"]'
-  )
-  const bottomLimit = window.innerHeight - (tabBar?.offsetHeight ?? 0) - EDGE
+// 화면에 보이는 요소의 위/아래 끝 (숨겨진 요소는 null)
+const visibleRect = (el: Element | null) => {
+  const rect = el?.getBoundingClientRect()
+  return rect && rect.height > 0 ? rect : null
+}
+
+// 버튼 전체가 헤더 아래, 하단 탭바·고정 CTA(예약하기 등) 위에 있도록
+const clampBetweenFixedBars: ClampFn = (pos, { width, height }) => {
+  const header = visibleRect(document.querySelector("header"))
+  const bottoms = [
+    visibleRect(document.querySelector('nav[aria-label="주요 메뉴"]')),
+    ...[...document.querySelectorAll("[data-floating-cta]")].map(visibleRect)
+  ]
+    .filter((rect) => rect !== null)
+    .map((rect) => rect.top)
+  const topLimit = (header?.bottom ?? 0) + EDGE
+  const bottomLimit = Math.min(window.innerHeight, ...bottoms) - EDGE
   return {
     x: Math.min(Math.max(pos.x, EDGE), window.innerWidth - width - EDGE),
-    y: Math.min(Math.max(pos.y, EDGE), bottomLimit - height)
+    y: Math.min(Math.max(pos.y, topLimit), bottomLimit - height)
   }
 }
 
@@ -54,9 +65,10 @@ const SuggestionButton = () => {
   const { ref, position, initialized, wasDragged, handlers } =
     useDraggable<HTMLButtonElement>({
       enabled: !hidden,
-      clamp: clampAboveTabBar,
+      clamp: clampBetweenFixedBars,
       initialPosition: savedPosition,
-      onDragEnd: savePosition
+      onDragEnd: savePosition,
+      reclampKey: pathname
     })
   const form = useRef<FeedbackForm | null>(null)
 

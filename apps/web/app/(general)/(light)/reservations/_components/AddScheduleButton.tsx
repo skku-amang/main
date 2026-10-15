@@ -49,13 +49,16 @@ interface AddScheduleButtonProps {
   equipments: Equipment[]
   iconOnly?: boolean
   label?: string
+  /** 화면에 고정된 CTA로 쓸 때 — 떠 있는 의견 버튼이 이 위로 비켜감 */
+  floating?: boolean
 }
 
 export default function AddScheduleButton({
   className,
   equipments,
   iconOnly,
-  label
+  label,
+  floating
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
@@ -224,6 +227,7 @@ export default function AddScheduleButton({
     >
       <DialogTrigger asChild>
         <Button
+          data-floating-cta={floating || undefined}
           className={cn(
             iconOnly
               ? "h-14 w-14 rounded-full p-0 bg-primary text-gray-50"
