@@ -40,11 +40,11 @@ const TeamActionsMenu = ({
       align="end"
       className="rounded-lg border border-slate-100 p-[5px] text-base drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
     >
-      <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
-        <Link
-          href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, teamId)}
-          className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-        >
+      <DropdownMenuItem
+        asChild
+        className="flex items-center justify-center gap-x-2 px-6 py-2 selection:text-slate-700 hover:cursor-pointer"
+      >
+        <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, teamId)}>
           <Pencil />
           편집하기
         </Link>
