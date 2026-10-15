@@ -101,8 +101,21 @@ describe("NotificationListener", () => {
       const [name, event] = emit.mock.calls[0]
       expect(name).toBe(NOTIFICATION_EVENTS.CREATED)
       expect(event).toBeInstanceOf(NotificationCreatedEvent)
-      expect([...event.recipientIds].sort()).toEqual([1, 2, 3])
+      expect([...event.recipientIds].sort()).toEqual([1, 2, 3, 9])
       expect(event.payload.changeType).toBe("REMOVED")
+    })
+
+    it("팀장이 뺀 멤버는 본인도 받고, 스스로 나간 멤버는 받지 않는다", async () => {
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [1], 4)
+      )
+      expect(recipients()).toEqual([1, 2, 3, 9])
+
+      prisma.notification.createMany.mockClear()
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [1], 9)
+      )
+      expect(recipients()).toEqual([1, 2, 3, 4])
     })
 
     it("수신자가 없으면 저장도 발행도 하지 않는다", async () => {

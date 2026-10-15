@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { NotFoundError } from "@repo/api-client"
 import {
   GetNotificationsQuery,
@@ -10,6 +10,8 @@ import { PrismaService } from "../prisma/prisma.service"
 
 @Injectable()
 export class NotificationService {
+  private readonly logger = new Logger(NotificationService.name)
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(
@@ -23,13 +25,19 @@ export class NotificationService {
     })
 
     const hasMore = rows.length > limit
-    const items = NotificationItemSchema.array().parse(
-      hasMore ? rows.slice(0, limit) : rows
-    )
+    const page = hasMore ? rows.slice(0, limit) : rows
+
+    // 스키마와 어긋난 row 하나가 알림함 전체를 막지 않도록 건너뛴다. cursor는 원본 page 기준.
+    const items = page.flatMap((row) => {
+      const parsed = NotificationItemSchema.safeParse(row)
+      if (parsed.success) return [parsed.data]
+      this.logger.warn(`알림 ${row.id}의 payload가 스키마와 맞지 않아 건너뜀`)
+      return []
+    })
 
     return {
       items,
-      nextCursor: hasMore ? (items.at(-1)?.id ?? null) : null
+      nextCursor: hasMore ? (page.at(-1)?.id ?? null) : null
     }
   }
 

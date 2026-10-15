@@ -145,18 +145,20 @@ export class NotificationListener {
     ])
     if (!team || !member) return
 
-    await this.create(
-      teamMemberIds(team).filter((id) => id !== event.actorId),
-      NotificationType.TEAM_MEMBER_CHANGE,
-      {
-        teamId: team.id,
-        performanceId: team.performanceId,
-        teamName: team.name,
-        changeType,
-        memberName: member.name,
-        sessionNames: sessions.map((s) => s.name)
-      }
-    )
+    // 제거된 멤버는 커밋 뒤 스냅샷에 없지만 이벤트 시점엔 팀원이었다 — 본인도 받는다 (스스로 나간 경우는 actor 제외로 빠짐)
+    const recipientIds = distinct([
+      ...teamMemberIds(team),
+      ...(changeType === "REMOVED" ? [event.userId] : [])
+    ]).filter((id) => id !== event.actorId)
+
+    await this.create(recipientIds, NotificationType.TEAM_MEMBER_CHANGE, {
+      teamId: team.id,
+      performanceId: team.performanceId,
+      teamName: team.name,
+      changeType,
+      memberName: member.name,
+      sessionNames: sessions.map((s) => s.name)
+    })
   }
 
   private findTeam(id: number) {

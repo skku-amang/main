@@ -59,29 +59,43 @@ function fakeNotificationTable(rows: Row[]) {
   }
 }
 
+async function makeService(rows: Row[]) {
+  const table = fakeNotificationTable(rows)
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [
+      NotificationService,
+      { provide: PrismaService, useValue: { notification: table } }
+    ]
+  }).compile()
+  return { service: module.get(NotificationService), table }
+}
+
 describe("NotificationService", () => {
   let service: NotificationService
   let table: ReturnType<typeof fakeNotificationTable>
 
   beforeEach(async () => {
-    table = fakeNotificationTable([
+    ;({ service, table } = await makeService([
       row(30, 1, null),
       row(20, 1, null),
       row(10, 1, new Date("2026-10-01")),
       row(5, 2, null)
-    ])
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        NotificationService,
-        { provide: PrismaService, useValue: { notification: table } }
-      ]
-    }).compile()
-
-    service = module.get(NotificationService)
+    ]))
   })
 
   describe("findAll", () => {
+    it("payload가 깨진 row는 건너뛰고 나머지를 돌려주며 cursor는 원본 기준", async () => {
+      const { service } = await makeService([
+        row(30, 1, null),
+        { ...row(25, 1, null), payload: { broken: true } } as unknown as Row,
+        row(20, 1, null)
+      ])
+
+      const result = await service.findAll(1, { limit: 2 })
+      expect(result.items.map((i) => i.id)).toEqual([30])
+      expect(result.nextCursor).toBe(25)
+    })
+
     it("본인 알림만 최신순으로 limit만큼 주고 nextCursor를 돌려준다", async () => {
       const result = await service.findAll(1, { limit: 2 })
       expect(result.items.map((i) => i.id)).toEqual([30, 20])

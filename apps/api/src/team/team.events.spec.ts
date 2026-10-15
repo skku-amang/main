@@ -99,6 +99,15 @@ describe("changedTeamFields", () => {
     ).toEqual(["name", "songYoutubeVideoUrl"])
   })
 
+  it("nullable 필드를 안 보내면 null로 저장되므로 기존 값이 있었다면 변경이다", () => {
+    expect(
+      changedTeamFields(
+        { ...existing, songYoutubeVideoUrl: "https://youtu.be/abc" },
+        sameDto
+      )
+    ).toEqual(["songYoutubeVideoUrl"])
+  })
+
   it("공연 이동은 performanceId로 잡히고, 안 보내면 잡히지 않는다", () => {
     expect(
       changedTeamFields(existing, { ...sameDto, performanceId: 6 })

@@ -124,6 +124,8 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 ## 6. 구현 결정 (refinements)
 
 - **actor 제외**: 자기 행동의 결과는 자기에게 알리지 않는다. (예: 멤버가 self-apply([team.controller.ts](../../../apps/api/src/team/team.controller.ts)로 본인 지원)하면 그 멤버는 수신자에서 빠지고, 기존 팀원들이 "새 멤버 합류"를 받는다.)
+- **제거된 멤버 본인도 수신**: 팀장·운영진이 로스터에서 뺀 멤버는 커밋 뒤 스냅샷엔 없지만 이벤트 시점엔 팀원이었으므로 `REMOVED` 알림을 받는다. 스스로 나간(unapply) 경우는 actor 제외로 빠진다. (리뷰에서 발견, 2026-10-15)
+- **nullable 필드 변경 감지**: `update`는 `description`·`image`·`songYoutubeVideoUrl`을 `?? null`로 쓰므로 요청에서 생략 = null 저장. `changedFields` 계산도 같은 규칙(생략을 null로 비교). "안 보내면 유지"는 `performanceId`뿐.
 - **다중 세션 배칭**: `apply`의 `applyTeamDto`는 배열(한 번에 여러 세션 지원). `TEAM_MEMBER_CHANGE` **1건**으로 묶고 `sessionNames`에 나열 — 세션당 1건은 스팸.
 - **팀 공연 이동**: `update`로 팀의 `performanceId`가 바뀔 수 있다([#666](https://github.com/skku-amang/main/pull/666)). 이때도 `TEAM_ATTRIBUTE_CHANGE` 1건으로 처리 — `changedFields`에 `performanceId` 포함, payload의 `performanceId`는 변경 후 값. 옮겨간 공연 쪽 유저에게 `TEAM_CREATED`를 따로 쏘지 않는다(드문 운영 동작, 이벤트 분기 비용 대비 효용 낮음).
 - **읽음 UX**: 알림함 항목 클릭 시 개별 읽음 + 딥링크 이동, "모두 읽음" 버튼 별도. 드롭다운 여는 것만으로 자동 읽음 처리하지 않는다(지나쳐도 안 놓치게).

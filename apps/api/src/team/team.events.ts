@@ -98,7 +98,8 @@ export function changedTeamFields(existing: ExistingTeam, dto: UpdateTeam) {
 
   for (const field of SCALAR_FIELDS) {
     const incoming = dto[field]
-    if (incoming === undefined) continue
+    // performanceId만 "안 보내면 유지". 나머지 nullable 필드는 update가 `?? null`로 써서 생략 = null
+    if (field === "performanceId" && incoming === undefined) continue
     if ((incoming ?? null) !== (existing[field] ?? null)) changed.push(field)
   }
 
