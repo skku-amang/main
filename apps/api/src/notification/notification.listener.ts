@@ -1,0 +1,207 @@
+import { Injectable, Logger } from "@nestjs/common"
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
+import { NotificationType, Prisma } from "@repo/database"
+import { NotificationPayload } from "@repo/shared-types"
+import { PrismaService } from "../prisma/prisma.service"
+import {
+  PERFORMANCE_EVENTS,
+  PerformanceCreatedEvent
+} from "../performance/performance.events"
+import {
+  TEAM_EVENTS,
+  TeamCreatedEvent,
+  TeamMemberAddedEvent,
+  TeamMemberRemovedEvent,
+  TeamUpdatedEvent
+} from "../team/team.events"
+import {
+  NOTIFICATION_EVENTS,
+  NotificationCreatedEvent
+} from "./notification.events"
+
+const teamSnapshotSelect = {
+  id: true,
+  name: true,
+  performanceId: true,
+  leaderId: true,
+  teamSessions: { select: { members: { select: { userId: true } } } }
+} satisfies Prisma.TeamSelect
+
+type TeamSnapshot = Prisma.TeamGetPayload<{ select: typeof teamSnapshotSelect }>
+
+/**
+ * 도메인 이벤트를 알림 row로 바꾼다. 수신자 해석·스냅샷 조립·fan-out 저장을 담당하고,
+ * 저장이 끝나면 notification.created를 발행해 전달 채널(푸시)에 넘긴다.
+ * 실패는 로깅만 한다 — 원본 요청은 이미 커밋됐고, 알림은 best-effort.
+ */
+@Injectable()
+export class NotificationListener {
+  private readonly logger = new Logger(NotificationListener.name)
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
+
+  @OnEvent(TEAM_EVENTS.MEMBER_ADDED)
+  onTeamMemberAdded(event: TeamMemberAddedEvent) {
+    return this.safely(() => this.notifyMemberChange(event, "ADDED"))
+  }
+
+  @OnEvent(TEAM_EVENTS.MEMBER_REMOVED)
+  onTeamMemberRemoved(event: TeamMemberRemovedEvent) {
+    return this.safely(() => this.notifyMemberChange(event, "REMOVED"))
+  }
+
+  @OnEvent(TEAM_EVENTS.UPDATED)
+  onTeamUpdated(event: TeamUpdatedEvent) {
+    return this.safely(async () => {
+      const team = await this.findTeam(event.teamId)
+      if (!team) return
+
+      await this.create(
+        teamMemberIds(team).filter((id) => id !== event.actorId),
+        NotificationType.TEAM_ATTRIBUTE_CHANGE,
+        {
+          teamId: team.id,
+          performanceId: team.performanceId,
+          teamName: team.name,
+          changedFields: event.changedFields
+        }
+      )
+    })
+  }
+
+  @OnEvent(TEAM_EVENTS.CREATED)
+  onTeamCreated(event: TeamCreatedEvent) {
+    return this.safely(async () => {
+      const team = await this.findTeam(event.teamId)
+      if (!team) return
+      const performance = await this.prisma.performance.findUnique({
+        where: { id: team.performanceId },
+        select: {
+          id: true,
+          name: true,
+          teams: {
+            select: {
+              leaderId: true,
+              teamSessions: {
+                select: { members: { select: { userId: true } } }
+              }
+            }
+          }
+        }
+      })
+      if (!performance) return
+
+      const recipientIds = distinct(
+        performance.teams.flatMap(teamMemberIds)
+      ).filter((id) => id !== event.actorId)
+
+      await this.create(recipientIds, NotificationType.TEAM_CREATED, {
+        performanceId: performance.id,
+        performanceName: performance.name,
+        teamId: team.id,
+        teamName: team.name
+      })
+    })
+  }
+
+  @OnEvent(PERFORMANCE_EVENTS.CREATED)
+  onPerformanceCreated(event: PerformanceCreatedEvent) {
+    return this.safely(async () => {
+      const performance = await this.prisma.performance.findUnique({
+        where: { id: event.performanceId },
+        select: { id: true, name: true }
+      })
+      if (!performance) return
+      const users = await this.prisma.user.findMany({
+        where: { isApproved: true },
+        select: { id: true }
+      })
+
+      await this.create(
+        users.map((u) => u.id).filter((id) => id !== event.actorId),
+        NotificationType.PERFORMANCE_CREATED,
+        { performanceId: performance.id, performanceName: performance.name }
+      )
+    })
+  }
+
+  private async notifyMemberChange(
+    event: TeamMemberAddedEvent | TeamMemberRemovedEvent,
+    changeType: "ADDED" | "REMOVED"
+  ) {
+    const [team, member, sessions] = await Promise.all([
+      this.findTeam(event.teamId),
+      this.prisma.user.findUnique({
+        where: { id: event.userId },
+        select: { name: true }
+      }),
+      this.prisma.session.findMany({
+        where: { id: { in: event.sessionIds } },
+        select: { name: true }
+      })
+    ])
+    if (!team || !member) return
+
+    await this.create(
+      teamMemberIds(team).filter((id) => id !== event.actorId),
+      NotificationType.TEAM_MEMBER_CHANGE,
+      {
+        teamId: team.id,
+        performanceId: team.performanceId,
+        teamName: team.name,
+        changeType,
+        memberName: member.name,
+        sessionNames: sessions.map((s) => s.name)
+      }
+    )
+  }
+
+  private findTeam(id: number) {
+    return this.prisma.team.findUnique({
+      where: { id },
+      select: teamSnapshotSelect
+    })
+  }
+
+  private async create<T extends NotificationType>(
+    recipientIds: number[],
+    type: T,
+    payload: NotificationPayload<T>
+  ) {
+    if (recipientIds.length === 0) return
+
+    await this.prisma.notification.createMany({
+      data: recipientIds.map((recipientId) => ({
+        recipientId,
+        type,
+        payload
+      }))
+    })
+    this.eventEmitter.emit(
+      NOTIFICATION_EVENTS.CREATED,
+      new NotificationCreatedEvent(recipientIds, type, payload)
+    )
+  }
+
+  private async safely(work: () => Promise<void>) {
+    try {
+      await work()
+    } catch (error) {
+      this.logger.error("알림 생성 실패", error)
+    }
+  }
+}
+
+function teamMemberIds(team: Pick<TeamSnapshot, "leaderId" | "teamSessions">) {
+  return distinct([
+    team.leaderId,
+    ...team.teamSessions.flatMap((s) => s.members.map((m) => m.userId))
+  ])
+}
+
+function distinct(ids: number[]) {
+  return [...new Set(ids)]
+}
