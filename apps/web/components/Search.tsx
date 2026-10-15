@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 const Search = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => {
+>(({ className, placeholder = "검색", ...props }, ref) => {
   return (
     <div
       className={cn(
@@ -17,7 +17,7 @@ const Search = React.forwardRef<
       <SearchIcon size={24} className="text-gray-500" strokeWidth={1.25} />
       <input
         {...props}
-        placeholder="검색"
+        placeholder={placeholder}
         type="search"
         ref={ref}
         className="w-full placeholder:text-gray-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
