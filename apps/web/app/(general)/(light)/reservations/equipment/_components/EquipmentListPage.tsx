@@ -138,7 +138,7 @@ export default function EquipmentListPage() {
   }
 
   return (
-    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
+    <div className="bg-neutral-50 -mx-4 px-4 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="장비 대여"
         routes={[
