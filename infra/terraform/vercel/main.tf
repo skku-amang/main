@@ -123,7 +123,8 @@ resource "vercel_project_environment_variable" "sentry_dsn" {
   team_id    = var.vercel_team_id
   key        = "NEXT_PUBLIC_SENTRY_DSN"
   value      = "https://fec0864f2e695dbd2d9b09dafb90cca3@o4511134421286912.ingest.us.sentry.io/4511134423515136"
-  target     = ["production"]
+  target     = ["production", "preview"]
+  sensitive  = false
 }
 
 resource "vercel_project_environment_variable" "sentry_environment" {
@@ -132,6 +133,16 @@ resource "vercel_project_environment_variable" "sentry_environment" {
   key        = "NEXT_PUBLIC_SENTRY_ENVIRONMENT"
   value      = "production"
   target     = ["production"]
+}
+
+# staging도 Vercel상 preview라(#625) 여기선 구분 불가 — 브라우저에서 호스트로 staging을 가려냄
+# (sentry.client.config.ts). Sentry 알림은 전부 environment=production 필터라 preview·staging은 알림 없음
+resource "vercel_project_environment_variable" "sentry_environment_preview" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_SENTRY_ENVIRONMENT"
+  value      = "preview"
+  target     = ["preview"]
 }
 
 # Web Push VAPID 공개키 (비밀 아님). private 키는 infra/k8s/api/overlays/*/sealed-secret.yaml.

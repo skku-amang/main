@@ -27,9 +27,17 @@ if (typeof window !== "undefined" && Sentry.replayIntegration) {
   )
 }
 
+// staging은 Vercel상 preview 배포에 커스텀 도메인을 붙인 것(#625) — *.vercel.app이 아니면 staging
+const environment =
+  process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT === "preview" &&
+  typeof window !== "undefined" &&
+  !window.location.hostname.endsWith(".vercel.app")
+    ? "staging"
+    : process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+  environment,
   enabled: process.env.NODE_ENV === "production",
 
   tracesSampleRate: 1.0,
