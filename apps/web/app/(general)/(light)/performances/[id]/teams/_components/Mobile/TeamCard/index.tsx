@@ -1,23 +1,25 @@
 "use client"
 
-import { Image, PencilLine, Trash2 } from "lucide-react"
+import { Image } from "lucide-react"
 import Link from "next/link"
 
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
-import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
+import { useAuth } from "@/lib/providers/auth-provider"
 import {
   getMissingIndices,
   TeamFromList,
   TeamSessionFromList
 } from "@/lib/team/teamSession"
+import { cn } from "@/lib/utils"
+
+import TeamActionsMenu from "../../TeamActionsMenu"
 
 interface TeamCardProps {
   performanceId: number
@@ -42,14 +44,27 @@ const TeamCard = ({
   leader,
   missingTeamSessions
 }: TeamCardProps) => {
+  const { user } = useAuth()
   const { canEdit } = useTeamPermission({ leaderId: leader.id })
+  const isMyTeam = user?.id === leader.id
 
   return (
-    <div className="rounded-lg bg-white p-5 shadow-md">
+    <div
+      className={cn(
+        "relative rounded-lg bg-white p-5 shadow-md",
+        isMyTeam && "border-l-4 border-primary pl-4"
+      )}
+    >
+      {isMyTeam && <span className="sr-only">내가 팀장인 팀</span>}
       <Link href={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, id)}>
         <div>
           {/* 곡명 & 상태 */}
-          <div className="text-md flex items-start justify-between">
+          <div
+            className={cn(
+              "text-md flex items-start justify-between",
+              canEdit && "pr-6"
+            )}
+          >
             <div className="flex items-center gap-x-2">
               <h4 className="flex items-center gap-x-1 self-stretch font-bold text-slate-700">
                 {songName}
@@ -112,34 +127,11 @@ const TeamCard = ({
 
       {/* 액션: 편집, 삭제 */}
       {canEdit && (
-        <div className="mt-3 grid grid-cols-2 gap-x-4">
-          <Button
-            asChild
-            className="flex h-9 w-full items-center gap-x-2 rounded-lg border-none bg-slate-100 text-xs text-primary drop-shadow-sm"
-            variant="outline"
-          >
-            <Link href={ROUTES.PERFORMANCE.TEAM.EDIT(performanceId, id)}>
-              <PencilLine size={14} strokeWidth={2} className="font-bold" />
-              편집하기
-            </Link>
-          </Button>
-          <TeamDeleteButton
-            teamId={id}
-            className="w-full"
-            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          >
-            <Button
-              asChild
-              className="flex h-9 w-full items-center gap-x-2 rounded-lg bg-slate-100 text-xs text-primary drop-shadow-sm"
-              variant="destructive"
-            >
-              <div>
-                <Trash2 size={14} strokeWidth={2} className="font-bold" />
-                삭제하기
-              </div>
-            </Button>
-          </TeamDeleteButton>
-        </div>
+        <TeamActionsMenu
+          performanceId={performanceId}
+          teamId={id}
+          className="absolute right-1 top-4 h-8 w-8"
+        />
       )}
     </div>
   )

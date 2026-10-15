@@ -1,31 +1,16 @@
 "use client"
 
 import { CellContext, ColumnDef } from "@tanstack/react-table"
-import {
-  ArrowUpDown,
-  EllipsisVertical,
-  Image,
-  Paperclip,
-  Pencil,
-  Trash2
-} from "lucide-react"
+import { ArrowUpDown, Image, Paperclip } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 
 import { useMiniPlayer } from "@/components/MiniPlayer"
-import TeamDeleteButton from "@/components/TeamDeleteButton"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { matchesKorean } from "@/lib/hangul-search"
@@ -35,6 +20,8 @@ import {
   TeamFromList
 } from "@/lib/team/teamSession"
 import { extractYoutubeVideoId } from "@repo/shared-types"
+
+import TeamActionsMenu from "../TeamActionsMenu"
 
 export type TeamColumn = TeamFromList
 
@@ -61,53 +48,14 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
     leaderId: row.original.leader.id
   })
 
-  if (canEdit) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex w-full items-center justify-center p-0 "
-          >
-            <span className="sr-only">Open menu</span>
-            <EllipsisVertical className="h-5 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="rounded-lg border border-slate-100 p-[5px] text-base drop-shadow-[0_3px_6px_rgb(0,0,0,0.3)]"
-        >
-          <DropdownMenuItem className="p-0 selection:text-slate-700 hover:cursor-pointer">
-            <Link
-              href={ROUTES.PERFORMANCE.TEAM.EDIT(
-                row.original.performanceId,
-                row.original.id
-              )}
-              className="flex h-full w-full items-center justify-center gap-x-2 px-6 py-2"
-            >
-              <Pencil />
-              편집하기
-            </Link>
-          </DropdownMenuItem>
-          <TeamDeleteButton
-            teamId={row.original.id}
-            redirectUrl={ROUTES.PERFORMANCE.TEAM.LIST(
-              row.original.performanceId
-            )}
-          >
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex items-center justify-center gap-x-2 px-6 py-2 selection:text-slate-700 hover:cursor-pointer"
-            >
-              <Trash2 />
-              삭제하기
-            </DropdownMenuItem>
-          </TeamDeleteButton>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-  return null
+  if (!canEdit) return null
+  return (
+    <TeamActionsMenu
+      performanceId={row.original.performanceId}
+      teamId={row.original.id}
+      className="w-full"
+    />
+  )
 }
 
 const YoutubeCell = ({ row }: { row: any }) => {
