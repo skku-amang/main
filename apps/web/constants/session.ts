@@ -19,7 +19,9 @@ export type SessionNameValue =
 /**
  * SessionName → 한글 표시명 매핑. 정의는 @repo/shared-types (알림 문구와 공유)
  */
-export { SESSION_DISPLAY_NAME } from "@repo/shared-types"
+import { SESSION_DISPLAY_NAME } from "@repo/shared-types"
+
+export { SESSION_DISPLAY_NAME }
 
 /**
  * SessionName을 한글 표시명으로 변환

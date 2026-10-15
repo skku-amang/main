@@ -8,6 +8,9 @@ import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 import NavLink from "../NavLink"
+import NotificationBell, {
+  NotificationBellLink
+} from "./_component/NotificationBell"
 import Profile from "./_component/Profile"
 import TeamRecruitDropdown from "./_component/TeamRecruitDropdown"
 
@@ -65,7 +68,7 @@ const Header = ({
         >
           Amang
         </Link>
-        <div className="w-6" />
+        <NotificationBellLink />
       </nav>
 
       {/* Tablet & Desktop */}
@@ -98,6 +101,7 @@ const Header = ({
           </div>
 
           {/* Personal */}
+          <NotificationBell mode={mode} />
           <Profile />
         </div>
       </nav>
