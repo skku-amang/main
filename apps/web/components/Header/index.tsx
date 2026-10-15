@@ -32,7 +32,8 @@ const Header = ({
       name: "동방 예약",
       url: ROUTES.RESERVATION.CLUBROOM,
       active: true
-    }
+    },
+    { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true }
   ]
 
   return (
