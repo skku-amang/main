@@ -79,20 +79,49 @@ export function isSubscribedWithKey(
   )
 }
 
-/** 이 브라우저 구독을 서버와 브라우저 양쪽에서 푼다. 구독이 없거나 실패해도 조용히 끝난다 */
+const OPT_OUT_KEY = "push-opted-out"
+
+/** 사용자가 직접 끈 기기. 배너로 다시 묻지 않는다 (ADR-0003 원칙2: 재촉 금지) */
+export function isPushOptedOut() {
+  try {
+    return localStorage.getItem(OPT_OUT_KEY) === "1"
+  } catch {
+    return false
+  }
+}
+
+export function setPushOptOut(on: boolean) {
+  try {
+    if (on) localStorage.setItem(OPT_OUT_KEY, "1")
+    else localStorage.removeItem(OPT_OUT_KEY)
+  } catch {
+    // 저장 불가 환경이면 이번 세션만
+  }
+}
+
+/**
+ * 이 브라우저 구독을 서버와 브라우저 양쪽에서 푼다 (로그아웃용). 구독이 없거나 실패해도 조용히 끝난다.
+ * 서버 해제가 실패해도 브라우저 쪽은 반드시 푼다 — 공용 기기에서 다음 사람에게 내 푸시가 가면 안 되므로.
+ */
 export async function removePushSubscription(apiClient: {
   deletePushSubscription: (body: { endpoint: string }) => Promise<unknown>
 }) {
+  if (!("serviceWorker" in navigator)) return
+  let subscription: PushSubscription | null = null
   try {
-    if (!("serviceWorker" in navigator)) return
     const registration = await navigator.serviceWorker.getRegistration()
-    const subscription = await registration?.pushManager.getSubscription()
+    subscription = (await registration?.pushManager.getSubscription()) ?? null
     if (!subscription) return
     await apiClient.deletePushSubscription({ endpoint: subscription.endpoint })
-    await subscription.unsubscribe()
-    sessionStorage.removeItem("push-subscription-ensured")
   } catch {
     // best-effort
+  } finally {
+    try {
+      await subscription?.unsubscribe()
+      sessionStorage.removeItem("push-subscription-ensured")
+    } catch {
+      // best-effort
+    }
   }
 }
 

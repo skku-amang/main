@@ -12,6 +12,7 @@ import {
   isSubscribedWithKey,
   PushSupport,
   registerServiceWorker,
+  setPushOptOut,
   subscribeBrowser,
   toSubscriptionDto
 } from "@/lib/push"
@@ -41,25 +42,35 @@ export function usePushSubscription() {
     if (current !== "granted" && current !== "default") return
 
     let cancelled = false
-    registerServiceWorker(API_URL, VAPID_PUBLIC_KEY)
-      .then(async () => {
-        let existing = await getBrowserSubscription()
-        if (cancelled) return
+    ;(async () => {
+      let existing: PushSubscription | null
+      try {
+        await registerServiceWorker(API_URL, VAPID_PUBLIC_KEY)
+        existing = await getBrowserSubscription()
+      } catch {
+        // SW 등록 자체가 안 되는 브라우저
+        if (!cancelled) setSupport("unsupported")
+        return
+      }
+      if (cancelled) return
+
+      try {
         // 공개키가 바뀐 뒤 남은 옛 구독은 영구 실패 — 권한이 있으니 조용히 새로 만든다
         if (existing && !isSubscribedWithKey(existing, VAPID_PUBLIC_KEY)) {
           await existing.unsubscribe()
           existing = await subscribeBrowser(VAPID_PUBLIC_KEY)
           sessionStorage.removeItem(ENSURED_KEY)
         }
+        if (cancelled) return
         setSubscribed(existing !== null)
         if (existing && !sessionStorage.getItem(ENSURED_KEY)) {
           await createSubscription.mutateAsync([toSubscriptionDto(existing)])
           sessionStorage.setItem(ENSURED_KEY, "1")
         }
-      })
-      .catch(() => {
-        if (!cancelled) setSupport("unsupported")
-      })
+      } catch {
+        // 서버 등록 실패(일시 장애·세션 만료)는 다음 세션에 재시도. 브라우저 상태 판정은 유지
+      }
+    })()
     return () => {
       cancelled = true
     }
@@ -75,22 +86,33 @@ export function usePushSubscription() {
     const subscription = await subscribeBrowser(VAPID_PUBLIC_KEY)
     await createSubscription.mutateAsync([toSubscriptionDto(subscription)])
     sessionStorage.setItem(ENSURED_KEY, "1")
+    setPushOptOut(false)
     setSubscribed(true)
     return true
   }, [createSubscription])
 
   const disable = useCallback(async () => {
+    setPushOptOut(true)
     const subscription = await getBrowserSubscription()
-    if (!subscription) return
-    await deleteSubscription.mutateAsync([{ endpoint: subscription.endpoint }])
-    await subscription.unsubscribe()
-    sessionStorage.removeItem(ENSURED_KEY)
-    setSubscribed(false)
+    if (!subscription) {
+      setSubscribed(false)
+      return
+    }
+    try {
+      await deleteSubscription.mutateAsync([
+        { endpoint: subscription.endpoint }
+      ])
+    } finally {
+      // 서버 해제가 실패해도 브라우저 구독은 푼다 — 서버 row는 다음 발송의 410으로 정리됨
+      await subscription.unsubscribe()
+      sessionStorage.removeItem(ENSURED_KEY)
+      setSubscribed(false)
+    }
   }, [deleteSubscription])
 
   return {
-    /** null = 아직 판정 전(SSR·첫 렌더) */
-    support: configured ? support : "unsupported",
+    /** null = 아직 판정 전(SSR·첫 렌더) 또는 공개키 미설정(푸시 UI 전체 숨김) */
+    support: configured ? support : null,
     subscribed,
     enable,
     disable,

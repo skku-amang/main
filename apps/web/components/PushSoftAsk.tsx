@@ -1,11 +1,14 @@
 "use client"
 
 import { BellRing, X } from "lucide-react"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
+import ROUTES from "@/constants/routes"
 import { usePushSubscription } from "@/hooks/usePushSubscription"
+import { isPushOptedOut } from "@/lib/push"
 
 const SNOOZE_KEY = "push-soft-ask-snoozed-until"
 const SNOOZE_DAYS = 7
@@ -33,16 +36,19 @@ const snooze = () => {
 /**
  * 브라우저 권한 프롬프트를 바로 띄우지 않고 먼저 묻는 배너 (ADR-0003 원칙2).
  * iOS 미설치·인앱 브라우저는 권한 요청 자체가 불가능하므로 안내만 한다.
+ * 직접 끈 기기(opt-out)와 설정 카드가 있는 기기 페이지에서는 띄우지 않는다.
  */
 const PushSoftAsk = () => {
+  const pathname = usePathname()
   const { support, subscribed, enable, isPending } = usePushSubscription()
   const { toast } = useToast()
   const [dismissed, setDismissed] = useState(true)
 
   useEffect(() => {
-    setDismissed(readSnoozed())
+    setDismissed(readSnoozed() || isPushOptedOut())
   }, [])
 
+  if (pathname === ROUTES.PROFILE.DEVICES) return null
   if (dismissed || support === null) return null
   if (support === "unsupported" || support === "denied") return null
   if (support === "granted" && subscribed !== false) return null
