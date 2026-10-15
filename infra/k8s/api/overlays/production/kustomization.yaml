@@ -22,4 +22,4 @@ configMapGenerator:
   - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=production
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261015011011-3e5646d
+  newTag: 20261015011935-b66b518
