@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2, Home, UserRound, Users } from "lucide-react"
+import { Archive, Building2, Home, UserRound, Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -35,6 +35,13 @@ const BottomTabBar = () => {
       href: ROUTES.RESERVATION.CLUBROOM,
       icon: Building2,
       isCurrent: (p) => p.startsWith(ROUTES.RESERVATION.CLUBROOM)
+    },
+    {
+      label: "아카이브",
+      href: ROUTES.PERFORMANCE.LIST,
+      icon: Archive,
+      // 공연 목록·공연 상세 (팀 페이지는 팀 모집 탭)
+      isCurrent: (p) => /^\/performances(\/[^/]+)?$/.test(p)
     },
     {
       label: "내 정보",
