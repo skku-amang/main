@@ -30,7 +30,7 @@ const TeamEditPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center">
+      <div className="-mx-4 flex h-full w-[calc(100%+2rem)] flex-col items-center justify-center md:mx-0 md:w-full">
         <TeamFormBackground />
         <OleoPageHeader
           title="Edit Your Team"
@@ -50,7 +50,7 @@ const TeamEditPage = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="-mx-4 flex h-full w-[calc(100%+2rem)] flex-col items-center justify-center md:mx-0 md:w-full">
       <TeamFormBackground />
 
       <OleoPageHeader

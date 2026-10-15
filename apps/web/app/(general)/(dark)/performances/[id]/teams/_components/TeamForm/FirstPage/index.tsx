@@ -14,6 +14,7 @@ import PosterImageDialog from "@/app/(general)/(dark)/performances/[id]/teams/_c
 import YoutubeDialog from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeDialog"
 import YoutubeInput from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/FirstPage/YoutubeInput"
 import SimpleLabel from "@/components/Form/SimpleLabel"
+import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form } from "@/components/ui/form"
@@ -135,7 +136,26 @@ const FirstPage = ({
                           key={performance.id}
                           value={performance.id.toString()}
                         >
-                          {performance.name}
+                          <span className="flex items-center gap-x-2">
+                            {performance.name}
+                            {isPerformanceRecruiting(performance) ? (
+                              <span
+                                className={badgeVariants({
+                                  variant: "default"
+                                })}
+                              >
+                                모집 중
+                              </span>
+                            ) : (
+                              <span
+                                className={badgeVariants({
+                                  variant: "secondary"
+                                })}
+                              >
+                                마감
+                              </span>
+                            )}
+                          </span>
                         </SelectItem>
                       ))}
                   </SelectContent>
@@ -233,7 +253,7 @@ const FirstPage = ({
           </div>
 
           {/* 디바이더 */}
-          <hr className="my-14" />
+          <hr className="my-8 md:my-14" />
 
           {/* 게시글, 유튜브 링크 */}
           <div>

@@ -31,7 +31,7 @@ function TeamFormSkeleton() {
       </div>
 
       {/* 디바이더 */}
-      <Skeleton className="my-14 h-px w-full" />
+      <Skeleton className="my-8 h-px w-full md:my-14" />
 
       {/* 게시글 작성 */}
       <div className="mb-4 flex items-center justify-between">
