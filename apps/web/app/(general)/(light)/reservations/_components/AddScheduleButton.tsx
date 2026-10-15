@@ -33,7 +33,6 @@ import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import { Equipment } from "@repo/shared-types"
 import type { DateRange } from "react-day-picker"
-import { ApiError } from "@repo/api-client"
 
 // Generate hour/minute options
 const HOURS = Array.from({ length: 24 }, (_, i) =>
@@ -247,12 +246,7 @@ export default function AddScheduleButton({
           toast({
             variant: "destructive",
             title: "예약 실패",
-            description:
-              error instanceof ApiError
-                ? (error.detail ?? error.message)
-                : error instanceof Error
-                  ? error.message
-                  : "예약을 추가하지 못했습니다."
+            description: error.detail ?? error.message
           })
         }
       }
