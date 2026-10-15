@@ -41,7 +41,11 @@ import {
   publicUser,
   publicUserList,
   PresignedUrlRequest,
-  PresignedUrlResponse
+  PresignedUrlResponse,
+  GetNotificationsQuery,
+  NotificationItem,
+  NotificationList,
+  UnreadNotificationCount
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
@@ -1098,6 +1102,61 @@ export default class ApiClient {
       PresignedUrlResponse,
       AuthError | ValidationError | InternalServerError
     >(`/uploads/presigned-url`, "POST", request)
+  }
+
+  /**
+   * 내 알림 목록 (최신순, cursor 페이지네이션)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ValidationError} limit이 1~50 범위를 벗어난 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getNotifications(query?: Partial<GetNotificationsQuery>) {
+    const searchParams = new URLSearchParams()
+    if (query?.cursor) searchParams.append("cursor", String(query.cursor))
+    if (query?.limit) searchParams.append("limit", String(query.limit))
+    const queryString = searchParams.toString()
+
+    return this._request<
+      NotificationList,
+      AuthError | ValidationError | InternalServerError
+    >(`/notifications${queryString ? `?${queryString}` : ""}`, "GET")
+  }
+
+  /**
+   * 내 안 읽은 알림 수
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getUnreadNotificationCount() {
+    return this._request<
+      UnreadNotificationCount,
+      AuthError | InternalServerError
+    >(`/notifications/unread-count`, "GET")
+  }
+
+  /**
+   * 알림 1건 읽음 처리 (멱등)
+   * @throws {NotFoundError} 내 알림이 아니거나 없는 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public markNotificationRead(id: number) {
+    return this._request<
+      NotificationItem,
+      NotFoundError | AuthError | InternalServerError
+    >(`/notifications/${id}/read`, "PATCH")
+  }
+
+  /**
+   * 내 알림 전체 읽음 처리
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public markAllNotificationsRead() {
+    return this._request<{ count: number }, AuthError | InternalServerError>(
+      `/notifications/read-all`,
+      "PATCH"
+    )
   }
 }
 

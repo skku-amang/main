@@ -17,17 +17,11 @@ export type SessionNameValue =
   (typeof SESSION_NAMES)[keyof typeof SESSION_NAMES]
 
 /**
- * SessionName → 한글 표시명 매핑
+ * SessionName → 한글 표시명 매핑. 정의는 @repo/shared-types (알림 문구와 공유)
  */
-export const SESSION_DISPLAY_NAME: Record<SessionNameValue, string> = {
-  [SESSION_NAMES.VOCAL]: "보컬",
-  [SESSION_NAMES.GUITAR]: "기타",
-  [SESSION_NAMES.BASS]: "베이스",
-  [SESSION_NAMES.SYNTH]: "신디",
-  [SESSION_NAMES.DRUM]: "드럼",
-  [SESSION_NAMES.STRINGS]: "현악기",
-  [SESSION_NAMES.WINDS]: "관악기"
-}
+import { SESSION_DISPLAY_NAME } from "@repo/shared-types"
+
+export { SESSION_DISPLAY_NAME }
 
 /**
  * SessionName을 한글 표시명으로 변환

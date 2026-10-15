@@ -35,6 +35,7 @@ const ROUTES = {
     DEVICES: "/profile/devices"
   },
   SUGGESTIONS: "/suggestions",
+  NOTIFICATIONS: "/notifications",
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",
     EQUIPMENT: "/reservations/equipment",
