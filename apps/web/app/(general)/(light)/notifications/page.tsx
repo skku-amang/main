@@ -1,6 +1,5 @@
 "use client"
 
-import { useQueryClient } from "@tanstack/react-query"
 import { CheckCheck } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -10,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import {
-  NOTIFICATIONS_QUERY_KEY,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotifications,
@@ -32,7 +30,6 @@ const NotificationsSkeleton = () => (
 const NotificationsPage = () => {
   const { user, isLoading: userLoading, isAuthenticated } = useCurrentUser()
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   const { data: unread = 0 } = useUnreadNotificationCount({ enabled: !!user })
   const {
@@ -46,12 +43,8 @@ const NotificationsPage = () => {
   const markRead = useMarkNotificationRead()
   const markAllRead = useMarkAllNotificationsRead()
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY })
-
   const openItem = (item: NotificationItem) => {
-    if (item.readAt === null)
-      markRead.mutate([item.id], { onSuccess: invalidate })
+    if (item.readAt === null) markRead.mutate([item.id])
     router.push(formatNotification(item).href)
   }
 
@@ -82,7 +75,7 @@ const NotificationsPage = () => {
           variant="ghost"
           size="sm"
           disabled={unread === 0 || markAllRead.isPending}
-          onClick={() => markAllRead.mutate([], { onSuccess: invalidate })}
+          onClick={() => markAllRead.mutate([])}
         >
           <CheckCheck className="mr-1 size-4" />
           모두 읽음

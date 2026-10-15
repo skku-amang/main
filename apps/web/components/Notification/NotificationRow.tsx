@@ -17,12 +17,13 @@ const NotificationRow = ({ item, className }: NotificationRowProps) => {
   return (
     <div className={cn("flex w-full items-start gap-x-3", className)}>
       <span
-        aria-label={unread ? "안 읽음" : undefined}
+        aria-hidden
         className={cn(
           "mt-1.5 size-2 shrink-0 rounded-full",
           unread ? "bg-primary" : "bg-transparent"
         )}
       />
+      {unread && <span className="sr-only">안 읽음</span>}
       <div className="min-w-0 flex-1">
         <div
           className={cn(
