@@ -44,7 +44,12 @@ spec:
         outputs:
           - name: id
             fromExpression: response.body.deployments[0].uid
+          - name: url
+            fromExpression: response.body.deployments[0].url
+          - name: inspectorUrl
+            fromExpression: response.body.deployments[0].inspectorUrl
     - uses: http
+      as: alias-staging
       if: ${{ ctx.stage == 'staging' }}
       config:
         method: POST
@@ -61,6 +66,7 @@ spec:
         successExpression: response.status == 200
     # 409 = 이미 현재 production 배포 (같은 Freight 재승격)
     - uses: http
+      as: promote-production
       if: ${{ ctx.stage == 'production' }}
       config:
         method: POST
@@ -72,3 +78,16 @@ spec:
           - name: teamId
             value: ${{ vars.vercelTeam }}
         successExpression: response.status == 201 || response.status == 409
+    # 지금 이 stage에 연결된 web 배포를 Stage status에 기록 (kargo get stage / kubectl로 확인)
+    - uses: set-metadata
+      as: record-web-deployment
+      config:
+        updates:
+          - kind: Stage
+            name: ${{ ctx.stage }}
+            values:
+              web:
+                commit: ${{ commitFrom(vars.gitRepo).ID }}
+                deploymentId: ${{ task.outputs.find.id }}
+                url: https://${{ task.outputs.find.url }}
+                inspector: ${{ task.outputs.find.inspectorUrl }}

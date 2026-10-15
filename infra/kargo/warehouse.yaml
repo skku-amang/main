@@ -1,10 +1,9 @@
 # main의 커밋 하나 = Freight 하나. 그 커밋에서 빌드된 API 이미지와 짝이 맞을 때만 만든다.
 # 같은 커밋의 web(Vercel) 빌드는 promote-web이 커밋 SHA로 찾는다.
-# (이름이 api인 건 web 통합 전부터 쓰던 것. 바꾸면 Freight 이력이 끊김)
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse
 metadata:
-  name: api
+  name: main
   namespace: amang
 spec:
   interval: 5m0s

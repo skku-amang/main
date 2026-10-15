@@ -72,6 +72,7 @@ main 머지 (커밋 C)
 - Freight = main 커밋 하나. CI가 실패해 이미지가 없는 커밋은 Freight가 안 생겨 배포되지 않는다
 - web은 승격 때 새로 빌드하지 않는다. 이미 만들어진 Vercel 빌드를 도메인에 연결만 한다 (수 초)
 - 순서는 API → web. API 변경은 옛 web과도 호환되게 짤 것
+- 지금 stage에 연결된 web 배포(커밋, Vercel URL, 대시보드 링크)는 Stage status에 기록된다: `kubectl -n amang get stage <stage> -o jsonpath='{.status.metadata.web}'`
 - ArgoCD api 앱은 `main`이 아니라 **`env/<stage>` 브랜치의 `infra/k8s/api/overlays/<stage>`**를 바라본다. 디렉토리 구조는 main과 같고, 그 stage overlay에 이미지 태그만 고정돼 있다. 실제 배포 상태 = 해당 브랜치 내용
 - `env/*` 브랜치는 Kargo만 쓴다. GitHub ruleset `env branches (Kargo only)`로 GitHub App `amang-kargo` 외 생성·push·삭제 금지 (레포 설정에서 수동 생성, Terraform 밖)
 - overlay 설정 변경도 Freight에 포함되므로 production에는 승격을 거쳐야 반영된다
