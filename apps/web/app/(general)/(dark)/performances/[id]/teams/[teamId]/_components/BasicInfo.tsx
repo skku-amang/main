@@ -1,3 +1,5 @@
+import dayjs from "dayjs"
+
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
@@ -39,7 +41,12 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           {team.leader.name}
         </div>
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
-          {getRepresentativeRelativeTime(team.createdAt)}
+          <time
+            dateTime={new Date(team.createdAt).toISOString()}
+            title={getRepresentativeRelativeTime(team.createdAt)}
+          >
+            {dayjs(team.createdAt).format("YY.MM.DD HH:mm")} 생성
+          </time>
         </div>
         {canEdit && (
           <DeleteEditButton

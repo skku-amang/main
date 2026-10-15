@@ -172,7 +172,7 @@ export class TeamService {
 
     const existingTeam = await this.prisma.team.findUnique({
       where: { id },
-      include: { teamSessions: true }
+      include: { teamSessions: { include: { members: true } } }
     })
     if (!existingTeam)
       throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
@@ -237,17 +237,30 @@ export class TeamService {
       }
 
       if (existingSession) {
+        // 같은 자리(index)에 그대로 있는 팀원은 지우지 않아야 참여 시각(createdAt)이 유지됨
+        const isKept = (m: { userId: number; index: number }) =>
+          existingSession.members.some(
+            (e) => e.userId === m.userId && e.index === m.index
+          )
         prismaOperaions.push(
           this.prisma.teamSession.update({
             where: { id: existingSession.id },
             data: {
               capacity: newSession.capacity,
               members: {
-                deleteMany: {},
-                create: newSession.members.map((m) => ({
-                  userId: m.userId,
-                  index: m.index
-                }))
+                deleteMany: {
+                  NOT: {
+                    OR: newSession.members
+                      .filter(isKept)
+                      .map((m) => ({ userId: m.userId, index: m.index }))
+                  }
+                },
+                create: newSession.members
+                  .filter((m) => !isKept(m))
+                  .map((m) => ({
+                    userId: m.userId,
+                    index: m.index
+                  }))
               }
             }
           })

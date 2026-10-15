@@ -146,6 +146,7 @@ const TeamDetailClient = () => {
                     sessionName={ts.session.name}
                     sessionIndex={member.index}
                     user={member.user}
+                    joinedAt={member.createdAt}
                     onUnapplySuccess={() => {}}
                   />
                 ))
