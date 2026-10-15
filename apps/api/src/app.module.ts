@@ -4,6 +4,7 @@ import { SentryModule } from "@sentry/nestjs/setup"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { ConfigModule } from "@nestjs/config"
+import { EventEmitterModule } from "@nestjs/event-emitter"
 import { LoggerModule } from "nestjs-pino"
 import { pinoLoggerModuleOption } from "./common/logger/pino-logger.config"
 import { validateEnv } from "./common/config/env.schema"
@@ -28,6 +29,7 @@ import { HealthModule } from "./health/health.module"
       cache: true,
       validate: validateEnv
     }),
+    EventEmitterModule.forRoot(),
     LoggerModule.forRoot(pinoLoggerModuleOption),
     PrismaModule,
     HealthModule,
