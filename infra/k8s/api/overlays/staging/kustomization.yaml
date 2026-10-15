@@ -20,4 +20,4 @@ configMapGenerator:
   - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261015065159-9f470db
+  newTag: 20261015065804-a7925b3
