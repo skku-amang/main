@@ -1,2 +1,4 @@
 node_modules
 npm-debug.log
+# 로컬 개발값(.env.local 등)이 이미지 빌드에 섞이지 않게
+**/.env*.local
