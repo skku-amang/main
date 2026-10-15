@@ -164,7 +164,7 @@ export default function EquipmentCalendarPage() {
             </TabsContent>
             <TabsContent value="month" className="relative">
               <MonthCalendarField
-                currentMonday={currentMonday}
+                calendarViewMonth={calendarViewMonth}
                 rentals={rentalList}
                 onRentalClick={setSelectedRental}
               />
@@ -190,7 +190,7 @@ export default function EquipmentCalendarPage() {
       {/* Mobile layout */}
       <div className="relative mx-auto max-w-[400px] md:hidden">
         <MobileCalendarField
-          currentMonday={currentMonday}
+          calendarViewMonth={calendarViewMonth}
           rentals={rentalList}
           onDateSelect={setSelectedDate}
           selectedDate={selectedDate}

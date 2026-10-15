@@ -3,20 +3,20 @@ import { RentalDetail } from "@repo/shared-types"
 import MonthBlock from "./MonthBlock"
 
 interface MonthCalendarFieldProps {
-  currentMonday: Dayjs
+  calendarViewMonth: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
 }
 
 export default function MonthCalendarField({
-  currentMonday,
+  calendarViewMonth,
   rentals,
   onRentalClick
 }: MonthCalendarFieldProps) {
   const WeekLabelList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
   // 1) 이 달의 첫째 날
-  const currentMonth = currentMonday.startOf("month")
+  const currentMonth = calendarViewMonth.startOf("month")
 
   // 2) 월간 그리드의 시작/끝 (일~토 기준)
   const gridStart = currentMonth.startOf("week")

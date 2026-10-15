@@ -3,14 +3,14 @@ import { RentalDetail } from "@repo/shared-types"
 import MobileMonthBlock from "./MobileMonthBlock"
 
 interface MobileCalendarFieldProps {
-  currentMonday: Dayjs
+  calendarViewMonth: Dayjs
   rentals: RentalDetail[]
   onDateSelect?: (date: Dayjs) => void
   selectedDate?: Dayjs | null
 }
 
 export default function MobileCalendarField({
-  currentMonday,
+  calendarViewMonth,
   rentals,
   onDateSelect,
   selectedDate
@@ -18,7 +18,7 @@ export default function MobileCalendarField({
   const DayLabel = ["S", "M", "T", "W", "T", "F", "S"]
 
   // 1) 이 달의 첫째 날
-  const currentMonth = currentMonday.startOf("month")
+  const currentMonth = calendarViewMonth.startOf("month")
 
   // 2) 월간 그리드의 시작/끝 (일~토 기준)
   const gridStart = currentMonth.startOf("week")
