@@ -62,10 +62,7 @@ const Footer = ({
 }) => {
   return (
     <footer
-      className={cn(
-        className,
-        "hidden w-[1440px] md:block min-[1440px]:w-full"
-      )}
+      className={cn(className, "hidden w-full md:block")}
       style={{
         height,
         transform: "translateY(-100%)"

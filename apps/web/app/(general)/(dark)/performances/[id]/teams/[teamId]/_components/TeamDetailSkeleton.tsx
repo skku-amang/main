@@ -7,7 +7,7 @@ interface TeamDetailSkeletonProps {
 }
 
 const BasicInfoSkeleton = () => (
-  <div className="relative h-fit w-full rounded-2xl bg-white px-10 py-14 shadow-md md:w-[466px] md:px-[40px] md:py-[60px]">
+  <div className="relative h-fit w-full rounded-2xl bg-white px-10 py-14 shadow-md md:px-[40px] xl:w-[466px] md:py-[60px]">
     {/* 뱃지 */}
     <Skeleton className="mb-[10px] h-[20px] w-[72px] md:mb-[16px] md:h-[32px] md:w-[130px]" />
 
@@ -73,10 +73,10 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
 
       {/* YouTube 영역 */}
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
-        <Skeleton className="mx-10 aspect-video h-auto w-full rounded-lg md:h-[673px] md:w-[1152px]" />
+        <Skeleton className="mx-10 aspect-video h-auto w-full rounded-lg md:mx-0 md:w-full md:max-w-[1152px]" />
       </div>
 
-      <div className="flex w-full gap-[24px] max-md:flex-col max-md:items-center md:flex md:w-[1152px]">
+      <div className="flex w-full gap-[24px] max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px]">
         {/* 왼쪽: BasicInfo + 포스터 */}
         <div className="flex w-full flex-col gap-y-[24px]">
           <BasicInfoSkeleton />
@@ -85,7 +85,7 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
         </div>
 
         {/* 오른쪽: 세션 카드들 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
+        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
           {/* 세션구성 */}
           <SessionSetCardSkeleton header="세션구성">
             <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">

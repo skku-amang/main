@@ -30,7 +30,7 @@ const OleoPageHeader = ({
       <Link
         href={goBackHref}
         className={cn(
-          "hidden items-center gap-x-6 px-[27px] py-2 font-semibold text-white md:flex",
+          "hidden shrink-0 items-center gap-x-6 whitespace-nowrap px-[27px] py-2 font-semibold text-white md:flex",
           {
             width: backButtonWidth
           }
@@ -40,7 +40,7 @@ const OleoPageHeader = ({
         뒤로가기
       </Link>
 
-      <div className="flex gap-x-3 text-[40px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:gap-x-5 md:text-[100px]">
+      <div className="flex gap-x-3 whitespace-nowrap text-[40px] font-bold drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] md:gap-x-4 md:text-[56px] lg:text-[80px] xl:gap-x-5 xl:text-[100px]">
         {words.map((word, i) => {
           const firstLetter = word.charAt(0)
           const rest = word.slice(1)
