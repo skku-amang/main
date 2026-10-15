@@ -124,7 +124,9 @@ export function TeamListDataTable<TValue>({
     return [{ id, desc: dir === "desc" }]
   }, [sortQuery])
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
+    searchQuery ? [{ id: "songName", value: searchQuery }] : []
+  )
 
   const [filterOpen, setFilterOpen] = useState(false)
   const [sessionFilterArr, setSessionFilterArr] = useQueryState(
@@ -235,8 +237,7 @@ export function TeamListDataTable<TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     initialState: {
       columnVisibility: { createdAt: false },
-      pagination: { pageIndex: Math.max(0, pageQuery - 1) },
-      columnFilters: searchQuery ? [{ id: "songName", value: searchQuery }] : []
+      pagination: { pageIndex: Math.max(0, pageQuery - 1) }
     },
     state: {
       sorting,
@@ -245,6 +246,16 @@ export function TeamListDataTable<TValue>({
   })
 
   const missingMemberSessions = getSessionsWithMissingMembers
+
+  const satisfiedTeamCount = useMemo(
+    () => data.filter((team) => isTeamSatisfied(team.teamSessions)).length,
+    [data]
+  )
+  const teamCountSummary = (
+    <p className="text-sm text-neutral-500">
+      전체 {data.length}팀 · 마감 {satisfiedTeamCount}팀
+    </p>
+  )
 
   const sortOptions = [
     { value: "songName-asc", display: "곡명 오름차순" },
@@ -263,7 +274,7 @@ export function TeamListDataTable<TValue>({
         <div className="flex items-center justify-between py-[25px]">
           {/* 검색 */}
           <Search
-            placeholder="검색"
+            placeholder="곡명, 이름 검색"
             value={searchQuery}
             onChange={(event) => {
               const value = event.target.value
@@ -333,6 +344,8 @@ export function TeamListDataTable<TValue>({
             </Popover>
           </div>
         </div>
+
+        <div className="pb-3">{teamCountSummary}</div>
 
         {/* 테이블 */}
         <Table>
@@ -414,7 +427,7 @@ export function TeamListDataTable<TValue>({
           <div className="flex items-center gap-x-3">
             {/* 검색 */}
             <Search
-              placeholder="검색"
+              placeholder="곡명, 이름 검색"
               value={searchQuery}
               onChange={(event) => {
                 const value = event.target.value
@@ -438,7 +451,7 @@ export function TeamListDataTable<TValue>({
                   />
                 </TeamHeaderButton>
               </DrawerTrigger>
-              <DrawerContent className="px-0 pb-40">
+              <DrawerContent className="px-0 pb-[env(safe-area-inset-bottom)]">
                 <DrawerHeader className="flex shrink-0 items-center justify-between px-7 py-0">
                   <DrawerTitle className="mb-3 mt-5 flex h-5 items-baseline gap-x-[15px] ">
                     <div className="h-full text-left text-[14px] font-semibold">
@@ -538,6 +551,8 @@ export function TeamListDataTable<TValue>({
         </div>
 
         <Separator orientation="horizontal" className="my-3" />
+
+        <div className="mb-3">{teamCountSummary}</div>
 
         {/* 카드 목록 */}
         <div className="space-y-3">
