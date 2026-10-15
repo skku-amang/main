@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
 import { PrismaService } from "../prisma/prisma.service"
@@ -11,18 +12,27 @@ import {
   recruitingPerformanceWhere
 } from "@repo/shared-types"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
+import {
+  PERFORMANCE_EVENTS,
+  PerformanceCreatedEvent
+} from "./performance.events"
 
 @Injectable()
 export class PerformanceService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly objectStorageService: ObjectStorageService
+    private readonly objectStorageService: ObjectStorageService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async create(createPerformanceDto: CreatePerformanceDto) {
+  async create(createPerformanceDto: CreatePerformanceDto, actorId: number) {
     const performance = await this.prisma.performance.create({
       data: createPerformanceDto
     })
+    this.eventEmitter.emit(
+      PERFORMANCE_EVENTS.CREATED,
+      new PerformanceCreatedEvent(performance.id, actorId)
+    )
 
     return this.findOne(performance.id)
   }

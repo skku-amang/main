@@ -8,8 +8,11 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
-  Query
+  Query,
+  Req
 } from "@nestjs/common"
+import { JwtPayload } from "@repo/shared-types"
+import { Request } from "express"
 import { PerformanceService } from "./performance.service"
 import { CreatePerformanceDto } from "./dto/create-performance.dto"
 import { UpdatePerformanceDto } from "./dto/update-performance.dto"
@@ -25,8 +28,12 @@ export class PerformanceController {
 
   @Post()
   @UseGuards(AdminGuard)
-  create(@Body() createPerformanceDto: CreatePerformanceDto) {
-    return this.performanceService.create(createPerformanceDto)
+  create(
+    @Body() createPerformanceDto: CreatePerformanceDto,
+    @Req() req: Request
+  ) {
+    const user = req.user as JwtPayload
+    return this.performanceService.create(createPerformanceDto, user.sub)
   }
 
   @Get()

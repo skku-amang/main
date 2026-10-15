@@ -27,8 +27,9 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post()
-  create(@Body() createTeamDto: CreateTeamDto) {
-    return this.teamService.create(createTeamDto)
+  create(@Body() createTeamDto: CreateTeamDto, @Req() req: Request) {
+    const user = req.user as JwtPayload
+    return this.teamService.create(createTeamDto, user.sub)
   }
 
   @Get()
@@ -47,9 +48,11 @@ export class TeamController {
   @UseGuards(TeamOwnerGuard)
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateTeamDto: UpdateTeamDto
+    @Body() updateTeamDto: UpdateTeamDto,
+    @Req() req: Request
   ) {
-    return this.teamService.update(id, updateTeamDto)
+    const user = req.user as JwtPayload
+    return this.teamService.update(id, updateTeamDto, user.sub)
   }
 
   @Delete(":id")
