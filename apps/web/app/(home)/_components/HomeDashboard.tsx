@@ -49,7 +49,7 @@ const Section = ({
       {moreHref && (
         <Link
           href={moreHref}
-          className="flex items-center text-sm text-slate-400 hover:text-primary"
+          className="flex items-center text-sm text-slate-500 hover:text-primary"
         >
           전체 보기
           <ChevronRight className="size-4" />
@@ -61,7 +61,7 @@ const Section = ({
 )
 
 const EmptyCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-400 shadow-sm">
+  <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-500 shadow-sm">
     {children}
   </div>
 )
@@ -138,6 +138,10 @@ const MyTeams = ({ userId }: { userId: number }) => {
     <Section title="내 팀" moreHref={ROUTES.PROFILE.TEAMS}>
       {status === "pending" ? (
         <Skeleton className="h-16 rounded-xl" />
+      ) : status === "error" ? (
+        <EmptyCard>
+          팀 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+        </EmptyCard>
       ) : myTeams.length === 0 ? (
         <EmptyCard>참여 중인 팀이 없어요.</EmptyCard>
       ) : (
@@ -153,7 +157,7 @@ const MyTeams = ({ userId }: { userId: number }) => {
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{team.songName}</p>
-                  <p className="truncate text-sm text-slate-400">
+                  <p className="truncate text-sm text-slate-500">
                     {team.songArtist}
                   </p>
                 </div>
@@ -194,6 +198,10 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
     <Section title="다가오는 내 예약">
       {status === "pending" ? (
         <Skeleton className="h-16 rounded-xl" />
+      ) : status === "error" ? (
+        <EmptyCard>
+          예약을 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+        </EmptyCard>
       ) : myRentals.length === 0 ? (
         <EmptyCard>앞으로 {UPCOMING_DAYS}일 동안 예약이 없어요.</EmptyCard>
       ) : (
@@ -201,6 +209,11 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
           {myRentals.map((rental) => {
             const isRoom = rental.equipment.category === "ROOM"
             const start = dayjs(rental.startAt).locale("ko")
+            const end = dayjs(rental.endAt).locale("ko")
+            // 하루를 넘기는 예약은 끝나는 날짜도 표시
+            const endLabel = end.isSame(start, "day")
+              ? end.format("HH:mm")
+              : end.format("M/D (ddd) HH:mm")
             return (
               <li key={rental.id}>
                 <Link
@@ -214,12 +227,11 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
                   <CalendarClock className="size-5 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{rental.title}</p>
-                    <p className="truncate text-sm text-slate-400">
+                    <p className="text-sm text-slate-500">
                       {isRoom
                         ? "동방"
                         : `${rental.equipment.brand} ${rental.equipment.model}`}{" "}
-                      · {start.format("M/D (ddd) HH:mm")}~
-                      {dayjs(rental.endAt).format("HH:mm")}
+                      · {start.format("M/D (ddd) HH:mm")}~{endLabel}
                     </p>
                   </div>
                   <ChevronRight className="size-4 text-slate-300" />
@@ -241,7 +253,7 @@ const SuggestionBanner = () => (
     <MessageSquareText className="size-7 shrink-0 text-primary" />
     <div className="min-w-0 flex-1">
       <p className="font-semibold">불편한 점이나 바라는 점이 있나요?</p>
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-600">
         개발자에게 바로 의견을 보내주세요.
       </p>
     </div>

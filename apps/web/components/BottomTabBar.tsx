@@ -62,7 +62,7 @@ const BottomTabBar = () => {
                 aria-current={current ? "page" : undefined}
                 className={cn(
                   "flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors",
-                  current ? "text-primary" : "text-slate-400"
+                  current ? "text-primary" : "text-slate-500"
                 )}
               >
                 <Icon className="size-5" strokeWidth={current ? 2.4 : 2} />
