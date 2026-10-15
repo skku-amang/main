@@ -71,17 +71,17 @@ model PushSubscription {
 
 | type | emit 지점 (코드) | 수신자 | payload 스냅샷 |
 |---|---|---|---|
-| `TEAM_MEMBER_CHANGE` | apply([team.service.ts:375](../../../apps/api/src/team/team.service.ts#L375), 추가) · unapply([:449](../../../apps/api/src/team/team.service.ts#L449), 제거) · update 로스터([:227](../../../apps/api/src/team/team.service.ts#L227)) | 해당 팀 멤버 전원 (− actor) | `{ teamId, performanceId, teamName, changeType: ADDED/REMOVED, memberName, sessionNames: [] }` |
-| `TEAM_ATTRIBUTE_CHANGE` | update([team.service.ts:155](../../../apps/api/src/team/team.service.ts#L155)) | 해당 팀 멤버 전원 (− actor) | `{ teamId, performanceId, teamName, changedFields: [] }` |
-| `TEAM_CREATED` | create([team.service.ts:102](../../../apps/api/src/team/team.service.ts#L102)) | 해당 공연 소속 전체 유저 (− actor) | `{ performanceId, performanceName, teamId, teamName }` |
-| `PERFORMANCE_CREATED` | create([performance.service.ts:21](../../../apps/api/src/performance/performance.service.ts#L21)) | 전체 승인 유저 (`isApproved = true`) | `{ performanceId, performanceName }` |
+| `TEAM_MEMBER_CHANGE` | apply([team.service.ts:396](../../../apps/api/src/team/team.service.ts#L396), 추가) · unapply([:470](../../../apps/api/src/team/team.service.ts#L470), 제거) · update 로스터([:245](../../../apps/api/src/team/team.service.ts#L245)) | 해당 팀 멤버 전원 (− actor) | `{ teamId, performanceId, teamName, changeType: ADDED/REMOVED, memberName, sessionNames: [] }` |
+| `TEAM_ATTRIBUTE_CHANGE` | update([team.service.ts:162](../../../apps/api/src/team/team.service.ts#L162)) | 해당 팀 멤버 전원 (− actor) | `{ teamId, performanceId, teamName, changedFields: [] }` (`performanceId` 변경 포함, §6) |
+| `TEAM_CREATED` | create([team.service.ts:109](../../../apps/api/src/team/team.service.ts#L109)) | 해당 공연 소속 전체 유저 (− actor) | `{ performanceId, performanceName, teamId, teamName }` |
+| `PERFORMANCE_CREATED` | create([performance.service.ts:23](../../../apps/api/src/performance/performance.service.ts#L23)) | 전체 승인 유저 (`isApproved = true`) | `{ performanceId, performanceName }` |
 
 > 피드백 시스템 이벤트는 요구사항 확정 후 추가(#347).
 
 **수신자 해석 로직**:
 
 - **팀 멤버 전원**: 팀의 `teamSessions → members`의 `userId` ∪ `{ team.leaderId }`, distinct.
-- **공연 소속 전체 유저**: 해당 공연의 모든 팀에 속한 멤버·리더 userId, distinct. ⚠️ "공연 소속"의 정확한 정의는 #347 작성자 확인 필요(기존 팀 멤버 한정 vs 참여 의사 유저 포함).
+- **공연 소속 전체 유저**: 해당 공연의 모든 팀에 속한 멤버·리더 userId, distinct. 스키마에 "공연 참여" 엔티티가 따로 없고 팀 멤버십이 유일한 소속 데이터라 이 정의로 확정(2026-10-15). 아직 팀에 들지 않은 유저는 수신 대상이 아니며, 새 팀은 팀 목록 페이지에서 확인한다.
 - **전체 승인 유저**: `User where isApproved = true`.
 
 ## 3. 발송 파이프라인
@@ -123,6 +123,7 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 
 - **actor 제외**: 자기 행동의 결과는 자기에게 알리지 않는다. (예: 멤버가 self-apply([team.controller.ts](../../../apps/api/src/team/team.controller.ts)로 본인 지원)하면 그 멤버는 수신자에서 빠지고, 기존 팀원들이 "새 멤버 합류"를 받는다.)
 - **다중 세션 배칭**: `apply`의 `applyTeamDto`는 배열(한 번에 여러 세션 지원). `TEAM_MEMBER_CHANGE` **1건**으로 묶고 `sessionNames`에 나열 — 세션당 1건은 스팸.
+- **팀 공연 이동**: `update`로 팀의 `performanceId`가 바뀔 수 있다([#666](https://github.com/skku-amang/main/pull/666)). 이때도 `TEAM_ATTRIBUTE_CHANGE` 1건으로 처리 — `changedFields`에 `performanceId` 포함, payload의 `performanceId`는 변경 후 값. 옮겨간 공연 쪽 유저에게 `TEAM_CREATED`를 따로 쏘지 않는다(드문 운영 동작, 이벤트 분기 비용 대비 효용 낮음).
 - **읽음 UX**: 알림함 항목 클릭 시 개별 읽음 + 딥링크 이동, "모두 읽음" 버튼 별도. 드롭다운 여는 것만으로 자동 읽음 처리하지 않는다(지나쳐도 안 놓치게).
 - **전달**: 인앱 알림함은 조회 시 fetch(+`refetchOnWindowFocus`). 모바일 도달은 Web Push(ADR-0003). 별도 실시간 소켓 없음.
 
@@ -135,6 +136,7 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 | 피드백 시스템 이벤트 | 요구사항 확정 후(#347) |
 | 발송 큐 | #546 미도입(과투자) |
 | 오프라인 캐싱 / full PWA | #547 미도입(ADR-0003 원칙5) |
+| 이벤트별 푸시 수신 토글 | #347 요구사항이나 v0.1 미도입 — 4종 모두 전원 관련이라 유형별 끄기 효용 낮음. 구독 해제 = 전체 opt-out. 후속 [#708](https://github.com/skku-amang/main/issues/708) |
 
 ## 8. 핵심 결정 이력
 
@@ -147,9 +149,13 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 | 수신자(멤버 변경) | 팀원 전원 − actor | #347 broadcast 모델 + 자기 행동 자기 제외 |
 | 그래뉴러리티 | 다중 세션 = 1건 | apply DTO가 배열, 스팸 방지 |
 | 구독 dedup | `endpoint @unique`, 410 삭제 | 기기별 고유, 죽은 구독 정리(#546) |
+| 수신자(팀 생성) | 해당 공연 팀 멤버·리더 | 스키마에 공연 참여 데이터는 팀 멤버십뿐. 미소속 유저는 팀 목록에서 확인 |
+| 팀 공연 이동 | `TEAM_ATTRIBUTE_CHANGE` 1건 | #666로 가능해진 드문 운영 동작, 별도 이벤트 분기 안 함 |
+| 푸시 유형별 토글 | v0.1 비범위 → #708 | 4종 전원 관련, 구독 해제가 전체 opt-out 역할 |
 
 ---
 
 ## 변경 이력
 
+- **2026-10-15**: 최신 main 기준으로 코드 앵커 6곳 재지정(#663·#666 반영). 미결이던 "공연 소속" 정의를 해당 공연 팀 멤버·리더로 확정. 팀 공연 이동(#666) 처리 방식, 푸시 유형별 토글 비범위(#708) 추가.
 - **2026-07-21**: #347/ADR-0003/#546/#547 정합으로 전면 재작성. 초안의 팀장-단독 수신·단일 이벤트·이메일 로드맵 폐기(상위 SSOT와 충돌). #347 이벤트 4종·팀원전원 수신·Web Push 채널·PushSubscription 반영.
