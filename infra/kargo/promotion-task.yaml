@@ -30,6 +30,12 @@ spec:
       config:
         inPath: ./src/infra/k8s/api
         outPath: ./out/infra/k8s/api
+    # Vercel은 ignore_command보다 Root Directory(apps/web) 존재 확인을 먼저 해서, 이게 없으면 env 브랜치 push마다
+    # 빌드가 ERROR로 끝난다. apps/web/vercel.json으로 이 브랜치의 Vercel 배포 자체를 끈다
+    - uses: copy
+      config:
+        inPath: ./src/infra/kargo/env-branch/apps
+        outPath: ./out/apps
     - uses: kustomize-set-image
       as: update-image
       config:
