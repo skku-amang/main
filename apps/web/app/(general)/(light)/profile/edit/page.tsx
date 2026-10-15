@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, Camera, KeyRound, Loader2, Save } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { UpdatePasswordSchema, UpdateProfileSchema } from "@repo/shared-types"
@@ -14,6 +15,7 @@ import DefaultPageHeader, {
 import { useToast } from "@/components/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -28,15 +30,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
 
+import { getSessionDisplayName } from "@/constants/session"
 import { ME_QUERY_KEY } from "@/hooks/api/useAuth"
+import { useSessions } from "@/hooks/api/useSession"
 import { useUpdatePassword, useUpdateProfile } from "@/hooks/api/useUser"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useImageUpload } from "@/hooks/useImageUpload"
+
+import AvatarCropDialog from "./_components/AvatarCropDialog"
 
 const ProfileFormSchema = UpdateProfileSchema.pick({
   name: true,
   nickname: true,
   bio: true,
+  sessions: true,
   image: true
 })
 
@@ -66,6 +73,8 @@ const ProfileEditPage = () => {
   const queryClient = useQueryClient()
   const updateProfileMutation = useUpdateProfile()
   const updatePasswordMutation = useUpdatePassword()
+  const { data: sessions } = useSessions()
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
   const imageUpload = useImageUpload({
     onSuccess: (publicUrl) => {
       profileForm.setValue("image", publicUrl)
@@ -78,6 +87,7 @@ const ProfileEditPage = () => {
       name: user?.name ?? "",
       nickname: user?.nickname ?? "",
       bio: user?.bio ?? "",
+      sessions: user?.sessions.map((s) => s.id) ?? [],
       image: user?.image ?? undefined
     }
   })
@@ -195,7 +205,20 @@ const ProfileEditPage = () => {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               className="hidden"
-              onChange={imageUpload.selectAndUpload}
+              onChange={(e) => {
+                const selected = e.target.files?.[0]
+                if (selected) setCropSrc(URL.createObjectURL(selected))
+                e.target.value = ""
+              }}
+            />
+            <AvatarCropDialog
+              key={cropSrc}
+              src={cropSrc}
+              onCancel={() => setCropSrc(null)}
+              onConfirm={(cropped) => {
+                setCropSrc(null)
+                imageUpload.validateAndUpload(cropped)
+              }}
             />
             <div className="text-sm text-slate-500">
               {imageUpload.isUploading
@@ -255,6 +278,42 @@ const ProfileEditPage = () => {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={profileForm.control}
+                name="sessions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>세션</FormLabel>
+                    <FormDescription>
+                      맡을 수 있는 악기를 모두 골라주세요.
+                    </FormDescription>
+                    <div className="grid grid-cols-3 gap-3 pt-1">
+                      {sessions?.map((session) => (
+                        <label
+                          key={session.id}
+                          className="flex items-center gap-x-2 text-sm"
+                        >
+                          <Checkbox
+                            checked={field.value?.includes(session.id)}
+                            onCheckedChange={(checked) =>
+                              field.onChange(
+                                checked
+                                  ? [...(field.value ?? []), session.id]
+                                  : field.value?.filter(
+                                      (id) => id !== session.id
+                                    )
+                              )
+                            }
+                          />
+                          {getSessionDisplayName(session.name)}
+                        </label>
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

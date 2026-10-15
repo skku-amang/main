@@ -90,7 +90,7 @@ export default function ClubroomReservationPage() {
   const equipmentList = equipments ?? []
 
   return (
-    <div className="bg-neutral-50 -mx-6 px-6 md:-mx-0 md:px-0">
+    <div className="bg-neutral-50 -mx-4 px-4 md:-mx-0 md:px-0">
       <DefaultPageHeader
         title="동아리방 예약"
         routes={[
