@@ -17,3 +17,28 @@ spec:
     - stageSelector:
         name: staging
       autoPromotionEnabled: true
+  # UI의 Stage·Freight "Links" 드롭다운. url은 Go 템플릿(sprig), if는 expr 식이며 .stage / .freight 객체를 쓴다.
+  # web 정보는 promote-web의 record-web-deployment가 Stage status.metadata.web에 남긴 값
+  stageLinks:
+    - title: 웹 사이트
+      description: 이 환경의 실제 웹 주소
+      url: '{{ if eq .stage.metadata.name "production" }}https://amang.json-server.win{{ else }}https://amang.staging.json-server.win{{ end }}'
+    - title: 웹 배포 (Vercel 빌드)
+      description: 이 Stage에 지금 연결된 Vercel 배포를 직접 연다
+      if: stage.status?.metadata?.web != nil
+      url: "{{ .stage.status.metadata.web.url }}"
+    - title: Vercel 배포 상세
+      description: 빌드 로그·배포 정보 (Vercel 대시보드)
+      if: stage.status?.metadata?.web != nil
+      url: "{{ .stage.status.metadata.web.inspector }}"
+    - title: GitHub 커밋
+      description: 이 Stage에 배포된 커밋
+      if: stage.status?.metadata?.web != nil
+      url: "https://github.com/skku-amang/main/commit/{{ .stage.status.metadata.web.commit }}"
+    - title: API health
+      url: '{{ if eq .stage.metadata.name "production" }}https://api.amang.json-server.win/health{{ else }}https://api.amang.staging.json-server.win/health{{ end }}'
+  freightLinks:
+    - title: GitHub 커밋
+      description: 이 Freight의 커밋 (API 이미지·web 빌드 모두 이 커밋에서 나옴)
+      if: len(freight.commits ?? []) > 0
+      url: "https://github.com/skku-amang/main/commit/{{ (index .freight.commits 0).id }}"
