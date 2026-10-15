@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function TeamFormSkeleton() {
   return (
-    <div className="w-full bg-white px-4 py-6 md:p-20">
+    <div className="w-full bg-white px-7 py-10 md:p-20">
       {/* 섹션 헤더 */}
       <Skeleton className="mb-2 h-7 w-40" />
       <Skeleton className="mb-6 h-4 w-64" />

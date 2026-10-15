@@ -36,7 +36,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
   const isClosed = performance !== null && !isPerformanceRecruiting(performance)
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="-mx-4 flex h-full w-[calc(100%+2rem)] flex-col items-center justify-center md:mx-0 md:w-full">
       <TeamFormBackground />
 
       <OleoPageHeader
@@ -60,7 +60,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
       ) : (
         <TeamForm
           defaultPerformanceId={Number(performanceId)}
-          className="w-full bg-white px-4 py-6 md:p-20"
+          className="w-full bg-white px-7 py-10 md:p-20"
         />
       )}
     </div>
