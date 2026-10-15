@@ -1,12 +1,10 @@
 import z from "zod"
+import { safeString, safeOptionalString } from "../constants/sanitization"
 
 export const UpdateProfileSchema = z.object({
-  name: z.string().min(1, { message: "이름을 입력해 주세요." }),
-  nickname: z.string().min(1, { message: "닉네임을 입력해 주세요." }),
-  bio: z
-    .string()
-    .max(100, { message: "자기소개는 100자 이내로 작성해 주세요." })
-    .optional(),
+  name: safeString({ max: 50, message: "이름을 입력해 주세요." }),
+  nickname: safeString({ max: 30, message: "닉네임을 입력해 주세요." }),
+  bio: safeOptionalString({ max: 100 }),
   sessions: z
     .array(z.number().int({ message: "세션 ID는 정수여야 합니다." }))
     .min(1, { message: "최소 하나의 세션을 선택해야 합니다." })
