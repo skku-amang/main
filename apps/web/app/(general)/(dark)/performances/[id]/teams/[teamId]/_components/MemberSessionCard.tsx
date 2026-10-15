@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { Minus } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 
@@ -18,6 +19,7 @@ interface MemberSessionCardProps {
   sessionName: SessionNameValue
   sessionIndex: number
   user: TeamMember
+  joinedAt: Date | string
 
   onUnapplySuccess: (team: TeamDetail) => void
 }
@@ -29,6 +31,7 @@ const MemberSessionCard = ({
   sessionName,
   sessionIndex,
   user,
+  joinedAt,
   onUnapplySuccess
 }: MemberSessionCardProps) => {
   const { user: authUser } = useAuth()
@@ -69,7 +72,7 @@ const MemberSessionCard = ({
       </div>
 
       {/* 유저 정보 */}
-      <div className="relative flex h-[48px] w-full items-center md:w-[466px] md:pl-4">
+      <div className="relative flex min-h-[48px] w-full items-center md:w-[466px] md:pl-4">
         {/* 아바타 */}
         <Avatar className="mr-[12px] md:mr-[24px]">
           <AvatarImage src={user.image ?? undefined} />
@@ -90,6 +93,12 @@ const MemberSessionCard = ({
           <div className="hidden text-sm text-gray-400 md:block">
             #{user.nickname}
           </div>
+          <time
+            dateTime={new Date(joinedAt).toISOString()}
+            className="mt-1 block text-xs text-gray-400 md:mt-0"
+          >
+            {dayjs(joinedAt).format("YY.MM.DD HH:mm")} 참여
+          </time>
         </div>
 
         {/* 탈퇴 버튼 */}

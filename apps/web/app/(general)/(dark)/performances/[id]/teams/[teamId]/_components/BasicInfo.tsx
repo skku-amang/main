@@ -1,7 +1,14 @@
+import dayjs from "dayjs"
+
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 import {
   formatGenerationOrder,
@@ -39,7 +46,16 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           {team.leader.name}
         </div>
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
-          {getRepresentativeRelativeTime(team.createdAt)}
+          <Popover>
+            <PopoverTrigger className="underline decoration-dotted underline-offset-4">
+              <time dateTime={new Date(team.createdAt).toISOString()}>
+                {getRepresentativeRelativeTime(team.createdAt)}
+              </time>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto px-3 py-2 text-sm font-normal text-slate-700">
+              {dayjs(team.createdAt).format("YYYY.MM.DD HH:mm")} 생성
+            </PopoverContent>
+          </Popover>
         </div>
         {canEdit && (
           <DeleteEditButton
