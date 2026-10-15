@@ -84,7 +84,10 @@ const SuggestionButton = () => {
       return
     }
     if (!form.current) {
-      form.current = await feedback.createForm()
+      // 기본 동작은 '고마워요' 안내가 떠 있는 5초 동안 페이지 스크롤을 막아둠
+      form.current = await feedback.createForm({
+        onSubmitSuccess: () => form.current?.close()
+      })
       form.current.appendToDom()
     }
     form.current.open()
