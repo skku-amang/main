@@ -9,6 +9,8 @@ resources:
   - ../../base
   - ingress.yaml
   - sealed-secret.yaml
+  - traffic/cronjob.yaml
+  - traffic/sealed-secret.yaml
 
 configMapGenerator:
   - name: api-config
@@ -22,3 +24,6 @@ configMapGenerator:
       - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
       - VAPID_PUBLIC_KEY=BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs
       - VAPID_SUBJECT=mailto:amang.skku@gmail.com
+  - name: traffic-script
+    files:
+      - traffic/traffic.js
