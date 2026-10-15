@@ -22,6 +22,7 @@ import { UploadModule } from "./upload/upload.module"
 import { HealthModule } from "./health/health.module"
 import { NotificationModule } from "./notification/notification.module"
 import { PushModule } from "./push/push.module"
+import { TeamBookmarkModule } from "./team-bookmark/team-bookmark.module"
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { PushModule } from "./push/push.module"
     ObjectStorageModule,
     UploadModule,
     NotificationModule,
-    PushModule
+    PushModule,
+    TeamBookmarkModule
   ],
   controllers: [AppController],
   providers: [AppService]

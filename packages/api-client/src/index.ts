@@ -1191,6 +1191,43 @@ export default class ApiClient {
       body
     )
   }
+
+  /**
+   * 내가 별표한 팀 id 목록 (최근 별표 순)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getMyTeamBookmarks() {
+    return this._request<number[], AuthError | InternalServerError>(
+      `/team-bookmarks`,
+      "GET"
+    )
+  }
+
+  /**
+   * 팀 별표 (이미 별표했으면 그대로)
+   * @throws {NotFoundError} 팀이 존재하지 않는 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public addTeamBookmark(teamId: number) {
+    return this._request<void, NotFoundError | AuthError | InternalServerError>(
+      `/team-bookmarks/${teamId}`,
+      "PUT"
+    )
+  }
+
+  /**
+   * 팀 별표 해제 (본인 것만)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public removeTeamBookmark(teamId: number) {
+    return this._request<void, AuthError | InternalServerError>(
+      `/team-bookmarks/${teamId}`,
+      "DELETE"
+    )
+  }
 }
 
 export * from "./api-result"
