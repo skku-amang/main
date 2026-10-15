@@ -100,7 +100,11 @@ export function useImageUpload(options?: UseImageUploadOptions) {
   async function selectAndUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0]
     if (!selected) return
+    await validateAndUpload(selected)
+  }
 
+  /** 파일 입력을 거치지 않은 파일(예: 잘라낸 이미지) 업로드 */
+  async function validateAndUpload(selected: File) {
     setError(null)
     setIsUploaded(false)
 
@@ -144,6 +148,7 @@ export function useImageUpload(options?: UseImageUploadOptions) {
     inputRef,
     handleFileSelect,
     selectAndUpload,
+    validateAndUpload,
     upload,
     cancelUpload,
     reset
