@@ -34,6 +34,7 @@ const ROUTES = {
     TEAMS: "/profile/teams",
     DEVICES: "/profile/devices"
   },
+  SUGGESTIONS: "/suggestions",
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",
     EQUIPMENT: "/reservations/equipment",

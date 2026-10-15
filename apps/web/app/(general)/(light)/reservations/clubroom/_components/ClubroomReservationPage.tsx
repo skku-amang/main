@@ -223,7 +223,8 @@ export default function ClubroomReservationPage() {
         </div>
 
         <AddScheduleButton
-          className="fixed bottom-4 left-4 right-4 z-50 shadow-lg"
+          className="fixed bottom-[calc(var(--tabbar-height)+1rem)] left-4 right-4 z-50 shadow-lg"
+          floating
           equipments={equipmentList}
           label="예약하기"
         />

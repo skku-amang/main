@@ -1,6 +1,6 @@
 import "@/app/globals.css"
 
-import { Metadata } from "next"
+import { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import React from "react"
 
@@ -61,6 +61,11 @@ export const metadata: Metadata = {
   //   google: "GOOGLE_VERIFICATION_CODE",
   //   other: { "naver-site-verification": "NAVER_VERIFICATION_CODE" }
   // }
+}
+
+// env(safe-area-inset-*)가 0이 아닌 값을 갖게 하려면 cover 필요 (iPhone 홈 인디케이터 영역)
+export const viewport: Viewport = {
+  viewportFit: "cover"
 }
 
 /**

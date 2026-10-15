@@ -5,17 +5,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <RootHeaderAndFooterWrapper
-      headerMode="transparent"
-      mainStyle={{
-        backgroundImage: `url('/Music band_pixabay 1.png')`,
-        backgroundPosition: "center",
-        backgroundSize: "cover"
-      }}
-      mainClassName=""
-    >
-      {children}
-    </RootHeaderAndFooterWrapper>
-  )
+  return <RootHeaderAndFooterWrapper>{children}</RootHeaderAndFooterWrapper>
 }

@@ -1,6 +1,12 @@
 "use client"
 
-import { LoaderCircle, LogOut, Settings, Users } from "lucide-react"
+import {
+  LoaderCircle,
+  LogOut,
+  MessageSquareText,
+  Settings,
+  Users
+} from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React from "react"
@@ -93,6 +99,12 @@ const Profile = () => {
         <DropdownMenuSeparator />
         <MenuItem icon={<Users size={iconSize} />} href={ROUTES.PROFILE.TEAMS}>
           참여 중인 팀
+        </MenuItem>
+        <MenuItem
+          icon={<MessageSquareText size={iconSize} />}
+          href={ROUTES.SUGGESTIONS}
+        >
+          의견 보내기
         </MenuItem>
 
         {user.isAdmin && (

@@ -77,6 +77,15 @@
 
 peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 팀 채택 후보에서 페널티. 학술 리뷰·GitHub PR 리뷰의 호혜 메커니즘과 동일. v0.1은 팀 단위 강제.
 
+### 의견 보내기 (Suggestion)
+
+사용자가 **홈페이지 자체**에 대해 개발자에게 보내는 버그·건의·칭찬. 팀 피드백과 완전히 다른 기능.
+
+- 입구 2개, 둘 다 Sentry User Feedback으로 수집
+  - `/suggestions` 페이지: 종류 선택 (`suggestion_kind` 태그: bug/idea/praise)
+  - 화면 위에 떠 있는 의견 버튼 (`SuggestionButton`, 드래그로 이동): Sentry 기본 폼, 스크린샷 첨부 가능
+- ⚠️ "피드백"이라 부르지 않는다 — 피드백은 녹음본 피드백 시스템 전용 어휘. 코드 식별자도 `suggestion` 사용
+
 ### 공연 라이프사이클 6단계
 
 `PREPARING → RECRUITING → SUBMISSION → EVALUATION 🔒 → DECISION → DONE`. EVALUATION 진입 시 팀 구성·곡 메타·녹음본 모두 freeze.
@@ -114,4 +123,5 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
 
 ## 변경 이력
 
+- **2026-10-14**: "의견 보내기(Suggestion)" 추가 — 개발자 소통 창구를 피드백 시스템과 어휘 분리 ([#692](https://github.com/skku-amang/main/issues/692)).
 - **2026-05-05**: 본 파일 신설. 피드백 시스템 도메인 추가 (곡/녹음본/피드백/피드백 작성자/Pay-to-vote/공연 라이프사이클). 회장·기장 명확 분리.

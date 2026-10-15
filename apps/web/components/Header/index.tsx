@@ -4,7 +4,6 @@ import { Knewave } from "next/font/google"
 import Link from "next/link"
 
 import MobileBackButton from "@/components/Header/_component/MobileBackButton"
-import Sidebar from "@/components/Header/_component/Sidebar"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -30,16 +29,10 @@ const Header = ({
 }) => {
   const menuItems: MenuItem[] = [
     {
-      name: "동방 대여",
+      name: "동방 예약",
       url: ROUTES.RESERVATION.CLUBROOM,
       active: true
-    },
-    {
-      name: "장비 대여",
-      url: ROUTES.RESERVATION.EQUIPMENT,
-      active: true
-    },
-    { name: "아카이브", url: ROUTES.PERFORMANCE.LIST, active: true }
+    }
   ]
 
   return (
@@ -71,7 +64,7 @@ const Header = ({
         >
           Amang
         </Link>
-        <Sidebar />
+        <div className="w-6" />
       </nav>
 
       {/* Tablet & Desktop */}

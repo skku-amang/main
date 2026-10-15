@@ -72,12 +72,15 @@
 }
 
 /* Responsive header/main padding — mobile 40px, desktop 82px */
+/* 하단 탭바는 모바일 전용 — 데스크톱에선 0 */
 :root {
   --header-height: 40px;
+  --tabbar-height: calc(56px + env(safe-area-inset-bottom));
 }
 @media (min-width: 768px) {
   :root {
     --header-height: 82px;
+    --tabbar-height: 0px;
   }
 }
 

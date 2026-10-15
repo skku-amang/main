@@ -3,10 +3,13 @@
 import {
   CalendarDays,
   Guitar,
+  LogOut,
   Mail,
+  MessageSquareText,
   Monitor,
   Music,
   Pencil,
+  Settings,
   Users
 } from "lucide-react"
 import Link from "next/link"
@@ -21,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 const ProfileSkeleton = () => (
   <div>
@@ -36,6 +40,31 @@ const ProfileSkeleton = () => (
       </div>
     </div>
   </div>
+)
+
+const ShortcutCard = ({
+  href,
+  icon,
+  title,
+  description
+}: {
+  href: string
+  icon: React.ReactNode
+  title: string
+  description: string
+}) => (
+  <Link
+    href={href}
+    className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+  >
+    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      {icon}
+    </div>
+    <div>
+      <p className="font-medium">{title}</p>
+      <p className="text-xs text-slate-400">{description}</p>
+    </div>
+  </Link>
 )
 
 const InfoRow = ({
@@ -56,6 +85,7 @@ const InfoRow = ({
 
 const ProfilePage = () => {
   const { user, isLoading, isAuthenticated } = useCurrentUser()
+  const { logout } = useAuth()
 
   if (isLoading) return <ProfileSkeleton />
 
@@ -159,47 +189,48 @@ const ProfilePage = () => {
 
         {/* 바로가기 */}
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <Link
+          <ShortcutCard
             href={ROUTES.PERFORMANCE.LIST}
-            className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <Music className="size-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">참여 공연</p>
-              <p className="text-xs text-slate-400">참여한 공연 목록 보기</p>
-            </div>
-          </Link>
-
-          <Link
+            icon={<Music className="size-5" />}
+            title="참여 공연"
+            description="참여한 공연 목록 보기"
+          />
+          <ShortcutCard
             href={ROUTES.PROFILE.TEAMS}
-            className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <Users className="size-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">참여 팀</p>
-              <p className="text-xs text-slate-400">참여 중인 팀 목록 보기</p>
-            </div>
-          </Link>
-
-          <Link
+            icon={<Users className="size-5" />}
+            title="참여 팀"
+            description="참여 중인 팀 목록 보기"
+          />
+          <ShortcutCard
             href={ROUTES.PROFILE.DEVICES}
-            className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <Monitor className="size-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">로그인 기기</p>
-              <p className="text-xs text-slate-400">
-                로그인된 기기 확인·로그아웃
-              </p>
-            </div>
-          </Link>
+            icon={<Monitor className="size-5" />}
+            title="로그인 기기"
+            description="로그인된 기기 확인·로그아웃"
+          />
+          <ShortcutCard
+            href={ROUTES.SUGGESTIONS}
+            icon={<MessageSquareText className="size-5" />}
+            title="의견 보내기"
+            description="불편한 점·바라는 점을 개발자에게"
+          />
+          {user.isAdmin && (
+            <ShortcutCard
+              href={ROUTES.ADMIN.INDEX}
+              icon={<Settings className="size-5" />}
+              title="관리자"
+              description="운영진 관리 페이지"
+            />
+          )}
         </div>
+
+        <Button
+          variant="ghost"
+          className="w-full text-red-600 hover:bg-red-50 hover:text-red-600"
+          onClick={() => logout().then(() => (window.location.href = "/"))}
+        >
+          <LogOut className="mr-1.5 size-4" />
+          로그아웃
+        </Button>
       </div>
     </div>
   )
