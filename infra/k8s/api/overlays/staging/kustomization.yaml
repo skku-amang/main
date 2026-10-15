@@ -22,4 +22,4 @@ configMapGenerator:
   - VAPID_SUBJECT=mailto:amang.skku@gmail.com
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261015090642-63aed47
+  newTag: 20261015110657-f431558
