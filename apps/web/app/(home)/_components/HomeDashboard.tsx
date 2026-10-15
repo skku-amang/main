@@ -101,6 +101,9 @@ const RecruitingPerformance = () => {
 
   // /performances/latest/teams와 같은 기준: 가장 최근에 만든 공연
   const latest = performances.reduce((a, b) => (a.id > b.id ? a : b))
+  // 모집 마감 = 공연 종료 일시 (isPerformanceRecruiting과 같은 기준)
+  const deadline = latest.endAt ? dayjs(latest.endAt) : null
+  const daysLeft = deadline?.startOf("day").diff(dayjs().startOf("day"), "day")
 
   return (
     <Link
@@ -111,12 +114,17 @@ const RecruitingPerformance = () => {
       <div className="min-w-0 flex-1">
         <p className="text-xs text-white/70">팀 모집 중</p>
         <p className="truncate text-lg font-semibold">{latest.name}</p>
-        {latest.startAt && (
+        {deadline && (
           <p className="text-xs text-white/70">
-            {dayjs(latest.startAt).locale("ko").format("YYYY.MM.DD (ddd)")}
+            {deadline.locale("ko").format("YYYY.MM.DD (ddd)")} 마감
           </p>
         )}
       </div>
+      {daysLeft !== undefined && daysLeft >= 0 && (
+        <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-sm font-semibold">
+          {daysLeft === 0 ? "D-Day" : `D-${daysLeft}`}
+        </span>
+      )}
       <ChevronRight className="size-5 shrink-0" />
     </Link>
   )
