@@ -3,7 +3,7 @@
 import { Bell, CheckCheck } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import NotificationRow from "@/components/Notification/NotificationRow"
 import {
@@ -50,7 +50,12 @@ const useUnreadCount = (enabled: boolean) => {
     staleTime: 30_000,
     refetchOnWindowFocus: true
   })
-  return data ?? 0
+  const count = data ?? 0
+  // 읽음 처리하면 앱 아이콘 숫자 배지도 맞춰 줄인다 (푸시 수신 시 증가는 sw.js)
+  useEffect(() => {
+    if ("setAppBadge" in navigator) navigator.setAppBadge(count).catch(() => {})
+  }, [count])
+  return count
 }
 
 /** 모바일 헤더용: 벨 아이콘 + 뱃지, 누르면 전체 목록 페이지 */

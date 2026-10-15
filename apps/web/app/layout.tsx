@@ -73,7 +73,8 @@ export const metadata: Metadata = {
 
 // env(safe-area-inset-*)가 0이 아닌 값을 갖게 하려면 cover 필요 (iPhone 홈 인디케이터 영역)
 export const viewport: Viewport = {
-  viewportFit: "cover"
+  viewportFit: "cover",
+  themeColor: SEO.THEME_COLOR
 }
 
 /**
