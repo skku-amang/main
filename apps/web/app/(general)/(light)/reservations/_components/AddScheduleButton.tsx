@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter, usePathname } from "next/navigation"
 import dayjs from "dayjs"
@@ -43,6 +43,65 @@ const MINUTES = Array.from({ length: 4 }, (_, i) =>
 )
 
 const DEFAULT_TITLE = "개인 연습"
+
+// 동방 사용은 대부분 9~23시 (22~06시 합주 금지)
+const FIRST_USABLE_HOUR = 9
+const LAST_USABLE_HOUR = 22
+
+/** 아직 고르지 않은 시간 목록을 열 때 먼저 보여줄 시 */
+function getInitialHour(afterHour?: string): number {
+  if (afterHour) return Math.min(Number(afterHour) + 1, 23)
+  const now = dayjs().hour()
+  return now >= FIRST_USABLE_HOUR && now <= LAST_USABLE_HOUR
+    ? now
+    : FIRST_USABLE_HOUR
+}
+
+interface HourSelectProps {
+  value: string
+  onValueChange: (value: string) => void
+  placeholder: string
+  triggerClassName?: string
+  /** 종료 시간 선택 시 시작 시간 — 목록이 그 다음 시부터 보임 */
+  afterHour?: string
+}
+
+function HourSelect({
+  value,
+  onValueChange,
+  placeholder,
+  triggerClassName,
+  afterHour
+}: HourSelectProps) {
+  const initialHour = getInitialHour(afterHour).toString().padStart(2, "0")
+  // 열릴 때 Radix가 첫 항목(00)에 포커스를 주므로 그 다음 프레임에 옮김
+  const moveToInitialHour = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return
+    requestAnimationFrame(() => {
+      el.focus({ preventScroll: true })
+      el.scrollIntoView({ block: "start" })
+    })
+  }, [])
+
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={triggerClassName}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {HOURS.map((h) => (
+          <SelectItem
+            key={h}
+            value={h}
+            ref={!value && h === initialHour ? moveToInitialHour : undefined}
+          >
+            {h}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
 
 interface AddScheduleButtonProps {
   className?: string
@@ -382,18 +441,12 @@ export default function AddScheduleButton({
               <div className="flex-1 space-y-1.5">
                 <label className="text-sm text-muted-foreground">From</label>
                 <div className="flex items-center gap-1">
-                  <Select value={startHour} onValueChange={setStartHour}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {HOURS.map((h) => (
-                        <SelectItem key={h} value={h}>
-                          {h}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <HourSelect
+                    value={startHour}
+                    onValueChange={setStartHour}
+                    placeholder="Select"
+                    triggerClassName="w-full"
+                  />
                   <span className="text-muted-foreground">:</span>
                   <Select value={startMinute} onValueChange={setStartMinute}>
                     <SelectTrigger className="w-full">
@@ -415,18 +468,13 @@ export default function AddScheduleButton({
               <div className="flex-1 space-y-1.5">
                 <label className="text-sm text-muted-foreground">To</label>
                 <div className="flex items-center gap-1">
-                  <Select value={endHour} onValueChange={setEndHour}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {HOURS.map((h) => (
-                        <SelectItem key={h} value={h}>
-                          {h}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <HourSelect
+                    value={endHour}
+                    onValueChange={setEndHour}
+                    placeholder="Select"
+                    triggerClassName="w-full"
+                    afterHour={startHour}
+                  />
                   <span className="text-muted-foreground">:</span>
                   <Select value={endMinute} onValueChange={setEndMinute}>
                     <SelectTrigger className="w-full">
@@ -450,18 +498,12 @@ export default function AddScheduleButton({
             {/* Mobile: compact time row */}
             <div className="flex sm:hidden items-center gap-2">
               <div className="flex flex-1 items-center gap-1">
-                <Select value={startHour} onValueChange={setStartHour}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="HH" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HOURS.map((h) => (
-                      <SelectItem key={h} value={h}>
-                        {h}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <HourSelect
+                  value={startHour}
+                  onValueChange={setStartHour}
+                  placeholder="HH"
+                  triggerClassName="h-9"
+                />
                 <span className="text-muted-foreground">:</span>
                 <Select value={startMinute} onValueChange={setStartMinute}>
                   <SelectTrigger className="h-9">
@@ -478,18 +520,13 @@ export default function AddScheduleButton({
               </div>
               <span className="text-muted-foreground text-sm">~</span>
               <div className="flex flex-1 items-center gap-1">
-                <Select value={endHour} onValueChange={setEndHour}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="HH" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HOURS.map((h) => (
-                      <SelectItem key={h} value={h}>
-                        {h}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <HourSelect
+                  value={endHour}
+                  onValueChange={setEndHour}
+                  placeholder="HH"
+                  triggerClassName="h-9"
+                  afterHour={startHour}
+                />
                 <span className="text-muted-foreground">:</span>
                 <Select value={endMinute} onValueChange={setEndMinute}>
                   <SelectTrigger className="h-9">

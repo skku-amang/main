@@ -49,10 +49,9 @@ export default function MobileMonthBlock({
             </span>
             {rentalCount > 0 && (
               <div className="mt-0.5 flex gap-0.5">
-                <div className="h-1 w-1 rounded-full bg-blue-400" />
-                {rentalCount >= 2 && (
-                  <div className="h-1 w-1 rounded-full bg-blue-400" />
-                )}
+                {Array.from({ length: Math.min(rentalCount, 3) }, (_, j) => (
+                  <div key={j} className="h-1 w-1 rounded-full bg-blue-400" />
+                ))}
               </div>
             )}
           </div>
