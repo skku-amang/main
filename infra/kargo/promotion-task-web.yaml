@@ -1,0 +1,74 @@
+# Freight 커밋에서 나온 web(Vercel) 빌드를 찾아 stage 도메인에 연결한다. 빌드를 새로 하지 않는다.
+# - staging:    deploy-staging.yml이 만든 preview 빌드(staging API를 보도록 빌드됨) → amang.staging.json-server.win alias
+# - production: Vercel git 연동이 만든 production 빌드 → promote (auto_assign_custom_domains=false라 자동 연결 안 됨)
+# 토큰: sealed-vercel-token.yaml (Vercel 토큰 kargo-amang)
+apiVersion: kargo.akuity.io/v1alpha1
+kind: PromotionTask
+metadata:
+  name: promote-web
+  namespace: amang
+spec:
+  vars:
+    - name: gitRepo
+      value: https://github.com/skku-amang/main
+    # infra/terraform/vercel의 vercel_project.web / var.vercel_team_id
+    - name: vercelProject
+      value: prj_Be6ghVdveO0bbNJZrfyTFnQsXLRo
+    - name: vercelTeam
+      value: team_aDiKenl6xun665nVWV49POd4
+    - name: stagingDomain
+      value: amang.staging.json-server.win
+  steps:
+    # 빌드가 끝날 때까지 polling. 빌드 실패면 바로 실패
+    - uses: http
+      as: find
+      retry:
+        timeout: 30m
+      config:
+        url: https://api.vercel.com/v6/deployments
+        headers:
+          - name: Authorization
+            value: Bearer ${{ secret('vercel').token }}
+        queryParams:
+          - name: projectId
+            value: ${{ vars.vercelProject }}
+          - name: teamId
+            value: ${{ vars.vercelTeam }}
+          - name: sha
+            value: ${{ commitFrom(vars.gitRepo).ID }}
+          - name: target
+            value: "${{ ctx.stage == 'production' ? 'production' : 'preview' }}"
+        pollInterval: 20s
+        successExpression: response.status == 200 && len(response.body.deployments) > 0 && response.body.deployments[0].state == "READY"
+        failureExpression: response.status >= 400 || (len(response.body.deployments) > 0 && response.body.deployments[0].state in ["ERROR", "CANCELED"])
+        outputs:
+          - name: id
+            fromExpression: response.body.deployments[0].uid
+    - uses: http
+      if: ${{ ctx.stage == 'staging' }}
+      config:
+        method: POST
+        url: https://api.vercel.com/v2/deployments/${{ task.outputs.find.id }}/aliases
+        headers:
+          - name: Authorization
+            value: Bearer ${{ secret('vercel').token }}
+          - name: Content-Type
+            value: application/json
+        queryParams:
+          - name: teamId
+            value: ${{ vars.vercelTeam }}
+        body: '${{ quote({"alias": vars.stagingDomain}) }}'
+        successExpression: response.status == 200
+    # 409 = 이미 현재 production 배포 (같은 Freight 재승격)
+    - uses: http
+      if: ${{ ctx.stage == 'production' }}
+      config:
+        method: POST
+        url: https://api.vercel.com/v10/projects/${{ vars.vercelProject }}/promote/${{ task.outputs.find.id }}
+        headers:
+          - name: Authorization
+            value: Bearer ${{ secret('vercel').token }}
+        queryParams:
+          - name: teamId
+            value: ${{ vars.vercelTeam }}
+        successExpression: response.status == 201 || response.status == 409
