@@ -12,7 +12,6 @@ import {
 } from "@nestjs/common"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { UsersService } from "./users.service"
-import { Public } from "../auth/decorators/public.decorator"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { UpdateUserDto } from "./dto/update-user.dto"
@@ -27,7 +26,6 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
-  @Public()
   findAll() {
     return this.userService.findAll()
   }
@@ -45,7 +43,6 @@ export class UsersController {
   }
 
   @Get(":id")
-  @Public()
   async findOne(@Param("id", ParseIntPipe) id: number) {
     return this.userService.findOne(id)
   }

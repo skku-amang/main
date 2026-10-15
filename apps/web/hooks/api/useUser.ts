@@ -5,6 +5,12 @@ export const useUsers = createQueryHook(ApiClient.prototype.getUsers, () => [
   "users"
 ])
 
+// 자기소개·이메일 등 관리자만 보는 정보 포함. 키가 "users"로 시작해 목록 무효화에 함께 걸림
+export const useUsersForAdmin = createQueryHook(
+  ApiClient.prototype.getUsersForAdmin,
+  () => ["users", "admin"]
+)
+
 export const useUpdateProfile = createMutationHook(
   ApiClient.prototype.updateProfile
 )

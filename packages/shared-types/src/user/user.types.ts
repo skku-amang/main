@@ -9,10 +9,10 @@ export const basicUserSelector = {
   }
 } satisfies Prisma.UserSelect
 
+// 다른 부원에게 보이는 정보. 자기소개(bio)는 본인·관리자(detailed)에게만
 export const publicUserSelector = {
   ...basicUserSelector,
   nickname: true,
-  bio: true,
   sessions: {
     select: { id: true, name: true }
   }
@@ -20,6 +20,7 @@ export const publicUserSelector = {
 
 export const detailedUserSelector = {
   ...publicUserSelector,
+  bio: true,
   isAdmin: true,
   email: true,
   isApproved: true
