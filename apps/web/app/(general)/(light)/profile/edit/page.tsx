@@ -204,6 +204,7 @@ const ProfileEditPage = () => {
             <input
               ref={imageUpload.inputRef}
               type="file"
+              name="avatar"
               accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={(e) => {
@@ -241,7 +242,11 @@ const ProfileEditPage = () => {
                   <FormItem>
                     <FormLabel>이름</FormLabel>
                     <FormControl>
-                      <Input placeholder="홍길동" {...field} />
+                      <Input
+                        placeholder="홍길동"
+                        autoComplete="name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -289,17 +294,29 @@ const ProfileEditPage = () => {
                 name="sessions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>세션</FormLabel>
+                    {/* 체크박스 여러 개를 묶는 제목이라 특정 입력칸을 가리키는 label 대신 group 이름으로 */}
+                    <p
+                      id="sessions-label"
+                      className="text-sm font-medium leading-none"
+                    >
+                      세션
+                    </p>
                     <FormDescription>
                       맡을 수 있는 악기를 모두 골라주세요.
                     </FormDescription>
-                    <div className="grid grid-cols-3 gap-3 pt-1">
+                    <div
+                      role="group"
+                      aria-labelledby="sessions-label"
+                      className="grid grid-cols-3 gap-3 pt-1"
+                    >
                       {sessions?.map((session) => (
                         <label
                           key={session.id}
                           className="flex items-center gap-x-2 text-sm"
                         >
                           <Checkbox
+                            name="sessions"
+                            value={String(session.id)}
                             checked={field.value?.includes(session.id)}
                             onCheckedChange={(checked) =>
                               field.onChange(
@@ -353,7 +370,11 @@ const ProfileEditPage = () => {
                   <FormItem>
                     <FormLabel>현재 비밀번호</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input
+                        type="password"
+                        autoComplete="current-password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -367,7 +388,11 @@ const ProfileEditPage = () => {
                   <FormItem>
                     <FormLabel>새 비밀번호</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       영문, 숫자, 특수문자를 각각 1개 이상 포함한 8자 이상
@@ -384,7 +409,11 @@ const ProfileEditPage = () => {
                   <FormItem>
                     <FormLabel>비밀번호 확인</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

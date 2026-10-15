@@ -28,6 +28,7 @@ const MemberSessionRequiredCheckbox = ({
       {/* TODO: 내부 체크 SVG 크기 조정 */}
       <Checkbox
         id={requiredFieldName}
+        name={requiredFieldName}
         className="h-3 w-3 md:h-5 md:w-5"
         onCheckedChange={(e) => {
           secondPageForm.setValue(requiredFieldName, !!e)

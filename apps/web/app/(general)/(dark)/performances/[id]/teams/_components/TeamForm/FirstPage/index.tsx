@@ -112,6 +112,7 @@ const FirstPage = ({
                   공연 선택
                 </SimpleLabel>
                 <Select
+                  name="performanceId"
                   onValueChange={(e) => {
                     form.setValue("performanceId", +e)
                     form.clearErrors("performanceId")
@@ -196,6 +197,7 @@ const FirstPage = ({
                 <div className="flex items-center gap-x-2">
                   <Checkbox
                     id="isFreshmenFixedInput"
+                    name="isFreshmenFixed"
                     onCheckedChange={(e) =>
                       form.setValue("isFreshmenFixed", !!e)
                     }
@@ -237,6 +239,7 @@ const FirstPage = ({
                 <div className="flex items-center gap-x-2">
                   <Checkbox
                     id="isSelfMadeInput"
+                    name="isSelfMade"
                     onCheckedChange={(e) => form.setValue("isSelfMade", !!e)}
                     checked={form.watch("isSelfMade")}
                     className="h-4 w-4 rounded-md border border-gray-400"
@@ -422,6 +425,7 @@ const FirstPage = ({
         <input
           ref={poster.inputRef}
           type="file"
+          name="poster"
           accept={ACCEPTED_IMAGE_TYPES.join(",")}
           onChange={poster.selectAndUpload}
           className="hidden"
