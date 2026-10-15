@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: web
+          # 환경별 이미지(amang-web-<stage>)와 태그는 Kargo가 env/<stage> 브랜치의 overlay images:로 고정.
+          # 없는 이미지라 overlay에 빠지면 바로 실패
+          image: ghcr.io/skku-amang/amang-web:kargo-managed
+          imagePullPolicy: IfNotPresent
+          env:
+            # standalone server.js는 HOSTNAME에 bind한다. k8s는 HOSTNAME=파드 이름이라 명시
+            - name: HOSTNAME
+              value: "0.0.0.0"
+          lifecycle:
+            # Service endpoint에서 빠질 시간을 준 뒤 SIGTERM 전달 (그 사이 요청 계속 처리)
+            preStop:
+              sleep:
+                seconds: 5
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi

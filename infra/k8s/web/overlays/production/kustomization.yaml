@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: amang-web-production
+
+resources:
+  - namespace.yaml
+  - ../../base
+  - ingress.yaml
+
+# NEXT_PUBLIC_*가 빌드 때 박혀 환경마다 이미지가 다르다 (apps/web/env/production.env).
+# newTag는 Kargo가 승격 때 채운다
+images:
+  - name: ghcr.io/skku-amang/amang-web
+    newName: ghcr.io/skku-amang/amang-web-production
+    newTag: kargo-managed
