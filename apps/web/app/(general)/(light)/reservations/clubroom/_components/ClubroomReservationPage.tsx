@@ -138,7 +138,7 @@ export default function ClubroomReservationPage() {
             {/* 월간 캘린더 */}
             <TabsContent value="month" className="relative">
               <MonthCalendarField
-                currentMonday={currentMonday}
+                calendarViewMonth={calendarViewMonth}
                 rentals={rentalList}
                 onRentalClick={setSelectedRental}
               />
@@ -165,7 +165,7 @@ export default function ClubroomReservationPage() {
       <div className="relative mx-auto max-w-[400px] md:hidden">
         {/* Calendar with month navigation */}
         <MobileCalendarField
-          currentMonday={currentMonday}
+          calendarViewMonth={calendarViewMonth}
           rentals={rentalList}
           onDateSelect={setSelectedDate}
           selectedDate={selectedDate}
