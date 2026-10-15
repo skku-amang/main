@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function TeamFormSkeleton() {
   return (
-    <div className="w-full bg-white px-7 py-10 md:p-20">
+    <div className="w-full bg-white px-4 py-6 md:p-20">
       {/* 섹션 헤더 */}
       <Skeleton className="mb-2 h-7 w-40" />
       <Skeleton className="mb-6 h-4 w-64" />
@@ -31,7 +31,7 @@ function TeamFormSkeleton() {
       </div>
 
       {/* 디바이더 */}
-      <Skeleton className="my-14 h-px w-full" />
+      <Skeleton className="my-8 h-px w-full md:my-14" />
 
       {/* 게시글 작성 */}
       <div className="mb-4 flex items-center justify-between">

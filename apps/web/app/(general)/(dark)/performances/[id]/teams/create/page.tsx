@@ -58,7 +58,10 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
           </Link>
         </div>
       ) : (
-        <TeamForm className="w-full bg-white px-7 py-10 md:p-20" />
+        <TeamForm
+          defaultPerformanceId={Number(performanceId)}
+          className="w-full bg-white px-4 py-6 md:p-20"
+        />
       )}
     </div>
   )

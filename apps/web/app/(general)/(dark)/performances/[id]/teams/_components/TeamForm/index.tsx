@@ -29,10 +29,16 @@ import ThirdPage from "./ThirdPage"
 
 interface TeamCreateFormProps {
   initialData?: TeamDetail
+  /** 생성 시 미리 선택할 공연 (진입한 공연 페이지) */
+  defaultPerformanceId?: number
   className?: string
 }
 
-const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
+const TeamForm = ({
+  initialData,
+  defaultPerformanceId,
+  className
+}: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useQueryState(
     "step",
     parseAsInteger.withDefault(1)
@@ -53,7 +59,7 @@ const TeamForm = ({ initialData, className }: TeamCreateFormProps) => {
   const firstPageForm = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
     defaultValues: {
-      performanceId: initialData?.performanceId,
+      performanceId: initialData?.performanceId ?? defaultPerformanceId,
       songName: initialData?.songName,
       isFreshmenFixed: initialData?.isFreshmenFixed,
       songArtist: initialData?.songArtist,
