@@ -132,8 +132,16 @@ const YoutubeCell = ({ row }: { row: any }) => {
 export const columns: ColumnDef<TeamColumn>[] = [
   {
     accessorKey: "songName",
-    filterFn: (row, columnId, filterValue) =>
-      matchesKorean(String(row.getValue(columnId) ?? ""), String(filterValue)),
+    // 곡명과 팀장·팀원 이름 중 하나라도 맞으면 검색 결과에 포함
+    filterFn: (row, _columnId, filterValue) => {
+      const team = row.original
+      const memberNames = team.teamSessions.flatMap((ts) =>
+        ts.members.map((m) => m.user.name)
+      )
+      return [team.songName, team.leader.name, ...memberNames].some((text) =>
+        matchesKorean(text ?? "", String(filterValue))
+      )
+    },
     header: ({ column }) => <SortButton column={column}>곡명</SortButton>,
     cell: ({ row }) => (
       <Link
