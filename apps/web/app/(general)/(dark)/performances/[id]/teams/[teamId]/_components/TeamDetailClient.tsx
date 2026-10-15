@@ -66,7 +66,7 @@ const TeamDetailClient = () => {
       <OleoPageHeader
         title="Join Your Team"
         goBackHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-        className="relative mb-1 md:mb-[78px] md:mt-[78px] md:w-[1152px]"
+        className="relative mb-1 md:mb-[78px] md:mt-[78px] md:w-full md:max-w-[1152px]"
       />
 
       {/* 유튜브 임베드 */}
@@ -75,7 +75,7 @@ const TeamDetailClient = () => {
           <YoutubePlayer
             videoUrl={team.songYoutubeVideoUrl}
             title={`${team.songName} 연주 영상`}
-            className="mx-10 aspect-video h-auto w-full md:h-[673px] md:w-[1152px]"
+            className="mx-10 aspect-video h-auto w-full md:mx-0 md:w-full md:max-w-[1152px]"
           />
         )}
       </div>
@@ -87,15 +87,15 @@ const TeamDetailClient = () => {
         </div>
       )}
 
-      <div className="relative z-10 flex w-full gap-5 max-md:flex-col max-md:items-center md:flex md:w-[1152px] md:gap-[24px]">
+      <div className="relative z-10 flex w-full gap-5 max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}
-        <div className="flex w-[93%] flex-col gap-y-5 md:w-[466px] md:shrink-0 md:gap-y-[24px]">
+        <div className="flex w-[93%] flex-col gap-y-5 md:w-full md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
           <BasicInfo team={team} canEdit={canEdit} />
           {team.image && <PosterImage src={team.image} />}
         </div>
 
         {/* 세션 구성 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-[662px]">
+        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
           {/* 세션 구성 */}
           {team.teamSessions && team.teamSessions.length > 0 && (
             <SessionSetCard

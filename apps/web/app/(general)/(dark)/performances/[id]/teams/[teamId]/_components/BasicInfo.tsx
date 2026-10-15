@@ -25,7 +25,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
   const isSatisfied = isTeamSatisfied(team.teamSessions ?? [])
 
   return (
-    <div className="relative h-fit w-full rounded-2xl bg-white px-[26px] py-[30px] text-lg font-semibold shadow-[0_4px_30px_0_rgba(59,130,246,0.07)] md:w-[466px] md:px-[40px] md:py-[60px]">
+    <div className="relative h-fit w-full rounded-2xl bg-white px-[26px] py-[30px] text-lg font-semibold shadow-[0_4px_30px_0_rgba(59,130,246,0.07)] md:px-[40px] xl:w-[466px] md:py-[60px]">
       {/* 신입고정 뱃지 */}
       {team.isFreshmenFixed && (
         <FreshmenFixedBadge
