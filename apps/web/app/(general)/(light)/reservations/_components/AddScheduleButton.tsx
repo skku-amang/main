@@ -318,14 +318,12 @@ export default function AddScheduleButton({
           {/* 장비 선택 (데스크톱 + 여러 장비일 때만 표시) */}
           {equipments.length > 1 && (
             <div className="hidden sm:block space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">
-                장비
-              </label>
+              <p className="text-sm font-medium text-muted-foreground">장비</p>
               <Select
                 onValueChange={(v) => setEquipmentId(Number(v))}
                 value={equipmentId?.toString()}
               >
-                <SelectTrigger>
+                <SelectTrigger aria-label="장비">
                   <SelectValue placeholder="장비를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
@@ -344,10 +342,15 @@ export default function AddScheduleButton({
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-muted-foreground">
+            <label
+              htmlFor="rentalTitle"
+              className="text-sm font-medium text-muted-foreground"
+            >
               Title
             </label>
             <Input
+              id="rentalTitle"
+              name="title"
               placeholder={DEFAULT_TITLE}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -364,9 +367,7 @@ export default function AddScheduleButton({
             {/* Desktop: two calendars side by side */}
             <div className="hidden sm:flex gap-3">
               <div className="flex-1 min-w-0 space-y-1.5">
-                <label className="text-sm text-muted-foreground">
-                  Start date
-                </label>
+                <p className="text-sm text-muted-foreground">Start date</p>
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -388,9 +389,7 @@ export default function AddScheduleButton({
                 )}
               </div>
               <div className="flex-1 min-w-0 space-y-1.5">
-                <label className="text-sm text-muted-foreground">
-                  End date
-                </label>
+                <p className="text-sm text-muted-foreground">End date</p>
                 <Calendar
                   mode="single"
                   selected={endDate}
@@ -441,7 +440,7 @@ export default function AddScheduleButton({
             {/* Desktop: time selectors */}
             <div className="hidden sm:flex gap-3">
               <div className="flex-1 space-y-1.5">
-                <label className="text-sm text-muted-foreground">From</label>
+                <p className="text-sm text-muted-foreground">From</p>
                 <div className="flex items-center gap-1">
                   <HourSelect
                     value={startHour}
@@ -472,7 +471,7 @@ export default function AddScheduleButton({
                 )}
               </div>
               <div className="flex-1 space-y-1.5">
-                <label className="text-sm text-muted-foreground">To</label>
+                <p className="text-sm text-muted-foreground">To</p>
                 <div className="flex items-center gap-1">
                   <HourSelect
                     value={endHour}
@@ -576,7 +575,7 @@ export default function AddScheduleButton({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm text-muted-foreground">Members</label>
+              <p className="text-sm text-muted-foreground">Members</p>
               <MemberPicker
                 users={users ?? []}
                 excludeIds={selectedUserIds}

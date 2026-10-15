@@ -46,6 +46,8 @@ const YoutubeInput = ({
             <Link className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           )}
           <Input
+            name="songYoutubeVideoUrl"
+            aria-label="유튜브 링크"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             className={cn(
