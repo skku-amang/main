@@ -6,6 +6,7 @@ import React from "react"
 
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
+import PushSoftAsk from "@/components/PushSoftAsk"
 import { Toaster } from "@/components/ui/toaster"
 import VercelAnalytics from "@/components/VercelAnalytics"
 import { SEO } from "@/constants/seo"
@@ -27,7 +28,14 @@ export const metadata: Metadata = {
   },
   description: SEO.SITE_DESCRIPTION,
   icons: {
-    icon: "/favicon.ico"
+    icon: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png"
+  },
+  // iOS "홈 화면에 추가" → standalone 웹앱. Web Push는 이 상태에서만 동작 (ADR-0003)
+  appleWebApp: {
+    capable: true,
+    title: "AMANG",
+    statusBarStyle: "default"
   },
   openGraph: {
     type: "website",
@@ -84,6 +92,7 @@ export default function RootLayout({
       <body className={cn(pretendard.className, "bg-neutral-50")}>
         <Providers>
           {children}
+          <PushSoftAsk />
           <Toaster />
           <VercelAnalytics />
           <SpeedInsights />

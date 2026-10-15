@@ -13,6 +13,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import PushSettingsCard from "@/components/PushSettingsCard"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -211,6 +212,8 @@ const ProfileDevicesPage = () => {
             />
           )}
         </div>
+
+        <PushSettingsCard />
 
         {status === "pending" && <DevicesSkeleton />}
 

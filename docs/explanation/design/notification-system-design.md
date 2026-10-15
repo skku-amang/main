@@ -2,7 +2,7 @@
 
 본 문서는 알림 시스템의 **구현 설계 SSOT**. 제품 결정·채널 결정은 아래 상위 문서가 SSOT이며, 본 문서는 그것들이 구현에 위임한 빈칸(데이터 모델·이벤트 매핑·수신자 해석)을 확정한다.
 
-- 상태: 설계 확정, 구현 대기
+- 상태: 구현 완료 (PR #724·#727·#733·#734), 스테이징 QA 대기
 - 상위: [#347](https://github.com/skku-amang/main/issues/347) 알림 시스템(무엇), [ADR-0003](../adr/0003-web-push-notification-channel.md) 모바일 채널(Web Push)
 - 하위 작업: [#546](https://github.com/skku-amang/main/issues/546) 백엔드(저장·조회·발송), [#547](https://github.com/skku-amang/main/issues/547) web(구독·알림함 UI)
 - 범위 밖 연결: 이메일/SMS(ADR-0003에서 분리), 비밀번호 찾기 인증 메일([#528](https://github.com/skku-amang/main/issues/528))

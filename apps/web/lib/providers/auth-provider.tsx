@@ -8,6 +8,7 @@ import ROUTES from "@/constants/routes"
 import { ME_QUERY_KEY, useMe } from "@/hooks/api/useAuth"
 import { TokenManager } from "@/lib/auth/tokenManager"
 import { useApiClient } from "@/lib/providers/api-client-provider"
+import { removePushSubscription } from "@/lib/push"
 import {
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError
@@ -105,6 +106,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
+      // 공용 기기에서 다음 사람에게 내 푸시가 가지 않도록 이 브라우저 구독을 먼저 푼다 (실패해도 로그아웃은 진행)
+      await removePushSubscription(apiClient)
       await apiClient.logout()
     } finally {
       queryClient.setQueryData(ME_QUERY_KEY, null)
