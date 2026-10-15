@@ -42,20 +42,22 @@ const RootHeaderAndFooterWrapper = ({
   const toPixelString = (value: number) => `${value}px`
 
   return (
-    <div className="h-screen">
+    // h-screen(100vh)은 모바일 주소창이 접힌 높이 기준이라, 주소창이 보일 땐 그만큼 스크롤이 생김
+    <div className="h-dvh">
       <Header position="fixed" mode={headerMode} />
 
       <main
         className={cn(
           "h-auto min-h-full pt-[calc(var(--header-height)+var(--extra-pt))]",
+          // Footer는 md부터 보이므로 그 자리도 md부터만 비움
+          "pb-[calc(var(--extra-pb)+var(--tabbar-height))] md:pb-[calc(var(--footer-height)+var(--extra-pb)+var(--tabbar-height))]",
           mainClassName
         )}
         style={
           {
             "--extra-pt": toPixelString(paddingTopPixel),
-            paddingBottom: `calc(${toPixelString(
-              footerHeightPixel + paddingBottomPixel
-            )} + var(--tabbar-height))`,
+            "--extra-pb": toPixelString(paddingBottomPixel),
+            "--footer-height": toPixelString(footerHeightPixel),
             ...mainStyle
           } as React.CSSProperties
         }
