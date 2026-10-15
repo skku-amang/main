@@ -1,3 +1,4 @@
+import { ErrorType } from "@repo/api-client"
 import { NextFunction, Request, Response } from "express"
 import { isAllowedOrigin } from "../allowed-origins"
 
@@ -25,7 +26,7 @@ export function originCheck(
     res.status(403).json({
       isSuccess: false,
       error: {
-        type: "/errors/forbidden",
+        type: ErrorType.FORBIDDEN,
         title: "Forbidden",
         status: 403,
         detail: "허용되지 않은 출처의 요청입니다."

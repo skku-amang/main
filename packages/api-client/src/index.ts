@@ -58,6 +58,8 @@ import {
   DuplicateMemberIndexError,
   DuplicateSessionUserError,
   DuplicateTeamSessionError,
+  ErrorType,
+  ErrorTypeValue,
   ForbiddenError,
   InternalServerError,
   InvalidMemberIndexError,
@@ -78,64 +80,55 @@ import {
 } from "./errors"
 
 /**
+ * 에러 종류별로 만들 에러 클래스.
+ * ErrorType에 새 종류를 추가하고 여기를 빠뜨리거나, type이 다른 클래스를 짝지으면 컴파일 에러가 난다.
+ */
+const ERROR_CLASS_BY_TYPE: {
+  [K in ErrorTypeValue]: new (
+    detail?: string,
+    instance?: string
+  ) => ApiError & { readonly type: K }
+} = {
+  [ErrorType.VALIDATION_ERROR]: ValidationError,
+  [ErrorType.AUTHENTICATION_ERROR]: AuthError,
+  [ErrorType.FORBIDDEN]: ForbiddenError,
+  [ErrorType.NOT_FOUND]: NotFoundError,
+  [ErrorType.CONFLICT]: ConflictError,
+  [ErrorType.UNPROCESSABLE_ENTITY]: UnprocessableEntityError,
+  [ErrorType.INTERNAL_SERVER_ERROR]: InternalServerError,
+  [ErrorType.TEAM_DUPLICATE_APPLICATION]: DuplicateApplicationError,
+  [ErrorType.TEAM_POSITION_OCCUPIED]: PositionOccupiedError,
+  [ErrorType.TEAM_SESSION_NOT_FOUND]: SessionNotFoundError,
+  [ErrorType.TEAM_NO_APPLICATION_FOUND]: NoApplicationFoundError,
+  [ErrorType.TEAM_INVALID_MEMBER_INDEX]: InvalidMemberIndexError,
+  [ErrorType.TEAM_DUPLICATE_MEMBER_INDEX]: DuplicateMemberIndexError,
+  [ErrorType.TEAM_DUPLICATE_SESSION_USER]: DuplicateSessionUserError,
+  [ErrorType.TEAM_DUPLICATE_TEAM_SESSION]: DuplicateTeamSessionError,
+  [ErrorType.TEAM_REFERENCED_ENTITY_NOT_FOUND]: ReferencedEntityNotFoundError,
+  [ErrorType.TEAM_PERFORMANCE_RECRUITMENT_CLOSED]:
+    PerformanceRecruitmentClosedError,
+  [ErrorType.PERFORMANCE_INVALID_PERFORMANCE_DATE]: InvalidPerformanceDateError,
+  [ErrorType.USER_NOT_APPROVED]: UserNotApprovedError,
+  [ErrorType.TOKEN_REFRESH_TOKEN_EXPIRED]: RefreshTokenExpiredError,
+  [ErrorType.TOKEN_REFRESH_TOKEN_NOT_FOUND]: RefreshTokenNotFoundError,
+  [ErrorType.TOKEN_ACCESS_TOKEN_EXPIRED]: AccessTokenExpiredError,
+  [ErrorType.TOKEN_ACCESS_TOKEN_NOT_FOUND]: AccessTokenNotFoundError
+}
+
+/**
  * 서버에서 plain object로 전달되는 에러를
  * 자바스크립트의 에러 형식으로 변환합니다.
  */
 function createErrorFromProblemDocument(problemDoc: ProblemDocument): ApiError {
   const { detail, instance, type } = problemDoc
 
-  switch (type) {
-    case "/errors/validation-error":
-      return new ValidationError(detail, instance)
-    case "/errors/authentication-error":
-      return new AuthError(detail, instance)
-    case "/errors/forbidden":
-      return new ForbiddenError(detail, instance)
-    case "/errors/not-found":
-      return new NotFoundError(detail, instance)
-    case "/errors/conflict":
-      return new ConflictError(detail, instance)
-    case "/errors/unprocessable-entity":
-      return new UnprocessableEntityError(detail, instance)
-    case "/errors/internal-server-error":
-      return new InternalServerError(detail, instance)
-    case "/errors/team/duplicate-application":
-      return new DuplicateApplicationError(detail, instance)
-    case "/errors/team/position-occupied":
-      return new PositionOccupiedError(detail, instance)
-    case "/errors/team/session-not-found":
-      return new SessionNotFoundError(detail, instance)
-    case "/errors/team/no-application-found":
-      return new NoApplicationFoundError(detail, instance)
-    case "/errors/team/invalid-member-index":
-      return new InvalidMemberIndexError(detail, instance)
-    case "/errors/team/duplicate-member-index":
-      return new DuplicateMemberIndexError(detail, instance)
-    case "/errors/team/duplicate-session-user":
-      return new DuplicateSessionUserError(detail, instance)
-    case "/errors/team/duplicate-team-session":
-      return new DuplicateTeamSessionError(detail, instance)
-    case "/errors/team/referenced-entity-not-found":
-      return new ReferencedEntityNotFoundError(detail, instance)
-    case "/errors/team/performance-recruitment-closed":
-      return new PerformanceRecruitmentClosedError(detail, instance)
-    case "/errors/performance/invalid-performance-date":
-      return new InvalidPerformanceDateError(detail, instance)
-    case "/errors/user/not-approved":
-      return new UserNotApprovedError(detail, instance)
-    case "/errors/token/refresh-token-expired":
-      return new RefreshTokenExpiredError(detail, instance)
-    case "/errors/token/refresh-token-not-found":
-      return new RefreshTokenNotFoundError(detail, instance)
-    case "/errors/token/access-token-expired":
-      return new AccessTokenExpiredError(detail, instance)
-    case "/errors/token/access-token-not-found":
-      return new AccessTokenNotFoundError(detail, instance)
-    default:
-      // API 서버에서 알 수 없는 에러가 전달될 경우
-      // detail과 instance가 없을 수 있습니다.
-      return new InternalServerError()
+  if (!Object.hasOwn(ERROR_CLASS_BY_TYPE, type)) {
+    // API 서버에서 알 수 없는 에러가 전달될 경우
+    // detail과 instance가 없을 수 있습니다.
+    return new InternalServerError()
   }
+  const ErrorClass = ERROR_CLASS_BY_TYPE[type as ErrorTypeValue]
+  return new ErrorClass(detail, instance)
 }
 
 // Promise에 에러 타입을 주입하기 위한 트릭
@@ -177,15 +170,27 @@ export default class ApiClient {
 
   /**
    * 내부 API 요청 헬퍼 메소드
+   * async로 선언하면 반환 타입이 Promise<PromiseWithError<T, E>>로 한 번 더 감싸져
+   * 에러 타입(E) 추론이 깨지므로, 실제 요청은 _send에 맡기고 타입만 입힌다.
    */
-  private async _request<T, E extends ProblemDocument>(
+  private _request<T, E extends ProblemDocument>(
     endpoint: string, // 예: "/posts", "/projects/1" (항상 '/'로 시작 가정)
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    body?: any,
+    headers?: Record<string, string>
+  ): PromiseWithError<T, E> {
+    return this._send<T>(endpoint, method, body, headers)
+  }
+
+  private async _send<T>(
+    endpoint: string,
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any,
     headers?: Record<string, string>,
     isRetry = false
-  ): Promise<PromiseWithError<T, E>> {
+  ): Promise<T> {
     const options: RequestInit = {
       method,
       credentials: "include",
@@ -266,7 +271,7 @@ export default class ApiClient {
 
         if (refreshed) {
           // 갱신된 토큰은 httpOnly cookie가 운반 — 헤더 토큰 갱신 없이 재시도
-          return this._request<T, E>(endpoint, method, body, headers, true)
+          return this._send<T>(endpoint, method, body, headers, true)
         }
       }
 
