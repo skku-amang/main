@@ -5,6 +5,7 @@ import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
+import { memberProfileSelect, toMemberProfile } from "./member-profile"
 import { UpdateUserDto } from "./dto/update-user.dto"
 import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { UpdateProfileDto } from "./dto/update-profile.dto"
@@ -83,6 +84,19 @@ export class UsersService {
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
     return user
+  }
+
+  /** 다른 부원 프로필. 비공개면 이름·사진만 (본인은 항상 전체) */
+  async getProfile(userId: number, viewerId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId, isApproved: true },
+      select: memberProfileSelect
+    })
+
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+
+    return toMemberProfile(user, viewerId)
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {

@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import Link from "next/link"
 
 import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
@@ -9,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
+import ROUTES from "@/constants/routes"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 import {
   formatGenerationOrder,
@@ -40,11 +42,14 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           <AvatarImage src={team.leader?.image ?? undefined} />
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
-        <div className="text-xs font-medium leading-3 text-primary md:text-base">
+        <Link
+          href={ROUTES.MEMBER_PROFILE(team.leader.id)}
+          className="text-xs font-medium leading-3 text-primary hover:underline md:text-base"
+        >
           {team.leader.generation &&
             `${formatGenerationOrder(team.leader.generation.order)}기 `}
           {team.leader.name}
-        </div>
+        </Link>
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
           <Popover>
             <PopoverTrigger className="underline decoration-dotted underline-offset-4">

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
 
@@ -44,7 +45,8 @@ const ProfileFormSchema = UpdateProfileSchema.pick({
   nickname: true,
   bio: true,
   sessions: true,
-  image: true
+  image: true,
+  isProfilePublic: true
 })
 
 const PasswordFormSchema = UpdatePasswordSchema.extend({
@@ -88,7 +90,8 @@ const ProfileEditPage = () => {
       nickname: user?.nickname ?? "",
       bio: user?.bio ?? "",
       sessions: user?.sessions.map((s) => s.id) ?? [],
-      image: user?.image ?? undefined
+      image: user?.image ?? undefined,
+      isProfilePublic: user?.isProfilePublic ?? false
     }
   })
 
@@ -107,6 +110,7 @@ const ProfileEditPage = () => {
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: ["users"] })
+        queryClient.invalidateQueries({ queryKey: ["memberProfile"] })
         toast({ title: "프로필이 수정되었습니다." })
       })
       .catch((error) => {
@@ -327,6 +331,31 @@ const ProfileEditPage = () => {
                                     )
                               )
                             }
+                          />
+
+                          <FormField
+                            control={profileForm.control}
+                            name="isProfilePublic"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
+                                <div className="space-y-1">
+                                  <FormLabel>
+                                    다른 부원에게 프로필 공개
+                                  </FormLabel>
+                                  <FormDescription>
+                                    켜면 로그인한 부원이 내 기수·세션·소개와
+                                    참여한 팀·공연을 볼 수 있어요. 끄면 이름과
+                                    사진만 보여요.
+                                  </FormDescription>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value ?? false}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
                           />
                           {getSessionDisplayName(session.name)}
                         </label>

@@ -2,6 +2,7 @@
 
 import {
   CalendarDays,
+  Eye,
   Guitar,
   LogOut,
   Mail,
@@ -158,6 +159,20 @@ const ProfilePage = () => {
               icon={<Mail className="size-4" />}
               label="이메일"
               value={user.email}
+            />
+
+            <InfoRow
+              icon={<Eye className="size-4" />}
+              label="공개"
+              value={
+                <Link
+                  href={ROUTES.MEMBER_PROFILE(user.id)}
+                  className="underline-offset-4 hover:underline"
+                >
+                  {user.isProfilePublic ? "부원에게 공개 중" : "비공개"} · 다른
+                  부원에게 보이는 모습
+                </Link>
+              }
             />
 
             {user?.generation && (

@@ -34,6 +34,7 @@ const ROUTES = {
     TEAMS: "/profile/teams",
     DEVICES: "/profile/devices"
   },
+  MEMBER_PROFILE: (userId: number) => `/profiles/${userId}`,
   SUGGESTIONS: "/suggestions",
   NOTIFICATIONS: "/notifications",
   RESERVATION: {

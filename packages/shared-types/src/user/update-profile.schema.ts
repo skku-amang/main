@@ -12,7 +12,8 @@ export const UpdateProfileSchema = z.object({
   image: z
     .string()
     .url({ message: "유효한 이미지 주소(URL)를 입력해 주세요." })
-    .optional()
+    .optional(),
+  isProfilePublic: z.boolean().optional()
 })
 
 export type UpdateProfile = z.infer<typeof UpdateProfileSchema>

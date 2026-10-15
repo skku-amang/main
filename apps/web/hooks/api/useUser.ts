@@ -11,6 +11,11 @@ export const useUsersForAdmin = createQueryHook(
   () => ["users", "admin"]
 )
 
+export const useMemberProfile = createQueryHook(
+  ApiClient.prototype.getMemberProfile,
+  (userId: number) => ["memberProfile", userId]
+)
+
 export const useUpdateProfile = createMutationHook(
   ApiClient.prototype.updateProfile
 )

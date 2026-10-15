@@ -21,6 +21,7 @@ export const publicUserSelector = {
 export const detailedUserSelector = {
   ...publicUserSelector,
   bio: true,
+  isProfilePublic: true,
   isAdmin: true,
   email: true,
   isApproved: true
