@@ -55,7 +55,7 @@ resource "vercel_project" "web" {
 resource "vercel_project_environment_variable" "api_url_production" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_API_URL"
+  key        = "API_URL"
   value      = "https://api.amang.json-server.win"
   target     = ["production"]
 }
@@ -63,7 +63,7 @@ resource "vercel_project_environment_variable" "api_url_production" {
 resource "vercel_project_environment_variable" "api_url_preview" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_API_URL"
+  key        = "API_URL"
   value      = "https://api.amang.staging.json-server.win"
   target     = ["preview", "development"]
 }
@@ -94,22 +94,6 @@ resource "vercel_project_domain" "staging" {
   git_branch = "env/staging"
 }
 
-resource "vercel_project_environment_variable" "site_url_production" {
-  project_id = vercel_project.web.id
-  team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_SITE_URL"
-  value      = "https://amang.json-server.win"
-  target     = ["production"]
-}
-
-resource "vercel_project_environment_variable" "site_url_preview" {
-  project_id = vercel_project.web.id
-  team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_SITE_URL"
-  value      = "https://amang.staging.json-server.win"
-  target     = ["preview", "development"]
-}
-
 resource "vercel_project_environment_variable" "developer_emails" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
@@ -121,7 +105,7 @@ resource "vercel_project_environment_variable" "developer_emails" {
 resource "vercel_project_environment_variable" "sentry_dsn" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_SENTRY_DSN"
+  key        = "SENTRY_DSN"
   value      = "https://fec0864f2e695dbd2d9b09dafb90cca3@o4511134421286912.ingest.us.sentry.io/4511134423515136"
   target     = ["production"]
 }
@@ -129,7 +113,7 @@ resource "vercel_project_environment_variable" "sentry_dsn" {
 resource "vercel_project_environment_variable" "sentry_environment" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_SENTRY_ENVIRONMENT"
+  key        = "SENTRY_ENVIRONMENT"
   value      = "production"
   target     = ["production"]
 }
@@ -139,7 +123,7 @@ resource "vercel_project_environment_variable" "sentry_environment" {
 resource "vercel_project_environment_variable" "vapid_public_key_production" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
+  key        = "VAPID_PUBLIC_KEY"
   value      = "BHOyS6PFfVjOuqhMZMBp7i8YsBbSCeFlzQYw6HjdYJVgC9m-3qxOALsm51kETbJnQjabjztXX-37c5jXu_8x4hc"
   target     = ["production"]
 }
@@ -147,7 +131,7 @@ resource "vercel_project_environment_variable" "vapid_public_key_production" {
 resource "vercel_project_environment_variable" "vapid_public_key_preview" {
   project_id = vercel_project.web.id
   team_id    = var.vercel_team_id
-  key        = "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
+  key        = "VAPID_PUBLIC_KEY"
   value      = "BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs"
   target     = ["preview", "development"]
 }

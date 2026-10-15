@@ -1,5 +1,7 @@
 import * as Sentry from "@sentry/nextjs"
 
+import { publicEnv } from "@/lib/publicEnv"
+
 // replayIntegration/feedbackIntegration은 브라우저 전용 — SSR에서 존재하지 않음
 const integrations: ReturnType<typeof Sentry.getDefaultIntegrations>[number][] =
   [Sentry.captureConsoleIntegration({ levels: ["error", "warn"] })]
@@ -28,8 +30,8 @@ if (typeof window !== "undefined" && Sentry.replayIntegration) {
 }
 
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+  dsn: publicEnv.SENTRY_DSN,
+  environment: publicEnv.SENTRY_ENVIRONMENT,
   enabled: process.env.NODE_ENV === "production",
 
   tracesSampleRate: 1.0,

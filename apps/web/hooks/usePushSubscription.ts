@@ -17,9 +17,9 @@ import {
   toSubscriptionDto
 } from "@/lib/push"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { publicEnv } from "@/lib/publicEnv"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""
+const { API_URL, VAPID_PUBLIC_KEY } = publicEnv
 const ENSURED_KEY = "push-subscription-ensured"
 
 /**

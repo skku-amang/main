@@ -2,6 +2,7 @@ import "@/app/globals.css"
 
 import { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
+import Script from "next/script"
 import React from "react"
 
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -90,6 +91,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={cn(pretendard.className, "bg-neutral-50")}>
+        {/* window.__ENV. beforeInteractive는 app 모듈(apiClient·Sentry 등)을 require하기 전에 로드가 끝난다 */}
+        <Script src="/env.js" strategy="beforeInteractive" />
         <Providers>
           {children}
           <PushSoftAsk />

@@ -5,6 +5,8 @@ import { cookies } from "next/headers"
 import { ApiResult } from "@repo/api-client"
 import { DetailedUser } from "@repo/shared-types"
 
+import { publicEnv } from "@/lib/publicEnv"
+
 /**
  * RSC/서버 전용: 현재 로그인 사용자 조회 (ADR-0002).
  * 브라우저가 보낸 auth cookie를 백엔드 GET /auth/me로 전달한다.
@@ -14,7 +16,7 @@ import { DetailedUser } from "@repo/shared-types"
 export async function getServerUser(): Promise<DetailedUser | null> {
   const cookieStore = await cookies()
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+  const response = await fetch(`${publicEnv.API_URL}/auth/me`, {
     headers: { cookie: cookieStore.toString() },
     cache: "no-store"
   })

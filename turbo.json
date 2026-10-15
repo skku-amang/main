@@ -49,10 +49,14 @@
     "NODE_ENV",
     "PORT",
     "DATABASE_URL",
-    "NEXT_PUBLIC_API_URL",
-    "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
     "COOKIE_DOMAIN",
     "COOKIE_SAMESITE",
     "VERCEL_ENV"
+  ],
+  "globalPassThroughEnv": [
+    "API_URL",
+    "SENTRY_DSN",
+    "SENTRY_ENVIRONMENT",
+    "VAPID_PUBLIC_KEY"
   ]
 }
