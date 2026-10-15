@@ -139,18 +139,11 @@ const TeamListSkeleton = () => {
       {/* 모바일: 카드 */}
       <div className="mb-4 mt-6 md:hidden">
         {/* 검색, 필터, 정렬 */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-center gap-x-3">
-            <Skeleton className="h-9 w-full rounded-md" />
-            <Skeleton className="h-9 w-9 shrink-0 rounded-md" />
-            <Skeleton className="h-9 w-9 shrink-0 rounded-md" />
-          </div>
-
-          {/* 공연선택 + 생성 버튼 */}
-          <div className="grid grid-cols-2 gap-x-4">
-            <Skeleton className="h-9 rounded-lg" />
-            <Skeleton className="h-9 rounded-lg" />
-          </div>
+        <div className="flex items-center justify-center gap-x-3">
+          <Skeleton className="h-9 w-full rounded-md" />
+          <Skeleton className="h-9 w-9 shrink-0 rounded-md" />
+          <Skeleton className="h-9 w-9 shrink-0 rounded-md" />
+          <Skeleton className="h-9 w-[84px] shrink-0 rounded-lg" />
         </div>
 
         <div className="my-3 h-[1px] w-full bg-slate-200" />

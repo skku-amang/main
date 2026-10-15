@@ -17,12 +17,14 @@ interface DefaultPageHeaderProps {
   title: React.ReactNode
   routes?: DefaultPageHeaderBreadCrumbRoute[]
   className?: string
+  children?: React.ReactNode
 }
 
 const DefaultPageHeader = ({
   title,
   routes = [],
-  className
+  className,
+  children
 }: DefaultPageHeaderProps) => {
   return (
     <div
@@ -33,6 +35,7 @@ const DefaultPageHeader = ({
     >
       <h1 className="text-[22px] font-semibold md:text-5xl">{title}</h1>
       {routes.length > 0 && <DefaultPageHeaderBreadCrumb routes={routes} />}
+      {children}
     </div>
   )
 }

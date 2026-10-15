@@ -7,6 +7,7 @@ import ROUTES from "@/constants/routes"
 
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useTeams } from "@/hooks/api/useTeam"
+import { isTeamSatisfied } from "@/lib/team/teamSession"
 import { useParams } from "next/navigation"
 import TeamListSkeleton from "./_components/TeamListSkeleton"
 import { columns } from "./_components/TeamListTable/columns"
@@ -36,6 +37,9 @@ const TeamList = () => {
   const currentPerformance = relatedPerformances.find(
     (p) => p.id === performanceId
   )
+  const satisfiedTeamCount = teams.filter((team) =>
+    isTeamSatisfied(team.teamSessions)
+  ).length
 
   return (
     <div>
@@ -63,7 +67,11 @@ const TeamList = () => {
             href: ROUTES.PERFORMANCE.TEAM.LIST(performanceId)
           }
         ]}
-      />
+      >
+        <p className="text-sm text-neutral-500">
+          전체 {teams.length}팀 · 마감 {satisfiedTeamCount}팀
+        </p>
+      </DefaultPageHeader>
 
       {/* 팀 목록 */}
       <TeamListDataTable

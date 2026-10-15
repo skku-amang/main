@@ -24,7 +24,6 @@ import { useCallback, useMemo, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
 import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
-import RelatedPerformanceList from "@/app/(general)/(light)/performances/[id]/teams/_components/RelatedPerformanceList"
 import TeamListTableFilter, {
   FilterValue
 } from "@/app/(general)/(light)/performances/[id]/teams/_components/TeamListTable/filter"
@@ -247,16 +246,6 @@ export function TeamListDataTable<TValue>({
 
   const missingMemberSessions = getSessionsWithMissingMembers
 
-  const satisfiedTeamCount = useMemo(
-    () => data.filter((team) => isTeamSatisfied(team.teamSessions)).length,
-    [data]
-  )
-  const teamCountSummary = (
-    <p className="text-sm text-neutral-500">
-      전체 {data.length}팀 · 마감 {satisfiedTeamCount}팀
-    </p>
-  )
-
   const sortOptions = [
     { value: "songName-asc", display: "곡명 오름차순" },
     { value: "songName-desc", display: "곡명 내림차순" },
@@ -344,8 +333,6 @@ export function TeamListDataTable<TValue>({
             </Popover>
           </div>
         </div>
-
-        <div className="pb-3">{teamCountSummary}</div>
 
         {/* 테이블 */}
         <Table>
@@ -512,38 +499,18 @@ export function TeamListDataTable<TValue>({
                 <SelectItem value="none">정렬해제</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          {/* 공연 선택 및 생성 버튼 */}
-          <div className="grid grid-cols-2 gap-x-4">
-            {/* 연관된 공연 목록 */}
-            <RelatedPerformanceList
-              currentPerformanceId={performanceId}
-              relatedPerformances={relatedPerformances}
-              className="drop-shadow-search"
-            />
 
             {/* 생성 버튼 */}
             {isRecruiting ? (
               <Link
                 href={ROUTES.PERFORMANCE.TEAM.CREATE(performanceId)}
-                className="flex items-center gap-x-1"
+                className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-lg bg-primary px-3 text-sm font-medium text-white shadow"
               >
-                <div className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-white shadow">
-                  <div className="relative h-4 w-4">
-                    <div className="absolute left-0 top-0 h-4 w-4">
-                      <Plus size={18} />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="text-sm font-medium leading-tight">
-                      Create
-                    </div>
-                  </div>
-                </div>
+                <Plus size={16} />
+                Create
               </Link>
             ) : (
-              <div className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-muted px-4 py-2 text-sm font-medium leading-tight text-muted-foreground">
+              <div className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-muted px-3 text-sm font-medium text-muted-foreground">
                 모집 마감
               </div>
             )}
@@ -551,8 +518,6 @@ export function TeamListDataTable<TValue>({
         </div>
 
         <Separator orientation="horizontal" className="my-3" />
-
-        <div className="mb-3">{teamCountSummary}</div>
 
         {/* 카드 목록 */}
         <div className="space-y-3">

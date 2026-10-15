@@ -21,20 +21,19 @@ const PerformanceListClient = () => {
         title="공연 목록"
         routes={[
           { display: <DefaultHomeIcon />, href: ROUTES.HOME },
-          { display: "아카이브" },
           { display: "공연 목록", href: ROUTES.PERFORMANCE.LIST }
         ]}
       />
 
       {/* 도구 모음 */}
       <div className="mb-3 flex justify-between gap-x-2">
-        <Search />
+        <Search className="h-9 min-w-0 flex-1 md:h-10 md:w-80 md:flex-none" />
         <Button
           asChild
-          className="h-10 w-[136px] rounded-full text-[20px] font-semibold"
+          className="h-9 rounded-lg px-4 text-sm font-medium md:h-10 md:w-[136px] md:rounded-full md:text-[20px] md:font-semibold"
         >
           <Link href={ROUTES.ADMIN.PERFORMANCES}>
-            <CirclePlus size={24} className="me-[9px]" />
+            <CirclePlus className="me-1 size-4 md:me-[9px] md:size-6" />
             Create
           </Link>
         </Button>
