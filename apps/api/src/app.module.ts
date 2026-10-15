@@ -21,6 +21,7 @@ import { ObjectStorageModule } from "./object-storage/object-storage.module"
 import { UploadModule } from "./upload/upload.module"
 import { HealthModule } from "./health/health.module"
 import { NotificationModule } from "./notification/notification.module"
+import { PushModule } from "./push/push.module"
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ import { NotificationModule } from "./notification/notification.module"
     RentalModule,
     ObjectStorageModule,
     UploadModule,
-    NotificationModule
+    NotificationModule,
+    PushModule
   ],
   controllers: [AppController],
   providers: [AppService]
