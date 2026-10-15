@@ -4,6 +4,7 @@ import { SentryModule } from "@sentry/nestjs/setup"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { ConfigModule } from "@nestjs/config"
+import { EventEmitterModule } from "@nestjs/event-emitter"
 import { LoggerModule } from "nestjs-pino"
 import { pinoLoggerModuleOption } from "./common/logger/pino-logger.config"
 import { validateEnv } from "./common/config/env.schema"
@@ -19,6 +20,7 @@ import { RentalModule } from "./rental/rental.module"
 import { ObjectStorageModule } from "./object-storage/object-storage.module"
 import { UploadModule } from "./upload/upload.module"
 import { HealthModule } from "./health/health.module"
+import { NotificationModule } from "./notification/notification.module"
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { HealthModule } from "./health/health.module"
       cache: true,
       validate: validateEnv
     }),
+    EventEmitterModule.forRoot(),
     LoggerModule.forRoot(pinoLoggerModuleOption),
     PrismaModule,
     HealthModule,
@@ -40,7 +43,8 @@ import { HealthModule } from "./health/health.module"
     EquipmentModule,
     RentalModule,
     ObjectStorageModule,
-    UploadModule
+    UploadModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService]

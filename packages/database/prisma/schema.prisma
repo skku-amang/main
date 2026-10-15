@@ -33,6 +33,13 @@ enum EquipCategory {
   ETC //그 외
 }
 
+enum NotificationType {
+  TEAM_MEMBER_CHANGE // 팀 멤버 추가/제거
+  TEAM_ATTRIBUTE_CHANGE // 팀 곡명/세션 등 변경
+  TEAM_CREATED // 공연에 새 팀 생성
+  PERFORMANCE_CREATED // 새 공연 생성
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   email      String   @unique
@@ -58,6 +65,8 @@ model User {
 
   rentalLogs     EquipmentRental[] @relation("rentalUsers")
   createdRentals EquipmentRental[] @relation("rentalCreator")
+
+  notifications Notification[] @relation("notifications")
 
   @@map("users")
 }
@@ -208,4 +217,20 @@ model EquipmentRental {
   users    User[] @relation("rentalUsers")
 
   @@map("equipment_rentals")
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  recipientId Int
+  recipient   User @relation("notifications", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  type    NotificationType
+  payload Json // 이벤트 시점 스냅샷. 구조는 type별 (shared-types notification.schema)
+  readAt  DateTime? // null = 안 읽음
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId, readAt])
+  @@map("notifications")
 }

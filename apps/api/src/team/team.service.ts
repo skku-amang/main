@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { CreateTeamDto } from "./dto/create-team.dto"
 import { UpdateTeamDto } from "./dto/update-team.dto"
 import { TeamApplicationDto } from "./dto/team-application.dto"
@@ -27,14 +28,24 @@ import {
 } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
+import {
+  TEAM_EVENTS,
+  TeamCreatedEvent,
+  TeamMemberAddedEvent,
+  TeamMemberRemovedEvent,
+  TeamUpdatedEvent,
+  changedTeamFields,
+  diffRoster
+} from "./team.events"
 
 @Injectable()
 export class TeamService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly objectStorageService: ObjectStorageService
+    private readonly objectStorageService: ObjectStorageService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
-  async create(createTeamDto: CreateTeamDto) {
+  async create(createTeamDto: CreateTeamDto, actorId: number) {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
 
@@ -116,6 +127,10 @@ export class TeamService {
           sessionCount: memberSessions?.length ?? 0
         }
       })
+      this.eventEmitter.emit(
+        TEAM_EVENTS.CREATED,
+        new TeamCreatedEvent(team.id, actorId)
+      )
 
       return this.findOne(team.id)
     } catch (error) {
@@ -159,7 +174,7 @@ export class TeamService {
     return team
   }
 
-  async update(id: number, updateTeamDto: UpdateTeamDto) {
+  async update(id: number, updateTeamDto: UpdateTeamDto, actorId: number) {
     const {
       leaderId,
       performanceId,
@@ -188,6 +203,8 @@ export class TeamService {
       )
 
     const oldImageUrl = existingTeam.image
+    const changedFields = changedTeamFields(existingTeam, updateTeamDto)
+    const roster = diffRoster(existingTeam.teamSessions, memberSessions)
 
     const prismaOperaions: Prisma.PrismaPromise<any>[] = []
 
@@ -307,6 +324,22 @@ export class TeamService {
       if (image !== undefined && oldImageUrl && oldImageUrl !== image)
         this.objectStorageService.deleteObjectSafely(oldImageUrl)
 
+      if (changedFields.length > 0)
+        this.eventEmitter.emit(
+          TEAM_EVENTS.UPDATED,
+          new TeamUpdatedEvent(id, changedFields, actorId)
+        )
+      for (const [userId, sessionIds] of roster.removed)
+        this.eventEmitter.emit(
+          TEAM_EVENTS.MEMBER_REMOVED,
+          new TeamMemberRemovedEvent(id, userId, sessionIds, actorId)
+        )
+      for (const [userId, sessionIds] of roster.added)
+        this.eventEmitter.emit(
+          TEAM_EVENTS.MEMBER_ADDED,
+          new TeamMemberAddedEvent(id, userId, sessionIds, actorId)
+        )
+
       return this.findOne(id)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -409,6 +442,15 @@ export class TeamService {
       await this.prisma.teamMember.createMany({
         data: newMembers
       })
+      this.eventEmitter.emit(
+        TEAM_EVENTS.MEMBER_ADDED,
+        new TeamMemberAddedEvent(
+          id,
+          userId,
+          applyTeamDto.map((s) => s.sessionId),
+          userId
+        )
+      )
 
       return this.findOne(id)
     } catch (error) {
@@ -487,6 +529,15 @@ export class TeamService {
           }
         }
       })
+      this.eventEmitter.emit(
+        TEAM_EVENTS.MEMBER_REMOVED,
+        new TeamMemberRemovedEvent(
+          id,
+          userId,
+          unapplyTeamDto.map((s) => s.sessionId),
+          userId
+        )
+      )
       return this.findOne(id)
     } catch (error) {
       throw error
