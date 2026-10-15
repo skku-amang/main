@@ -41,7 +41,7 @@
 이미 SSOT가 있는 내용은 복붙하지 말고 링크한다.
 
 - **이슈·브랜치·PR·커밋 규칙**: [CONTRIBUTING.md](../../CONTRIBUTING.md) (= [how-to/contributing.md](./contributing.md))
-- **외부 도구(Figma·Notion·Slack·Sentry 등) 계정·연동**: 루트 [AGENTS.md](../../AGENTS.md)의 외부 도구 컨텍스트 섹션
+- **외부 도구(Figma·Notion·Slack·Sentry·Kargo·ArgoCD 등) 계정·접근 방법**: [reference/tools.md](../reference/tools.md)
 - **도메인 용어 정의**: [reference/glossary.md](../reference/glossary.md)
 
 ## 5. ADR 작성
