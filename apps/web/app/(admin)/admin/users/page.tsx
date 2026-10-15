@@ -8,10 +8,14 @@ import { DeleteConfirmDialog } from "@/app/(admin)/_components/data-table/Delete
 import { useToast } from "@/components/hooks/use-toast"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
-import { useDeleteUser, useUpdateUser, useUsers } from "@/hooks/api/useUser"
+import {
+  useDeleteUser,
+  useUpdateUser,
+  useUsersForAdmin
+} from "@/hooks/api/useUser"
 import { formatGenerationOrder } from "@/lib/utils"
 import { getSessionDisplayName } from "@/constants/session"
-import { publicUser } from "@repo/shared-types"
+import { DetailedUser } from "@repo/shared-types"
 import { ApiError } from "@repo/api-client"
 
 import { getColumns } from "./_components/columns"
@@ -20,14 +24,14 @@ import { UserFormDialog } from "./_components/UserFormDialog"
 export default function UsersAdminPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const { data: users, isLoading } = useUsers()
+  const { data: users, isLoading } = useUsersForAdmin()
   const { data: generations } = useGenerations()
   const { data: sessions } = useSessions()
 
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [editing, setEditing] = useState<publicUser | null>(null)
-  const [deleting, setDeleting] = useState<publicUser | null>(null)
+  const [editing, setEditing] = useState<DetailedUser | null>(null)
+  const [deleting, setDeleting] = useState<DetailedUser | null>(null)
 
   const updateMutation = useUpdateUser()
   const deleteMutation = useDeleteUser()

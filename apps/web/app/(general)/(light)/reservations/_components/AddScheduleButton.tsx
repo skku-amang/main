@@ -123,7 +123,7 @@ export default function AddScheduleButton({
 }: AddScheduleButtonProps) {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
-  const { data: users } = useUsers()
+  const { data: users } = useUsers({ enabled: !!user })
   const createRental = useCreateRental()
   const queryClient = useQueryClient()
   const { toast } = useToast()
