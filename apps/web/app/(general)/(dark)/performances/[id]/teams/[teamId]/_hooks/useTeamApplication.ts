@@ -2,6 +2,7 @@ import { useToast } from "@/components/hooks/use-toast"
 import { useApplyToTeam } from "@/hooks/api/useTeam"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import { ApiError } from "@repo/api-client"
 
 type SelectedSessionWithIndex = {
   sessionId: number
@@ -29,9 +30,11 @@ const useTeamApplication = (teamId: number) => {
       toast({
         title: "지원 실패",
         description:
-          error instanceof Error
-            ? error.message
-            : "팀 지원 중 오류가 발생했습니다.",
+          error instanceof ApiError
+            ? (error.detail ?? error.message)
+            : error instanceof Error
+              ? error.message
+              : "팀 지원 중 오류가 발생했습니다.",
         variant: "destructive"
       })
     }

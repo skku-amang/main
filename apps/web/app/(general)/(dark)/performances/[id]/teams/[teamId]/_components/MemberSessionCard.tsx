@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/providers/auth-provider"
 import { formatGenerationOrder } from "@/lib/utils"
 import type { SessionNameValue } from "@/constants/session"
 import { TeamDetail } from "@repo/shared-types"
+import { ApiError } from "@repo/api-client"
 
 type TeamMember = TeamDetail["teamSessions"][number]["members"][number]["user"]
 
@@ -52,9 +53,11 @@ const MemberSessionCard = ({
       toast({
         title: "탈퇴 실패",
         description:
-          error instanceof Error
-            ? error.message
-            : "팀 탈퇴 중 오류가 발생했습니다.",
+          error instanceof ApiError
+            ? (error.detail ?? error.message)
+            : error instanceof Error
+              ? error.message
+              : "팀 탈퇴 중 오류가 발생했습니다.",
         variant: "destructive"
       })
     }

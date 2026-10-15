@@ -27,6 +27,7 @@ import {
 import { useToast } from "@/components/hooks/use-toast"
 import { useDeleteRental } from "@/hooks/api/useRental"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { ApiError } from "@repo/api-client"
 
 interface RentalDetailModalProps {
   rental: RentalDetail | null
@@ -63,9 +64,11 @@ export default function RentalDetailModal({
           variant: "destructive",
           title: "삭제 실패",
           description:
-            error instanceof Error
-              ? error.message
-              : "예약을 삭제하지 못했습니다."
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : error instanceof Error
+                ? error.message
+                : "예약을 삭제하지 못했습니다."
         })
       }
     })
