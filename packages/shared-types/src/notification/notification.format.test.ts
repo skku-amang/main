@@ -18,7 +18,8 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "팀A",
       body: "홍길동님이 보컬, 기타 멤버로 합류했습니다",
-      href: "/performances/3/teams/7"
+      href: "/performances/3/teams/7",
+      tag: "team-7"
     })
   })
 
@@ -52,7 +53,8 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "팀A",
       body: "팀 정보가 바뀌었습니다: 곡명, 세션 구성, 공연",
-      href: "/performances/3/teams/7"
+      href: "/performances/3/teams/7",
+      tag: "team-7"
     })
   })
 
@@ -70,7 +72,8 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "봄 공연",
       body: "새 팀이 생겼습니다: 팀B",
-      href: "/performances/3/teams/9"
+      href: "/performances/3/teams/9",
+      tag: "team-9"
     })
   })
 
@@ -83,7 +86,8 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "새 공연",
       body: "봄 공연 팀 모집이 시작됐습니다",
-      href: "/performances/3/teams"
+      href: "/performances/3/teams",
+      tag: "performance-3"
     })
   })
 })

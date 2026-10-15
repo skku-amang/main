@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 
+import ROUTES from "@/constants/routes"
 import { SEO } from "@/constants/seo"
 
 /**
@@ -28,6 +29,12 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
         purpose: "maskable"
       }
+    ],
+    // 홈 화면 아이콘 길게 누르기 메뉴
+    shortcuts: [
+      { name: "알림", url: ROUTES.NOTIFICATIONS },
+      { name: "공연 목록", url: ROUTES.PERFORMANCE.LIST },
+      { name: "동방 예약", url: ROUTES.RESERVATION.CLUBROOM }
     ]
   }
 }

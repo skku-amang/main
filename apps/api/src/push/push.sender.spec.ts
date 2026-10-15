@@ -22,23 +22,50 @@ jest.mock("web-push", () => ({
 
 const sendNotification = webpush.sendNotification as jest.Mock
 
-const message = { title: "팀A", body: "홍길동님이 합류했습니다", href: "/x" }
+const message = {
+  title: "팀A",
+  body: "홍길동님이 합류했습니다",
+  href: "/x",
+  tag: "team-1"
+}
 
 describe("PushSender", () => {
   let sender: PushSender
   let prisma: {
     pushSubscription: { findMany: jest.Mock; deleteMany: jest.Mock }
+    notification: { groupBy: jest.Mock }
   }
 
   const makeSender = async (env: Record<string, string>) => {
     prisma = {
       pushSubscription: {
         findMany: jest.fn(async () => [
-          { id: 1, endpoint: "https://push/ok1", p256dh: "p", auth: "a" },
-          { id: 2, endpoint: "https://push/gone", p256dh: "p", auth: "a" },
-          { id: 3, endpoint: "https://push/ok2", p256dh: "p", auth: "a" }
+          {
+            id: 1,
+            userId: 7,
+            endpoint: "https://push/ok1",
+            p256dh: "p",
+            auth: "a"
+          },
+          {
+            id: 2,
+            userId: 7,
+            endpoint: "https://push/gone",
+            p256dh: "p",
+            auth: "a"
+          },
+          {
+            id: 3,
+            userId: 8,
+            endpoint: "https://push/ok2",
+            p256dh: "p",
+            auth: "a"
+          }
         ]),
         deleteMany: jest.fn(async () => ({ count: 1 }))
+      },
+      notification: {
+        groupBy: jest.fn(async () => [{ recipientId: 7, _count: { _all: 3 } }])
       }
     }
     const module: TestingModule = await Test.createTestingModule({
@@ -80,13 +107,25 @@ describe("PushSender", () => {
       })
     })
 
-    it("푸시 본문은 title·body·href JSON", async () => {
+    it("푸시 본문에 수신자별 안 읽은 알림 수(badge)를 싣는다", async () => {
       sendNotification.mockResolvedValue({ statusCode: 201 })
 
-      await sender.sendToUsers([7], message)
+      await sender.sendToUsers([7, 8], message)
 
-      const [, payload] = sendNotification.mock.calls[0]
-      expect(JSON.parse(payload)).toEqual(message)
+      const badgeByEndpoint = Object.fromEntries(
+        sendNotification.mock.calls.map(([sub, payload]) => [
+          sub.endpoint,
+          JSON.parse(payload).badge
+        ])
+      )
+      expect(badgeByEndpoint).toEqual({
+        "https://push/ok1": 3,
+        "https://push/gone": 3,
+        "https://push/ok2": 0
+      })
+      expect(JSON.parse(sendNotification.mock.calls[0][1])).toMatchObject(
+        message
+      )
     })
 
     it("그 외 실패(5xx)는 구독을 지우지 않고 넘어간다", async () => {

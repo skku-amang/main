@@ -20,8 +20,10 @@ export class PushListener {
   @OnEvent(NOTIFICATION_EVENTS.CREATED)
   async onNotificationCreated(event: NotificationCreatedEvent) {
     try {
-      const { title, body, href } = formatNotification(event.content)
-      await this.sender.sendToUsers(event.recipientIds, { title, body, href })
+      await this.sender.sendToUsers(
+        event.recipientIds,
+        formatNotification(event.content)
+      )
     } catch (error) {
       this.logger.error("푸시 발송 실패", error)
     }

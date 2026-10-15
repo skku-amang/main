@@ -30,6 +30,8 @@ export type FormattedNotification = {
   title: string
   body: string
   href: string
+  /** 같은 tag의 푸시는 기기 알림창에서 최신 것으로 덮어쓴다 */
+  tag: string
 }
 
 /** Pick을 union 각 멤버에 분배해 type↔payload 상관관계를 유지한다 */
@@ -44,6 +46,8 @@ export type NotificationContent = DistributivePick<
 
 const teamHref = (performanceId: number, teamId: number) =>
   `/performances/${performanceId}/teams/${teamId}`
+
+const teamTag = (teamId: number) => `team-${teamId}`
 
 /**
  * 저장된 type + payload를 사람이 읽을 문구와 이동 경로로 바꾼다.
@@ -65,7 +69,8 @@ export function formatNotification(
       return {
         title: p.teamName,
         body,
-        href: teamHref(p.performanceId, p.teamId)
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
       }
     }
     case "TEAM_ATTRIBUTE_CHANGE": {
@@ -76,7 +81,8 @@ export function formatNotification(
       return {
         title: p.teamName,
         body: `팀 정보가 바뀌었습니다: ${fields}`,
-        href: teamHref(p.performanceId, p.teamId)
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
       }
     }
     case "TEAM_CREATED": {
@@ -84,7 +90,8 @@ export function formatNotification(
       return {
         title: p.performanceName,
         body: `새 팀이 생겼습니다: ${p.teamName}`,
-        href: teamHref(p.performanceId, p.teamId)
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
       }
     }
     case "PERFORMANCE_CREATED": {
@@ -92,7 +99,8 @@ export function formatNotification(
       return {
         title: "새 공연",
         body: `${p.performanceName} 팀 모집이 시작됐습니다`,
-        href: `/performances/${p.performanceId}/teams`
+        href: `/performances/${p.performanceId}/teams`,
+        tag: `performance-${p.performanceId}`
       }
     }
   }
