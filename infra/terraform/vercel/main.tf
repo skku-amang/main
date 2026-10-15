@@ -89,6 +89,9 @@ resource "vercel_project_domain" "main" {
 resource "vercel_project_domain" "staging" {
   project_id = vercel_project.web.id
   domain     = "amang.staging.json-server.win"
+  # 브랜치 미지정 도메인은 production 도메인으로 취급되어 promote 때 production 빌드로 함께 옮겨진다.
+  # 빌드되지 않는 브랜치(env/*는 ignore_command로 제외)에 묶어 Kargo staging alias만 이 도메인을 바꾸게 한다
+  git_branch = "env/staging"
 }
 
 resource "vercel_project_environment_variable" "site_url_production" {
