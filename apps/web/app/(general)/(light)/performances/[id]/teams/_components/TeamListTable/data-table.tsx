@@ -66,7 +66,10 @@ import {
   SelectItem,
   SelectTrigger
 } from "../Mobile/SortSelect"
+import CompactTeamList from "./CompactTeamList"
 import { TeamColumn } from "./columns"
+import { useTeamListView } from "./useTeamListView"
+import { ViewSwitchButton, ViewToggle } from "./ViewToggle"
 import {
   Drawer,
   DrawerClose,
@@ -285,9 +288,36 @@ export function TeamListDataTable<TValue>({
       : [])
   ]
 
+  // 고른 적 없으면 휴대폰은 카드, 데스크톱은 표
+  const [view, setView] = useTeamListView()
+  const desktopView = view ?? "table"
+  const mobileView = view ?? "card"
+
+  const rowsOnPage = table.getRowModel().rows
+  const emptyMessage = (
+    <div className="flex flex-col items-center justify-center py-10 font-semibold text-gray-400">
+      생성된 공연팀이 존재하지 않습니다
+    </div>
+  )
+  const teamCards = rowsOnPage.map((row) => (
+    <TeamCard
+      key={row.id}
+      performanceId={performanceId}
+      id={row.original.id}
+      songName={row.original.songName}
+      songArtist={row.original.songArtist}
+      isFreshmenFixed={row.original.isFreshmenFixed}
+      isSelfMade={row.original.isSelfMade}
+      isBookmarked={row.original.isBookmarked}
+      image={row.original.image}
+      leader={row.original.leader}
+      missingTeamSessions={missingMemberSessions(row.original.teamSessions)}
+    />
+  ))
+
   return (
     <div className={className}>
-      {/* 데스크톱: 테이블 보기 */}
+      {/* 데스크톱 */}
       <div className="hidden md:block">
         {/* 헤더 */}
         <div className="flex items-center justify-between py-[25px]">
@@ -303,8 +333,10 @@ export function TeamListDataTable<TValue>({
             className="max-w-sm"
           />
 
-          {/* 생성 및 필터 */}
+          {/* 보기 형식, 생성, 필터 */}
           <div className="flex gap-4">
+            <ViewToggle view={desktopView} onChange={setView} />
+
             {/* 생성 버튼 */}
             {isRecruiting ? (
               <Button
@@ -373,62 +405,71 @@ export function TeamListDataTable<TValue>({
           </div>
         </div>
 
-        {/* 테이블 */}
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-none">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className="border-y border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg first:border-l last:rounded-r-lg last:border-r"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] transition-all duration-300 hover:drop-shadow-[2px_2px_4px_rgb(0,0,0,0.06)]"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="bg-transparent first:rounded-l-lg last:rounded-r-lg"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+        {desktopView === "card" ? (
+          rowsOnPage.length ? (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+              {teamCards}
+            </div>
+          ) : (
+            emptyMessage
+          )
+        ) : (
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="border-none">
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className="border-y border-gray-200 bg-gray-100 py-0 font-semibold text-neutral-600 first:rounded-l-lg first:border-l last:rounded-r-lg last:border-r"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center font-semibold text-gray-400"
-                >
-                  생성된 공연팀이 존재하지 않습니다
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="bg-white drop-shadow-[0_1px_2px_rgb(0,0,0,0.06)] transition-all duration-300 hover:drop-shadow-[2px_2px_4px_rgb(0,0,0,0.06)]"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="bg-transparent first:rounded-l-lg last:rounded-r-lg"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center font-semibold text-gray-400"
+                  >
+                    생성된 공연팀이 존재하지 않습니다
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
 
         {/* 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
@@ -547,6 +588,9 @@ export function TeamListDataTable<TValue>({
               </SelectContent>
             </Select>
 
+            {/* 보기 형식 */}
+            <ViewSwitchButton view={mobileView} onChange={setView} />
+
             {/* 생성 버튼 */}
             {isRecruiting ? (
               <Link
@@ -566,33 +610,14 @@ export function TeamListDataTable<TValue>({
 
         <Separator orientation="horizontal" className="my-3" />
 
-        {/* 카드 목록 */}
-        <div className="space-y-3">
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <div key={row.id}>
-                <TeamCard
-                  performanceId={performanceId}
-                  id={row.original.id}
-                  songName={row.original.songName}
-                  songArtist={row.original.songArtist}
-                  isFreshmenFixed={row.original.isFreshmenFixed}
-                  isSelfMade={row.original.isSelfMade}
-                  isBookmarked={row.original.isBookmarked}
-                  image={row.original.image}
-                  leader={row.original.leader}
-                  missingTeamSessions={missingMemberSessions(
-                    row.original.teamSessions
-                  )}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center">
-              생성된 공연팀이 존재하지 않습니다
-            </div>
-          )}
-        </div>
+        {/* 팀 목록 */}
+        {!rowsOnPage.length ? (
+          emptyMessage
+        ) : mobileView === "card" ? (
+          <div className="space-y-3">{teamCards}</div>
+        ) : (
+          <CompactTeamList rows={rowsOnPage} />
+        )}
 
         {/* 모바일 페이지네이션 */}
         {table.getRowModel().rows.length > 0 && (
