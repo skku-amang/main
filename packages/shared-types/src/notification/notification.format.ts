@@ -75,7 +75,7 @@ export function formatNotification(
         .join(", ")
       return {
         title: p.teamName,
-        body: `${fields}이 바뀌었습니다`,
+        body: `팀 정보가 바뀌었습니다: ${fields}`,
         href: teamHref(p.performanceId, p.teamId)
       }
     }

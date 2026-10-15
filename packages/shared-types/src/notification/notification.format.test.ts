@@ -51,7 +51,7 @@ describe("formatNotification", () => {
       })
     ).toEqual({
       title: "팀A",
-      body: "곡명, 세션 구성, 공연이 바뀌었습니다",
+      body: "팀 정보가 바뀌었습니다: 곡명, 세션 구성, 공연",
       href: "/performances/3/teams/7"
     })
   })
