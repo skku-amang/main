@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
 import { NotificationType, Prisma } from "@repo/database"
-import { NotificationPayload } from "@repo/shared-types"
+import { NotificationContent } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
 import {
   PERFORMANCE_EVENTS,
@@ -61,12 +61,14 @@ export class NotificationListener {
 
       await this.create(
         teamMemberIds(team).filter((id) => id !== event.actorId),
-        NotificationType.TEAM_ATTRIBUTE_CHANGE,
         {
-          teamId: team.id,
-          performanceId: team.performanceId,
-          teamName: team.name,
-          changedFields: event.changedFields
+          type: NotificationType.TEAM_ATTRIBUTE_CHANGE,
+          payload: {
+            teamId: team.id,
+            performanceId: team.performanceId,
+            teamName: team.name,
+            changedFields: event.changedFields
+          }
         }
       )
     })
@@ -98,11 +100,14 @@ export class NotificationListener {
         performance.teams.flatMap(teamMemberIds)
       ).filter((id) => id !== event.actorId)
 
-      await this.create(recipientIds, NotificationType.TEAM_CREATED, {
-        performanceId: performance.id,
-        performanceName: performance.name,
-        teamId: team.id,
-        teamName: team.name
+      await this.create(recipientIds, {
+        type: NotificationType.TEAM_CREATED,
+        payload: {
+          performanceId: performance.id,
+          performanceName: performance.name,
+          teamId: team.id,
+          teamName: team.name
+        }
       })
     })
   }
@@ -122,8 +127,13 @@ export class NotificationListener {
 
       await this.create(
         users.map((u) => u.id).filter((id) => id !== event.actorId),
-        NotificationType.PERFORMANCE_CREATED,
-        { performanceId: performance.id, performanceName: performance.name }
+        {
+          type: NotificationType.PERFORMANCE_CREATED,
+          payload: {
+            performanceId: performance.id,
+            performanceName: performance.name
+          }
+        }
       )
     })
   }
@@ -151,13 +161,16 @@ export class NotificationListener {
       ...(changeType === "REMOVED" ? [event.userId] : [])
     ]).filter((id) => id !== event.actorId)
 
-    await this.create(recipientIds, NotificationType.TEAM_MEMBER_CHANGE, {
-      teamId: team.id,
-      performanceId: team.performanceId,
-      teamName: team.name,
-      changeType,
-      memberName: member.name,
-      sessionNames: sessions.map((s) => s.name)
+    await this.create(recipientIds, {
+      type: NotificationType.TEAM_MEMBER_CHANGE,
+      payload: {
+        teamId: team.id,
+        performanceId: team.performanceId,
+        teamName: team.name,
+        changeType,
+        memberName: member.name,
+        sessionNames: sessions.map((s) => s.name)
+      }
     })
   }
 
@@ -168,23 +181,19 @@ export class NotificationListener {
     })
   }
 
-  private async create<T extends NotificationType>(
-    recipientIds: number[],
-    type: T,
-    payload: NotificationPayload<T>
-  ) {
+  private async create(recipientIds: number[], content: NotificationContent) {
     if (recipientIds.length === 0) return
 
     await this.prisma.notification.createMany({
       data: recipientIds.map((recipientId) => ({
         recipientId,
-        type,
-        payload
+        type: content.type,
+        payload: content.payload
       }))
     })
     this.eventEmitter.emit(
       NOTIFICATION_EVENTS.CREATED,
-      new NotificationCreatedEvent(recipientIds, type, payload)
+      new NotificationCreatedEvent(recipientIds, content)
     )
   }
 
