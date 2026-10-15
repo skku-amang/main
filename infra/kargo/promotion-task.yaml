@@ -1,17 +1,18 @@
-# Freight의 커밋에서 infra/k8s/api(base + overlays)를 그대로 env/<stage> 브랜치로 복사하고,
+# Freight의 커밋에서 infra/k8s/{api,web}(base + overlays)를 그대로 env/<stage> 브랜치로 복사하고,
 # 해당 stage overlay의 이미지 태그만 Freight 것으로 바꿔 커밋한다.
-# ArgoCD 앱 api-<stage>는 env/<stage> 브랜치의 infra/k8s/api/overlays/<stage>를 바라본다
-# (homelab k8s/argocd/applications/apps/amang/api.yaml). base 변경도 승격을 거쳐야 반영된다.
+# 같은 브랜치를 git-clear로 비우고 다시 채우므로 api·web을 한 task에서 같이 써야 서로 지우지 않는다.
+# ArgoCD 앱 api-<stage>·web-<stage>는 env/<stage> 브랜치의 infra/k8s/<app>/overlays/<stage>를 바라본다
+# (homelab k8s/argocd/applications/apps/amang/{api,web}.yaml). base 변경도 승격을 거쳐야 반영된다.
 apiVersion: kargo.akuity.io/v1alpha1
 kind: PromotionTask
 metadata:
-  name: promote-api
+  name: promote-k8s
   namespace: amang
 spec:
   vars:
     - name: gitRepo
       value: https://github.com/skku-amang/main
-    - name: imageRepo
+    - name: apiImage
       value: ghcr.io/skku-amang/amang-api
   steps:
     - uses: git-clone
@@ -33,6 +34,11 @@ spec:
       config:
         inPath: ./src/infra/k8s/api
         outPath: ./out/infra/k8s/api
+    - uses: copy
+      as: copy-web-manifests
+      config:
+        inPath: ./src/infra/k8s/web
+        outPath: ./out/infra/k8s/web
     # Vercel은 ignore_command보다 Root Directory(apps/web) 존재 확인을 먼저 해서, 이게 없으면 env 브랜치 push마다
     # 빌드가 ERROR로 끝난다. apps/web/vercel.json으로 이 브랜치의 Vercel 배포 자체를 끈다
     - uses: copy
@@ -41,17 +47,26 @@ spec:
         inPath: ./src/infra/kargo/env-branch/apps
         outPath: ./out/apps
     - uses: kustomize-set-image
-      as: update-image
+      as: update-api-image
       config:
         path: ./out/infra/k8s/api/overlays/${{ ctx.stage }}
         images:
-          - image: ${{ vars.imageRepo }}
-            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+          - image: ${{ vars.apiImage }}
+            tag: ${{ imageFrom(vars.apiImage).Tag }}
+    - uses: kustomize-set-image
+      as: update-web-image
+      config:
+        path: ./out/infra/k8s/web/overlays/${{ ctx.stage }}
+        images:
+          # web은 stage별 이미지 (apps/web/env/<stage>.env로 빌드)
+          - image: ghcr.io/skku-amang/amang-web
+            newName: ghcr.io/skku-amang/amang-web-${{ ctx.stage }}
+            tag: ${{ imageFrom('ghcr.io/skku-amang/amang-web-' + ctx.stage).Tag }}
     - uses: git-commit
       as: commit
       config:
         path: ./out
-        message: ${{ task.outputs['update-image'].commitMessage }}
+        message: ${{ task.outputs['update-api-image'].commitMessage }}
     - uses: git-push
       as: push
       config:
@@ -61,6 +76,16 @@ spec:
       config:
         apps:
           - name: api-${{ ctx.stage }}
+            sources:
+              - repoURL: ${{ vars.gitRepo }}
+                desiredRevision: ${{ task.outputs.commit.commit }}
+    # production web은 아직 Vercel (promote-web). 홈랩으로 옮기면 if를 지운다 (#749)
+    - uses: argocd-update
+      as: sync-argocd-web
+      if: ${{ ctx.stage == 'staging' }}
+      config:
+        apps:
+          - name: web-${{ ctx.stage }}
             sources:
               - repoURL: ${{ vars.gitRepo }}
                 desiredRevision: ${{ task.outputs.commit.commit }}

@@ -13,9 +13,8 @@
  * 요청은 그대로 401/403을 받는다.
  *
  * `VERCEL_ENV === "preview"` 단독으로 판정하지 않는다: staging은 preview 배포에
- * 커스텀 도메인을 alias한 형태([deploy-staging.yml](../../../../.github/workflows/deploy-staging.yml))라
- * `VERCEL_ENV`가 preview인데도 cookie 스코프 안이며, 게이트가 정상 동작해야 하는
- * 환경이다. production 배포의 `*.vercel.app` URL은 cookie 스코프 밖이지만
+ * 커스텀 도메인을 alias한 형태였어서 `VERCEL_ENV`가 preview인데도 cookie 스코프 안이며,
+ * 게이트가 정상 동작해야 하는 환경이었다. (staging은 이제 홈랩 K3s, #749) production 배포의 `*.vercel.app` URL은 cookie 스코프 밖이지만
  * 우회 대상에서 제외해 노출면을 좁힌다.
  */
 const VERCEL_PREVIEW_HOST_SUFFIX = ".vercel.app"
