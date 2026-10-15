@@ -10,6 +10,40 @@ export type ProblemDocument = {
   instance?: string
 }
 
+/**
+ * 서버가 ProblemDocument.type으로 보내는 에러 종류.
+ * 에러 클래스의 type과 index.ts의 변환표가 모두 이 값을 참조한다.
+ */
+export const ErrorType = {
+  NOT_FOUND: "/errors/not-found",
+  INTERNAL_SERVER_ERROR: "/errors/internal-server-error",
+  VALIDATION_ERROR: "/errors/validation-error",
+  AUTHENTICATION_ERROR: "/errors/authentication-error",
+  FORBIDDEN: "/errors/forbidden",
+  CONFLICT: "/errors/conflict",
+  UNPROCESSABLE_ENTITY: "/errors/unprocessable-entity",
+  TEAM_DUPLICATE_APPLICATION: "/errors/team/duplicate-application",
+  TEAM_POSITION_OCCUPIED: "/errors/team/position-occupied",
+  TEAM_SESSION_NOT_FOUND: "/errors/team/session-not-found",
+  TEAM_NO_APPLICATION_FOUND: "/errors/team/no-application-found",
+  TEAM_INVALID_MEMBER_INDEX: "/errors/team/invalid-member-index",
+  TEAM_DUPLICATE_MEMBER_INDEX: "/errors/team/duplicate-member-index",
+  TEAM_DUPLICATE_SESSION_USER: "/errors/team/duplicate-session-user",
+  TEAM_DUPLICATE_TEAM_SESSION: "/errors/team/duplicate-team-session",
+  TEAM_REFERENCED_ENTITY_NOT_FOUND: "/errors/team/referenced-entity-not-found",
+  TEAM_PERFORMANCE_RECRUITMENT_CLOSED:
+    "/errors/team/performance-recruitment-closed",
+  PERFORMANCE_INVALID_PERFORMANCE_DATE:
+    "/errors/performance/invalid-performance-date",
+  USER_NOT_APPROVED: "/errors/user/not-approved",
+  TOKEN_REFRESH_TOKEN_EXPIRED: "/errors/token/refresh-token-expired",
+  TOKEN_ACCESS_TOKEN_EXPIRED: "/errors/token/access-token-expired",
+  TOKEN_REFRESH_TOKEN_NOT_FOUND: "/errors/token/refresh-token-not-found",
+  TOKEN_ACCESS_TOKEN_NOT_FOUND: "/errors/token/access-token-not-found"
+} as const
+
+export type ErrorTypeValue = (typeof ErrorType)[keyof typeof ErrorType]
+
 export abstract class ApiError extends Error {
   abstract readonly type: string
   abstract readonly status: number
@@ -26,7 +60,7 @@ export abstract class ApiError extends Error {
 }
 
 export class NotFoundError extends ApiError {
-  readonly type = "/errors/not-found"
+  readonly type = ErrorType.NOT_FOUND
   readonly status = 404
   readonly title = "Not Found"
 
@@ -36,7 +70,7 @@ export class NotFoundError extends ApiError {
 }
 
 export class InternalServerError extends ApiError {
-  readonly type = "/errors/internal-server-error"
+  readonly type = ErrorType.INTERNAL_SERVER_ERROR
   readonly status = 500
   readonly title = "Internal Server Error"
 
@@ -61,7 +95,7 @@ export class UpstreamError extends InternalServerError {
 }
 
 export class ValidationError extends ApiError {
-  readonly type = "/errors/validation-error"
+  readonly type = ErrorType.VALIDATION_ERROR
   readonly status = 400
   readonly title = "Validation Error"
 
@@ -71,7 +105,7 @@ export class ValidationError extends ApiError {
 }
 
 export class AuthError extends ApiError {
-  readonly type = "/errors/authentication-error"
+  readonly type = ErrorType.AUTHENTICATION_ERROR
   readonly status = 401
   readonly title = "Authentication Error"
 
@@ -81,7 +115,7 @@ export class AuthError extends ApiError {
 }
 
 export class ForbiddenError extends ApiError {
-  readonly type = "/errors/forbidden"
+  readonly type = ErrorType.FORBIDDEN
   readonly status = 403
   readonly title = "Forbidden"
 
@@ -95,7 +129,7 @@ export class ForbiddenError extends ApiError {
  * @example 중복된 데이터 생성 시
  */
 export class ConflictError extends ApiError {
-  readonly type = "/errors/conflict"
+  readonly type = ErrorType.CONFLICT
   readonly status = 409
   readonly title = "Conflict"
 
@@ -110,7 +144,7 @@ export class ConflictError extends ApiError {
  * @example 유효하지 않은 외래 키 참조
  */
 export class UnprocessableEntityError extends ApiError {
-  readonly type = "/errors/unprocessable-entity"
+  readonly type = ErrorType.UNPROCESSABLE_ENTITY
   readonly status = 422
   readonly title = "Unprocessable Entity"
 
@@ -131,7 +165,7 @@ export class UnprocessableEntityError extends ApiError {
  * 사용자가 이미 지원한 세션에 중복으로 지원했을 때 발생하는 오류입니다.
  */
 export class DuplicateApplicationError extends ApiError {
-  readonly type = "/errors/team/duplicate-application"
+  readonly type = ErrorType.TEAM_DUPLICATE_APPLICATION
   readonly status = 409
   readonly title = "Conflict"
 
@@ -144,7 +178,7 @@ export class DuplicateApplicationError extends ApiError {
  * 지원하려는 포지션(인덱스)을 이미 다른 사용자가 선점했을 때 발생하는 오류입니다.
  */
 export class PositionOccupiedError extends ApiError {
-  readonly type = "/errors/team/position-occupied"
+  readonly type = ErrorType.TEAM_POSITION_OCCUPIED
   readonly status = 409
   readonly title = "Conflict"
 
@@ -157,7 +191,7 @@ export class PositionOccupiedError extends ApiError {
  * 요청한 팀 내에 특정 세션이 존재하지 않을 때 발생하는 오류입니다.
  */
 export class SessionNotFoundError extends ApiError {
-  readonly type = "/errors/team/session-not-found"
+  readonly type = ErrorType.TEAM_SESSION_NOT_FOUND
   readonly status = 404
   readonly title = "Not Found"
 
@@ -170,7 +204,7 @@ export class SessionNotFoundError extends ApiError {
  * 지원 기록이 존재하지 않아 취소할 수 없을 때 발생하는 오류입니다.
  */
 export class NoApplicationFoundError extends ApiError {
-  readonly type = "/errors/team/no-application-found"
+  readonly type = ErrorType.TEAM_NO_APPLICATION_FOUND
   readonly status = 404
   readonly title = "Not Found"
 
@@ -183,7 +217,7 @@ export class NoApplicationFoundError extends ApiError {
  * 멤버의 인덱스가 세션 정원의 유효 범위를 벗어났을 때 발생하는 오류입니다.
  */
 export class InvalidMemberIndexError extends ApiError {
-  readonly type = "/errors/team/invalid-member-index"
+  readonly type = ErrorType.TEAM_INVALID_MEMBER_INDEX
   readonly status = 400
   readonly title = "Validation Error"
 
@@ -196,7 +230,7 @@ export class InvalidMemberIndexError extends ApiError {
  * 한 세션 내에 동일한 인덱스를 가진 멤버가 중복될 때 발생하는 오류입니다.
  */
 export class DuplicateMemberIndexError extends ApiError {
-  readonly type = "/errors/team/duplicate-member-index"
+  readonly type = ErrorType.TEAM_DUPLICATE_MEMBER_INDEX
   readonly status = 400
   readonly title = "Validation Error"
 
@@ -209,7 +243,7 @@ export class DuplicateMemberIndexError extends ApiError {
  * 한 세션 내에 동일한 사용자가 중복될 때 발생하는 오류입니다.
  */
 export class DuplicateSessionUserError extends ApiError {
-  readonly type = "/errors/team/duplicate-session-user"
+  readonly type = ErrorType.TEAM_DUPLICATE_SESSION_USER
   readonly status = 400
   readonly title = "Validation Error"
 
@@ -222,7 +256,7 @@ export class DuplicateSessionUserError extends ApiError {
  * 한 팀에 동일한 세션을 중복하여 추가하려고 할 때 발생하는 오류입니다.
  */
 export class DuplicateTeamSessionError extends ApiError {
-  readonly type = "/errors/team/duplicate-team-session"
+  readonly type = ErrorType.TEAM_DUPLICATE_TEAM_SESSION
   readonly status = 422
   readonly title = "Unprocessable Entity"
 
@@ -239,7 +273,7 @@ export class DuplicateTeamSessionError extends ApiError {
  * 존재하지 않는 엔티티(팀장, 세션, 사용자 등)를 참조하려고 할 때 발생하는 오류입니다.
  */
 export class ReferencedEntityNotFoundError extends ApiError {
-  readonly type = "/errors/team/referenced-entity-not-found"
+  readonly type = ErrorType.TEAM_REFERENCED_ENTITY_NOT_FOUND
   readonly status = 422
   readonly title = "Unprocessable Entity"
 
@@ -256,7 +290,7 @@ export class ReferencedEntityNotFoundError extends ApiError {
  * 팀 모집이 마감된(종료 일시가 지난) 공연에 팀을 생성하거나, 팀을 그런 공연으로 옮기려고 할 때 발생하는 오류입니다.
  */
 export class PerformanceRecruitmentClosedError extends ApiError {
-  readonly type = "/errors/team/performance-recruitment-closed"
+  readonly type = ErrorType.TEAM_PERFORMANCE_RECRUITMENT_CLOSED
   readonly status = 409
   readonly title = "Conflict"
 
@@ -274,7 +308,7 @@ export class PerformanceRecruitmentClosedError extends ApiError {
  * 예: 공연 생성 또는 수정 시
  */
 export class InvalidPerformanceDateError extends ApiError {
-  readonly type = "/errors/performance/invalid-performance-date"
+  readonly type = ErrorType.PERFORMANCE_INVALID_PERFORMANCE_DATE
   readonly status = 400
   readonly title = "Validation Error"
 
@@ -291,7 +325,7 @@ export class InvalidPerformanceDateError extends ApiError {
 // Approve Specific Errors
 // ----------------------------------
 export class UserNotApprovedError extends ApiError {
-  readonly type = "/errors/user/not-approved"
+  readonly type = ErrorType.USER_NOT_APPROVED
   readonly status = 403
   readonly title = "User Not Approved"
 
@@ -308,7 +342,7 @@ export class UserNotApprovedError extends ApiError {
  * 리프레시 토큰이 유효하지 않거나 만료되었을 때 발생하는 오류입니다.
  */
 export class RefreshTokenExpiredError extends ApiError {
-  readonly type = "/errors/token/refresh-token-expired"
+  readonly type = ErrorType.TOKEN_REFRESH_TOKEN_EXPIRED
   readonly status = 401
   readonly title = "Refresh Token Expired"
 
@@ -321,7 +355,7 @@ export class RefreshTokenExpiredError extends ApiError {
  * 액세스 토큰이 유효하지 않거나 만료되었을 때 발생하는 오류입니다.
  */
 export class AccessTokenExpiredError extends ApiError {
-  readonly type = "/errors/token/access-token-expired"
+  readonly type = ErrorType.TOKEN_ACCESS_TOKEN_EXPIRED
   readonly status = 401
   readonly title = "Access Token Expired"
 
@@ -334,7 +368,7 @@ export class AccessTokenExpiredError extends ApiError {
  * 리프레시 토큰이 요청에 존재하지 않을 때 발생하는 오류입니다.
  */
 export class RefreshTokenNotFoundError extends ApiError {
-  readonly type = "/errors/token/refresh-token-not-found"
+  readonly type = ErrorType.TOKEN_REFRESH_TOKEN_NOT_FOUND
   readonly status = 401
   readonly title = "Refresh Token Not Found"
 
@@ -347,7 +381,7 @@ export class RefreshTokenNotFoundError extends ApiError {
  * 액세스 토큰이 요청에 존재하지 않을 때 발생하는 오류입니다.
  */
 export class AccessTokenNotFoundError extends ApiError {
-  readonly type = "/errors/token/access-token-not-found"
+  readonly type = ErrorType.TOKEN_ACCESS_TOKEN_NOT_FOUND
   readonly status = 401
   readonly title = "Access Token Not Found"
 
