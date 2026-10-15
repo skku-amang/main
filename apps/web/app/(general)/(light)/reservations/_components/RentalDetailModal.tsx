@@ -62,10 +62,7 @@ export default function RentalDetailModal({
         toast({
           variant: "destructive",
           title: "삭제 실패",
-          description:
-            error instanceof Error
-              ? error.message
-              : "예약을 삭제하지 못했습니다."
+          description: error.detail ?? error.message
         })
       }
     })

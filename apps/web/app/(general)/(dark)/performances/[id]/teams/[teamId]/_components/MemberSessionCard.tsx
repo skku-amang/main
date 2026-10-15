@@ -51,10 +51,7 @@ const MemberSessionCard = ({
     onError: (error) => {
       toast({
         title: "탈퇴 실패",
-        description:
-          error instanceof Error
-            ? error.message
-            : "팀 탈퇴 중 오류가 발생했습니다.",
+        description: error.detail ?? error.message,
         variant: "destructive"
       })
     }
