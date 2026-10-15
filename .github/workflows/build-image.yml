@@ -27,11 +27,14 @@ jobs:
       fail-fast: false # 하나 실패해도 다른 것들 계속 실행
       matrix:
         app:
-          # web은 Vercel로 배포하므로 주석 처리
-          # - name: web
-          #   dockerfile: apps/web/Dockerfile
-          #   build-args: |
-          #     NEXT_PUBLIC_API_URL=https://api.amang.json-server.win
+          # web은 NEXT_PUBLIC_*가 빌드 때 박혀서 환경마다 이미지가 따로다 (apps/web/env/*.env).
+          # Kargo Warehouse가 같은 커밋의 두 이미지를 한 Freight로 묶는다
+          - name: web-staging
+            dockerfile: apps/web/Dockerfile
+            build-args: APP_ENV=staging
+          - name: web-production
+            dockerfile: apps/web/Dockerfile
+            build-args: APP_ENV=production
           - name: api
             dockerfile: apps/api/Dockerfile
             build-args: ""
@@ -67,5 +70,6 @@ jobs:
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ steps.sortable.outputs.tag }}
           build-args: ${{ matrix.app.build-args }}
-          cache-from: type=gha
-          cache-to: ${{ inputs.push && 'type=gha,mode=max' || '' }}
+          # scope 없으면 matrix 항목끼리 같은 캐시를 덮어쓴다
+          cache-from: type=gha,scope=${{ matrix.app.name }}
+          cache-to: ${{ inputs.push && format('type=gha,mode=max,scope={0}', matrix.app.name) || '' }}
