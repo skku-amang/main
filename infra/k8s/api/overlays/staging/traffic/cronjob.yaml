@@ -1,0 +1,46 @@
+# 스테이징 가짜 사용자 트래픽 (#748) — 30분마다 k6가 traffic.js를 한 번 돌린다.
+# 봇 계정(traffic-bot@amang.staging.json-server.win)은 스테이징에서 가입 후 DB로 승인함 (2026-10-15).
+# 로그인 쿠키가 amang.staging.json-server.win 도메인이라 내부 Service가 아닌 공개 주소로 요청한다.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: traffic-bot
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 300
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: k6
+              image: grafana/k6:2.3.0
+              args: ["run", "--quiet", "/scripts/traffic.js"]
+              env:
+                - name: API_URL
+                  value: https://api.amang.staging.json-server.win
+                - name: ORIGIN
+                  value: https://amang.staging.json-server.win
+              envFrom:
+                - secretRef:
+                    name: traffic-bot
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: scripts
+              configMap:
+                name: traffic-script
