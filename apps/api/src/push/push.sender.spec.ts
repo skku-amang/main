@@ -67,7 +67,7 @@ describe("PushSender", () => {
     it("410 Gone인 구독만 지우고 나머지는 모두 보낸다", async () => {
       sendNotification.mockImplementation(async (sub: { endpoint: string }) => {
         if (sub.endpoint === "https://push/gone")
-          throw new webpush.WebPushError("gone", 410)
+          throw new webpush.WebPushError("gone", 410, {}, "", sub.endpoint)
         return { statusCode: 201 }
       })
 
@@ -90,7 +90,9 @@ describe("PushSender", () => {
     })
 
     it("그 외 실패(5xx)는 구독을 지우지 않고 넘어간다", async () => {
-      sendNotification.mockRejectedValue(new webpush.WebPushError("boom", 500))
+      sendNotification.mockRejectedValue(
+        new webpush.WebPushError("boom", 500, {}, "", "https://push/ok1")
+      )
 
       await expect(sender.sendToUsers([7], message)).resolves.toBeUndefined()
       expect(prisma.pushSubscription.deleteMany).not.toHaveBeenCalled()
