@@ -106,14 +106,14 @@ PushListener (#546 후반)
 
 JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 
-| 메서드 | 경로                            | 용도                                          |
-| ------ | ------------------------------- | --------------------------------------------- |
-| GET    | `/notifications?cursor=&limit=` | 본인 알림 목록, 최신순, cursor 페이지네이션   |
-| GET    | `/notifications/unread-count`   | `{ count }`                                   |
-| PATCH  | `/notifications/:id/read`       | 단건 읽음. 소유 검증(남의 것 404). idempotent |
-| PATCH  | `/notifications/read-all`       | 본인 전체 읽음                                |
-| POST   | `/push/subscriptions`           | 구독 등록 (`{ endpoint, p256dh, auth }`)      |
-| DELETE | `/push/subscriptions`           | 구독 해제 (`{ endpoint }`)                    |
+| 메서드 | 경로                            | 용도                                                                                            |
+| ------ | ------------------------------- | ----------------------------------------------------------------------------------------------- |
+| GET    | `/notifications?cursor=&limit=` | 본인 알림 목록, 최신순, cursor 페이지네이션                                                     |
+| GET    | `/notifications/unread-count`   | `{ count }`                                                                                     |
+| PATCH  | `/notifications/:id/read`       | 단건 읽음. 소유 검증(남의 것 404). idempotent                                                   |
+| PATCH  | `/notifications/read-all`       | 본인 전체 읽음                                                                                  |
+| POST   | `/push/subscriptions`           | 구독 등록 (브라우저 `PushSubscription.toJSON()` 그대로: `{ endpoint, keys: { p256dh, auth } }`) |
+| DELETE | `/push/subscriptions`           | 구독 해제 (`{ endpoint }`)                                                                      |
 
 ## 5. 공유 타입 (`@repo/shared-types/notification`)
 

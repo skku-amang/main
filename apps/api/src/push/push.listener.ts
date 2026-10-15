@@ -1,0 +1,29 @@
+import { Injectable, Logger } from "@nestjs/common"
+import { OnEvent } from "@nestjs/event-emitter"
+import { formatNotification } from "@repo/shared-types"
+import {
+  NOTIFICATION_EVENTS,
+  NotificationCreatedEvent
+} from "../notification/notification.events"
+import { PushSender } from "./push.sender"
+
+/**
+ * 저장된 알림(notification.created)에서 파생된 푸시 발송. 알림함이 SSOT이고
+ * 푸시는 best-effort라 실패는 로깅만 한다 (ADR-0003 원칙1).
+ */
+@Injectable()
+export class PushListener {
+  private readonly logger = new Logger(PushListener.name)
+
+  constructor(private readonly sender: PushSender) {}
+
+  @OnEvent(NOTIFICATION_EVENTS.CREATED)
+  async onNotificationCreated(event: NotificationCreatedEvent) {
+    try {
+      const { title, body, href } = formatNotification(event.content)
+      await this.sender.sendToUsers(event.recipientIds, { title, body, href })
+    } catch (error) {
+      this.logger.error("푸시 발송 실패", error)
+    }
+  }
+}

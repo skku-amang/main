@@ -102,7 +102,7 @@ describe("NotificationListener", () => {
       expect(name).toBe(NOTIFICATION_EVENTS.CREATED)
       expect(event).toBeInstanceOf(NotificationCreatedEvent)
       expect([...event.recipientIds].sort()).toEqual([1, 2, 3, 9])
-      expect(event.payload.changeType).toBe("REMOVED")
+      expect(event.content.payload.changeType).toBe("REMOVED")
     })
 
     it("팀장이 뺀 멤버는 본인도 받고, 스스로 나간 멤버는 받지 않는다", async () => {

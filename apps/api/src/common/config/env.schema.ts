@@ -9,7 +9,11 @@ export const envSchema = z
     ACCESS_TOKEN_EXPIRES_IN_SECONDS: z.coerce.number().int().positive(),
     REFRESH_TOKEN_EXPIRES_IN_SECONDS: z.coerce.number().int().positive(),
     REDIS_HOST: z.string().min(1),
-    REDIS_PASSWORD: z.string().min(1)
+    REDIS_PASSWORD: z.string().min(1),
+    // Web Push. 셋 다 있어야 발송하고, 없으면 발송만 건너뛴다 (알림함은 동작)
+    VAPID_PUBLIC_KEY: z.string().min(1).optional(),
+    VAPID_PRIVATE_KEY: z.string().min(1).optional(),
+    VAPID_SUBJECT: z.string().startsWith("mailto:").optional()
   })
   .passthrough()
 
