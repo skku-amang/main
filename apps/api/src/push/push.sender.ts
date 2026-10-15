@@ -42,11 +42,14 @@ export class PushSender {
     if (subscriptions.length === 0) return
 
     const payload = JSON.stringify(message)
+    // TTL: 하루 지난 팀 소식은 안 보낸다 (기본 4주). timeout: 푸시 서비스가 응답을 안 주면 배치 전체가 멈추지 않게
+    const options = { TTL: 24 * 60 * 60, timeout: 10_000 }
     const results = await Promise.allSettled(
       subscriptions.map((s) =>
         webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          payload
+          payload,
+          options
         )
       )
     )

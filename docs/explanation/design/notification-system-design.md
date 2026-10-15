@@ -92,7 +92,7 @@ model PushSubscription {
    ▼
 NotificationListener (apps/api/src/notification/notification.listener.ts)
    │  수신자 해석 + 스냅샷 조립 → recipient마다 Notification row 1개 (fan-out)   ← 인앱함 SSOT
-   │  emit("notification.created", { recipientIds, type, payload })
+   │  emit("notification.created", { recipientIds, content: { type, payload } })
    ▼
 PushListener (#546 후반)
    └─ recipient들의 PushSubscription 전체에 web-push 발송, 응답 410 Gone → 해당 구독 삭제
