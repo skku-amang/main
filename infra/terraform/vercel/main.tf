@@ -133,3 +133,21 @@ resource "vercel_project_environment_variable" "sentry_environment" {
   value      = "production"
   target     = ["production"]
 }
+
+# Web Push VAPID 공개키 (비밀 아님). private 키는 infra/k8s/api/overlays/*/sealed-secret.yaml.
+# 환경별로 키 쌍이 다르므로 production/preview 값이 다르다. 교체 = 기존 구독 전부 무효화.
+resource "vercel_project_environment_variable" "vapid_public_key_production" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
+  value      = "BHOyS6PFfVjOuqhMZMBp7i8YsBbSCeFlzQYw6HjdYJVgC9m-3qxOALsm51kETbJnQjabjztXX-37c5jXu_8x4hc"
+  target     = ["production"]
+}
+
+resource "vercel_project_environment_variable" "vapid_public_key_preview" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
+  value      = "BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs"
+  target     = ["preview", "development"]
+}

@@ -45,7 +45,9 @@ import {
   GetNotificationsQuery,
   NotificationItem,
   NotificationList,
-  UnreadNotificationCount
+  UnreadNotificationCount,
+  CreatePushSubscription,
+  DeletePushSubscription
 } from "@repo/shared-types"
 import { ApiResult } from "./api-result"
 import {
@@ -1156,6 +1158,32 @@ export default class ApiClient {
     return this._request<{ count: number }, AuthError | InternalServerError>(
       `/notifications/read-all`,
       "PATCH"
+    )
+  }
+
+  /**
+   * 이 브라우저의 푸시 구독 등록 (같은 endpoint면 갱신)
+   * @throws {ValidationError} endpoint·keys 형식이 올바르지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public createPushSubscription(subscription: CreatePushSubscription) {
+    return this._request<
+      { id: number },
+      ValidationError | AuthError | InternalServerError
+    >(`/push/subscriptions`, "POST", subscription)
+  }
+
+  /**
+   * 이 브라우저의 푸시 구독 해제 (본인 것만)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public deletePushSubscription(body: DeletePushSubscription) {
+    return this._request<{ count: number }, AuthError | InternalServerError>(
+      `/push/subscriptions`,
+      "DELETE",
+      body
     )
   }
 }
