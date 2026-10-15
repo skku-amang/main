@@ -20,6 +20,7 @@ import { RentalModule } from "./rental/rental.module"
 import { ObjectStorageModule } from "./object-storage/object-storage.module"
 import { UploadModule } from "./upload/upload.module"
 import { HealthModule } from "./health/health.module"
+import { NotificationModule } from "./notification/notification.module"
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { HealthModule } from "./health/health.module"
     EquipmentModule,
     RentalModule,
     ObjectStorageModule,
-    UploadModule
+    UploadModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService]
