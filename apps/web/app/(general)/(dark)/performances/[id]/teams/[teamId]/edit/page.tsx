@@ -20,15 +20,15 @@ const TeamEditPage = () => {
   const teamId = Number(params.teamId)
 
   const { data: team, isLoading, isError } = useTeam(teamId)
-  const { canEdit } = useTeamPermission(team)
+  const { canEdit, isLoading: isAuthLoading } = useTeamPermission(team)
 
   useEffect(() => {
-    if (team && !canEdit) {
+    if (team && !isAuthLoading && !canEdit) {
       router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId))
     }
-  }, [team, canEdit, router, performanceId, teamId])
+  }, [team, isAuthLoading, canEdit, router, performanceId, teamId])
 
-  if (isLoading) {
+  if (isLoading || isAuthLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <TeamFormBackground />
