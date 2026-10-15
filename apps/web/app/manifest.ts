@@ -11,11 +11,14 @@ export default function manifest(): MetadataRoute.Manifest {
     name: SEO.SITE_NAME,
     short_name: "AMANG",
     description: SEO.SITE_DESCRIPTION,
+    // id를 고정해 두면 start_url을 바꿔도 같은 앱으로 인식된다
+    id: "/",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     lang: "ko",
     background_color: "#ffffff",
-    theme_color: "#1e3a8a",
+    theme_color: SEO.THEME_COLOR,
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },

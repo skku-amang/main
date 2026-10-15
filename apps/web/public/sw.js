@@ -25,7 +25,9 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "/icons/icon-192.png",
+      icon: "/icons/notification-192.png",
+      // 안드로이드 상태바용. 알파만 쓰이므로 흰색 단색 실루엣
+      badge: "/icons/badge-96.png",
       data: { href: data.href }
     })
   )
