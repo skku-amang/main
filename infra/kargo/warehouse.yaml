@@ -1,4 +1,6 @@
-# 새 API 이미지 또는 API 매니페스트 변경을 감지해 Freight(이미지 + 커밋 묶음)를 만든다
+# main의 커밋 하나 = Freight 하나. 그 커밋에서 빌드된 API 이미지와 짝이 맞을 때만 만든다.
+# 같은 커밋의 web(Vercel) 빌드는 promote-web이 커밋 SHA로 찾는다.
+# (이름이 api인 건 web 통합 전부터 쓰던 것. 바꾸면 Freight 이력이 끊김)
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse
 metadata:
@@ -17,6 +19,9 @@ spec:
     - git:
         repoURL: https://github.com/skku-amang/main
         branch: main
-        includePaths:
-          - infra/k8s/api
         discoveryLimit: 10
+  # 커밋이 들어온 직후엔 이미지가 아직 없으므로, 그 커밋의 이미지가 올라올 때까지 Freight를 만들지 않는다.
+  # CI가 실패해 이미지가 없는 커밋은 Freight가 안 생김 = 배포 불가
+  freightCreationCriteria:
+    expression: |
+      imageFrom('ghcr.io/skku-amang/amang-api').Tag endsWith commitFrom('https://github.com/skku-amang/main').ID[0:7]

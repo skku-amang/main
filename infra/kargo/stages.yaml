@@ -12,9 +12,12 @@ spec:
         direct: true
   promotionTemplate:
     spec:
+      # API 먼저 (새 web이 새 API에 기대는 경우가 많음), 그다음 같은 커밋의 web
       steps:
         - task:
             name: promote-api
+        - task:
+            name: promote-web
 ---
 # staging을 통과한 Freight만 승격 가능
 apiVersion: kargo.akuity.io/v1alpha1
@@ -32,6 +35,9 @@ spec:
           - staging
   promotionTemplate:
     spec:
+      # API 먼저 (새 web이 새 API에 기대는 경우가 많음), 그다음 같은 커밋의 web
       steps:
         - task:
             name: promote-api
+        - task:
+            name: promote-web

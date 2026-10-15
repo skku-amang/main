@@ -57,19 +57,25 @@ Kustomize overlay의 `kustomization.yaml`에 `namespace:` 필드를 **명시하�
 
 ## 환경 승격 (Kargo)
 
-staging과 production은 **같은 이미지·같은 매니페스트를 시차를 두고** 받는다 ([#603](https://github.com/skku-amang/main/issues/603)). 정의는 [infra/kargo/](kargo/), UI는 https://kargo.json-server.win.
+staging과 production은 **같은 커밋의 API·web을 시차를 두고** 받는다 ([#603](https://github.com/skku-amang/main/issues/603), [#700](https://github.com/skku-amang/main/issues/700)). 정의는 [infra/kargo/](kargo/), UI는 https://kargo.json-server.win.
 
 ```
-main 머지 → 이미지 빌드 ─┐
-infra/k8s/api 변경 ──────┴→ Warehouse가 Freight(이미지 태그 + 커밋) 생성
-  → staging 자동 승격: infra/k8s/api 복사 + overlay 태그 교체 → env/staging 브랜치 커밋 → ArgoCD api-staging sync
-  → production 수동 승격 (Kargo UI): 같은 Freight → env/production 브랜치 → ArgoCD api-production
+main 머지 (커밋 C)
+ ├─ GHA: API 이미지 <시각>-C
+ ├─ Vercel git 연동: web production 빌드 (도메인 자동 연결 안 함, auto_assign_custom_domains=false)
+ └─ deploy-staging.yml: web staging 빌드 (staging API를 보도록 빌드, 도메인 연결 안 함)
+      → Warehouse: 커밋 C와 이미지 *-C가 짝이 맞으면 Freight 생성
+  → staging 자동 승격:    promote-api(env/staging) → promote-web(staging 빌드를 amang.staging 도메인에 alias)
+  → production 수동 승격: promote-api(env/production) → promote-web(production 빌드를 promote)
 ```
 
+- Freight = main 커밋 하나. CI가 실패해 이미지가 없는 커밋은 Freight가 안 생겨 배포되지 않는다
+- web은 승격 때 새로 빌드하지 않는다. 이미 만들어진 Vercel 빌드를 도메인에 연결만 한다 (수 초)
+- 순서는 API → web. API 변경은 옛 web과도 호환되게 짤 것
 - ArgoCD api 앱은 `main`이 아니라 **`env/<stage>` 브랜치의 `infra/k8s/api/overlays/<stage>`**를 바라본다. 디렉토리 구조는 main과 같고, 그 stage overlay에 이미지 태그만 고정돼 있다. 실제 배포 상태 = 해당 브랜치 내용
 - `env/*` 브랜치는 Kargo만 쓴다. GitHub ruleset `env branches (Kargo only)`로 GitHub App `amang-kargo` 외 생성·push·삭제 금지 (레포 설정에서 수동 생성, Terraform 밖)
 - overlay 설정 변경도 Freight에 포함되므로 production에는 승격을 거쳐야 반영된다
-- 롤백: Kargo UI에서 이전 Freight를 production에 다시 승격
+- 롤백: Kargo UI에서 이전 Freight를 production에 다시 승격 (API·web 함께 그 커밋으로)
 
 ### Public 이미지 (postgres, redis 등)
 
