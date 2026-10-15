@@ -14,6 +14,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { usePerformance } from "@/hooks/api/usePerformance"
 
+import PerformanceAdminActions from "./PerformanceAdminActions"
+
 const formatDate = (date: Date) => {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
 }
@@ -151,12 +153,15 @@ const PerformanceDetailClient = () => {
             </p>
           )}
 
-          {/* 팀 목록 바로가기 */}
-          <Button asChild className="w-fit rounded-full">
-            <Link href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}>
-              <Users className="mr-2 size-4" />팀 목록 보기
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {/* 팀 목록 바로가기 */}
+            <Button asChild className="w-fit rounded-full">
+              <Link href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}>
+                <Users className="mr-2 size-4" />팀 목록 보기
+              </Link>
+            </Button>
+            <PerformanceAdminActions performance={performance} />
+          </div>
         </div>
       </div>
     </div>

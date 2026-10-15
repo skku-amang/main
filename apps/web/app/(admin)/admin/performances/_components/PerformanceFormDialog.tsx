@@ -34,7 +34,16 @@ const AdminPerformanceSchema = z.object({
   endAt: z.string().nullable().optional()
 })
 
-type AdminPerformanceForm = z.infer<typeof AdminPerformanceSchema>
+export type AdminPerformanceForm = z.infer<typeof AdminPerformanceSchema>
+
+// datetime-local string을 Date로 변환
+export const toPerformancePayload = (data: AdminPerformanceForm) => ({
+  name: data.name,
+  description: data.description,
+  location: data.location,
+  startAt: data.startAt ? new Date(data.startAt) : null,
+  endAt: data.endAt ? new Date(data.endAt) : null
+})
 
 interface PerformanceFormDialogProps {
   open: boolean

@@ -16,7 +16,11 @@ import { useAllTeams } from "@/hooks/api/useTeam"
 import { Performance } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
-import { PerformanceFormDialog } from "./_components/PerformanceFormDialog"
+import {
+  AdminPerformanceForm,
+  PerformanceFormDialog,
+  toPerformancePayload
+} from "./_components/PerformanceFormDialog"
 
 export default function PerformancesAdminPage() {
   const { toast } = useToast()
@@ -90,21 +94,8 @@ export default function PerformancesAdminPage() {
     [teamCountMap]
   )
 
-  const handleSubmit = (data: {
-    name: string
-    description?: string | null
-    location?: string | null
-    startAt?: string | null
-    endAt?: string | null
-  }) => {
-    // datetime-local string을 Date로 변환
-    const payload = {
-      name: data.name,
-      description: data.description,
-      location: data.location,
-      startAt: data.startAt ? new Date(data.startAt) : null,
-      endAt: data.endAt ? new Date(data.endAt) : null
-    }
+  const handleSubmit = (data: AdminPerformanceForm) => {
+    const payload = toPerformancePayload(data)
 
     const mutation = editing
       ? updateMutation.mutateAsync([editing.id, payload])
