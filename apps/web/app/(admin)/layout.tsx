@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
+import SuggestionButton from "@/components/SuggestionButton"
 import ROUTES from "@/constants/routes"
 import { isAuthCookieBlindHost } from "@/lib/auth/authCookieScope"
 import { getServerUser } from "@/lib/auth/server"
@@ -33,6 +34,7 @@ export default async function AdminLayout({
           {children}
         </main>
       </div>
+      <SuggestionButton />
     </UnsavedChangesProvider>
   )
 }
