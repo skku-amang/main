@@ -182,6 +182,7 @@ const ProfileEditPage = () => {
           <div className="mb-6 flex items-center gap-4">
             <button
               type="button"
+              aria-label="프로필 사진 바꾸기"
               className="group relative"
               onClick={() => imageUpload.inputRef.current?.click()}
               disabled={imageUpload.isUploading}

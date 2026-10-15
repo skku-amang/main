@@ -10,6 +10,7 @@ import { mapPerformance } from "@/hooks/api/mapper"
 import { apiClient } from "@/lib/apiClient"
 import { getServerUser } from "@/lib/auth/server"
 import { isPerformanceRecruiting } from "@repo/shared-types"
+import { josa } from "es-hangul"
 
 import TeamForm from "../_components/TeamForm"
 
@@ -48,7 +49,8 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
         <div className="mb-20 flex w-full flex-col items-center gap-4 rounded-2xl bg-white px-7 py-16 text-center shadow-2xl md:p-20">
           <p className="text-lg font-semibold">팀 모집이 마감된 공연입니다.</p>
           <p className="text-sm text-muted-foreground">
-            {performance.name}은(는) 종료 일시가 지나 새 팀을 만들 수 없습니다.
+            {josa(performance.name, "은/는")} 종료 일시가 지나 새 팀을 만들 수
+            없습니다.
           </p>
           <Link
             href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}

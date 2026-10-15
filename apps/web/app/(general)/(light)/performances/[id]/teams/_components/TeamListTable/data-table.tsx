@@ -439,7 +439,7 @@ export function TeamListDataTable<TValue>({
 
             {/* 필터 */}
             <Drawer>
-              <DrawerTrigger>
+              <DrawerTrigger aria-label="필터">
                 <TeamHeaderButton asChild variant="outline">
                   <Filter
                     className={
@@ -464,7 +464,7 @@ export function TeamListDataTable<TValue>({
                       초기화
                     </button>
                   </DrawerTitle>
-                  <DrawerClose>
+                  <DrawerClose aria-label="닫기">
                     <X className="h-3 w-3 text-slate-500" strokeWidth={2} />
                   </DrawerClose>
                 </DrawerHeader>
@@ -494,7 +494,7 @@ export function TeamListDataTable<TValue>({
                 setSortQuery(value === "none" ? null : value)
               }
             >
-              <SelectTrigger>
+              <SelectTrigger aria-label="정렬">
                 <TeamHeaderButton asChild variant="outline">
                   <ArrowDownUp
                     strokeWidth={1.75}
