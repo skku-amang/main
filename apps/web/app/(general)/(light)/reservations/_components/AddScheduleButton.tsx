@@ -62,6 +62,7 @@ interface HourSelectProps {
   onValueChange: (value: string) => void
   placeholder: string
   triggerClassName?: string
+  ariaLabel: string
   /** 종료 시간 선택 시 시작 시간 — 목록이 그 다음 시부터 보임 */
   afterHour?: string
 }
@@ -71,6 +72,7 @@ function HourSelect({
   onValueChange,
   placeholder,
   triggerClassName,
+  ariaLabel,
   afterHour
 }: HourSelectProps) {
   const initialHour = getInitialHour(afterHour).toString().padStart(2, "0")
@@ -85,7 +87,7 @@ function HourSelect({
 
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className={triggerClassName}>
+      <SelectTrigger className={triggerClassName} aria-label={ariaLabel}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -446,10 +448,14 @@ export default function AddScheduleButton({
                     onValueChange={setStartHour}
                     placeholder="Select"
                     triggerClassName="w-full"
+                    ariaLabel="시작 시각(시)"
                   />
                   <span className="text-muted-foreground">:</span>
                   <Select value={startMinute} onValueChange={setStartMinute}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      aria-label="시작 시각(분)"
+                    >
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -473,11 +479,15 @@ export default function AddScheduleButton({
                     onValueChange={setEndHour}
                     placeholder="Select"
                     triggerClassName="w-full"
+                    ariaLabel="종료 시각(시)"
                     afterHour={startHour}
                   />
                   <span className="text-muted-foreground">:</span>
                   <Select value={endMinute} onValueChange={setEndMinute}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      aria-label="종료 시각(분)"
+                    >
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -503,10 +513,11 @@ export default function AddScheduleButton({
                   onValueChange={setStartHour}
                   placeholder="HH"
                   triggerClassName="h-9"
+                  ariaLabel="시작 시각(시)"
                 />
                 <span className="text-muted-foreground">:</span>
                 <Select value={startMinute} onValueChange={setStartMinute}>
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-9" aria-label="시작 시각(분)">
                     <SelectValue placeholder="MM" />
                   </SelectTrigger>
                   <SelectContent>
@@ -525,11 +536,12 @@ export default function AddScheduleButton({
                   onValueChange={setEndHour}
                   placeholder="HH"
                   triggerClassName="h-9"
+                  ariaLabel="종료 시각(시)"
                   afterHour={startHour}
                 />
                 <span className="text-muted-foreground">:</span>
                 <Select value={endMinute} onValueChange={setEndMinute}>
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-9" aria-label="종료 시각(분)">
                     <SelectValue placeholder="MM" />
                   </SelectTrigger>
                   <SelectContent>

@@ -13,7 +13,7 @@ const MobileBackButton = () => {
   }
 
   return (
-    <button onClick={() => router.back()}>
+    <button onClick={() => router.back()} aria-label="뒤로 가기">
       <ArrowLeftIcon className="h-6 w-6 text-white" />
     </button>
   )
