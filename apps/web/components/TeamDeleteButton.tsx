@@ -1,6 +1,6 @@
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,7 @@ const TeamDeleteButton = ({
   const router = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
+  const cancelRef = useRef<HTMLButtonElement>(null)
   const deleteTeam = useDeleteTeam()
   const queryClient = useQueryClient()
 
@@ -50,7 +51,14 @@ const TeamDeleteButton = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className={className}>{children}</DialogTrigger>
-      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow">
+      <DialogContent
+        className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow"
+        // 되돌릴 수 없는 작업이라 Enter 한 번에 지워지지 않도록 취소에 먼저 포커스
+        onOpenAutoFocus={(e) => {
+          e.preventDefault()
+          cancelRef.current?.focus()
+        }}
+      >
         {/* 삭제 아이콘 및 메시지 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch pt-5">
           {/* 삭제 아이콘 */}
@@ -83,6 +91,7 @@ const TeamDeleteButton = ({
             확인
           </Button>
           <Button
+            ref={cancelRef}
             onClick={() => setIsOpen(false)}
             variant="outline"
             className="inline-flex w-full items-center justify-center gap-2 self-stretch rounded-lg border border-gray-300 px-[18px] py-2.5 font-semibold text-gray-700 shadow"
