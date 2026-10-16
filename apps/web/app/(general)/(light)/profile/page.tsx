@@ -2,7 +2,6 @@
 
 import {
   CalendarDays,
-  Eye,
   Guitar,
   LogOut,
   Mail,
@@ -79,7 +78,7 @@ const InfoRow = ({
 }) => (
   <div className="flex items-center gap-3 text-sm">
     <span className="text-slate-400">{icon}</span>
-    <span className="w-20 shrink-0 text-slate-400">{label}</span>
+    <span className="w-16 shrink-0 text-slate-400">{label}</span>
     <span className="text-slate-700">{value}</span>
   </div>
 )
@@ -159,12 +158,6 @@ const ProfilePage = () => {
               icon={<Mail className="size-4" />}
               label="이메일"
               value={user.email}
-            />
-
-            <InfoRow
-              icon={<Eye className="size-4" />}
-              label="프로필 공개"
-              value={user.isProfilePublic ? "공개" : "비공개"}
             />
 
             {user?.generation && (
