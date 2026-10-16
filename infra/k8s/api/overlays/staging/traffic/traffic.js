@@ -12,6 +12,7 @@
 //   → TEAM_MEMBER_CHANGE·ATTRIBUTE_CHANGE·FILLED·LEADER_CHANGED·CREATED·DELETED, ROOM_RESERVATION_SOON,
 //     EQUIPMENT_RETURN_DUE, USER_SIGNED_UP(운영진), PERFORMANCE_CREATED/UPDATED, TEAM_RECRUITMENT_DEADLINE(시즌 말).
 //     별표한 팀 빈자리는 부원이 스테이징에서 봇 팀을 별표해 두면 '나가기' 때 온다.
+// - 봇은 PLAYGROUND_PERFORMANCE_ID 공연과 "[traffic-bot]"으로 시작하는 공연에서만 논다. 실제 공연은 안 건드린다.
 // - 실행마다 시나리오를 "하루 목표 ÷ 그 시간대 실행 횟수" 확률로 고른다. 밤(23~09시 KST)엔 아무것도 만들지 않는다.
 // - 실패해야 정상인 요청은 500이 아니라 정해진 오류 코드로 오는지 확인한다.
 import http from "k6/http";
@@ -20,6 +21,8 @@ import { check, group, sleep } from "k6";
 const API = __ENV.API_URL;
 const ORIGIN = __ENV.ORIGIN;
 const TARGET_USER_ID = Number(__ENV.TARGET_USER_ID) || null;
+const PLAYGROUND_PERFORMANCE_ID =
+  Number(__ENV.PLAYGROUND_PERFORMANCE_ID) || null;
 const TAG = "[traffic-bot]";
 const MEMBER_PREFIX = "traffic-member-";
 const MEMBER_DOMAIN = "amang.staging.json-server.win";
@@ -58,7 +61,9 @@ const okOr = (res, name, allowed) =>
   res.status < 300;
 
 const data = (res) =>
-  res.status >= 200 && res.status < 300 ? res.json("data") : undefined;
+  res.status >= 200 && res.status < 300 && res.body
+    ? res.json("data")
+    : undefined;
 
 // 날짜 경계는 한국 기준 (서버·k6는 UTC). KST는 DST가 없어 산술로 충분
 const KST = 9 * 36e5;
@@ -84,8 +89,11 @@ function roll(perDay, [from, to]) {
 }
 const DAYTIME = [9, 23];
 
-/** 봇 한 명 = 쿠키 저장소 하나. 같은 VU 안에서 여러 사람으로 행동하려고 jar를 나눈다 */
-function login(email, password) {
+/**
+ * 봇 한 명 = 쿠키 저장소 하나. 같은 VU 안에서 여러 사람으로 행동하려고 jar를 나눈다.
+ * soft: 풀 멤버처럼 실패해도 되는 로그인 — 체크를 남기지 않고 null
+ */
+function login(email, password, { soft = false } = {}) {
   const jar = new http.CookieJar();
   const params = {
     headers: { Origin: ORIGIN, "Content-Type": "application/json" },
@@ -101,9 +109,12 @@ function login(email, password) {
     logout: () => http.post(API + "/auth/logout", null, params),
   };
   const res = bot.post("/auth/login", { email, password });
+  if (soft && (res.status < 200 || res.status >= 300)) return null;
   if (!ok(res, `로그인 ${email}`))
     throw new Error("로그인 실패 — 이후 단계 의미 없음");
-  bot.me = data(bot.get("/auth/me")).user;
+  const me = bot.get("/auth/me");
+  if (!ok(me, `GET /auth/me ${email}`)) throw new Error("내 정보 조회 실패");
+  bot.me = data(me).user;
   return bot;
 }
 
@@ -172,11 +183,11 @@ function loginPool(bot1, bot2, count) {
   const chosen = shuffle(members).slice(0, count);
   const pool = [bot2];
   for (const u of chosen) {
-    try {
-      pool.push(login(`${u.nickname}@${MEMBER_DOMAIN}`, __ENV.BOT_PASSWORD));
-    } catch {
-      // 비밀번호가 다른 계정(사람이 만든 것)이면 그냥 건너뜀
-    }
+    // 비밀번호가 다른 계정(사람이 만든 것)이면 그냥 건너뜀
+    const member = login(`${u.nickname}@${MEMBER_DOMAIN}`, __ENV.BOT_PASSWORD, {
+      soft: true,
+    });
+    if (member) pool.push(member);
   }
   return pool;
 }
@@ -222,8 +233,17 @@ function approvePending(bot1) {
 
 // ───────────────────────── 시즌 (공연) ─────────────────────────
 
-function latestPerformance(bot) {
-  const performances = data(bot.get("/performances")) ?? [];
+/**
+ * 봇이 노는 공연 = 이름이 TAG로 시작하거나 PLAYGROUND_PERFORMANCE_ID로 지정한 공연뿐.
+ * 운영진이 만든 실제 공연은 비어 있어도 절대 건드리지 않는다 (팀 생성·마감 조정 알림이 실제 부원에게 가니까)
+ */
+const isPlayground = (p) =>
+  p.name.startsWith(TAG) || p.id === PLAYGROUND_PERFORMANCE_ID;
+
+function latestPlayground(bot) {
+  const performances = (data(bot.get("/performances")) ?? []).filter(
+    isPlayground,
+  );
   return performances.reduce((a, b) => (a && a.id > b.id ? a : b), null);
 }
 
@@ -232,7 +252,7 @@ function latestPerformance(bot) {
  * 마감이 8주 넘게 남은 공연은 4주로 당긴다(1회, PERFORMANCE_UPDATED) — 시즌 말 D-1 알림이 실제로 오게.
  */
 function currentSeason(bot1, teams) {
-  const performance = latestPerformance(bot1);
+  const performance = latestPlayground(bot1);
   if (!bot1.me.isAdmin) return performance;
   const now = new Date();
   const teamCount = performance
@@ -274,31 +294,9 @@ function currentSeason(bot1, teams) {
         "PATCH /performances/:id (마감 4주 뒤)",
       );
     });
-    return latestPerformance(bot1);
+    return latestPlayground(bot1);
   }
   return performance;
-}
-
-/** 공연 참여자가 봇·풀·TARGET뿐일 때만 그 공연에 팀을 만든다 — 다른 부원에게 알림이 안 가게 */
-function isBotPlayground(performance, teams, pool, bot1) {
-  const allowed = new Set([
-    bot1.me.id,
-    TARGET_USER_ID,
-    ...pool.map((b) => b.me.id),
-  ]);
-  const inPerf = teams.filter((t) => t.performanceId === performance.id);
-  return (
-    performance.name.startsWith(TAG) ||
-    inPerf.every((t) =>
-      participantIds(t).every(
-        (id) =>
-          allowed.has(id) ||
-          (data(bot1.get(`/users/${id}`)) ?? {}).nickname?.startsWith(
-            MEMBER_PREFIX,
-          ),
-      ),
-    )
-  );
 }
 
 // ───────────────────────── 팀 ─────────────────────────
@@ -618,20 +616,20 @@ function expectedRejections(bot1) {
 
 // ───────────────────────── 실행 ─────────────────────────
 
-export default function () {
+function run() {
   const bot1 = login(__ENV.BOT_EMAIL, __ENV.BOT_PASSWORD);
   const bot2 = login(__ENV.BOT2_EMAIL, __ENV.BOT2_PASSWORD);
+  // 시즌 운영·승인·팀장 되찾기·삭제가 전부 운영진 권한에 기대므로, 빠지면 조용히 반쪽이 되지 않게 Job을 실패시킨다
+  check(bot1.me, { "봇1은 운영진": (me) => me.isAdmin === true });
   const pool = loginPool(bot1, bot2, 3);
   const weekend = isWeekend(new Date());
 
   approvePending(bot1);
   let teams = data(bot1.get("/teams")) ?? [];
   const performance = currentSeason(bot1, teams);
-  const recruiting =
+  const playground =
     performance &&
     (!performance.endAt || new Date(performance.endAt) > new Date());
-  const playground =
-    recruiting && isBotPlayground(performance, teams, pool, bot1);
   teams = data(bot1.get("/teams")) ?? [];
 
   const equipments = data(bot1.get("/equipments")) ?? [];
@@ -677,5 +675,14 @@ export default function () {
       `${bot.me.nickname} 알림 모두 읽음`,
     );
     bot.logout();
+  }
+}
+
+// k6는 잡히지 않은 예외가 나도 exit 0으로 끝낼 수 있어, 예외를 실패한 체크로 바꿔 Job이 빨갛게 되게 한다
+export default function () {
+  try {
+    run();
+  } catch (error) {
+    check(null, { [`스크립트 예외: ${error && error.message}`]: () => false });
   }
 }
