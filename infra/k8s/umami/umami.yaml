@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umami
+  template:
+    metadata:
+      labels:
+        app: umami
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: umami
+          # 컨테이너 시작 때 Prisma 마이그레이션을 스스로 실행한다. 버전을 올리기 전 릴리스 노트 확인
+          image: ghcr.io/umami-software/umami:3.4.0
+          envFrom:
+            - secretRef:
+                name: umami-credentials
+          env:
+            - name: DISABLE_TELEMETRY
+              value: "1"
+            # 버전은 이 파일에서 고정하므로 화면의 새 버전 알림은 끈다
+            - name: DISABLE_UPDATES
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 3000
+          # 첫 기동은 마이그레이션 때문에 오래 걸릴 수 있어 startupProbe로 여유를 둔다
+          startupProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "192Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: umami
+spec:
+  selector:
+    app: umami
+  ports:
+    - port: 3000
+      targetPort: 3000
