@@ -307,6 +307,8 @@ export class NotificationListener {
       }
     })
 
+    if (changeType === "REMOVED") await this.notifyBookmarkers(team, event)
+
     // 스스로 지원해 마지막 자리가 찼을 때만 팀장에게. 팀장이 로스터를 편집한 경우는 본인이 아니까 제외
     const selfApplied = event.actorId === event.userId
     const filled = team.teamSessions.every(
@@ -324,6 +326,41 @@ export class NotificationListener {
           }
         }
       )
+  }
+
+  /** 별표한 사람 중 아직 팀원이 아닌 사람에게. 빠진 당사자와 행동한 사람은 제외 */
+  private async notifyBookmarkers(
+    team: { id: number; name: string; performanceId: number } & Parameters<
+      typeof teamMemberIds
+    >[0],
+    event: TeamMemberRemovedEvent
+  ) {
+    const bookmarks = await this.prisma.teamBookmark.findMany({
+      where: { teamId: team.id },
+      select: { userId: true }
+    })
+    const excluded = new Set([
+      ...teamMemberIds(team),
+      event.userId,
+      event.actorId
+    ])
+    const sessions = await this.prisma.session.findMany({
+      where: { id: { in: event.sessionIds } },
+      select: { name: true }
+    })
+
+    await this.create(
+      bookmarks.map((b) => b.userId).filter((id) => !excluded.has(id)),
+      {
+        type: NotificationType.BOOKMARKED_TEAM_SPOT_OPENED,
+        payload: {
+          teamId: team.id,
+          performanceId: team.performanceId,
+          teamName: team.name,
+          sessionNames: sessions.map((s) => s.name)
+        }
+      }
+    )
   }
 
   private findTeam(id: number) {

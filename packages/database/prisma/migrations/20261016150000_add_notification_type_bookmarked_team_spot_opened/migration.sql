@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "NotificationType" ADD VALUE 'BOOKMARKED_TEAM_SPOT_OPENED';

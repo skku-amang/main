@@ -169,5 +169,17 @@ export function formatNotification(
         tag: "user-approved"
       }
     }
+    case "BOOKMARKED_TEAM_SPOT_OPENED": {
+      const p = item.payload
+      const sessions = p.sessionNames
+        .map((s) => SESSION_DISPLAY_NAME[s])
+        .join(", ")
+      return {
+        title: "별표한 팀에 자리가 났어요",
+        body: `${p.teamName} 팀 ${sessions ? `${sessions} ` : ""}자리가 비었어요`,
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
+      }
+    }
   }
 }
