@@ -13,11 +13,13 @@ import RosterCell from "./RosterCell"
 const CompactTeamList = ({
   rows,
   slots,
-  viewerId
+  viewerId,
+  canApply
 }: {
   rows: Row<TeamColumn>[]
   slots: RosterSlot[]
   viewerId?: number
+  canApply: boolean
 }) => (
   <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
     <table className="w-max min-w-full border-collapse text-left">
@@ -79,6 +81,7 @@ const CompactTeamList = ({
                   team={team}
                   slot={slot}
                   viewerId={viewerId}
+                  canApply={canApply}
                   compact
                 />
               </td>

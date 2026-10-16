@@ -638,6 +638,7 @@ export function TeamListDataTable<TValue>({
             rows={rowsOnPage}
             slots={rosterSlots}
             viewerId={user?.id}
+            canApply={isAuthenticated && isRecruiting}
           />
         )}
 
