@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { usePerformance } from "@/hooks/api/usePerformance"
+import { useNotificationSubjectRead } from "@/hooks/useNotificationSubjectRead"
 
 import PerformanceAdminActions from "./PerformanceAdminActions"
 
@@ -78,6 +79,7 @@ const PerformanceDetailClient = () => {
   const performanceId = Number(id)
 
   const { data: performance, status } = usePerformance(performanceId)
+  useNotificationSubjectRead({ performanceId })
 
   if (status === "pending") {
     return <DetailSkeleton />

@@ -1,12 +1,27 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { NotFoundError } from "@repo/api-client"
+import { NotificationType } from "@repo/database"
 import {
   GetNotificationsQuery,
+  MarkNotificationsReadBySubject,
   NotificationItemSchema,
   NotificationList,
   UnreadNotificationCount
 } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
+
+/** 대상 페이지에서 "본 것"으로 칠 수 있는 알림 유형. 팀 멤버 변경은 공연 페이지에선 안 보이므로 teamId 쪽에만 */
+const SUBJECT_TYPES = {
+  teamId: [
+    NotificationType.TEAM_MEMBER_CHANGE,
+    NotificationType.TEAM_ATTRIBUTE_CHANGE,
+    NotificationType.TEAM_CREATED
+  ],
+  performanceId: [
+    NotificationType.PERFORMANCE_CREATED,
+    NotificationType.TEAM_CREATED
+  ]
+} as const
 
 @Injectable()
 export class NotificationService {
@@ -65,6 +80,24 @@ export class NotificationService {
   async markAllRead(recipientId: number) {
     const { count } = await this.prisma.notification.updateMany({
       where: { recipientId, readAt: null },
+      data: { readAt: new Date() }
+    })
+    return { count }
+  }
+
+  /** 대상(팀/공연) 페이지에 도달한 사용자의 그 대상 알림을 읽음 처리한다 */
+  async markReadBySubject(
+    recipientId: number,
+    subject: MarkNotificationsReadBySubject
+  ) {
+    const key = subject.teamId !== undefined ? "teamId" : "performanceId"
+    const { count } = await this.prisma.notification.updateMany({
+      where: {
+        recipientId,
+        readAt: null,
+        type: { in: [...SUBJECT_TYPES[key]] },
+        payload: { path: [key], equals: subject[key] }
+      },
       data: { readAt: new Date() }
     })
     return { count }

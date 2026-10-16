@@ -47,6 +47,7 @@ import {
   NotificationItem,
   NotificationList,
   UnreadNotificationCount,
+  MarkNotificationsReadBySubject,
   CreatePushSubscription,
   DeletePushSubscription
 } from "@repo/shared-types"
@@ -1178,6 +1179,21 @@ export default class ApiClient {
       `/notifications/read-all`,
       "PATCH"
     )
+  }
+
+  /**
+   * 알림이 가리키는 팀/공연 페이지에 도달했을 때 그 대상의 안 읽은 알림을 읽음 처리
+   * @throws {ValidationError} teamId·performanceId 중 하나만 보내지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public markNotificationsReadBySubject(
+    subject: MarkNotificationsReadBySubject
+  ) {
+    return this._request<
+      { count: number },
+      ValidationError | AuthError | InternalServerError
+    >(`/notifications/read`, "PATCH", subject)
   }
 
   /**

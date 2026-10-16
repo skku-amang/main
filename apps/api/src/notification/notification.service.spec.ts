@@ -7,33 +7,50 @@ type Row = {
   id: number
   recipientId: number
   readAt: Date | null
-  type: "PERFORMANCE_CREATED"
-  payload: { performanceId: number; performanceName: string }
+  type: string
+  payload: Record<string, unknown>
   createdAt: Date
 }
 
-const row = (id: number, recipientId: number, readAt: Date | null): Row => ({
+const row = (
+  id: number,
+  recipientId: number,
+  readAt: Date | null,
+  type = "PERFORMANCE_CREATED",
+  payload: Record<string, unknown> = {
+    performanceId: 1,
+    performanceName: "공연"
+  }
+): Row => ({
   id,
   recipientId,
   readAt,
-  type: "PERFORMANCE_CREATED",
-  payload: { performanceId: 1, performanceName: "공연" },
+  type,
+  payload,
   createdAt: new Date("2026-10-01")
 })
 
-/** 최소한의 in-memory notification 테이블. where/orderBy/take 의미를 흉내 낸다. */
+type Where = {
+  recipientId?: number
+  id?: number | { lt: number }
+  readAt?: null
+  type?: { in: string[] }
+  payload?: { path: string[]; equals: unknown }
+}
+
+/** 최소한의 in-memory notification 테이블. where/orderBy/take 의미를 흉내 낸다 (Prisma처럼 있는 조건만 적용). */
 function fakeNotificationTable(rows: Row[]) {
-  const matches = (
-    row: Row,
-    where: { recipientId?: number; id?: number | { lt: number }; readAt?: null }
-  ) =>
+  const matches = (row: Row, where: Where) =>
     (where.recipientId === undefined ||
       row.recipientId === where.recipientId) &&
     (where.id === undefined ||
       (typeof where.id === "number"
         ? row.id === where.id
         : row.id < where.id.lt)) &&
-    (where.readAt === undefined || row.readAt === where.readAt)
+    (where.readAt === undefined || row.readAt === where.readAt) &&
+    (where.type === undefined || where.type.in.includes(row.type)) &&
+    (where.payload === undefined ||
+      row.payload[where.payload.path[0]!] === where.payload.equals)
 
   return {
     findMany: jest.fn(({ where, take }) =>
@@ -137,5 +154,53 @@ describe("NotificationService", () => {
     await expect(service.markAllRead(1)).resolves.toEqual({ count: 2 })
     await expect(service.countUnread(1)).resolves.toEqual({ count: 0 })
     await expect(service.countUnread(2)).resolves.toEqual({ count: 1 })
+  })
+
+  describe("markReadBySubject", () => {
+    it("teamId: 그 팀의 멤버 변경·속성 변경·팀 생성 알림만, 본인 것만 읽음", async () => {
+      const { service } = await makeService([
+        row(1, 1, null, "TEAM_MEMBER_CHANGE", { teamId: 7, performanceId: 3 }),
+        row(2, 1, null, "TEAM_ATTRIBUTE_CHANGE", {
+          teamId: 7,
+          performanceId: 3
+        }),
+        row(3, 1, null, "TEAM_CREATED", { teamId: 7, performanceId: 3 }),
+        row(4, 1, null, "TEAM_MEMBER_CHANGE", { teamId: 8, performanceId: 3 }),
+        row(5, 2, null, "TEAM_MEMBER_CHANGE", { teamId: 7, performanceId: 3 })
+      ])
+
+      await expect(
+        service.markReadBySubject(1, { teamId: 7 })
+      ).resolves.toEqual({ count: 3 })
+      await expect(service.countUnread(1)).resolves.toEqual({ count: 1 })
+      await expect(service.countUnread(2)).resolves.toEqual({ count: 1 })
+    })
+
+    it("performanceId: 공연 생성과 그 공연의 팀 생성만 읽음, 팀 멤버 변경은 그대로", async () => {
+      const { service } = await makeService([
+        row(1, 1, null, "PERFORMANCE_CREATED", { performanceId: 3 }),
+        row(2, 1, null, "TEAM_CREATED", { teamId: 7, performanceId: 3 }),
+        row(3, 1, null, "TEAM_MEMBER_CHANGE", { teamId: 7, performanceId: 3 }),
+        row(4, 1, null, "PERFORMANCE_CREATED", { performanceId: 4 })
+      ])
+
+      await expect(
+        service.markReadBySubject(1, { performanceId: 3 })
+      ).resolves.toEqual({ count: 2 })
+      await expect(service.countUnread(1)).resolves.toEqual({ count: 2 })
+    })
+
+    it("이미 읽은 알림은 세지 않는다", async () => {
+      const { service } = await makeService([
+        row(1, 1, new Date("2026-10-01"), "TEAM_CREATED", {
+          teamId: 7,
+          performanceId: 3
+        })
+      ])
+
+      await expect(
+        service.markReadBySubject(1, { teamId: 7 })
+      ).resolves.toEqual({ count: 0 })
+    })
   })
 })

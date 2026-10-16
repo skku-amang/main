@@ -7,6 +7,7 @@ import ROUTES from "@/constants/routes"
 
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useTeams } from "@/hooks/api/useTeam"
+import { useNotificationSubjectRead } from "@/hooks/useNotificationSubjectRead"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 import { useParams } from "next/navigation"
 import TeamListSkeleton from "./_components/TeamListSkeleton"
@@ -16,6 +17,7 @@ import { TeamListDataTable } from "./_components/TeamListTable/data-table"
 const TeamList = () => {
   const params = useParams()
   const performanceId = Number(params.id)
+  useNotificationSubjectRead({ performanceId })
 
   const { data: teams, status: teamsStatus } = useTeams(performanceId)
   const { data: relatedPerformances, status: relatedPerformancesStatus } =

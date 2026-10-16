@@ -20,6 +20,7 @@ import { useTeamPermission } from "@/hooks/useTeamPermission"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/components/YoutubePlayer"
+import { useNotificationSubjectRead } from "@/hooks/useNotificationSubjectRead"
 import useTeamApplication from "../_hooks/useTeamApplication"
 
 const TeamDetailClient = () => {
@@ -28,6 +29,7 @@ const TeamDetailClient = () => {
 
   const performanceId = Number(params.id)
   const id = Number(params.teamId)
+  useNotificationSubjectRead({ teamId: id })
 
   const { data: team, isLoading, isError } = useTeam(id)
   const { canEdit } = useTeamPermission(team)
