@@ -48,6 +48,8 @@ import {
   NotificationList,
   UnreadNotificationCount,
   MarkNotificationsReadBySubject,
+  NotificationPreferences,
+  UpdateNotificationPreferences,
   CreatePushSubscription,
   DeletePushSubscription
 } from "@repo/shared-types"
@@ -1194,6 +1196,33 @@ export default class ApiClient {
       { count: number },
       ValidationError | AuthError | InternalServerError
     >(`/notifications/read`, "PATCH", subject)
+  }
+
+  /**
+   * 알림 설정 조회 — 푸시를 끈 유형, 방해금지 시간대
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getNotificationPreferences() {
+    return this._request<
+      NotificationPreferences,
+      AuthError | InternalServerError
+    >(`/notifications/preferences`, "GET")
+  }
+
+  /**
+   * 알림 설정 변경. 보낸 필드만 바뀌고 quietHours는 통째로. 바뀐 뒤 전체 설정을 돌려준다
+   * @throws {ValidationError} 시(hour)가 0–23 밖이거나 유형이 올바르지 않은 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateNotificationPreferences(
+    preferences: UpdateNotificationPreferences
+  ) {
+    return this._request<
+      NotificationPreferences,
+      ValidationError | AuthError | InternalServerError
+    >(`/notifications/preferences`, "PATCH", preferences)
   }
 
   /**

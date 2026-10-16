@@ -65,6 +65,36 @@ const useMarkNotificationsReadBySubjectMutation = createMutationHook(
   ApiClient.prototype.markNotificationsReadBySubject
 )
 
+/** 알림함 키와 분리 — 읽음 처리 invalidate에 설정까지 다시 불러오지 않게 */
+export const NOTIFICATION_PREFERENCES_QUERY_KEY = [
+  "notification-preferences"
+] as const
+
+export const useNotificationPreferences = createQueryHook(
+  ApiClient.prototype.getNotificationPreferences,
+  () => NOTIFICATION_PREFERENCES_QUERY_KEY
+)
+
+const useUpdateNotificationPreferencesMutation = createMutationHook(
+  ApiClient.prototype.updateNotificationPreferences
+)
+
+/**
+ * 설정 변경. 응답이 전체 설정이라 캐시를 그걸로 바로 바꾼다.
+ * 날아가던 refetch(포커스 복귀 등)가 늦게 도착해 바꾼 값을 덮지 않도록 먼저 취소한다
+ */
+export const useUpdateNotificationPreferences = () => {
+  const queryClient = useQueryClient()
+  return useUpdateNotificationPreferencesMutation({
+    onMutate: () =>
+      queryClient.cancelQueries({
+        queryKey: NOTIFICATION_PREFERENCES_QUERY_KEY
+      }),
+    onSuccess: (data) =>
+      queryClient.setQueryData(NOTIFICATION_PREFERENCES_QUERY_KEY, data)
+  })
+}
+
 /** 대상(팀/공연) 페이지 도달 시 그 대상 알림 읽음 처리. 0건이면 invalidate 생략 */
 export const useMarkNotificationsReadBySubject = () => {
   const invalidate = useInvalidateNotifications()
