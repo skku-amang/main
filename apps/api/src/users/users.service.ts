@@ -1,8 +1,10 @@
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { Injectable } from "@nestjs/common"
 import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
+import { USER_EVENTS, UserApprovedEvent } from "./users.events"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { memberProfileSelect, toMemberProfile } from "./member-profile"
@@ -11,7 +13,10 @@ import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { UpdateProfileDto } from "./dto/update-profile.dto"
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const { sessions: sessionIds, ...userData } = createUserDto
@@ -22,7 +27,7 @@ export class UsersService {
       image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(userData.email)}`
 
     try {
-      const user = await this.prisma.user.create({
+      return await this.prisma.user.create({
         data: {
           ...userData,
           password: hashedPassword,
@@ -33,8 +38,6 @@ export class UsersService {
         },
         select: detailedUserSelector
       })
-
-      return user
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -231,12 +234,14 @@ export class UsersService {
 
     if (!user)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+    if (user.isApproved) return
 
     await this.prisma.user.update({
       where: { id: userId },
       data: { isApproved: true },
       select: detailedUserSelector
     })
+    this.eventEmitter.emit(USER_EVENTS.APPROVED, new UserApprovedEvent(userId))
   }
 
   async deleteUser(userId: number) {

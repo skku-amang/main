@@ -14,7 +14,9 @@ import {
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 import {
   PERFORMANCE_EVENTS,
-  PerformanceCreatedEvent
+  PerformanceCreatedEvent,
+  PerformanceUpdatedEvent,
+  changedPerformanceFields
 } from "./performance.events"
 
 @Injectable()
@@ -74,7 +76,11 @@ export class PerformanceService {
     return performance
   }
 
-  async update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
+  async update(
+    id: number,
+    updatePerformanceDto: UpdatePerformanceDto,
+    actorId: number
+  ) {
     const performance = await this.prisma.performance.findUnique({
       where: { id }
     })
@@ -83,6 +89,10 @@ export class PerformanceService {
       throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
 
     const oldImageUrl = performance.image
+    const changedFields = changedPerformanceFields(
+      performance,
+      updatePerformanceDto
+    )
 
     const startAt = updatePerformanceDto.startAt ?? performance.startAt
     const endAt = updatePerformanceDto.endAt ?? performance.endAt
@@ -98,6 +108,11 @@ export class PerformanceService {
         where: { id },
         data: updatePerformanceDto
       })
+      if (changedFields.length > 0)
+        this.eventEmitter.emit(
+          PERFORMANCE_EVENTS.UPDATED,
+          new PerformanceUpdatedEvent(id, changedFields, actorId)
+        )
 
       if (
         updatePerformanceDto.image !== undefined &&

@@ -3,7 +3,8 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { PerformanceService } from "./performance.service"
 import {
   PERFORMANCE_EVENTS,
-  PerformanceCreatedEvent
+  PerformanceCreatedEvent,
+  PerformanceUpdatedEvent
 } from "./performance.events"
 import { PrismaService } from "../prisma/prisma.service"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
@@ -22,7 +23,15 @@ describe("PerformanceService", () => {
           useValue: {
             performance: {
               create: jest.fn(async () => ({ id: 3 })),
-              findUnique: jest.fn(async () => ({ id: 3, teams: [] })),
+              findUnique: jest.fn(async () => ({
+                id: 3,
+                name: "봄 공연",
+                location: "소극장",
+                startAt: new Date("2026-11-01T10:00:00Z"),
+                endAt: new Date("2026-11-01T12:00:00Z"),
+                image: null,
+                teams: []
+              })),
               findAll: jest.fn(),
               findTeamsByPerformanceId: jest.fn(),
               findOne: jest.fn(),
@@ -55,5 +64,24 @@ describe("PerformanceService", () => {
       PERFORMANCE_EVENTS.CREATED,
       new PerformanceCreatedEvent(3, 42)
     )
+  })
+
+  describe("공연 변경 이벤트", () => {
+    it("일정이 바뀌면 performance.updated에 바뀐 필드가 담긴다", async () => {
+      await service.update(3, { startAt: new Date("2026-11-01T09:00:00Z") }, 42)
+
+      expect(emit).toHaveBeenCalledWith(
+        PERFORMANCE_EVENTS.UPDATED,
+        new PerformanceUpdatedEvent(3, ["startAt"], 42)
+      )
+    })
+
+    it("설명만 바뀌면 발행하지 않는다", async () => {
+      await service.update(3, { description: "새 설명" }, 42)
+
+      expect(
+        emit.mock.calls.some(([name]) => name === PERFORMANCE_EVENTS.UPDATED)
+      ).toBe(false)
+    })
   })
 })

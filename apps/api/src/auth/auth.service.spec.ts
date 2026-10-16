@@ -1,4 +1,5 @@
 import { ConfigService } from "@nestjs/config"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import { Test, TestingModule } from "@nestjs/testing"
 import {
@@ -9,6 +10,7 @@ import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import RedisMock from "ioredis-mock"
 import { REDIS_CLIENT } from "../redis/redis.module"
+import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
 import { AuthSessionStore } from "./auth-session.store"
 import { AuthService } from "./auth.service"
@@ -25,6 +27,7 @@ describe("AuthService", () => {
   let service: AuthService
   let jwtService: JwtService
   let redis: InstanceType<typeof RedisMock>
+  let emit: jest.Mock
 
   const loginDto = { email: "member@g.skku.edu", password: PASSWORD }
   const otherLoginDto = { email: "other@g.skku.edu", password: PASSWORD }
@@ -33,6 +36,7 @@ describe("AuthService", () => {
   beforeEach(async () => {
     redis = new RedisMock()
     await redis.flushall()
+    emit = jest.fn()
     const password = await bcrypt.hash(PASSWORD, 4)
     const users = [
       { id: 1, email: loginDto.email, password, isApproved: true },
@@ -51,13 +55,15 @@ describe("AuthService", () => {
             findOneByEmail: (email: string) =>
               Promise.resolve(users.find((u) => u.email === email) ?? null),
             findOneById: (id: number) =>
-              Promise.resolve(users.find((u) => u.id === id) ?? null)
+              Promise.resolve(users.find((u) => u.id === id) ?? null),
+            create: () => Promise.resolve({ id: 3 })
           }
         },
         {
           provide: ConfigService,
           useValue: { get: (key: string) => env[key] }
-        }
+        },
+        { provide: EventEmitter2, useValue: { emit } }
       ]
     }).compile()
 
@@ -66,6 +72,22 @@ describe("AuthService", () => {
   })
 
   afterEach(() => redis.disconnect())
+
+  it("가입 신청이 저장되면 user.signed_up을 발행한다 (#790)", async () => {
+    await service.signUp({
+      email: "new@g.skku.edu",
+      password: PASSWORD,
+      name: "홍길동",
+      nickname: "gil",
+      generationId: 1,
+      sessions: []
+    })
+
+    expect(emit).toHaveBeenCalledWith(
+      USER_EVENTS.SIGNED_UP,
+      new UserSignedUpEvent(3)
+    )
+  })
 
   it("다른 기기에서 로그인해도 기존 기기의 refresh가 유지된다 (#541)", async () => {
     const laptop = await service.login(loginDto, { userAgent: "laptop" })

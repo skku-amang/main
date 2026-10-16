@@ -91,3 +91,142 @@ describe("formatNotification", () => {
     })
   })
 })
+
+describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정원", () => {
+  it("가입 신청: 운영진용, 가입 대기 목록으로", () => {
+    expect(
+      formatNotification({
+        type: "USER_SIGNED_UP",
+        payload: { userId: 5, userName: "홍길동", generationOrder: 23 }
+      })
+    ).toEqual({
+      title: "새 가입 신청",
+      body: "23기 홍길동님이 가입을 신청했어요",
+      href: "/admin/pending-users",
+      tag: "user-signup"
+    })
+  })
+
+  it("가입 승인: 본인에게, 홈으로", () => {
+    expect(
+      formatNotification({
+        type: "USER_APPROVED",
+        payload: { userName: "홍길동" }
+      })
+    ).toEqual({
+      title: "가입 승인",
+      body: "홍길동님, AMANG 가입이 승인됐어요. 환영해요!",
+      href: "/",
+      tag: "user-approved"
+    })
+  })
+
+  it("팀장 교체: 새 팀장과 전 팀장 문구가 다르다", () => {
+    const base = {
+      teamId: 7,
+      performanceId: 3,
+      teamName: "팀A",
+      leaderName: "김새팀장"
+    }
+    expect(
+      formatNotification({
+        type: "TEAM_LEADER_CHANGED",
+        payload: { ...base, assigned: true }
+      })
+    ).toEqual({
+      title: "팀A",
+      body: "팀장이 됐어요",
+      href: "/performances/3/teams/7",
+      tag: "team-7"
+    })
+    expect(
+      formatNotification({
+        type: "TEAM_LEADER_CHANGED",
+        payload: { ...base, assigned: false }
+      }).body
+    ).toBe("팀장이 김새팀장님으로 바뀌었어요")
+  })
+
+  it("공연 변경: 바뀐 필드를 한글로, 공연 상세로", () => {
+    expect(
+      formatNotification({
+        type: "PERFORMANCE_UPDATED",
+        payload: {
+          performanceId: 3,
+          performanceName: "봄 공연",
+          changedFields: ["startAt", "location"]
+        }
+      })
+    ).toEqual({
+      title: "봄 공연",
+      body: "공연 정보가 바뀌었습니다: 시작 일시, 장소",
+      href: "/performances/3",
+      tag: "performance-3"
+    })
+  })
+
+  it("팀 삭제: 팀이 없으므로 공연 팀 목록으로", () => {
+    expect(
+      formatNotification({
+        type: "TEAM_DELETED",
+        payload: {
+          performanceId: 3,
+          performanceName: "봄 공연",
+          teamName: "팀A"
+        }
+      })
+    ).toEqual({
+      title: "봄 공연",
+      body: "팀A 팀이 삭제됐습니다",
+      href: "/performances/3/teams",
+      tag: "performance-3"
+    })
+  })
+
+  it("정원 다 참: 팀장에게, 팀 상세로", () => {
+    expect(
+      formatNotification({
+        type: "TEAM_FILLED",
+        payload: { teamId: 7, performanceId: 3, teamName: "팀A" }
+      })
+    ).toEqual({
+      title: "팀A",
+      body: "멤버가 모두 모였어요",
+      href: "/performances/3/teams/7",
+      tag: "team-7"
+    })
+  })
+
+  it("별표한 팀 빈자리: 세션 이름을 풀어서, 팀 상세로", () => {
+    expect(
+      formatNotification({
+        type: "BOOKMARKED_TEAM_SPOT_OPENED",
+        payload: {
+          teamId: 7,
+          performanceId: 3,
+          teamName: "팀A",
+          sessionNames: ["VOCAL"]
+        }
+      })
+    ).toEqual({
+      title: "별표한 팀에 자리가 났어요",
+      body: "팀A 팀 보컬 자리가 났어요",
+      href: "/performances/3/teams/7",
+      tag: "team-7"
+    })
+  })
+
+  it("별표한 팀 빈자리: 세션 정보가 없으면 팀 이름만", () => {
+    expect(
+      formatNotification({
+        type: "BOOKMARKED_TEAM_SPOT_OPENED",
+        payload: {
+          teamId: 7,
+          performanceId: 3,
+          teamName: "팀A",
+          sessionNames: []
+        }
+      }).body
+    ).toBe("팀A 팀 자리가 났어요")
+  })
+})

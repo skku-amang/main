@@ -32,6 +32,8 @@ import { ObjectStorageService } from "../object-storage/object-storage.service"
 import {
   TEAM_EVENTS,
   TeamCreatedEvent,
+  TeamDeletedEvent,
+  TeamLeaderChangedEvent,
   TeamMemberAddedEvent,
   TeamMemberRemovedEvent,
   TeamUpdatedEvent,
@@ -347,6 +349,16 @@ export class TeamService {
           TEAM_EVENTS.UPDATED,
           new TeamUpdatedEvent(id, changedFields, actorId)
         )
+      if (leaderId !== existingTeam.leaderId)
+        this.eventEmitter.emit(
+          TEAM_EVENTS.LEADER_CHANGED,
+          new TeamLeaderChangedEvent(
+            id,
+            leaderId,
+            existingTeam.leaderId,
+            actorId
+          )
+        )
       for (const [userId, sessionIds] of roster.removed)
         this.eventEmitter.emit(
           TEAM_EVENTS.MEMBER_REMOVED,
@@ -382,7 +394,7 @@ export class TeamService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, actorId: number) {
     const team = await this.findOne(id)
 
     try {
@@ -390,6 +402,23 @@ export class TeamService {
     } catch (error) {
       throw error
     }
+
+    const memberIds = [
+      ...new Set([
+        team.leaderId,
+        ...team.teamSessions.flatMap((s) => s.members.map((m) => m.userId))
+      ])
+    ]
+    this.eventEmitter.emit(
+      TEAM_EVENTS.DELETED,
+      new TeamDeletedEvent(
+        id,
+        team.name,
+        team.performanceId,
+        memberIds,
+        actorId
+      )
+    )
 
     return team
   }
