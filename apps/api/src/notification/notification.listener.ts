@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter"
-import { NotificationType, Prisma } from "@repo/database"
+import { NotificationType, Prisma, SessionName } from "@repo/database"
 import { NotificationContent } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
 import {
@@ -33,9 +33,15 @@ const teamSnapshotSelect = {
   performanceId: true,
   leaderId: true,
   teamSessions: {
-    select: { capacity: true, members: { select: { userId: true } } }
+    select: {
+      sessionId: true,
+      capacity: true,
+      members: { select: { userId: true } }
+    }
   }
 } satisfies Prisma.TeamSelect
+
+type TeamSnapshot = Prisma.TeamGetPayload<{ select: typeof teamSnapshotSelect }>
 
 /** 공연 소속 전원(모든 팀의 멤버·팀장)을 뽑기 위한 select */
 const performanceMembersSelect = {
@@ -284,7 +290,7 @@ export class NotificationListener {
       }),
       this.prisma.session.findMany({
         where: { id: { in: event.sessionIds } },
-        select: { name: true }
+        select: { id: true, name: true }
       })
     ])
     if (!team || !member) return
@@ -307,6 +313,9 @@ export class NotificationListener {
       }
     })
 
+    if (changeType === "REMOVED")
+      await this.notifyBookmarkers(team, event, sessions)
+
     // 스스로 지원해 마지막 자리가 찼을 때만 팀장에게. 팀장이 로스터를 편집한 경우는 본인이 아니까 제외
     const selfApplied = event.actorId === event.userId
     const filled = team.teamSessions.every(
@@ -324,6 +333,51 @@ export class NotificationListener {
           }
         }
       )
+  }
+
+  /**
+   * 별표한 사람 중 아직 팀원이 아닌 사람에게. 빠진 당사자와 행동한 사람은 제외.
+   * 교체·정원 축소·세션 삭제처럼 빠졌는데도 빈자리가 안 생긴 경우는 커밋 후 스냅샷으로 걸러낸다
+   */
+  private async notifyBookmarkers(
+    team: TeamSnapshot,
+    event: TeamMemberRemovedEvent,
+    sessions: { id: number; name: SessionName }[]
+  ) {
+    const openedSessionIds = new Set(
+      team.teamSessions
+        .filter(
+          (s) =>
+            event.sessionIds.includes(s.sessionId) &&
+            s.members.length < s.capacity
+        )
+        .map((s) => s.sessionId)
+    )
+    const opened = sessions.filter((s) => openedSessionIds.has(s.id))
+    if (opened.length === 0) return
+
+    const bookmarks = await this.prisma.teamBookmark.findMany({
+      where: { teamId: team.id },
+      select: { userId: true }
+    })
+    const excluded = new Set([
+      ...teamMemberIds(team),
+      event.userId,
+      event.actorId
+    ])
+
+    await this.create(
+      bookmarks.map((b) => b.userId).filter((id) => !excluded.has(id)),
+      {
+        type: NotificationType.BOOKMARKED_TEAM_SPOT_OPENED,
+        payload: {
+          teamId: team.id,
+          performanceId: team.performanceId,
+          teamName: team.name,
+          sessionNames: opened.map((s) => s.name)
+        }
+      }
+    )
   }
 
   private findTeam(id: number) {

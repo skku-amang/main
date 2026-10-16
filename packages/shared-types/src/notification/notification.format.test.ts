@@ -196,4 +196,37 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       tag: "team-7"
     })
   })
+
+  it("별표한 팀 빈자리: 세션 이름을 풀어서, 팀 상세로", () => {
+    expect(
+      formatNotification({
+        type: "BOOKMARKED_TEAM_SPOT_OPENED",
+        payload: {
+          teamId: 7,
+          performanceId: 3,
+          teamName: "팀A",
+          sessionNames: ["VOCAL"]
+        }
+      })
+    ).toEqual({
+      title: "별표한 팀에 자리가 났어요",
+      body: "팀A 팀 보컬 자리가 났어요",
+      href: "/performances/3/teams/7",
+      tag: "team-7"
+    })
+  })
+
+  it("별표한 팀 빈자리: 세션 정보가 없으면 팀 이름만", () => {
+    expect(
+      formatNotification({
+        type: "BOOKMARKED_TEAM_SPOT_OPENED",
+        payload: {
+          teamId: 7,
+          performanceId: 3,
+          teamName: "팀A",
+          sessionNames: []
+        }
+      }).body
+    ).toBe("팀A 팀 자리가 났어요")
+  })
 })

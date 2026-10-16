@@ -26,8 +26,8 @@ const team = {
   performanceId: 3,
   leaderId: 4,
   teamSessions: [
-    { sessionId: 1, members: [{ userId: 1 }, { userId: 2 }] },
-    { sessionId: 2, members: [{ userId: 3 }] }
+    { sessionId: 1, capacity: 3, members: [{ userId: 1 }, { userId: 2 }] },
+    { sessionId: 2, capacity: 1, members: [{ userId: 3 }] }
   ]
 }
 
@@ -38,6 +38,7 @@ describe("NotificationListener", () => {
     user: { findUnique: jest.Mock; findMany: jest.Mock }
     session: { findMany: jest.Mock }
     performance: { findUnique: jest.Mock }
+    teamBookmark: { findMany: jest.Mock }
     notification: { createMany: jest.Mock }
   }
   let emit: jest.Mock
@@ -61,9 +62,13 @@ describe("NotificationListener", () => {
         findMany: jest.fn(async () => [])
       },
       session: {
-        findMany: jest.fn(async () => [{ name: "VOCAL" }, { name: "GUITAR" }])
+        findMany: jest.fn(async () => [
+          { id: 1, name: "VOCAL" },
+          { id: 2, name: "GUITAR" }
+        ])
       },
       performance: { findUnique: jest.fn(async () => null) },
+      teamBookmark: { findMany: jest.fn(async () => []) },
       notification: { createMany: jest.fn(async () => ({ count: 0 })) }
     }
     emit = jest.fn()
@@ -152,6 +157,92 @@ describe("NotificationListener", () => {
       await expect(
         listener.onTeamMemberAdded(new TeamMemberAddedEvent(7, 1, [1], 1))
       ).resolves.toBeUndefined()
+    })
+  })
+
+  describe("별표한 팀에 자리가 나면 (#794)", () => {
+    const rowsOf = (type: string) =>
+      prisma.notification.createMany.mock.calls
+        .flatMap(
+          (c) =>
+            c[0].data as {
+              recipientId: number
+              type: string
+              payload: Record<string, unknown>
+            }[]
+        )
+        .filter((r) => r.type === type)
+
+    it("별표한 비멤버에게 빈자리가 난 세션 이름과 함께 알린다", async () => {
+      prisma.teamBookmark.findMany.mockResolvedValue([
+        { userId: 11 },
+        { userId: 12 }
+      ])
+
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [1], 4)
+      )
+
+      const rows = rowsOf("BOOKMARKED_TEAM_SPOT_OPENED")
+      expect(rows.map((r) => r.recipientId).sort()).toEqual([11, 12])
+      expect(rows[0]!.payload).toEqual({
+        teamId: 7,
+        performanceId: 3,
+        teamName: "팀A",
+        sessionNames: ["VOCAL"]
+      })
+    })
+
+    it("팀원, 팀장, 빠진 당사자, 행동한 사람은 별표했어도 받지 않는다", async () => {
+      prisma.teamBookmark.findMany.mockResolvedValue([
+        { userId: 1 },
+        { userId: 4 },
+        { userId: 9 },
+        { userId: 99 },
+        { userId: 11 }
+      ])
+
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [1], 99)
+      )
+
+      expect(
+        rowsOf("BOOKMARKED_TEAM_SPOT_OPENED").map((r) => r.recipientId)
+      ).toEqual([11])
+    })
+
+    it("빠졌는데도 빈자리가 안 생기면(교체·정원 축소) 보내지 않는다", async () => {
+      prisma.teamBookmark.findMany.mockResolvedValue([{ userId: 11 }])
+      prisma.team.findUnique.mockResolvedValue({
+        ...team,
+        teamSessions: [
+          { sessionId: 1, capacity: 2, members: [{ userId: 1 }, { userId: 2 }] }
+        ]
+      })
+
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [1], 4)
+      )
+
+      expect(rowsOf("BOOKMARKED_TEAM_SPOT_OPENED")).toEqual([])
+    })
+
+    it("팀에서 지워진 세션의 멤버 제거는 빈자리가 아니다", async () => {
+      prisma.teamBookmark.findMany.mockResolvedValue([{ userId: 11 }])
+
+      await listener.onTeamMemberRemoved(
+        new TeamMemberRemovedEvent(7, 9, [5], 4)
+      )
+
+      expect(rowsOf("BOOKMARKED_TEAM_SPOT_OPENED")).toEqual([])
+    })
+
+    it("멤버가 들어온 경우엔 보내지 않는다", async () => {
+      prisma.teamBookmark.findMany.mockResolvedValue([{ userId: 11 }])
+
+      await listener.onTeamMemberAdded(new TeamMemberAddedEvent(7, 1, [1], 1))
+
+      expect(rowsOf("BOOKMARKED_TEAM_SPOT_OPENED")).toEqual([])
     })
   })
 

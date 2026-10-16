@@ -68,6 +68,13 @@ export const UserApprovedPayloadSchema = z.object({
   userName: z.string()
 })
 
+export const BookmarkedTeamSpotOpenedPayloadSchema = z.object({
+  teamId: idSchema,
+  performanceId: idSchema,
+  teamName: z.string(),
+  sessionNames: z.array(z.nativeEnum(SessionName))
+})
+
 const notificationBase = {
   id: idSchema,
   readAt: z.coerce.date().nullable(),
@@ -128,6 +135,11 @@ export const NotificationItemSchema = z.discriminatedUnion("type", [
     ...notificationBase,
     type: z.literal(NotificationType.USER_APPROVED),
     payload: UserApprovedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.BOOKMARKED_TEAM_SPOT_OPENED),
+    payload: BookmarkedTeamSpotOpenedPayloadSchema
   })
 ])
 
