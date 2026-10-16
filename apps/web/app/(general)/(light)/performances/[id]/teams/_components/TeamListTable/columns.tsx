@@ -196,7 +196,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "songYoutubeVideoUrl",
-    header: () => <div className="flex items-center justify-center">영상</div>,
+    header: () => (
+      <div className="flex items-center justify-center whitespace-nowrap">
+        영상
+      </div>
+    ),
     cell: ({ row }) => <YoutubeCell row={row} />
   },
   {
