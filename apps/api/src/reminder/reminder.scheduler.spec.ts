@@ -16,7 +16,11 @@ describe("ReminderScheduler", () => {
     remind = jest.fn(async () => 2)
     scheduler = new ReminderScheduler(
       redis,
-      { remindRecruitmentDeadline: remind } as unknown as ReminderService,
+      {
+        remindRecruitmentDeadline: remind,
+        remindRoomReservations: jest.fn(async () => 0),
+        remindEquipmentReturns: jest.fn(async () => 0)
+      } as unknown as ReminderService,
       { flush: jest.fn(async () => 0) } as unknown as PushDeferredService
     )
   })

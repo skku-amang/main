@@ -75,6 +75,19 @@ export const BookmarkedTeamSpotOpenedPayloadSchema = z.object({
   sessionNames: z.array(z.nativeEnum(SessionName))
 })
 
+export const RoomReservationSoonPayloadSchema = z.object({
+  rentalId: idSchema,
+  title: z.string(),
+  startAt: z.coerce.date()
+})
+
+export const EquipmentReturnDuePayloadSchema = z.object({
+  rentalId: idSchema,
+  equipmentId: idSchema,
+  equipmentName: z.string(),
+  endAt: z.coerce.date()
+})
+
 export const TeamRecruitmentDeadlinePayloadSchema = z.object({
   teamId: idSchema,
   performanceId: idSchema,
@@ -158,6 +171,16 @@ export const NotificationItemSchema = z.discriminatedUnion("type", [
     ...notificationBase,
     type: z.literal(NotificationType.TEAM_RECRUITMENT_DEADLINE),
     payload: TeamRecruitmentDeadlinePayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.ROOM_RESERVATION_SOON),
+    payload: RoomReservationSoonPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.EQUIPMENT_RETURN_DUE),
+    payload: EquipmentReturnDuePayloadSchema
   })
 ])
 

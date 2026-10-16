@@ -56,6 +56,15 @@ const teamHref = (performanceId: number, teamId: number) =>
 
 const teamTag = (teamId: number) => `team-${teamId}`
 
+/** 서버(UTC)·브라우저 어디서 렌더해도 한국 시각 "15:00". payload를 거친 날짜는 문자열일 수 있어 new Date로 받는다 */
+const kstTime = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Seoul",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23"
+})
+const formatKstTime = (at: Date | string) => kstTime.format(new Date(at))
+
 /**
  * 저장된 type + payload를 사람이 읽을 문구와 이동 경로로 바꾼다.
  * 인앱 알림함과 푸시 본문이 같은 함수를 쓴다 (문구는 저장하지 않는다는 설계 §5).
@@ -193,6 +202,24 @@ export function formatNotification(
           : "내일 모집 마감이에요",
         href: teamHref(p.performanceId, p.teamId),
         tag: teamTag(p.teamId)
+      }
+    }
+    case "ROOM_RESERVATION_SOON": {
+      const p = item.payload
+      return {
+        title: "동방 예약 1시간 전",
+        body: `오늘 ${formatKstTime(p.startAt)} 동방 예약 — ${p.title}`,
+        href: "/reservations/clubroom",
+        tag: `rental-${p.rentalId}`
+      }
+    }
+    case "EQUIPMENT_RETURN_DUE": {
+      const p = item.payload
+      return {
+        title: "장비 반납",
+        body: `오늘 ${formatKstTime(p.endAt)}까지 ${p.equipmentName} 반납`,
+        href: `/reservations/equipment/${p.equipmentId}`,
+        tag: `rental-${p.rentalId}`
       }
     }
   }
