@@ -79,7 +79,7 @@ const ProfileEditPage = () => {
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const imageUpload = useImageUpload({
     onSuccess: (publicUrl) => {
-      profileForm.setValue("image", publicUrl)
+      profileForm.setValue("image", publicUrl, { shouldDirty: true })
     }
   })
 
@@ -89,7 +89,8 @@ const ProfileEditPage = () => {
       name: user?.name ?? "",
       nickname: user?.nickname ?? "",
       bio: user?.bio ?? "",
-      sessions: user?.sessions.map((s) => s.id) ?? [],
+      // 체크 순서와 무관하게 비교되도록 id 오름차순 (isDirty는 배열 순서까지 비교)
+      sessions: user?.sessions.map((s) => s.id).sort((a, b) => a - b) ?? [],
       image: user?.image ?? undefined,
       isProfilePublic: user?.isProfilePublic ?? false
     }
@@ -325,7 +326,9 @@ const ProfileEditPage = () => {
                             onCheckedChange={(checked) =>
                               field.onChange(
                                 checked
-                                  ? [...(field.value ?? []), session.id]
+                                  ? [...(field.value ?? []), session.id].sort(
+                                      (a, b) => a - b
+                                    )
                                   : field.value?.filter(
                                       (id) => id !== session.id
                                     )
@@ -366,7 +369,10 @@ const ProfileEditPage = () => {
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={updateProfileMutation.isPending}
+                  disabled={
+                    !profileForm.formState.isDirty ||
+                    updateProfileMutation.isPending
+                  }
                   className="rounded-full"
                 >
                   <Save className="mr-1.5 size-4" />
