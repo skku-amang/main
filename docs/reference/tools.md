@@ -9,10 +9,9 @@
 
 ## Terraform 선언적 관리
 
-| 도구       | 용도                      | Terraform 모듈                                           | Web                                                                                                                                                | CLI                                                        | MCP            |
-| ---------- | ------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------- |
-| **Vercel** | web 호스팅                | [infra/terraform/vercel/](../../infra/terraform/vercel/) | <ul><li>[amang-homepage 팀](https://vercel.com/amang-homepage)<ul><li>[amang-web](https://vercel.com/amang-homepage/amang-web)</li></ul></li></ul> | `vercel` (도메인 연결은 Kargo가 함 — 직접 promote/alias X) | -              |
-| **Sentry** | 에러 트래킹 + 유저 피드백 | [infra/terraform/sentry/](../../infra/terraform/sentry/) | <ul><li>[amang-23 org](https://amang-23.sentry.io/)<ul><li>web</li><li>api</li></ul></li></ul>                                                     | -                                                          | `amang-sentry` |
+| 도구       | 용도                      | Terraform 모듈                                           | Web                                                                                            | CLI | MCP            |
+| ---------- | ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --- | -------------- |
+| **Sentry** | 에러 트래킹 + 유저 피드백 | [infra/terraform/sentry/](../../infra/terraform/sentry/) | <ul><li>[amang-23 org](https://amang-23.sentry.io/)<ul><li>web</li><li>api</li></ul></li></ul> | -   | `amang-sentry` |
 
 ## 클러스터 (homelab 레포 · ArgoCD 선언)
 
