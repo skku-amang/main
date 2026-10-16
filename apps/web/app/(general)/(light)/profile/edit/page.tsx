@@ -332,36 +332,33 @@ const ProfileEditPage = () => {
                               )
                             }
                           />
-
-                          <FormField
-                            control={profileForm.control}
-                            name="isProfilePublic"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
-                                <div className="space-y-1">
-                                  <FormLabel>
-                                    다른 부원에게 프로필 공개
-                                  </FormLabel>
-                                  <FormDescription>
-                                    켜면 로그인한 부원이 내 기수·세션·소개와
-                                    참여한 팀·공연을 볼 수 있어요. 끄면 이름과
-                                    사진만 보여요.
-                                  </FormDescription>
-                                </div>
-                                <FormControl>
-                                  <Switch
-                                    checked={field.value ?? false}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
                           {getSessionDisplayName(session.name)}
                         </label>
                       ))}
                     </div>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={profileForm.control}
+                name="isProfilePublic"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
+                    <div className="space-y-1">
+                      <FormLabel>다른 부원에게 프로필 공개</FormLabel>
+                      <FormDescription>
+                        켜면 로그인한 부원이 내 기수·세션·소개와 참여한
+                        팀·공연을 볼 수 있어요. 끄면 이름과 사진만 보여요.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value ?? false}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />
