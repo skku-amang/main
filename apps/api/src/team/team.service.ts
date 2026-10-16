@@ -23,6 +23,7 @@ import {
 } from "@repo/api-client"
 import {
   isPerformanceRecruiting,
+  SESSION_DISPLAY_NAME,
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
@@ -45,6 +46,23 @@ export class TeamService {
     private readonly objectStorageService: ObjectStorageService,
     private readonly eventEmitter: EventEmitter2
   ) {}
+
+  // 오류 안내에 내부 번호 대신 이름을 쓴다. 오류가 날 때만 조회한다
+  private async sessionLabel(sessionId: number) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      select: { name: true }
+    })
+    return session ? SESSION_DISPLAY_NAME[session.name] : "해당"
+  }
+
+  private async userLabel(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true }
+    })
+    return user?.name ?? "같은 부원"
+  }
   async create(createTeamDto: CreateTeamDto, actorId: number) {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
@@ -66,17 +84,17 @@ export class TeamService {
         for (const member of members) {
           if (member.index < 1 || member.index > capacity) {
             throw new InvalidMemberIndexError(
-              `세션(ID: ${sessionId})의 멤버 인덱스는 1과 정원(${capacity}) 사이의 값이어야 합니다.`
+              `${await this.sessionLabel(sessionId)} 세션의 자리 번호(${member.index})는 1부터 정원(${capacity}명)까지만 쓸 수 있습니다.`
             )
           }
           if (indexSet.has(member.index)) {
             throw new DuplicateMemberIndexError(
-              `세션(ID: ${sessionId}) 내에 중복된 인덱스(${member.index})가 존재합니다.`
+              `${await this.sessionLabel(sessionId)} 세션의 ${member.index}번 자리가 두 번 들어 있습니다.`
             )
           }
           if (userSet.has(member.userId)) {
             throw new DuplicateSessionUserError(
-              `세션(ID: ${sessionId}) 내에 중복된 사용자(ID: ${member.userId})가 존재합니다.`
+              `${await this.userLabel(member.userId)}님이 ${await this.sessionLabel(sessionId)} 세션에 두 번 들어 있습니다.`
             )
           }
           indexSet.add(member.index)
@@ -238,15 +256,15 @@ export class TeamService {
         for (const member of members) {
           if (member.index < 1 || member.index > capacity)
             throw new InvalidMemberIndexError(
-              `세션(ID: ${sessionId})의 멤버 인덱스(${member.index})는 1과 정원(${capacity}) 사이의 값이어야 합니다.`
+              `${await this.sessionLabel(sessionId)} 세션의 자리 번호(${member.index})는 1부터 정원(${capacity}명)까지만 쓸 수 있습니다.`
             )
           if (indexSet.has(member.index))
             throw new DuplicateMemberIndexError(
-              `세션(ID: ${sessionId}) 내에 중복된 인덱스(${member.index})가 존재합니다.`
+              `${await this.sessionLabel(sessionId)} 세션의 ${member.index}번 자리가 두 번 들어 있습니다.`
             )
           if (userSet.has(member.userId))
             throw new DuplicateSessionUserError(
-              `세션(ID: ${sessionId}) 내에 중복된 사용자(ID: ${member.userId})가 존재합니다.`
+              `${await this.userLabel(member.userId)}님이 ${await this.sessionLabel(sessionId)} 세션에 두 번 들어 있습니다.`
             )
           userSet.add(member.userId)
           indexSet.add(member.index)
@@ -401,14 +419,14 @@ export class TeamService {
 
       if (!targetSession) {
         throw new SessionNotFoundError(
-          `세션(ID: ${sessionId})이 팀에 존재하지 않습니다.`
+          `이 팀에는 ${await this.sessionLabel(sessionId)} 세션 자리가 없습니다.`
         )
       }
 
       // 2. 지원하고자 하는 index가 해당 세션의 capacity를 넘지 않는지 확인
       if (index < 1 || index > targetSession.capacity)
         throw new ValidationError(
-          `지원하려는 인덱스(${index})가 세션(ID: ${sessionId})의 정원(${targetSession.capacity}명)을 초과합니다.`
+          `${await this.sessionLabel(sessionId)} 세션 정원은 ${targetSession.capacity}명이라 ${index}번 자리에 지원할 수 없습니다.`
         )
 
       // 3. 이미 해당 세션에 지원한 이력이 있는지 확인
@@ -417,14 +435,14 @@ export class TeamService {
       )
       if (isAlreadyApplied) {
         throw new DuplicateApplicationError(
-          `이미 세션(ID: ${sessionId})에 지원한 이력이 있습니다.`
+          `이미 이 팀의 ${await this.sessionLabel(sessionId)} 세션에 지원했습니다.`
         )
       }
 
       // 4. 지원하고자 하는 index에 이미 다른 멤버가 지원했는지 확인
       if (targetSession.members.some((m) => m.index === index)) {
         throw new PositionOccupiedError(
-          `세션(ID: ${sessionId})의 인덱스(${index})는 이미 다른 멤버가 지원했습니다.`
+          `${await this.sessionLabel(sessionId)} ${index}번 자리는 이미 다른 부원이 지원했습니다.`
         )
       }
     }
@@ -504,18 +522,18 @@ export class TeamService {
       const targetSession = teamSessionMap.get(sessionId)
       if (!targetSession)
         throw new SessionNotFoundError(
-          `세션(ID: ${sessionId})이 팀에 존재하지 않습니다.`
+          `이 팀에는 ${await this.sessionLabel(sessionId)} 세션 자리가 없습니다.`
         )
 
       const targetMember = targetSession.members.find((m) => m.index === index)
       if (!targetMember)
         throw new NoApplicationFoundError(
-          `세션(ID: ${sessionId})의 ${index}번 자리에는 지원한 멤버가 없습니다.`
+          `${await this.sessionLabel(sessionId)} ${index}번 자리에는 지원한 사람이 없습니다.`
         )
 
       if (targetMember.userId !== userId)
         throw new ForbiddenError(
-          `세션(ID: ${sessionId})의 ${index}번 자리를 취소할 권한이 없습니다.`
+          `${await this.sessionLabel(sessionId)} ${index}번 자리는 본인이 지원한 자리가 아니라 취소할 수 없습니다.`
         )
 
       memberIdsToDelete.push(targetMember.id)
