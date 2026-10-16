@@ -5,6 +5,7 @@ import "dayjs/locale/ko"
 import dayjs from "dayjs"
 import {
   Archive,
+  Building2,
   CalendarClock,
   ChevronRight,
   Instagram,
@@ -345,6 +346,11 @@ const Shortcuts = ({ isAdmin }: { isAdmin: boolean }) => {
       label: "팀 모집",
       href: ROUTES.PERFORMANCE.TEAM.LATEST_LIST,
       icon: Users
+    },
+    {
+      label: "동방 예약",
+      href: ROUTES.RESERVATION.CLUBROOM,
+      icon: Building2
     },
     { label: "장비 대여", href: ROUTES.RESERVATION.EQUIPMENT, icon: Package },
     { label: "아카이브", href: ROUTES.PERFORMANCE.LIST, icon: Archive },
