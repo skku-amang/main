@@ -19,6 +19,7 @@
 // - 실패해야 정상인 요청은 500이 아니라 정해진 오류 코드로 오는지 확인하고, 팀장이 봇이면 지원 알림 row가 생기는지도 본다.
 import http from "k6/http";
 import { check, group, sleep } from "k6";
+import crypto from "k6/crypto";
 
 const API = __ENV.API_URL;
 const ORIGIN = __ENV.ORIGIN;
@@ -180,11 +181,29 @@ function slotOf(team, userId) {
 
 // ───────────────────────── 부원 풀 (가입 봇) ─────────────────────────
 
+/**
+ * 가입 봇 닉네임 = traffic-member-<base36 가입시각>-<태그 6자리>. 태그는 봇 비밀번호로 만든 HMAC이라
+ * 공개 스테이징에서 누가 같은 접두사로 가입해도 봇은 자기가 만든 계정만 알아보고 승인한다
+ */
+const memberTag = (stamp) =>
+  crypto
+    .hmac("sha256", __ENV.BOT_PASSWORD, `${MEMBER_PREFIX}${stamp}`, "hex")
+    .slice(0, 6);
+const memberNickname = (stamp) =>
+  `${MEMBER_PREFIX}${stamp}-${memberTag(stamp)}`;
+/** 닉네임이 봇이 만든 것이면 가입 시각(epoch ms), 아니면 NaN. pending 응답엔 createdAt이 없어 이걸 쓴다 */
+const signedUpAt = (user) => {
+  const m = /^traffic-member-([0-9a-z]+)-([0-9a-f]{6})$/.exec(
+    String(user.nickname ?? ""),
+  );
+  if (!m || memberTag(m[1]) !== m[2]) return NaN;
+  return parseInt(m[1], 36);
+};
+const isScriptMember = (user) => Number.isFinite(signedUpAt(user));
+
 /** 승인된 가입 봇(GET /users는 승인 계정만 준다) */
 const approvedMembers = (bot1) =>
-  (data(bot1.get("/users")) ?? []).filter((u) =>
-    u.nickname?.startsWith(MEMBER_PREFIX),
-  );
+  (data(bot1.get("/users")) ?? []).filter(isScriptMember);
 
 /** 승인된 가입 봇 중 몇 명을 골라 로그인한다. 봇2도 풀의 일원 */
 function loginPool(bot2, members, count) {
@@ -200,7 +219,7 @@ function loginPool(bot2, members, count) {
   return pool;
 }
 
-/** 가입 신청 → 운영진에게 USER_SIGNED_UP. 승인은 다음 실행들에서(approvePending). 닉네임에 가입 시각(base36)을 박는다 */
+/** 가입 신청 → 운영진에게 USER_SIGNED_UP. 승인은 다음 실행들에서(approvePending). 닉네임 = 가입 시각(base36) + HMAC 태그 */
 function signup(bot1, sessionIds) {
   group("가입 신청", () => {
     const stamp = Date.now().toString(36);
@@ -210,12 +229,13 @@ function signup(bot1, sessionIds) {
       null,
     );
     if (!generation || !sessionIds.length) return;
+    const nickname = memberNickname(stamp);
     ok(
       guest.post("/auth/signup", {
-        email: `${MEMBER_PREFIX}${stamp}@${MEMBER_DOMAIN}`,
+        email: `${nickname}@${MEMBER_DOMAIN}`,
         password: __ENV.BOT_PASSWORD,
         name: `점검 부원 ${stamp.slice(-3)}`,
-        nickname: `${MEMBER_PREFIX}${stamp}`,
+        nickname,
         generationId: generation.id,
         sessions: [pick(sessionIds)],
       }),
@@ -223,15 +243,6 @@ function signup(bot1, sessionIds) {
     );
   });
 }
-
-/** 닉네임의 base36 스탬프 → 가입 시각. pending 응답(detailedUserSelector)엔 createdAt이 없어서 이걸 쓴다 */
-const signedUpAt = (user) =>
-  parseInt(String(user.nickname ?? "").slice(MEMBER_PREFIX.length), 36);
-/** 스크립트가 만든 가입 봇인지 — 사람이 같은 접두사로 만든 계정("traffic-member-test")을 자동 승인하지 않게 스탬프가 그럴듯한 epoch ms여야 한다 */
-const isScriptMember = (user) =>
-  !!user.nickname?.startsWith(MEMBER_PREFIX) &&
-  Number.isFinite(signedUpAt(user)) &&
-  signedUpAt(user) > 1.6e12;
 
 const pendingMembers = (bot1) =>
   (data(bot1.get("/users/admin/pending")) ?? []).filter(isScriptMember);
