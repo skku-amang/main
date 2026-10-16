@@ -7,18 +7,21 @@ import SlotActionButton from "./SlotActionButton"
 /**
  * 세션 자리 한 칸: 맡은 사람 이름 / 모집 / 이 팀엔 없는 자리(–).
  * - canApply면 빈자리를 '지원' 버튼으로 (로그인 + 모집 중일 때)
- * - viewerId가 맡은 자리면 이름 옆에 '취소' 버튼 (서버가 모집 마감 후 취소도 허용)
+ * - viewerId가 맡은 자리면 이름을 강조하고 아래에 '취소' 버튼 (서버가 모집 마감 후 취소도 허용)
+ * - compact(휴대폰)면 사진·버튼 없이 이름과 '모집' 표시만
  */
 const RosterCell = ({
   team,
   slot,
   canApply = false,
-  viewerId
+  viewerId,
+  compact = false
 }: {
   team: TeamFromList
   slot: RosterSlot
   canApply?: boolean
   viewerId?: number
+  compact?: boolean
 }) => {
   const cell = getRosterCell(team, slot)
   const actionProps = {
@@ -30,9 +33,10 @@ const RosterCell = ({
 
   if (cell.kind === "member") {
     const { user } = cell.member
+    const isMe = viewerId !== undefined && user.id === viewerId
     return (
-      <MemberChip user={user}>
-        {viewerId !== undefined && user.id === viewerId && (
+      <MemberChip user={user} showAvatar={!compact} isMe={isMe}>
+        {isMe && !compact && (
           <SlotActionButton
             action="cancel"
             sessionId={cell.sessionId}
@@ -49,7 +53,7 @@ const RosterCell = ({
       team.teamSessions
         .find((ts) => ts.session.id === cell.sessionId)
         ?.members.some((m) => m.user.id === viewerId)
-    return canApply && !alreadyInSession ? (
+    return canApply && !compact && !alreadyInSession ? (
       <SlotActionButton
         action="apply"
         sessionId={cell.sessionId}

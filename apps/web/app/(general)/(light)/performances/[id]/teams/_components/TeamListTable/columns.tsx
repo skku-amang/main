@@ -8,6 +8,7 @@ import React from "react"
 
 import { useMiniPlayer } from "@/components/MiniPlayer"
 import { useTeamPermission } from "@/hooks/useTeamPermission"
+import { useAuth } from "@/lib/providers/auth-provider"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
@@ -58,6 +59,16 @@ const ActionsCell = ({ row }: CellContext<TeamColumn, unknown>) => {
       teamId={row.original.id}
       className="w-full"
     />
+  )
+}
+
+const LeaderCell = ({ row }: CellContext<TeamColumn, unknown>) => {
+  const { user } = useAuth()
+  const { leader, isFreshmenFixed } = row.original
+  return (
+    <MemberChip user={leader} isMe={user?.id === leader.id}>
+      {isFreshmenFixed && <FreshmenFixedBadge size="small" />}
+    </MemberChip>
   )
 }
 
@@ -142,11 +153,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
     id: "leaderName",
     accessorFn: (row) => row.leader.name,
     header: ({ column }) => <SortButton column={column}>팀장</SortButton>,
-    cell: ({ row }) => (
-      <MemberChip user={row.original.leader}>
-        {row.original.isFreshmenFixed && <FreshmenFixedBadge size="small" />}
-      </MemberChip>
-    )
+    cell: (props) => <LeaderCell {...props} />
   },
   {
     id: "requiredSessions",

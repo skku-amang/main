@@ -634,7 +634,11 @@ export function TeamListDataTable<TValue>({
         ) : mobileView === "card" ? (
           <div className="space-y-3">{teamCards}</div>
         ) : (
-          <CompactTeamList rows={rowsOnPage} slots={rosterSlots} />
+          <CompactTeamList
+            rows={rowsOnPage}
+            slots={rosterSlots}
+            viewerId={user?.id}
+          />
         )}
 
         {/* 모바일 페이지네이션 */}

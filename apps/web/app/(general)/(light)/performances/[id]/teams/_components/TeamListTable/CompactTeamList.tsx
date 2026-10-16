@@ -12,10 +12,12 @@ import RosterCell from "./RosterCell"
 /** 휴대폰 '표' 보기 — 팀 = 행, 세션 자리 = 열. 곡명 칸은 고정하고 가로로 밀어서 본다 */
 const CompactTeamList = ({
   rows,
-  slots
+  slots,
+  viewerId
 }: {
   rows: Row<TeamColumn>[]
   slots: RosterSlot[]
+  viewerId?: number
 }) => (
   <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
     <table className="w-max min-w-full border-collapse text-left">
@@ -62,14 +64,23 @@ const CompactTeamList = ({
               </div>
             </td>
             <td className="px-2 py-2">
-              <MemberChip user={team.leader} />
+              <MemberChip
+                user={team.leader}
+                showAvatar={false}
+                isMe={team.leader.id === viewerId}
+              />
             </td>
             {slots.map((slot) => (
               <td
                 key={`${slot.sessionName}-${slot.index}`}
                 className="px-2 py-2"
               >
-                <RosterCell team={team} slot={slot} />
+                <RosterCell
+                  team={team}
+                  slot={slot}
+                  viewerId={viewerId}
+                  compact
+                />
               </td>
             ))}
           </tr>
