@@ -17,7 +17,6 @@ configMapGenerator:
     behavior: merge
     literals:
       - S3_ENDPOINT=https://s3.amang.staging.json-server.win
-      - COOKIE_SAMESITE=none
       - COOKIE_DOMAIN=amang.staging.json-server.win
       - NODE_ENV=production
       - SENTRY_ENVIRONMENT=staging

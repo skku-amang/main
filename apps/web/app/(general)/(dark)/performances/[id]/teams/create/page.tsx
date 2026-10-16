@@ -1,11 +1,9 @@
-import { headers } from "next/headers"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
-import { isAuthCookieBlindHost } from "@/lib/auth/authCookieScope"
 import { mapPerformance } from "@/hooks/api/mapper"
 import { apiClient } from "@/lib/apiClient"
 import { getServerUser } from "@/lib/auth/server"
@@ -25,8 +23,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
   const performanceId = params.id
 
   const user = await getServerUser()
-  const host = (await headers()).get("host")
-  if (!isAuthCookieBlindHost(host) && !user) redirect(ROUTES.LOGIN)
+  if (!user) redirect(ROUTES.LOGIN)
 
   // 조회 실패 시에는 폼을 그대로 보여주고 판단을 서버(팀 생성 API)에 맡김.
   // apiClient 응답의 날짜는 문자열이라 mapper로 Date 변환 후 판정
