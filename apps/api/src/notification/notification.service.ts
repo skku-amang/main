@@ -6,9 +6,12 @@ import {
   MarkNotificationsReadBySubject,
   NotificationItemSchema,
   NotificationList,
-  UnreadNotificationCount
+  NotificationPreferences,
+  UnreadNotificationCount,
+  UpdateNotificationPreferences
 } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
+import { preferencesSelect, toPreferences } from "./preferences"
 
 /** 대상 페이지에서 "본 것"으로 칠 수 있는 알림 유형. 팀 멤버 변경은 공연 페이지에선 안 보이므로 teamId 쪽에만 */
 const SUBJECT_TYPES = {
@@ -89,6 +92,33 @@ export class NotificationService {
       data: { readAt: new Date() }
     })
     return { count }
+  }
+
+  async getPreferences(userId: number): Promise<NotificationPreferences> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: preferencesSelect
+    })
+    return toPreferences(user)
+  }
+
+  async updatePreferences(
+    userId: number,
+    { mutedTypes, quietHours }: UpdateNotificationPreferences
+  ): Promise<NotificationPreferences> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(mutedTypes && { mutedNotificationTypes: mutedTypes }),
+        ...(quietHours && {
+          quietHoursEnabled: quietHours.enabled,
+          quietHoursStart: quietHours.start,
+          quietHoursEnd: quietHours.end
+        })
+      },
+      select: preferencesSelect
+    })
+    return toPreferences(user)
   }
 
   /** 대상(팀/공연) 페이지에 도달한 사용자의 그 대상 알림을 읽음 처리한다 */
