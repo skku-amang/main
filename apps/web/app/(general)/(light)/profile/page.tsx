@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  Bell,
   CalendarDays,
   Guitar,
   LogOut,
@@ -206,6 +207,12 @@ const ProfilePage = () => {
             icon={<Monitor className="size-5" />}
             title="로그인 기기"
             description="로그인된 기기 확인·로그아웃"
+          />
+          <ShortcutCard
+            href={ROUTES.PROFILE.NOTIFICATIONS}
+            icon={<Bell className="size-5" />}
+            title="알림 설정"
+            description="받을 푸시 종류·방해금지 시간"
           />
           <ShortcutCard
             href={ROUTES.SUGGESTIONS}

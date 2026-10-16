@@ -47,6 +47,7 @@ yarn-error.log*
 
 # Temp
 tmp/
+.tmp/
 
 # Misc
 .DS_Store

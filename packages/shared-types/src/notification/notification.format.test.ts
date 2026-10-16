@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest"
-import { formatNotification } from "./notification.format"
+import { NotificationType } from "@repo/database/enums"
+import {
+  NOTIFICATION_TYPE_LABEL,
+  formatNotification
+} from "./notification.format"
+
+describe("NOTIFICATION_TYPE_LABEL", () => {
+  it("모든 알림 유형에 표시명이 있다 (유형을 추가하면 설정 화면에도 나타나야 한다)", () => {
+    for (const type of Object.values(NotificationType))
+      expect(NOTIFICATION_TYPE_LABEL[type]).toEqual(expect.any(String))
+  })
+})
 
 describe("formatNotification", () => {
   it("멤버 합류: 팀 이름이 제목, 세션은 한글로", () => {

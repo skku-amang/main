@@ -1,4 +1,4 @@
-import { SessionName } from "@repo/database/enums"
+import { NotificationType, SessionName } from "@repo/database/enums"
 import type { NotificationItem } from "./notification.schema"
 
 /** SessionName → 한글 표시명. 알림 문구·세션 UI가 함께 쓴다 */
@@ -10,6 +10,24 @@ export const SESSION_DISPLAY_NAME: Record<SessionName, string> = {
   DRUM: "드럼",
   STRINGS: "현악기",
   WINDS: "관악기"
+}
+
+/** 알림 유형 → 설정 화면 표시명. 순서가 곧 화면 순서 (#708) */
+export const NOTIFICATION_TYPE_LABEL: Record<NotificationType, string> = {
+  TEAM_MEMBER_CHANGE: "팀원 합류·탈퇴",
+  TEAM_ATTRIBUTE_CHANGE: "팀 정보 변경",
+  TEAM_LEADER_CHANGED: "팀장 교체",
+  TEAM_FILLED: "팀 정원이 다 찼을 때",
+  TEAM_DELETED: "팀 삭제",
+  TEAM_CREATED: "새 팀",
+  PERFORMANCE_CREATED: "새 공연",
+  PERFORMANCE_UPDATED: "공연 정보 변경",
+  BOOKMARKED_TEAM_SPOT_OPENED: "별표한 팀에 빈자리",
+  TEAM_RECRUITMENT_DEADLINE: "모집 마감 하루 전",
+  ROOM_RESERVATION_SOON: "동방 예약 1시간 전",
+  EQUIPMENT_RETURN_DUE: "장비 반납 기한",
+  USER_SIGNED_UP: "가입 신청 (운영진)",
+  USER_APPROVED: "가입 승인"
 }
 
 const TEAM_FIELD_LABEL: Record<string, string> = {
