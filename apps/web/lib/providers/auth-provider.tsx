@@ -10,6 +10,8 @@ import { TokenManager } from "@/lib/auth/tokenManager"
 import { useApiClient } from "@/lib/providers/api-client-provider"
 import { removePushSubscription } from "@/lib/push"
 import {
+  AccessTokenExpiredError,
+  InternalServerError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError
 } from "@repo/api-client"
@@ -19,6 +21,13 @@ import { DetailedUser, LoginUser } from "@repo/shared-types"
 const isSessionEnded = (error: unknown) =>
   error instanceof RefreshTokenExpiredError ||
   error instanceof RefreshTokenNotFoundError
+
+/**
+ * 네트워크 끊김(fetch TypeError)이나 서버·게이트웨이 오류. 세션이 끝났다는 증거가 아니므로
+ * 로그인 상태를 지우지 않는다 — 다음 요청이 401을 받으면 refresh를 다시 시도한다 (#542).
+ */
+const isTransientFailure = (error: unknown) =>
+  error instanceof TypeError || error instanceof InternalServerError
 
 /**
  * Cookie 기반 인증 상태 (ADR-0002).
@@ -46,12 +55,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const apiClient = useApiClient()
   const queryClient = useQueryClient()
 
-  const { data, isPending, isError } = useMe({
+  const { data, isPending, error } = useMe({
     retry: false,
     staleTime: 5 * 60 * 1000
   })
 
-  const user = isError ? null : (data ?? null)
+  // 재조회가 일시 실패(refresh 실패로 남은 만료 응답, 네트워크·서버 오류)하면 직전 사용자를 유지한다.
+  // 세션 종료는 아래 핸들러가 ME를 null로 명시한다
+  const keepsUser =
+    !error ||
+    error instanceof AccessTokenExpiredError ||
+    error instanceof InternalServerError
+  const user = keepsUser ? (data ?? null) : null
   const isLoading = isPending
 
   // 토큰 만료 시 TokenManager (Web Locks + single-flight)로 refresh.
@@ -63,6 +78,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await TokenManager.getInstance().refresh()
         return true
       } catch (error) {
+        if (isTransientFailure(error)) {
+          console.info("[AuthProvider] refresh 일시 실패, 로그인 유지", error)
+          return false
+        }
         // RT 수명이 다한 건 설계된 종료지 오류가 아니다. error로 남기면
         // Sentry가 정상 만료까지 수집해 진짜 이상 신호를 묻는다.
         if (isSessionEnded(error)) {

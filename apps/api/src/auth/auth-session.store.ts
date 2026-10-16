@@ -18,6 +18,12 @@ const authSessionKey = (userId: number, sid: string) =>
 const hashToken = (token: string) =>
   createHash("sha256").update(token).digest("hex")
 
+const hashEquals = (a: string, b: string) =>
+  timingSafeEqual(Buffer.from(a), Buffer.from(b))
+
+// Okta 기본값과 같다. 응답 유실 후 재시도까지만 메우면 되므로 짧게 둔다
+const ROTATION_GRACE_MS = 30_000
+
 // 클라이언트가 보낸 헤더라 길이를 믿을 수 없다
 const USER_AGENT_MAX_LENGTH = 512
 
@@ -59,23 +65,34 @@ export class AuthSessionStore {
       .exec()
   }
 
-  /** 세션이 없으면 null, 있으면 저장된 RT와 일치 여부. */
+  /**
+   * 세션이 없으면 null, 있으면 RT 일치 여부.
+   * 교체 직후 ROTATION_GRACE_MS 동안은 직전 RT도 인정한다 (#542) — 서버가 교체를
+   * 끝냈는데 응답이 기기에 닿지 못하면 기기에는 직전 RT만 남기 때문이다.
+   */
   async matches(
     userId: number,
     sid: string,
     refreshToken: string
   ): Promise<boolean | null> {
-    const tokenHash = await this.redis.hget(
+    const [tokenHash, prevTokenHash, rotatedAt] = await this.redis.hmget(
       authSessionKey(userId, sid),
-      "tokenHash"
+      "tokenHash",
+      "prevTokenHash",
+      "rotatedAt"
     )
-    if (tokenHash === null) return null
-    return timingSafeEqual(
-      Buffer.from(tokenHash),
-      Buffer.from(hashToken(refreshToken))
-    )
+    if (!tokenHash) return null
+
+    const received = hashToken(refreshToken)
+    if (hashEquals(tokenHash, received)) return true
+
+    if (!prevTokenHash || !rotatedAt) return false
+    const inGrace =
+      Date.now() - new Date(rotatedAt).getTime() < ROTATION_GRACE_MS
+    return inGrace && hashEquals(prevTokenHash, received)
   }
 
+  /** 현재 RT를 직전 RT 자리로 옮기고 새 RT로 바꾼다. 직전 RT는 한 번 쓰면 다음 교체로 밀려난다. */
   async rotate(
     userId: number,
     sid: string,
@@ -83,11 +100,15 @@ export class AuthSessionStore {
     ttlSeconds: number
   ): Promise<void> {
     const key = authSessionKey(userId, sid)
+    const currentHash = await this.redis.hget(key, "tokenHash")
+    const now = new Date().toISOString()
     await this.redis
       .multi()
       .hset(key, {
         tokenHash: hashToken(refreshToken),
-        lastUsedAt: new Date().toISOString()
+        ...(currentHash && { prevTokenHash: currentHash }),
+        rotatedAt: now,
+        lastUsedAt: now
       })
       .expire(key, ttlSeconds)
       .exec()

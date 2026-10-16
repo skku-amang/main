@@ -10,7 +10,11 @@ import {
 import { TokenExpiredError, JsonWebTokenError } from "@nestjs/jwt"
 import { JwtPayload } from "@repo/shared-types"
 import { Request, Response } from "express"
-import { clearAuthCookies, extractRefreshToken } from "../auth-cookie.util"
+import {
+  clearAuthCookies,
+  extractRefreshToken,
+  isRefreshTokenSentTo
+} from "../auth-cookie.util"
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {
@@ -48,7 +52,9 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
         // RT가 없으면 refresh로 복구할 수 없다. 그런데도 "만료"로 응답하면
         // 프론트가 refresh를 시도 → 실패 → /login 이동 → 재시도를 무한 반복한다.
         // 복구 불가능한 AT cookie를 지워 트리거 조건 자체를 없앤다.
-        if (!extractRefreshToken(req)) {
+        // 단 RT cookie는 Path=/auth라 그 밖의 경로에선 늘 안 보인다 — 거기서 지우면
+        // 멀쩡한 세션이 끊기므로 RT가 전송되는 경로에서만 판단한다 (#542).
+        if (isRefreshTokenSentTo(req.path) && !extractRefreshToken(req)) {
           clearAuthCookies(context.switchToHttp().getResponse<Response>())
           throw new AuthError("세션이 만료되었습니다. 다시 로그인해주세요.")
         }

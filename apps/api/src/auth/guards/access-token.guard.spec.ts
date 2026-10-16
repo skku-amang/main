@@ -14,10 +14,13 @@ describe("AccessTokenGuard", () => {
   const clearCookie = jest.fn()
   const res = { clearCookie } as unknown as Response
 
-  const contextWithCookies = (cookies: Record<string, string>) =>
+  const contextWithCookies = (
+    cookies: Record<string, string>,
+    path = "/auth/me"
+  ) =>
     ({
       switchToHttp: () => ({
-        getRequest: () => ({ cookies }),
+        getRequest: () => ({ cookies, path }),
         getResponse: () => res
       })
     }) as unknown as ExecutionContext
@@ -63,6 +66,20 @@ describe("AccessTokenGuard", () => {
         ACCESS_TOKEN_COOKIE,
         expect.objectContaining({ path: "/" })
       )
+    })
+
+    // RT cookie는 Path=/auth라 그 밖의 경로에는 원래 전송되지 않는다. 여기서 "RT 없음"으로
+    // 판단해 cookie를 지우면 멀쩡한 세션이 끊긴다 (#542)
+    it("RT가 전송되지 않는 경로에서는 RT가 안 보여도 갱신 가능한 만료로 알리고 cookie를 지우지 않는다", () => {
+      const context = contextWithCookies(
+        { [ACCESS_TOKEN_COOKIE]: "expired-at" },
+        "/notifications/unread-count"
+      )
+
+      expect(() =>
+        guard.handleRequest(null, null, expiredInfo, context)
+      ).toThrow(AccessTokenExpiredError)
+      expect(clearCookie).not.toHaveBeenCalled()
     })
 
     it("RT cookie가 있으면 cookie를 지우지 않는다", () => {

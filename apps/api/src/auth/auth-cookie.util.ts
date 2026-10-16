@@ -15,6 +15,16 @@ export function extractAccessToken(req: RequestWithCookies): string | null {
   return req.cookies?.[ACCESS_TOKEN_COOKIE] ?? null
 }
 
+/** RT cookie가 전송되는 경로. 이 밖의 요청에는 RT가 원래 붙지 않는다. */
+export const REFRESH_TOKEN_COOKIE_PATH = "/auth"
+
+export function isRefreshTokenSentTo(path: string): boolean {
+  return (
+    path === REFRESH_TOKEN_COOKIE_PATH ||
+    path.startsWith(`${REFRESH_TOKEN_COOKIE_PATH}/`)
+  )
+}
+
 export function extractRefreshToken(req: RequestWithCookies): string | null {
   return req.cookies?.[REFRESH_TOKEN_COOKIE] ?? null
 }
@@ -60,7 +70,7 @@ export function setAuthCookies(
   })
   res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
     ...baseCookieOptions,
-    path: "/auth",
+    path: REFRESH_TOKEN_COOKIE_PATH,
     maxAge: maxAgeSeconds.refreshToken * 1000
   })
 }
@@ -69,6 +79,6 @@ export function clearAuthCookies(res: Response): void {
   res.clearCookie(ACCESS_TOKEN_COOKIE, { ...baseCookieOptions, path: "/" })
   res.clearCookie(REFRESH_TOKEN_COOKIE, {
     ...baseCookieOptions,
-    path: "/auth"
+    path: REFRESH_TOKEN_COOKIE_PATH
   })
 }
