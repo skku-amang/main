@@ -21,9 +21,12 @@ configMapGenerator:
   - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
   - VAPID_PUBLIC_KEY=BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs
   - VAPID_SUBJECT=mailto:amang.skku@gmail.com
+  - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
+  - OTEL_SERVICE_NAME=amang-api
+  - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=staging
 - name: traffic-script
   files:
   - traffic/traffic.js
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261016142552-bb870ec
+  newTag: 20261016143418-ef06965
