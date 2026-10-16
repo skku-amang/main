@@ -92,8 +92,12 @@ export class UsersController {
 
   @Patch(":id/approve")
   @UseGuards(AdminGuard)
-  async approveUser(@Param("id", ParseIntPipe) id: number) {
-    return this.userService.approveUser(id)
+  async approveUser(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request
+  ) {
+    const user = req.user as JwtPayload
+    return this.userService.approveUser(id, user.sub)
   }
 
   @Delete(":id")

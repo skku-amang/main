@@ -1,8 +1,14 @@
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { Injectable } from "@nestjs/common"
 import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
+import {
+  USER_EVENTS,
+  UserApprovedEvent,
+  UserSignedUpEvent
+} from "./users.events"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { memberProfileSelect, toMemberProfile } from "./member-profile"
@@ -11,7 +17,10 @@ import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { UpdateProfileDto } from "./dto/update-profile.dto"
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const { sessions: sessionIds, ...userData } = createUserDto
@@ -33,6 +42,10 @@ export class UsersService {
         },
         select: detailedUserSelector
       })
+      this.eventEmitter.emit(
+        USER_EVENTS.SIGNED_UP,
+        new UserSignedUpEvent(user.id)
+      )
 
       return user
     } catch (error) {
@@ -226,7 +239,7 @@ export class UsersService {
     })
   }
 
-  async approveUser(userId: number) {
+  async approveUser(userId: number, actorId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } })
 
     if (!user)
@@ -237,6 +250,10 @@ export class UsersService {
       data: { isApproved: true },
       select: detailedUserSelector
     })
+    this.eventEmitter.emit(
+      USER_EVENTS.APPROVED,
+      new UserApprovedEvent(userId, actorId)
+    )
   }
 
   async deleteUser(userId: number) {

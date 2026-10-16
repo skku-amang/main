@@ -4,8 +4,30 @@ export const TEAM_EVENTS = {
   CREATED: "team.created",
   UPDATED: "team.updated",
   MEMBER_ADDED: "team.member.added",
-  MEMBER_REMOVED: "team.member.removed"
+  MEMBER_REMOVED: "team.member.removed",
+  LEADER_CHANGED: "team.leader.changed",
+  DELETED: "team.deleted"
 } as const
+
+export class TeamLeaderChangedEvent {
+  constructor(
+    readonly teamId: number,
+    readonly newLeaderId: number,
+    readonly formerLeaderId: number,
+    readonly actorId: number
+  ) {}
+}
+
+/** 삭제 뒤엔 팀을 조회할 수 없으므로 수신자·팀명을 이벤트가 들고 간다 */
+export class TeamDeletedEvent {
+  constructor(
+    readonly teamId: number,
+    readonly teamName: string,
+    readonly performanceId: number,
+    readonly memberIds: number[],
+    readonly actorId: number
+  ) {}
+}
 
 export class TeamCreatedEvent {
   constructor(

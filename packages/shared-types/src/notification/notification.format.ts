@@ -26,6 +26,13 @@ const TEAM_FIELD_LABEL: Record<string, string> = {
   sessions: "세션 구성"
 }
 
+const PERFORMANCE_FIELD_LABEL: Record<string, string> = {
+  name: "공연 이름",
+  startAt: "시작 일시",
+  endAt: "종료 일시",
+  location: "장소"
+}
+
 export type FormattedNotification = {
   title: string
   body: string
@@ -101,6 +108,65 @@ export function formatNotification(
         body: `${p.performanceName} 팀 모집이 시작됐습니다`,
         href: `/performances/${p.performanceId}/teams`,
         tag: `performance-${p.performanceId}`
+      }
+    }
+    case "PERFORMANCE_UPDATED": {
+      const p = item.payload
+      const fields = p.changedFields
+        .map((f) => PERFORMANCE_FIELD_LABEL[f] ?? f)
+        .join(", ")
+      return {
+        title: p.performanceName,
+        body: `공연 정보가 바뀌었습니다: ${fields}`,
+        href: `/performances/${p.performanceId}`,
+        tag: `performance-${p.performanceId}`
+      }
+    }
+    case "TEAM_DELETED": {
+      const p = item.payload
+      return {
+        title: p.performanceName,
+        body: `${p.teamName} 팀이 삭제됐습니다`,
+        href: `/performances/${p.performanceId}/teams`,
+        tag: `performance-${p.performanceId}`
+      }
+    }
+    case "TEAM_LEADER_CHANGED": {
+      const p = item.payload
+      return {
+        title: p.teamName,
+        body: p.assigned
+          ? "팀장이 됐어요"
+          : `팀장이 ${p.leaderName}님으로 바뀌었어요`,
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
+      }
+    }
+    case "TEAM_FILLED": {
+      const p = item.payload
+      return {
+        title: p.teamName,
+        body: "멤버가 모두 모였어요",
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
+      }
+    }
+    case "USER_SIGNED_UP": {
+      const p = item.payload
+      return {
+        title: "새 가입 신청",
+        body: `${p.userName}님이 가입을 신청했어요`,
+        href: "/admin/pending-users",
+        tag: "user-signup"
+      }
+    }
+    case "USER_APPROVED": {
+      const p = item.payload
+      return {
+        title: "가입 승인",
+        body: `${p.userName}님, AMANG 가입이 승인됐어요. 환영해요!`,
+        href: "/",
+        tag: "user-approved"
       }
     }
   }

@@ -5,6 +5,8 @@ import { TeamService } from "./team.service"
 import {
   TEAM_EVENTS,
   TeamCreatedEvent,
+  TeamDeletedEvent,
+  TeamLeaderChangedEvent,
   TeamMemberAddedEvent,
   TeamUpdatedEvent
 } from "./team.events"
@@ -71,7 +73,8 @@ describe("TeamService", () => {
           songYoutubeVideoUrl: null
         })),
         create: jest.fn(() => storedTeam),
-        update: jest.fn()
+        update: jest.fn(),
+        delete: jest.fn()
       },
       teamSession: {
         deleteMany: jest.fn(),
@@ -290,6 +293,47 @@ describe("TeamService", () => {
       ).rejects.toMatchObject({
         detail: "홍길동님이 기타 세션에 두 번 들어 있습니다."
       })
+    })
+  })
+
+  describe("팀장 교체·삭제 이벤트", () => {
+    it("팀장이 바뀌면 team.leader.changed에 새·전 팀장이 담긴다", async () => {
+      await service.update(storedTeam.id, { ...baseTeam, leaderId: 2 }, ACTOR)
+
+      expect(emitted(TEAM_EVENTS.LEADER_CHANGED)).toEqual([
+        new TeamLeaderChangedEvent(storedTeam.id, 2, baseTeam.leaderId, ACTOR)
+      ])
+    })
+
+    it("팀장이 그대로면 team.leader.changed는 없다", async () => {
+      await service.update(storedTeam.id, { ...baseTeam }, ACTOR)
+
+      expect(emitted(TEAM_EVENTS.LEADER_CHANGED)).toEqual([])
+    })
+
+    it("팀을 지우면 삭제 전 팀원 목록과 팀명을 담아 team.deleted를 발행한다", async () => {
+      storedTeam.teamSessions = [
+        {
+          id: 100,
+          sessionId: 1,
+          capacity: 2,
+          members: [
+            { id: 1, userId: 5, index: 1 },
+            { id: 2, userId: 6, index: 2 }
+          ]
+        }
+      ]
+
+      await service.remove(storedTeam.id, ACTOR)
+
+      const [event] = emitted(TEAM_EVENTS.DELETED) as TeamDeletedEvent[]
+      expect(event).toMatchObject({
+        teamId: storedTeam.id,
+        teamName: baseTeam.name,
+        performanceId: storedTeam.performanceId,
+        actorId: ACTOR
+      })
+      expect([...event!.memberIds].sort()).toEqual([1, 5, 6])
     })
   })
 })

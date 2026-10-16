@@ -58,9 +58,11 @@ export class PerformanceController {
   @UseGuards(AdminGuard)
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updatePerformanceDto: UpdatePerformanceDto
+    @Body() updatePerformanceDto: UpdatePerformanceDto,
+    @Req() req: Request
   ) {
-    return this.performanceService.update(id, updatePerformanceDto)
+    const user = req.user as JwtPayload
+    return this.performanceService.update(id, updatePerformanceDto, user.sub)
   }
 
   @Delete(":id")

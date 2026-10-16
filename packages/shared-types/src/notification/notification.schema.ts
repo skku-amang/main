@@ -31,6 +31,42 @@ export const PerformanceCreatedPayloadSchema = z.object({
   performanceName: z.string()
 })
 
+export const PerformanceUpdatedPayloadSchema = z.object({
+  performanceId: idSchema,
+  performanceName: z.string(),
+  changedFields: z.array(z.string())
+})
+
+export const TeamDeletedPayloadSchema = z.object({
+  performanceId: idSchema,
+  performanceName: z.string(),
+  teamName: z.string()
+})
+
+export const TeamLeaderChangedPayloadSchema = z.object({
+  teamId: idSchema,
+  performanceId: idSchema,
+  teamName: z.string(),
+  leaderName: z.string(),
+  /** true = 받는 사람이 새 팀장 */
+  assigned: z.boolean()
+})
+
+export const TeamFilledPayloadSchema = z.object({
+  teamId: idSchema,
+  performanceId: idSchema,
+  teamName: z.string()
+})
+
+export const UserSignedUpPayloadSchema = z.object({
+  userId: idSchema,
+  userName: z.string()
+})
+
+export const UserApprovedPayloadSchema = z.object({
+  userName: z.string()
+})
+
 const notificationBase = {
   id: idSchema,
   readAt: z.coerce.date().nullable(),
@@ -61,6 +97,36 @@ export const NotificationItemSchema = z.discriminatedUnion("type", [
     ...notificationBase,
     type: z.literal(NotificationType.PERFORMANCE_CREATED),
     payload: PerformanceCreatedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.PERFORMANCE_UPDATED),
+    payload: PerformanceUpdatedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.TEAM_DELETED),
+    payload: TeamDeletedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.TEAM_LEADER_CHANGED),
+    payload: TeamLeaderChangedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.TEAM_FILLED),
+    payload: TeamFilledPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.USER_SIGNED_UP),
+    payload: UserSignedUpPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.USER_APPROVED),
+    payload: UserApprovedPayloadSchema
   })
 ])
 

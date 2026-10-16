@@ -32,6 +32,8 @@ import { ObjectStorageService } from "../object-storage/object-storage.service"
 import {
   TEAM_EVENTS,
   TeamCreatedEvent,
+  TeamDeletedEvent,
+  TeamLeaderChangedEvent,
   TeamMemberAddedEvent,
   TeamMemberRemovedEvent,
   TeamUpdatedEvent,
@@ -347,6 +349,16 @@ export class TeamService {
           TEAM_EVENTS.UPDATED,
           new TeamUpdatedEvent(id, changedFields, actorId)
         )
+      if (leaderId !== existingTeam.leaderId)
+        this.eventEmitter.emit(
+          TEAM_EVENTS.LEADER_CHANGED,
+          new TeamLeaderChangedEvent(
+            id,
+            leaderId,
+            existingTeam.leaderId,
+            actorId
+          )
+        )
       for (const [userId, sessionIds] of roster.removed)
         this.eventEmitter.emit(
           TEAM_EVENTS.MEMBER_REMOVED,
@@ -382,13 +394,44 @@ export class TeamService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, actorId: number) {
     const team = await this.findOne(id)
+    // 삭제 뒤엔 조회할 수 없으므로 수신자를 먼저 잡아 둔다
+    const snapshot = await this.prisma.team.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        performanceId: true,
+        leaderId: true,
+        teamSessions: { select: { members: { select: { userId: true } } } }
+      }
+    })
 
     try {
       await this.prisma.team.delete({ where: { id } })
     } catch (error) {
       throw error
+    }
+
+    if (snapshot) {
+      const memberIds = [
+        ...new Set([
+          snapshot.leaderId,
+          ...snapshot.teamSessions.flatMap((s) =>
+            s.members.map((m) => m.userId)
+          )
+        ])
+      ]
+      this.eventEmitter.emit(
+        TEAM_EVENTS.DELETED,
+        new TeamDeletedEvent(
+          id,
+          snapshot.name,
+          snapshot.performanceId,
+          memberIds,
+          actorId
+        )
+      )
     }
 
     return team

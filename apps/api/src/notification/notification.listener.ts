@@ -5,15 +5,23 @@ import { NotificationContent } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
 import {
   PERFORMANCE_EVENTS,
-  PerformanceCreatedEvent
+  PerformanceCreatedEvent,
+  PerformanceUpdatedEvent
 } from "../performance/performance.events"
 import {
   TEAM_EVENTS,
   TeamCreatedEvent,
+  TeamDeletedEvent,
+  TeamLeaderChangedEvent,
   TeamMemberAddedEvent,
   TeamMemberRemovedEvent,
   TeamUpdatedEvent
 } from "../team/team.events"
+import {
+  USER_EVENTS,
+  UserApprovedEvent,
+  UserSignedUpEvent
+} from "../users/users.events"
 import {
   NOTIFICATION_EVENTS,
   NotificationCreatedEvent
@@ -24,10 +32,22 @@ const teamSnapshotSelect = {
   name: true,
   performanceId: true,
   leaderId: true,
-  teamSessions: { select: { members: { select: { userId: true } } } }
+  teamSessions: {
+    select: { capacity: true, members: { select: { userId: true } } }
+  }
 } satisfies Prisma.TeamSelect
 
-type TeamSnapshot = Prisma.TeamGetPayload<{ select: typeof teamSnapshotSelect }>
+/** 공연 소속 전원(모든 팀의 멤버·팀장)을 뽑기 위한 select */
+const performanceMembersSelect = {
+  id: true,
+  name: true,
+  teams: {
+    select: {
+      leaderId: true,
+      teamSessions: { select: { members: { select: { userId: true } } } }
+    }
+  }
+} satisfies Prisma.PerformanceSelect
 
 /**
  * 도메인 이벤트를 알림 row로 바꾼다. 수신자 해석·스냅샷 조립·fan-out 저장을 담당하고,
@@ -81,18 +101,7 @@ export class NotificationListener {
       if (!team) return
       const performance = await this.prisma.performance.findUnique({
         where: { id: team.performanceId },
-        select: {
-          id: true,
-          name: true,
-          teams: {
-            select: {
-              leaderId: true,
-              teamSessions: {
-                select: { members: { select: { userId: true } } }
-              }
-            }
-          }
-        }
+        select: performanceMembersSelect
       })
       if (!performance) return
 
@@ -138,6 +147,127 @@ export class NotificationListener {
     })
   }
 
+  @OnEvent(PERFORMANCE_EVENTS.UPDATED)
+  onPerformanceUpdated(event: PerformanceUpdatedEvent) {
+    return this.safely(async () => {
+      const performance = await this.prisma.performance.findUnique({
+        where: { id: event.performanceId },
+        select: performanceMembersSelect
+      })
+      if (!performance) return
+
+      await this.create(
+        distinct(performance.teams.flatMap(teamMemberIds)).filter(
+          (id) => id !== event.actorId
+        ),
+        {
+          type: NotificationType.PERFORMANCE_UPDATED,
+          payload: {
+            performanceId: performance.id,
+            performanceName: performance.name,
+            changedFields: event.changedFields
+          }
+        }
+      )
+    })
+  }
+
+  @OnEvent(TEAM_EVENTS.DELETED)
+  onTeamDeleted(event: TeamDeletedEvent) {
+    return this.safely(async () => {
+      const performance = await this.prisma.performance.findUnique({
+        where: { id: event.performanceId },
+        select: { id: true, name: true }
+      })
+      if (!performance) return
+
+      await this.create(
+        event.memberIds.filter((id) => id !== event.actorId),
+        {
+          type: NotificationType.TEAM_DELETED,
+          payload: {
+            performanceId: performance.id,
+            performanceName: performance.name,
+            teamName: event.teamName
+          }
+        }
+      )
+    })
+  }
+
+  @OnEvent(TEAM_EVENTS.LEADER_CHANGED)
+  onTeamLeaderChanged(event: TeamLeaderChangedEvent) {
+    return this.safely(async () => {
+      const [team, leader] = await Promise.all([
+        this.findTeam(event.teamId),
+        this.prisma.user.findUnique({
+          where: { id: event.newLeaderId },
+          select: { name: true }
+        })
+      ])
+      if (!team || !leader) return
+
+      const base = {
+        teamId: team.id,
+        performanceId: team.performanceId,
+        teamName: team.name,
+        leaderName: leader.name
+      }
+      // 새 팀장과 전 팀장은 문구가 달라 row를 따로 만든다. 행동한 본인은 제외
+      for (const [recipientId, assigned] of [
+        [event.newLeaderId, true],
+        [event.formerLeaderId, false]
+      ] as const) {
+        if (recipientId === event.actorId) continue
+        await this.create([recipientId], {
+          type: NotificationType.TEAM_LEADER_CHANGED,
+          payload: { ...base, assigned }
+        })
+      }
+    })
+  }
+
+  @OnEvent(USER_EVENTS.SIGNED_UP)
+  onUserSignedUp(event: UserSignedUpEvent) {
+    return this.safely(async () => {
+      const [user, admins] = await Promise.all([
+        this.prisma.user.findUnique({
+          where: { id: event.userId },
+          select: { name: true }
+        }),
+        this.prisma.user.findMany({
+          where: { isAdmin: true },
+          select: { id: true }
+        })
+      ])
+      if (!user) return
+
+      await this.create(
+        admins.map((a) => a.id),
+        {
+          type: NotificationType.USER_SIGNED_UP,
+          payload: { userId: event.userId, userName: user.name }
+        }
+      )
+    })
+  }
+
+  @OnEvent(USER_EVENTS.APPROVED)
+  onUserApproved(event: UserApprovedEvent) {
+    return this.safely(async () => {
+      const user = await this.prisma.user.findUnique({
+        where: { id: event.userId },
+        select: { name: true }
+      })
+      if (!user) return
+
+      await this.create([event.userId], {
+        type: NotificationType.USER_APPROVED,
+        payload: { userName: user.name }
+      })
+    })
+  }
+
   private async notifyMemberChange(
     event: TeamMemberAddedEvent | TeamMemberRemovedEvent,
     changeType: "ADDED" | "REMOVED"
@@ -172,6 +302,24 @@ export class NotificationListener {
         sessionNames: sessions.map((s) => s.name)
       }
     })
+
+    // 스스로 지원해 마지막 자리가 찼을 때만 팀장에게. 팀장이 로스터를 편집한 경우는 본인이 아니까 제외
+    const selfApplied = event.actorId === event.userId
+    const filled = team.teamSessions.every(
+      (s) => s.members.length >= s.capacity
+    )
+    if (changeType === "ADDED" && selfApplied && filled)
+      await this.create(
+        [team.leaderId].filter((id) => id !== event.actorId),
+        {
+          type: NotificationType.TEAM_FILLED,
+          payload: {
+            teamId: team.id,
+            performanceId: team.performanceId,
+            teamName: team.name
+          }
+        }
+      )
   }
 
   private findTeam(id: number) {
@@ -206,7 +354,10 @@ export class NotificationListener {
   }
 }
 
-function teamMemberIds(team: Pick<TeamSnapshot, "leaderId" | "teamSessions">) {
+function teamMemberIds(team: {
+  leaderId: number
+  teamSessions: { members: { userId: number }[] }[]
+}) {
   return distinct([
     team.leaderId,
     ...team.teamSessions.flatMap((s) => s.members.map((m) => m.userId))

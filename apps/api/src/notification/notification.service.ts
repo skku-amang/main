@@ -15,11 +15,15 @@ const SUBJECT_TYPES = {
   teamId: [
     NotificationType.TEAM_MEMBER_CHANGE,
     NotificationType.TEAM_ATTRIBUTE_CHANGE,
-    NotificationType.TEAM_CREATED
+    NotificationType.TEAM_CREATED,
+    NotificationType.TEAM_LEADER_CHANGED,
+    NotificationType.TEAM_FILLED
   ],
   performanceId: [
     NotificationType.PERFORMANCE_CREATED,
-    NotificationType.TEAM_CREATED
+    NotificationType.PERFORMANCE_UPDATED,
+    NotificationType.TEAM_CREATED,
+    NotificationType.TEAM_DELETED
   ]
 } as const
 

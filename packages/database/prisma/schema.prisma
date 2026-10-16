@@ -38,6 +38,12 @@ enum NotificationType {
   TEAM_ATTRIBUTE_CHANGE // 팀 곡명/세션 등 변경
   TEAM_CREATED // 공연에 새 팀 생성
   PERFORMANCE_CREATED // 새 공연 생성
+  PERFORMANCE_UPDATED // 공연 일정·장소·이름 변경
+  TEAM_DELETED // 팀 삭제
+  TEAM_LEADER_CHANGED // 팀장 교체 (새 팀장·전 팀장)
+  TEAM_FILLED // 팀 정원 다 참 (팀장)
+  USER_SIGNED_UP // 가입 신청 (운영진)
+  USER_APPROVED // 가입 승인 (본인)
 }
 
 model User {

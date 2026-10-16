@@ -27,6 +27,12 @@ enum NotificationType {
   TEAM_ATTRIBUTE_CHANGE  // 팀 곡명/세션 등 변경
   TEAM_CREATED           // 공연에 새 팀 생성
   PERFORMANCE_CREATED    // 새 공연 생성
+  PERFORMANCE_UPDATED    // 공연 일정·장소·이름 변경 (2026-10-16 추가)
+  TEAM_DELETED           // 팀 삭제
+  TEAM_LEADER_CHANGED    // 팀장 교체 (새 팀장·전 팀장)
+  TEAM_FILLED            // 팀 정원 다 참 (팀장)
+  USER_SIGNED_UP         // 가입 신청 (운영진)
+  USER_APPROVED          // 가입 승인 (본인)
 }
 
 model Notification {
@@ -69,12 +75,18 @@ model PushSubscription {
 
 위 이벤트 표(#347)를 기존 서비스 코드에 매핑한다.
 
-| type                    | emit 지점 (코드)                                                                                                                                                                                                                      | 수신자                               | payload 스냅샷                                                                                 |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| `TEAM_MEMBER_CHANGE`    | apply([team.service.ts:396](../../../apps/api/src/team/team.service.ts#L396), 추가) · unapply([:470](../../../apps/api/src/team/team.service.ts#L470), 제거) · update 로스터([:245](../../../apps/api/src/team/team.service.ts#L245)) | 해당 팀 멤버 전원 (− actor)          | `{ teamId, performanceId, teamName, changeType: ADDED/REMOVED, memberName, sessionNames: [] }` |
-| `TEAM_ATTRIBUTE_CHANGE` | update([team.service.ts:162](../../../apps/api/src/team/team.service.ts#L162))                                                                                                                                                        | 해당 팀 멤버 전원 (− actor)          | `{ teamId, performanceId, teamName, changedFields: [] }` (`performanceId` 변경 포함, §6)       |
-| `TEAM_CREATED`          | create([team.service.ts:109](../../../apps/api/src/team/team.service.ts#L109))                                                                                                                                                        | 해당 공연 소속 전체 유저 (− actor)   | `{ performanceId, performanceName, teamId, teamName }`                                         |
-| `PERFORMANCE_CREATED`   | create([performance.service.ts:23](../../../apps/api/src/performance/performance.service.ts#L23))                                                                                                                                     | 전체 승인 유저 (`isApproved = true`) | `{ performanceId, performanceName }`                                                           |
+| type                    | emit 지점 (코드)                                                                                                                                                                                                                      | 수신자                                                      | payload 스냅샷                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `TEAM_MEMBER_CHANGE`    | apply([team.service.ts:396](../../../apps/api/src/team/team.service.ts#L396), 추가) · unapply([:470](../../../apps/api/src/team/team.service.ts#L470), 제거) · update 로스터([:245](../../../apps/api/src/team/team.service.ts#L245)) | 해당 팀 멤버 전원 (− actor)                                 | `{ teamId, performanceId, teamName, changeType: ADDED/REMOVED, memberName, sessionNames: [] }` |
+| `TEAM_ATTRIBUTE_CHANGE` | update([team.service.ts:162](../../../apps/api/src/team/team.service.ts#L162))                                                                                                                                                        | 해당 팀 멤버 전원 (− actor)                                 | `{ teamId, performanceId, teamName, changedFields: [] }` (`performanceId` 변경 포함, §6)       |
+| `TEAM_CREATED`          | create([team.service.ts:109](../../../apps/api/src/team/team.service.ts#L109))                                                                                                                                                        | 해당 공연 소속 전체 유저 (− actor)                          | `{ performanceId, performanceName, teamId, teamName }`                                         |
+| `PERFORMANCE_CREATED`   | create([performance.service.ts:23](../../../apps/api/src/performance/performance.service.ts#L23))                                                                                                                                     | 전체 승인 유저 (`isApproved = true`)                        | `{ performanceId, performanceName }`                                                           |
+| `PERFORMANCE_UPDATED`   | update(performance.service.ts, `name`·`startAt`·`endAt`·`location` 바뀔 때만)                                                                                                                                                         | 해당 공연 모든 팀원·팀장 (− actor)                          | `{ performanceId, performanceName, changedFields: [] }`                                        |
+| `TEAM_DELETED`          | remove(team.service.ts, 삭제 전 스냅샷)                                                                                                                                                                                               | 삭제 전 팀원·팀장 (− actor)                                 | `{ performanceId, performanceName, teamName }`                                                 |
+| `TEAM_LEADER_CHANGED`   | update(team.service.ts, `leaderId` 변경)                                                                                                                                                                                              | 새 팀장(`assigned: true`)·전 팀장(`false`) 각 1건 (− actor) | `{ teamId, performanceId, teamName, leaderName, assigned }`                                    |
+| `TEAM_FILLED`           | 스스로 지원(apply)해 마지막 자리가 찼을 때, 리스너에서 판정                                                                                                                                                                           | 팀장 (− actor)                                              | `{ teamId, performanceId, teamName }`                                                          |
+| `USER_SIGNED_UP`        | create(users.service.ts, 가입 신청)                                                                                                                                                                                                   | 운영진(`isAdmin`) 전원                                      | `{ userId, userName }`                                                                         |
+| `USER_APPROVED`         | approveUser(users.service.ts)                                                                                                                                                                                                         | 승인된 본인                                                 | `{ userName }`                                                                                 |
 
 > 피드백 시스템 이벤트는 요구사항 확정 후 추가(#347).
 
@@ -160,6 +172,8 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 ---
 
 ## 변경 이력
+
+- **2026-10-16**: 유형 6종 추가(공연 변경·팀 삭제·팀장 교체·정원 참·가입 신청·가입 승인, #790~#795 → PR). 대상 페이지 도달 시 자동 읽음(#786 → #788): `PATCH /notifications/read { teamId | performanceId }`, 팀 상세·공연 상세·공연 팀 목록에서 호출.
 
 - **2026-10-15 (구현 중)**: §3을 2단계 리스너 체인(도메인 이벤트 → 저장 → `notification.created` → 푸시)으로 갱신. 구현 계획은 [plans/2026-10-15-notification-system.md](plans/2026-10-15-notification-system.md).
 - **2026-10-15**: 최신 main 기준으로 코드 앵커 6곳 재지정(#663·#666 반영). 미결이던 "공연 소속" 정의를 해당 공연 팀 멤버·리더로 확정. 팀 공연 이동(#666) 처리 방식, 푸시 유형별 토글 비범위(#708) 추가.

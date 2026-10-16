@@ -57,8 +57,9 @@ export class TeamController {
 
   @Delete(":id")
   @UseGuards(TeamOwnerGuard)
-  remove(@Param("id", ParseIntPipe) id: number) {
-    return this.teamService.remove(id)
+  remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as JwtPayload
+    return this.teamService.remove(id, user.sub)
   }
 
   @Patch(":id/apply")
