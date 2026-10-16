@@ -51,7 +51,9 @@ spec:
             failureThreshold: 3
           resources:
             limits:
-              cpu: 500m
+              # Node는 스레드 하나라 순간적으로 코어 하나를 쓴다. 500m이면 평균이 낮아도
+              # 몰릴 때마다 강제로 멈춰(7일 throttling api 6.5%·web 10%) 응답이 늦어진다
+              cpu: 1000m
               memory: 512Mi
             requests:
               cpu: 100m

@@ -17,13 +17,15 @@ configMapGenerator:
     behavior: merge
     literals:
       - S3_ENDPOINT=https://s3.amang.staging.json-server.win
-      - COOKIE_SAMESITE=none
       - COOKIE_DOMAIN=amang.staging.json-server.win
       - NODE_ENV=production
       - SENTRY_ENVIRONMENT=staging
       - REDIS_HOST=redis.amang-redis-staging.svc.cluster.local
       - VAPID_PUBLIC_KEY=BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs
       - VAPID_SUBJECT=mailto:amang.skku@gmail.com
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
+      - OTEL_SERVICE_NAME=amang-api
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=amang,deployment.environment.name=staging
   - name: traffic-script
     files:
       - traffic/traffic.js
