@@ -37,7 +37,14 @@ export function toMemberProfile(
   user: ProfileRow,
   viewerId: number
 ): MemberProfile {
-  const base = { id: user.id, name: user.name, image: user.image }
+  const base = {
+    id: user.id,
+    name: user.name,
+    image: user.image,
+    nickname: user.nickname,
+    generation: user.generation,
+    sessions: user.sessions
+  }
   if (!user.isProfilePublic && user.id !== viewerId)
     return { ...base, isPublic: false }
 
@@ -65,10 +72,7 @@ export function toMemberProfile(
   return {
     ...base,
     isPublic: true,
-    nickname: user.nickname,
     bio: user.bio,
-    generation: user.generation,
-    sessions: user.sessions,
     teams: [...teams.values()].sort(
       (a, b) =>
         (b.performance.startAt?.getTime() ?? 0) -

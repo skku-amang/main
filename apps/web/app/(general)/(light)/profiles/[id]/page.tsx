@@ -62,15 +62,11 @@ const MemberProfilePage = () => {
 
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-xl font-semibold">{profile.name}</h2>
-              {profile.isPublic && (
-                <>
-                  <p className="text-sm text-slate-400">@{profile.nickname}</p>
-                  {profile.bio && (
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                      {profile.bio}
-                    </p>
-                  )}
-                </>
+              <p className="text-sm text-slate-400">@{profile.nickname}</p>
+              {profile.isPublic && profile.bio && (
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {profile.bio}
+                </p>
               )}
             </div>
 
@@ -89,40 +85,36 @@ const MemberProfilePage = () => {
             )}
           </div>
 
-          {profile.isPublic ? (
-            <>
-              <hr className="my-6 border-slate-100" />
-              <div className="space-y-4 text-sm">
-                <div className="flex items-center gap-3">
-                  <CalendarDays className="size-4 text-slate-400" />
-                  <span className="w-16 shrink-0 text-slate-400">기수</span>
-                  <span>
-                    {formatGenerationOrder(profile.generation.order)}기
-                  </span>
+          <hr className="my-6 border-slate-100" />
+          <div className="space-y-4 text-sm">
+            <div className="flex items-center gap-3">
+              <CalendarDays className="size-4 text-slate-400" />
+              <span className="w-16 shrink-0 text-slate-400">기수</span>
+              <span>{formatGenerationOrder(profile.generation.order)}기</span>
+            </div>
+            {profile.sessions.length > 0 && (
+              <div className="flex items-center gap-3">
+                <Guitar className="size-4 text-slate-400" />
+                <span className="w-16 shrink-0 text-slate-400">세션</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {profile.sessions.map((s) => (
+                    <SessionBadge
+                      key={s.id}
+                      session={getSessionDisplayName(s.name)}
+                    />
+                  ))}
                 </div>
-                {profile.sessions.length > 0 && (
-                  <div className="flex items-center gap-3">
-                    <Guitar className="size-4 text-slate-400" />
-                    <span className="w-16 shrink-0 text-slate-400">세션</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {profile.sessions.map((s) => (
-                        <SessionBadge
-                          key={s.id}
-                          session={getSessionDisplayName(s.name)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
-            </>
-          ) : (
-            <p className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-slate-50 py-4 text-sm text-slate-500">
-              <Lock className="size-4" />
-              비공개 프로필이에요.
-            </p>
-          )}
+            )}
+          </div>
         </div>
+
+        {!profile.isPublic && (
+          <p className="flex items-center justify-center gap-2 rounded-xl bg-white py-4 text-sm text-slate-500 shadow-sm">
+            <Lock className="size-4" />
+            소개와 참여한 팀은 비공개예요.
+          </p>
+        )}
 
         {profile.isPublic && (
           <section className="space-y-3">

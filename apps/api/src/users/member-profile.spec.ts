@@ -37,11 +37,14 @@ const row = (overrides: Partial<ProfileRow> = {}): ProfileRow => ({
 })
 
 describe("toMemberProfile", () => {
-  it("비공개 프로필은 다른 사람에게 이름·사진만 보여준다", () => {
+  it("비공개 프로필은 다른 사람에게 소개·참여한 팀을 숨기고 기수·세션은 보여준다", () => {
     expect(toMemberProfile(row({ isProfilePublic: false }), 99)).toEqual({
       id: 7,
       name: "홍길동",
       image: null,
+      nickname: "길동",
+      generation: { id: 1, order: 30 },
+      sessions: [{ id: 3, name: "DRUM" }],
       isPublic: false
     })
   })
@@ -52,13 +55,10 @@ describe("toMemberProfile", () => {
     )
   })
 
-  it("공개 프로필은 자기소개·기수·세션을 보여준다", () => {
-    const profile = toMemberProfile(row(), 99)
-    expect(profile).toMatchObject({
+  it("공개 프로필은 자기소개를 보여준다", () => {
+    expect(toMemberProfile(row(), 99)).toMatchObject({
       isPublic: true,
-      nickname: "길동",
-      bio: "드럼 칩니다",
-      generation: { order: 30 }
+      bio: "드럼 칩니다"
     })
   })
 

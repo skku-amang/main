@@ -349,8 +349,8 @@ const ProfileEditPage = () => {
                     <div className="space-y-1">
                       <FormLabel>다른 부원에게 프로필 공개</FormLabel>
                       <FormDescription>
-                        켜면 로그인한 부원이 내 기수·세션·소개와 참여한
-                        팀·공연을 볼 수 있어요. 끄면 이름과 사진만 보여요.
+                        켜면 로그인한 부원이 내 소개와 참여한 팀·공연을 볼 수
+                        있어요. 기수·세션은 공개 설정과 상관없이 보여요.
                       </FormDescription>
                     </div>
                     <FormControl>
