@@ -29,14 +29,17 @@ export class PushListener {
     if (isQuietHours(now)) return
 
     try {
+      // 보내기 전에 처리됨으로 찍는다(claim) — flush와 겹쳐도 같은 row가 두 번 나가지 않는다. 발송 실패는 재시도 없음
+      const { count } = await this.prisma.notification.updateMany({
+        where: { id: { in: event.notificationIds }, pushedAt: null },
+        data: { pushedAt: now }
+      })
+      if (count === 0) return
+
       await this.sender.sendToUsers(
         event.recipientIds,
         formatNotification(event.content)
       )
-      await this.prisma.notification.updateMany({
-        where: { id: { in: event.notificationIds } },
-        data: { pushedAt: now }
-      })
     } catch (error) {
       this.logger.error("푸시 발송 실패", error)
     }

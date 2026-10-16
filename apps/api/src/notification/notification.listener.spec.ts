@@ -118,6 +118,7 @@ describe("NotificationListener", () => {
       expect(name).toBe(NOTIFICATION_EVENTS.CREATED)
       expect(event).toBeInstanceOf(NotificationCreatedEvent)
       expect([...event.recipientIds].sort()).toEqual([1, 2, 3, 9])
+      expect(event.notificationIds).toEqual([1, 2, 3, 4])
       expect(event.content.payload.changeType).toBe("REMOVED")
     })
 

@@ -127,8 +127,8 @@ PushListener (#546 후반)
 
 - **왜 in-process `@nestjs/schedule`인가**: 10분 주기여도 비용 0, 리마인더 3종 모두 ±10분이면 충분. K8s CronJob은 내부 엔드포인트·인증 시크릿(또는 CLI 엔트리)이 더 생기고 10분마다 pod를 띄운다. BullMQ 지연 잡은 분 단위 정확성이 필요할 때 — 지금은 없음. 핵심 로직이 `run(now)`로 트리거와 분리돼 있어 나중에 CronJob+CLI로 바꿔도 호출부 1줄.
 - **중복 실행 방지**: Redis `SET reminder:lock NX PX 5m`. pod가 여럿이어도 한 번만 돈다. 지금은 `replicas: 1`.
-- **멱등**: 리마인더마다 DB로 판정 — 모집 마감 D-1은 "오늘(KST) 만들어진 같은 유형 알림이 그 팀에 있으면 skip". 날짜 경계는 `Asia/Seoul`(서버는 UTC, [kst.ts](../../../apps/api/src/reminder/kst.ts)).
-- **발송 시각**: 날짜 단위 리마인더는 자정 넘은 첫 tick(00:00–00:10 KST)에 만들어진다. 밤중에 폰이 울리는 문제는 리마인더가 아니라 **푸시 계층의 방해금지 시간대**로 막는다(후속 PR) — 이벤트 알림(새벽 탈퇴 등)까지 한 번에 보호되고, 알림함 row는 즉시 생겨도 무방하기 때문.
+- **멱등**: 리마인더마다 DB로 판정 — 모집 마감 D-1은 "오늘(KST) 만들어진 같은 유형 알림이 그 팀에 있으면 skip". 날짜 경계는 `Asia/Seoul`(서버는 UTC, [kst.ts](../../../apps/api/src/common/kst.ts)).
+- **발송 시각**: 날짜 단위 리마인더는 자정 넘은 첫 tick(00:00–00:10 KST)에 만들어진다. 밤중에 폰이 울리는 문제는 리마인더가 아니라 **푸시 계층의 방해금지 시간대**로 막는다(§3.2) — 이벤트 알림(새벽 탈퇴 등)까지 한 번에 보호되고, 알림함 row는 즉시 생겨도 무방하기 때문.
 - **마감 정각 경계**: 지원 가능 조건이 `endAt > now`라 `endAt` 순간엔 이미 닫힌다. 그래서 "내일 마감" 창은 `(내일 00:00, 모레 00:00]` — 모레 00:00 정각 마감은 내일, 내일 00:00 정각 마감은 오늘.
 - **관측**: 실행마다 `Sentry.metrics.count("reminder.run", { reminder, result: ok | error })`, 리마인더 실패와 Redis 락 획득 실패는 `captureException` + 로그(`@nestjs/schedule`은 예외를 Logger로만 삼켜 Sentry Issue가 안 생기므로 직접 보낸다). 리마인더 하나가 실패해도 나머지는 돈다.
 - `@nestjs/schedule`은 **6.x 고정** — 12.x는 ESM 전용이라 Jest가 못 읽는다(event-emitter 12와 같은 함정).
@@ -138,10 +138,10 @@ PushListener (#546 후반)
 "밤에 폰 울리지 마"는 알림 **생성**이 아니라 **푸시 발송**의 문제다. 그래서 리마인더나 이벤트 쪽이 아니라 `PushListener` 한 곳에서 막는다 — 새벽 탈퇴 같은 이벤트 알림까지 같이 보호되고, 알림함 row는 즉시 생겨도 무방하다.
 
 - **판정**: `isQuietHours(now)` — 전역 기본값 **23:00–08:00 KST**([quiet-hours.ts](../../../apps/api/src/push/quiet-hours.ts)). 사용자별 끄기·시간 변경은 후속(C, #708 설정 화면과 함께).
-- **미루기**: 방해금지면 `PushListener`가 발송을 건너뛰고 `Notification.pushedAt`을 null로 둔다. 평소엔 발송 뒤 `pushedAt`에 시각을 적는다 (= 푸시 처리됨).
-- **flush**: 크론 틀(§3.1)의 `deferred_push` 잡([push-deferred.service.ts](../../../apps/api/src/push/push-deferred.service.ts))이 10분마다 돌며, 방해금지가 끝나면 `pushedAt null`인 알림을 수신자마다 보낸다. **그새 인앱에서 읽었거나 하루 지난 알림은 보내지 않고 처리됨으로 닫는다** — 고정 발송 창으론 못 하는 UX.
+- **미루기**: 방해금지면 `PushListener`가 발송을 건너뛰고 `Notification.pushedAt`을 null로 둔다. 평소엔 **보내기 전에** `pushedAt`을 찍고(claim, `where pushedAt: null`) 보낸다 — flush와 겹쳐도 같은 row가 두 번 나가지 않고, 발송 실패는 재시도하지 않는다(best-effort, ADR-0003).
+- **flush**: 크론 틀(§3.1)의 `deferred_push` 잡([push-deferred.service.ts](../../../apps/api/src/push/push-deferred.service.ts))이 10분마다 돌며, 방해금지가 끝나면 `pushedAt null`인 알림을 `updateManyAndReturn`으로 한 번에 claim한 뒤 수신자마다 보낸다. **그새 인앱에서 읽었거나 하루 지난 알림은 보내지 않고 처리됨으로 닫는다** — 고정 발송 창으론 못 하는 UX.
 - **긴급 유형 bypass**: "동방 예약 1시간 전"(#797)처럼 지금 봐야 의미 있는 알림은 방해금지를 무시해야 한다(08:00 예약의 07:00 알림이 08:00에 오면 무용). 유형별 속성은 첫 긴급 유형이 생기는 #797에서 도입.
-- **마이그레이션**: 기존 row는 `pushedAt = createdAt`으로 채워 배포 직후 flush가 옛 알림을 쏟아내지 않게 한다.
+- **마이그레이션**: 기존 row는 `pushedAt = createdAt`으로 채워 배포 직후 flush가 옛 알림을 쏟아내지 않게 한다. 롤아웃 간극(마이그레이션 뒤 ~ 새 pod Ready 전)에 구 pod가 즉시 푸시한 알림은 `pushedAt`이 없어 첫 flush가 한 번 더 보낼 수 있다 — 1~2분치, 수용.
 
 ## 4. API (#546 정합)
 

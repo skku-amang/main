@@ -21,35 +21,25 @@ export class PushDeferredService {
   async flush(now: Date) {
     if (isQuietHours(now)) return 0
 
-    await this.prisma.notification.updateMany({
-      where: {
-        pushedAt: null,
-        OR: [
-          { readAt: { not: null } },
-          { createdAt: { lt: new Date(now.getTime() - DAY) } }
-        ]
-      },
+    // 먼저 처리됨으로 찍고(claim) 보낸다 — 다음 tick이나 리스너와 겹쳐도 같은 row가 두 번 나가지 않는다
+    const claimed = await this.prisma.notification.updateManyAndReturn({
+      where: { pushedAt: null },
       data: { pushedAt: now }
     })
+    const freshSince = new Date(now.getTime() - DAY)
 
-    const rows = await this.prisma.notification.findMany({
-      where: { pushedAt: null },
-      orderBy: { createdAt: "asc" }
-    })
-    if (rows.length === 0) return 0
-
-    for (const row of rows) {
+    let sent = 0
+    for (const row of claimed) {
+      if (row.readAt !== null || row.createdAt < freshSince) continue
       const item = NotificationItemSchema.safeParse(row)
       if (!item.success) continue
+
       await this.sender.sendToUsers(
         [row.recipientId],
         formatNotification(item.data)
       )
+      sent += 1
     }
-    await this.prisma.notification.updateMany({
-      where: { id: { in: rows.map((r) => r.id) } },
-      data: { pushedAt: now }
-    })
-    return rows.length
+    return sent
   }
 }

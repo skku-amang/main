@@ -39,40 +39,19 @@ describe("PushDeferredService.flush", () => {
     sendToUsers = jest.fn(async () => undefined)
     rows = []
 
-    const matches = (
-      r: Row,
-      where: {
-        pushedAt?: null
-        id?: { in: number[] }
-        OR?: { readAt?: { not: null }; createdAt?: { lt: Date } }[]
-      }
-    ) =>
-      (where.pushedAt === undefined || r.pushedAt === where.pushedAt) &&
-      (where.id === undefined || where.id.in.includes(r.id)) &&
-      (where.OR === undefined ||
-        where.OR.some(
-          (c) =>
-            (c.readAt && r.readAt !== null) ||
-            (c.createdAt && r.createdAt < c.createdAt.lt)
-        ))
-
     const prisma = {
       notification: {
-        findMany: jest.fn(
-          async ({ where }: { where: Parameters<typeof matches>[1] }) =>
-            rows.filter((r) => matches(r, where))
-        ),
-        updateMany: jest.fn(
+        updateManyAndReturn: jest.fn(
           async ({
             where,
             data
           }: {
-            where: Parameters<typeof matches>[1]
+            where: { pushedAt: null }
             data: { pushedAt: Date }
           }) => {
-            const hit = rows.filter((r) => matches(r, where))
+            const hit = rows.filter((r) => r.pushedAt === where.pushedAt)
             hit.forEach((r) => (r.pushedAt = data.pushedAt))
-            return { count: hit.length }
+            return hit.map((r) => ({ ...r }))
           }
         )
       }
@@ -97,7 +76,7 @@ describe("PushDeferredService.flush", () => {
     expect(rows[0]!.pushedAt).toBeNull()
   })
 
-  it("아침이 되면 미뤄 둔 알림을 수신자마다 보내고 발송 시각을 남긴다", async () => {
+  it("아침이 되면 미뤄 둔 알림을 처리됨으로 찍은 뒤 수신자마다 보낸다", async () => {
     rows = [row({ id: 1, recipientId: 3 }), row({ id: 2, recipientId: 4 })]
 
     await expect(service.flush(MORNING_KST)).resolves.toBe(2)
@@ -116,6 +95,15 @@ describe("PushDeferredService.flush", () => {
       row({ id: 2, createdAt: new Date("2026-10-15T20:00:00Z") }),
       row({ id: 3 })
     ]
+
+    await expect(service.flush(MORNING_KST)).resolves.toBe(1)
+
+    expect(sendToUsers).toHaveBeenCalledTimes(1)
+    expect(rows.every((r) => r.pushedAt === MORNING_KST)).toBe(true)
+  })
+
+  it("깨진 payload는 보내지 않고 닫으며 집계에서도 뺀다", async () => {
+    rows = [row({ id: 1, payload: {} }), row({ id: 2 })]
 
     await expect(service.flush(MORNING_KST)).resolves.toBe(1)
 
