@@ -116,7 +116,7 @@ const TeamListSkeleton = () => {
               <th className="border-y border-gray-200 bg-gray-100 p-3 text-center text-sm font-semibold text-neutral-600">
                 모집상태
               </th>
-              <th className="border-y border-gray-200 bg-gray-100 p-3 text-center text-sm font-semibold text-neutral-600">
+              <th className="border-y border-gray-200 bg-gray-100 p-3 text-center text-sm font-semibold text-neutral-600 whitespace-nowrap">
                 영상
               </th>
               <th className="border-y border-gray-200 bg-gray-100 p-3 text-sm font-semibold text-neutral-600 last:rounded-r-lg last:border-r" />
