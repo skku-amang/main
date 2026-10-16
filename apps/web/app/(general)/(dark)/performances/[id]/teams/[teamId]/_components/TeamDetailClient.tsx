@@ -4,7 +4,6 @@ import { useParams } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
-import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
 import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import PosterImage from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/PosterImage"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
@@ -79,13 +78,6 @@ const TeamDetailClient = () => {
           />
         )}
       </div>
-
-      {/*수정 및 삭제 (모바일)*/}
-      {canEdit && (
-        <div className="relative z-10 block h-auto w-[93%] justify-items-end pb-5  md:hidden  min-[878px]:w-11/12 lg:w-5/6">
-          <DeleteEditButton performanceId={performanceId} team={team} />
-        </div>
-      )}
 
       <div className="relative z-10 flex w-full gap-5 max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}

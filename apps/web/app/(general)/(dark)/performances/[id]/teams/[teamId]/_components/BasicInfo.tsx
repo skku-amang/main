@@ -64,7 +64,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
         </div>
         {canEdit && (
           <DeleteEditButton
-            className="ml-auto hidden md:flex"
+            className="ml-auto"
             performanceId={team.performanceId}
             team={team}
           />
