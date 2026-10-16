@@ -131,7 +131,7 @@ PushListener (#546 후반)
 
 - **왜 in-process `@nestjs/schedule`인가**: 10분 주기여도 비용 0, 리마인더 3종 모두 ±10분이면 충분. K8s CronJob은 내부 엔드포인트·인증 시크릿(또는 CLI 엔트리)이 더 생기고 10분마다 pod를 띄운다. BullMQ 지연 잡은 분 단위 정확성이 필요할 때 — 지금은 없음. 핵심 로직이 `run(now)`로 트리거와 분리돼 있어 나중에 CronJob+CLI로 바꿔도 호출부 1줄.
 - **중복 실행 방지**: Redis `SET reminder:lock NX PX 5m`. pod가 여럿이어도 한 번만 돈다. 지금은 `replicas: 1`.
-- **멱등**: 리마인더마다 DB로 판정 — 모집 마감 D-1은 "오늘(KST) 만들어진 같은 유형 알림이 그 팀에 있으면 skip". 날짜 경계는 `Asia/Seoul`(서버는 UTC, [kst.ts](../../../apps/api/src/common/kst.ts)).
+- **멱등**: 리마인더마다 DB로 판정 — 날짜 단위(모집 마감 D-1·반납 당일)는 "오늘(KST) 만들어진 같은 유형 알림이 그 대상에 있으면 skip", 동방 예약 1시간 전은 "최근 2시간 안 같은 `rentalId` 알림이 있으면 skip"(시각이 바뀌면 2시간 뒤 다시 알림). 날짜 경계는 `Asia/Seoul`(서버는 UTC, [kst.ts](../../../apps/api/src/common/kst.ts)).
 - **발송 시각**: 날짜 단위 리마인더는 자정 넘은 첫 tick(00:00–00:10 KST)에 만들어진다. 밤중에 폰이 울리는 문제는 리마인더가 아니라 **푸시 계층의 방해금지 시간대**로 막는다(§3.2) — 이벤트 알림(새벽 탈퇴 등)까지 한 번에 보호되고, 알림함 row는 즉시 생겨도 무방하기 때문.
 - **마감 정각 경계**: 지원 가능 조건이 `endAt > now`라 `endAt` 순간엔 이미 닫힌다. 그래서 "내일 마감" 창은 `(내일 00:00, 모레 00:00]` — 모레 00:00 정각 마감은 내일, 내일 00:00 정각 마감은 오늘.
 - **관측**: 실행마다 `Sentry.metrics.count("reminder.run", { reminder, result: ok | error })`, 리마인더 실패와 Redis 락 획득 실패는 `captureException` + 로그(`@nestjs/schedule`은 예외를 Logger로만 삼켜 Sentry Issue가 안 생기므로 직접 보낸다). 리마인더 하나가 실패해도 나머지는 돈다.

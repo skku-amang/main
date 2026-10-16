@@ -264,13 +264,13 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       })
     ).toEqual({
       title: "동방 예약 1시간 전",
-      body: "오늘 15:00 동방 예약 — 합주",
+      body: "15:00 동방 예약 — 합주",
       href: "/reservations/clubroom",
       tag: "rental-5"
     })
   })
 
-  it("장비 반납: 문자열 날짜(JSON 경유)도 한국 시각으로, 장비 상세로", () => {
+  it("장비 반납: 문자열 날짜(JSON 경유)도 한국 날짜·시각으로, 장비 상세로", () => {
     expect(
       formatNotification({
         type: "EQUIPMENT_RETURN_DUE",
@@ -283,7 +283,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       })
     ).toEqual({
       title: "장비 반납",
-      body: "오늘 18:30까지 Yamaha P-125 반납",
+      body: "10/17 18:30까지 Yamaha P-125 반납",
       href: "/reservations/equipment/2",
       tag: "rental-6"
     })

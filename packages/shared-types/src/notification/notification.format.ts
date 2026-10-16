@@ -64,6 +64,12 @@ const kstTime = new Intl.DateTimeFormat("en-GB", {
   hourCycle: "h23"
 })
 const formatKstTime = (at: Date | string) => kstTime.format(new Date(at))
+const kstDate = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Seoul",
+  month: "numeric",
+  day: "numeric"
+})
+const formatKstDate = (at: Date | string) => kstDate.format(new Date(at))
 
 /**
  * 저장된 type + payload를 사람이 읽을 문구와 이동 경로로 바꾼다.
@@ -208,7 +214,7 @@ export function formatNotification(
       const p = item.payload
       return {
         title: "동방 예약 1시간 전",
-        body: `오늘 ${formatKstTime(p.startAt)} 동방 예약 — ${p.title}`,
+        body: `${formatKstTime(p.startAt)} 동방 예약 — ${p.title}`,
         href: "/reservations/clubroom",
         tag: `rental-${p.rentalId}`
       }
@@ -217,7 +223,7 @@ export function formatNotification(
       const p = item.payload
       return {
         title: "장비 반납",
-        body: `오늘 ${formatKstTime(p.endAt)}까지 ${p.equipmentName} 반납`,
+        body: `${formatKstDate(p.endAt)} ${formatKstTime(p.endAt)}까지 ${p.equipmentName} 반납`,
         href: `/reservations/equipment/${p.equipmentId}`,
         tag: `rental-${p.rentalId}`
       }

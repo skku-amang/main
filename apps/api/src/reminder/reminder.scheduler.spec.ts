@@ -8,18 +8,22 @@ const NOW = new Date("2026-10-16T14:50:00Z")
 describe("ReminderScheduler", () => {
   let redis: InstanceType<typeof RedisMock>
   let remind: jest.Mock
+  let remindRooms: jest.Mock
+  let remindReturns: jest.Mock
   let scheduler: ReminderScheduler
 
   beforeEach(async () => {
     redis = new RedisMock()
     await redis.flushall()
     remind = jest.fn(async () => 2)
+    remindRooms = jest.fn(async () => 0)
+    remindReturns = jest.fn(async () => 0)
     scheduler = new ReminderScheduler(
       redis,
       {
         remindRecruitmentDeadline: remind,
-        remindRoomReservations: jest.fn(async () => 0),
-        remindEquipmentReturns: jest.fn(async () => 0)
+        remindRoomReservations: remindRooms,
+        remindEquipmentReturns: remindReturns
       } as unknown as ReminderService,
       { flush: jest.fn(async () => 0) } as unknown as PushDeferredService
     )
@@ -27,10 +31,12 @@ describe("ReminderScheduler", () => {
 
   afterEach(() => redis.disconnect())
 
-  it("락을 잡고 리마인더를 돌린 뒤 락을 푼다", async () => {
+  it("락을 잡고 리마인더를 전부 돌린 뒤 락을 푼다", async () => {
     await expect(scheduler.runOnce(NOW)).resolves.toBe(true)
 
     expect(remind).toHaveBeenCalledWith(NOW)
+    expect(remindRooms).toHaveBeenCalledWith(NOW)
+    expect(remindReturns).toHaveBeenCalledWith(NOW)
     await expect(redis.get("reminder:lock")).resolves.toBeNull()
   })
 

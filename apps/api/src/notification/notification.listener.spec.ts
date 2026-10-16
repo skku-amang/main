@@ -31,7 +31,7 @@ const rental = {
   startAt: new Date("2026-10-17T06:00:00Z"),
   endAt: new Date("2026-10-17T09:30:00Z"),
   equipmentId: 2,
-  renterId: 4,
+  renterId: 9,
   users: [{ id: 1 }, { id: 4 }],
   equipment: { brand: "Yamaha", model: "P-125" }
 }
@@ -219,7 +219,7 @@ describe("NotificationListener", () => {
     it("동방 예약 1시간 전은 예약자와 멤버에게 중복 없이", async () => {
       await listener.onRoomReservationSoon(new RoomReservationSoonEvent(5))
 
-      expect(recipients()).toEqual([1, 4])
+      expect(recipients()).toEqual([1, 4, 9])
       expect(createdRows()[0]).toMatchObject({
         type: "ROOM_RESERVATION_SOON",
         payload: { rentalId: 5, title: "합주", startAt: rental.startAt }
@@ -229,7 +229,7 @@ describe("NotificationListener", () => {
     it("장비 반납은 장비 이름(브랜드 모델)과 기한을 담아", async () => {
       await listener.onEquipmentReturnDue(new EquipmentReturnDueEvent(5))
 
-      expect(recipients()).toEqual([1, 4])
+      expect(recipients()).toEqual([1, 4, 9])
       expect(createdRows()[0]).toMatchObject({
         type: "EQUIPMENT_RETURN_DUE",
         payload: {
