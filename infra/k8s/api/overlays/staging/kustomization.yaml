@@ -15,7 +15,6 @@ configMapGenerator:
   behavior: merge
   literals:
   - S3_ENDPOINT=https://s3.amang.staging.json-server.win
-  - COOKIE_SAMESITE=none
   - COOKIE_DOMAIN=amang.staging.json-server.win
   - NODE_ENV=production
   - SENTRY_ENVIRONMENT=staging
@@ -27,4 +26,4 @@ configMapGenerator:
   - traffic/traffic.js
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261016140226-5752a5e
+  newTag: 20261016142141-16494a8
