@@ -7,7 +7,7 @@ AMANG 인프라 매니페스트 디렉토리. K8s 매니페스트(Kustomize)와 
 ```
 infra/
 ├── k8s/
-│   └── {component}/                    # api, db, redis, ... (web은 Vercel 배포, K8s manifest 없음)
+│   └── {component}/                    # api, web, db, redis, umami, ...
 │       ├── base/                       # 공통 매니페스트 (deployment, service, pvc, configmap)
 │       └── overlays/
 │           ├── staging/                # 환경별 namespace, ingress, NetworkPolicy, SealedSecret
@@ -29,7 +29,7 @@ ArgoCD Application 정의는 **별도 레포**([homelab](https://github.com/mana
 | `amang-db-{staging,production}`    | PostgreSQL                    |
 | `amang-redis-{staging,production}` | Redis                         |
 
-> **web은 K8s로 배포하지 않는다** — Next.js 웹은 Vercel에 배포([infra/terraform/vercel/](../terraform/vercel/)). `AUTH_SECRET` 등 시크릿은 Terraform이 생성해 Vercel env로 주입(state 저장, 커밋 안 함)한다. 과거 `infra/k8s/web/` overlay가 있었으나 ArgoCD Application 없이 방치된 dead config였고 평문 시크릿까지 커밋돼 제거([#524](https://github.com/skku-amang/main/issues/524)). 추후 K8s 배포가 필요하면 SealedSecret으로 새로 작성한다.
+> **web도 K8s로 배포한다** ([#749](https://github.com/skku-amang/main/issues/749)) — `NEXT_PUBLIC_*`가 빌드 때 박혀서 환경별 이미지(`amang-web-staging`/`-production`)를 따로 만든다. 공개값은 [apps/web/env/](../apps/web/env/), 런타임 시크릿은 없음.
 
 **왜 컴포넌트별 분리인가**: NetworkPolicy의 `namespaceSelector` cross-namespace 참조를 명시적으로 만들어 권한 경계를 ns 단위로 관리. 단일 ns에 모두 두면 모든 pod가 모든 Service에 접근 가능해짐.
 
@@ -61,18 +61,16 @@ staging과 production은 **같은 커밋의 API·web을 시차를 두고** 받�
 
 ```
 main 머지 (커밋 C)
- ├─ GHA: 이미지 amang-api / amang-web-staging / amang-web-production <시각>-C
- └─ Vercel git 연동: web production 빌드 (도메인 자동 연결 안 함, auto_assign_custom_domains=false)
+ └─ GHA: 이미지 amang-api / amang-web-staging / amang-web-production <시각>-C
       → Warehouse: 커밋 C와 이미지 3개 *-C가 모두 짝이 맞으면 Freight 생성
-  → staging 자동 승격:    promote-k8s(env/staging: api·web 홈랩)
-  → production 수동 승격: promote-k8s(env/production: api) → promote-web(Vercel production 빌드를 promote)
+  → staging 자동 승격:    promote-k8s(env/staging)
+  → production 수동 승격: promote-k8s(env/production)
+     (promote-k8s: api·web 매니페스트를 env 브랜치에 쓰고 api 먼저 sync, 그다음 web)
 ```
 
 - Freight = main 커밋 하나. CI가 실패해 이미지가 없는 커밋은 Freight가 안 생겨 배포되지 않는다
 - web은 `NEXT_PUBLIC_*`가 빌드 때 박혀 환경별 이미지가 따로다 ([apps/web/env/](../apps/web/env/)). 같은 커밋의 두 이미지를 한 Freight로 묶어 staging에서 검증한 커밋이 그대로 production에 간다
-- web 이전 과도기 ([#749](https://github.com/skku-amang/main/issues/749)): staging web은 홈랩, production web은 아직 Vercel (승격 때 새로 빌드하지 않고 이미 만들어진 Vercel 빌드를 promote)
 - 순서는 API → web. API 변경은 옛 web과도 호환되게 짤 것
-- 지금 stage에 연결된 web 배포(커밋, Vercel URL, 대시보드 링크)는 Stage status에 기록된다: `kubectl -n amang get stage <stage> -o jsonpath='{.status.metadata.web}'`
 - ArgoCD api·web 앱은 `main`이 아니라 **`env/<stage>` 브랜치의 `infra/k8s/<app>/overlays/<stage>`**를 바라본다. 디렉토리 구조는 main과 같고, 그 stage overlay에 이미지 태그만 고정돼 있다. 실제 배포 상태 = 해당 브랜치 내용
 - `env/*` 브랜치는 Kargo만 쓴다. GitHub ruleset `env branches (Kargo only)`로 GitHub App `amang-kargo` 외 생성·push·삭제 금지 (레포 설정에서 수동 생성, Terraform 밖)
 - overlay 설정 변경도 Freight에 포함되므로 production에는 승격을 거쳐야 반영된다

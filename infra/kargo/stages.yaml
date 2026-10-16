@@ -33,9 +33,7 @@ spec:
           - staging
   promotionTemplate:
     spec:
-      # API 먼저 (새 web이 새 API에 기대는 경우가 많음), 그다음 같은 커밋의 web(아직 Vercel)
+      # API·web 모두 홈랩 K3s (promote-k8s가 api 먼저 sync, 그다음 web)
       steps:
         - task:
             name: promote-k8s
-        - task:
-            name: promote-web

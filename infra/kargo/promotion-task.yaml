@@ -79,10 +79,8 @@ spec:
             sources:
               - repoURL: ${{ vars.gitRepo }}
                 desiredRevision: ${{ task.outputs.commit.commit }}
-    # production web은 아직 Vercel (promote-web). 홈랩으로 옮기면 if를 지운다 (#749)
     - uses: argocd-update
       as: sync-argocd-web
-      if: ${{ ctx.stage == 'staging' }}
       config:
         apps:
           - name: web-${{ ctx.stage }}
