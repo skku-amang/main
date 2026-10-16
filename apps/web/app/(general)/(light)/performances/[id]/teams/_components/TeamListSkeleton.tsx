@@ -27,7 +27,7 @@ const TableRowSkeleton = () => (
         <Skeleton className="h-6 w-16 rounded-full" />
       </div>
     </td>
-    {/* 영상링크 */}
+    {/* 영상 */}
     <td className="p-4">
       <div className="flex justify-center">
         <Skeleton className="h-5 w-5 rounded" />
@@ -117,7 +117,7 @@ const TeamListSkeleton = () => {
                 모집상태
               </th>
               <th className="border-y border-gray-200 bg-gray-100 p-3 text-center text-sm font-semibold text-neutral-600">
-                영상링크
+                영상
               </th>
               <th className="border-y border-gray-200 bg-gray-100 p-3 text-sm font-semibold text-neutral-600 last:rounded-r-lg last:border-r" />
             </tr>
