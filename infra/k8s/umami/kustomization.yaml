@@ -9,7 +9,7 @@ labels:
 
 resources:
   - sealed-credentials.yaml
-  - postgres.yaml
-  - network-policy.yaml
-  - umami.yaml
+  - postgres
+  - deployment.yaml
+  - service.yaml
   - ingress.yaml

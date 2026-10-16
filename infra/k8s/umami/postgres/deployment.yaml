@@ -1,17 +1,3 @@
-# 아망 서비스 DB(infra/k8s/db)와 분리한 전용 인스턴스. Umami 업그레이드 마이그레이션이나
-# 통계 쓰기 부하가 서비스 DB에 영향을 주지 않게 한다
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: longhorn-ssd
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -77,14 +63,3 @@ spec:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-svc
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5432
-  selector:
-    app: postgres
