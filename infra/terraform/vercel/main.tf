@@ -151,3 +151,21 @@ resource "vercel_project_environment_variable" "vapid_public_key_preview" {
   value      = "BDzw2qJul-h1iGnW-AmYqGe8P3EneMjtizegthQuE0m1UFhA3ql-NWiyn9iw7ijkE-JYxQ82VE32O_PfRyniwBs"
   target     = ["preview", "development"]
 }
+
+# Umami 방문 통계 (production web이 홈랩으로 옮겨지면 제거, skku-amang/main#749).
+# 값은 apps/web/env/production.env와 같다
+resource "vercel_project_environment_variable" "umami_website_id" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_UMAMI_WEBSITE_ID"
+  value      = "f2614ff4-65b5-4ed0-968f-e94bae1b2b8e"
+  target     = ["production"]
+}
+
+resource "vercel_project_environment_variable" "developer_email_hashes" {
+  project_id = vercel_project.web.id
+  team_id    = var.vercel_team_id
+  key        = "NEXT_PUBLIC_DEVELOPER_EMAIL_HASHES"
+  value      = "e163987d9714c488e8abcd0c82c5a4548e0160a1267e7026179e9f998193b066"
+  target     = ["production"]
+}
