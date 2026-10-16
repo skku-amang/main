@@ -7,7 +7,7 @@ import {
 } from "../notification/notification.events"
 import { PrismaService } from "../prisma/prisma.service"
 import { PushSender } from "./push.sender"
-import { isQuietHours } from "./quiet-hours"
+import { QUIET_HOURS_BYPASS, isQuietHours } from "./quiet-hours"
 
 /**
  * 저장된 알림(notification.created)에서 파생된 푸시 발송. 알림함이 SSOT이고
@@ -26,7 +26,7 @@ export class PushListener {
   @OnEvent(NOTIFICATION_EVENTS.CREATED)
   async onNotificationCreated(event: NotificationCreatedEvent) {
     const now = new Date()
-    if (isQuietHours(now)) return
+    if (isQuietHours(now) && !QUIET_HOURS_BYPASS.has(event.content.type)) return
 
     try {
       // 보내기 전에 처리됨으로 찍는다(claim) — flush와 겹쳐도 같은 row가 두 번 나가지 않는다. 발송 실패는 재시도 없음

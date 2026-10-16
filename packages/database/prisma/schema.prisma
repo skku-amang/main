@@ -46,6 +46,8 @@ enum NotificationType {
   USER_APPROVED // 가입 승인 (본인)
   BOOKMARKED_TEAM_SPOT_OPENED // 별표한 팀에 빈자리 (별표한 비멤버)
   TEAM_RECRUITMENT_DEADLINE // 모집 마감 D-1, 빈자리 있는 팀 (팀장)
+  ROOM_RESERVATION_SOON // 동방 예약 1시간 전 (예약자·멤버, 방해금지 무시)
+  EQUIPMENT_RETURN_DUE // 장비 반납 당일 (대여자·멤버)
 }
 
 model User {
