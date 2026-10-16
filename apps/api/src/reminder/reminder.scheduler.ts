@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from "@nestjs/common"
 import { Cron } from "@nestjs/schedule"
 import * as Sentry from "@sentry/nestjs"
 import Redis from "ioredis"
+import { PushDeferredService } from "../push/push-deferred.service"
 import { REDIS_CLIENT } from "../redis/redis.module"
 import { ReminderService } from "./reminder.service"
 
@@ -22,9 +23,11 @@ export class ReminderScheduler {
 
   constructor(
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
-    reminderService: ReminderService
+    reminderService: ReminderService,
+    pushDeferred: PushDeferredService
   ) {
     this.reminders = [
+      { name: "deferred_push", run: (now) => pushDeferred.flush(now) },
       {
         name: "team_recruitment_deadline",
         run: (now) => reminderService.remindRecruitmentDeadline(now)

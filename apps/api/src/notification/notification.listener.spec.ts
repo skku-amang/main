@@ -40,12 +40,12 @@ describe("NotificationListener", () => {
     session: { findMany: jest.Mock }
     performance: { findUnique: jest.Mock }
     teamBookmark: { findMany: jest.Mock }
-    notification: { createMany: jest.Mock }
+    notification: { createManyAndReturn: jest.Mock }
   }
   let emit: jest.Mock
 
   const createdRows = () =>
-    prisma.notification.createMany.mock.calls[0]?.[0].data as {
+    prisma.notification.createManyAndReturn.mock.calls[0]?.[0].data as {
       recipientId: number
       type: string
       payload: Record<string, unknown>
@@ -70,7 +70,11 @@ describe("NotificationListener", () => {
       },
       performance: { findUnique: jest.fn(async () => null) },
       teamBookmark: { findMany: jest.fn(async () => []) },
-      notification: { createMany: jest.fn(async () => ({ count: 0 })) }
+      notification: {
+        createManyAndReturn: jest.fn(async ({ data }: { data: unknown[] }) =>
+          data.map((_, i) => ({ id: i + 1 }))
+        )
+      }
     }
     emit = jest.fn()
 
@@ -114,6 +118,7 @@ describe("NotificationListener", () => {
       expect(name).toBe(NOTIFICATION_EVENTS.CREATED)
       expect(event).toBeInstanceOf(NotificationCreatedEvent)
       expect([...event.recipientIds].sort()).toEqual([1, 2, 3, 9])
+      expect(event.notificationIds).toEqual([1, 2, 3, 4])
       expect(event.content.payload.changeType).toBe("REMOVED")
     })
 
@@ -123,7 +128,7 @@ describe("NotificationListener", () => {
       )
       expect(recipients()).toEqual([1, 2, 3, 9])
 
-      prisma.notification.createMany.mockClear()
+      prisma.notification.createManyAndReturn.mockClear()
       await listener.onTeamMemberRemoved(
         new TeamMemberRemovedEvent(7, 9, [1], 9)
       )
@@ -139,7 +144,7 @@ describe("NotificationListener", () => {
 
       await listener.onTeamMemberAdded(new TeamMemberAddedEvent(7, 4, [1], 4))
 
-      expect(prisma.notification.createMany).not.toHaveBeenCalled()
+      expect(prisma.notification.createManyAndReturn).not.toHaveBeenCalled()
       expect(emit).not.toHaveBeenCalled()
     })
 
@@ -149,7 +154,7 @@ describe("NotificationListener", () => {
       await expect(
         listener.onTeamMemberAdded(new TeamMemberAddedEvent(7, 1, [1], 1))
       ).resolves.toBeUndefined()
-      expect(prisma.notification.createMany).not.toHaveBeenCalled()
+      expect(prisma.notification.createManyAndReturn).not.toHaveBeenCalled()
     })
 
     it("DB 오류가 나도 예외를 밖으로 던지지 않는다", async () => {
@@ -190,12 +195,12 @@ describe("NotificationListener", () => {
       new TeamRecruitmentDeadlineEvent(7)
     )
 
-    expect(prisma.notification.createMany).not.toHaveBeenCalled()
+    expect(prisma.notification.createManyAndReturn).not.toHaveBeenCalled()
   })
 
   describe("별표한 팀에 자리가 나면 (#794)", () => {
     const rowsOf = (type: string) =>
-      prisma.notification.createMany.mock.calls
+      prisma.notification.createManyAndReturn.mock.calls
         .flatMap(
           (c) =>
             c[0].data as {
@@ -369,7 +374,7 @@ describe("NotificationListener", () => {
 
   describe("팀장 교체", () => {
     const allRows = () =>
-      prisma.notification.createMany.mock.calls.flatMap(
+      prisma.notification.createManyAndReturn.mock.calls.flatMap(
         (c) =>
           c[0].data as {
             recipientId: number
@@ -447,7 +452,7 @@ describe("NotificationListener", () => {
 
   describe("정원 다 참", () => {
     const allRows = () =>
-      prisma.notification.createMany.mock.calls.flatMap(
+      prisma.notification.createManyAndReturn.mock.calls.flatMap(
         (c) => c[0].data as { recipientId: number; type: string }[]
       )
     const fullTeam = {

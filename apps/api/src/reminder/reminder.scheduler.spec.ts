@@ -1,4 +1,5 @@
 import RedisMock from "ioredis-mock"
+import { PushDeferredService } from "../push/push-deferred.service"
 import { ReminderScheduler } from "./reminder.scheduler"
 import { ReminderService } from "./reminder.service"
 
@@ -13,9 +14,11 @@ describe("ReminderScheduler", () => {
     redis = new RedisMock()
     await redis.flushall()
     remind = jest.fn(async () => 2)
-    scheduler = new ReminderScheduler(redis, {
-      remindRecruitmentDeadline: remind
-    } as unknown as ReminderService)
+    scheduler = new ReminderScheduler(
+      redis,
+      { remindRecruitmentDeadline: remind } as unknown as ReminderService,
+      { flush: jest.fn(async () => 0) } as unknown as PushDeferredService
+    )
   })
 
   afterEach(() => redis.disconnect())

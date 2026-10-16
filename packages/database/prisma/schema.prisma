@@ -254,10 +254,12 @@ model Notification {
   type    NotificationType
   payload Json // 이벤트 시점 스냅샷. 구조는 type별 (shared-types notification.schema)
   readAt  DateTime? // null = 안 읽음
+  pushedAt DateTime? // 푸시 처리 시각. null = 방해금지로 미뤄 둠 (크론이 아침에 flush)
 
   createdAt DateTime @default(now())
 
   @@index([recipientId, readAt])
+  @@index([pushedAt])
   @@map("notifications")
 }
 

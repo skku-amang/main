@@ -11,3 +11,8 @@ export function kstDayStart(now: Date, dayOffset = 0): Date {
   const dayStart = Math.floor(shifted / DAY) * DAY - KST_OFFSET
   return new Date(dayStart + dayOffset * DAY)
 }
+
+/** 한국 시각의 시(0–23) */
+export function kstHour(now: Date): number {
+  return Math.floor(((now.getTime() + KST_OFFSET) % DAY) / HOUR)
+}
