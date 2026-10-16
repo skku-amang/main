@@ -16,6 +16,7 @@ const CLOSED_ID = 1
 const OPEN_ID = 2
 const UNDATED_ID = 3
 const ACTOR = 99
+const GUITAR_ID = 2
 
 const performanceEndAt: Record<number, Date | null> = {
   [CLOSED_ID]: new Date(Date.now() - DAY),
@@ -80,6 +81,16 @@ describe("TeamService", () => {
       teamMember: {
         createMany: jest.fn(),
         deleteMany: jest.fn()
+      },
+      session: {
+        findUnique: jest.fn(({ where }: { where: { id: number } }) =>
+          where.id === GUITAR_ID ? { name: "GUITAR" } : null
+        )
+      },
+      user: {
+        findUnique: jest.fn(({ where }: { where: { id: number } }) =>
+          where.id === 5 ? { name: "홍길동" } : null
+        )
       },
       $transaction: jest.fn()
     }
@@ -216,6 +227,69 @@ describe("TeamService", () => {
       expect(emitted(TEAM_EVENTS.MEMBER_ADDED)).toEqual([
         new TeamMemberAddedEvent(storedTeam.id, 5, [1, 2], 5)
       ])
+    })
+
+    it("같은 세션의 다른 자리에 또 지원하면 세션 이름으로 안내한다", async () => {
+      storedTeam.teamSessions = [
+        {
+          id: 100,
+          sessionId: GUITAR_ID,
+          capacity: 2,
+          members: [{ id: 1, userId: 5, index: 1 }]
+        }
+      ]
+
+      await expect(
+        service.apply(storedTeam.id, 5, [{ sessionId: GUITAR_ID, index: 2 }])
+      ).rejects.toMatchObject({
+        detail: "이미 이 팀의 기타 세션에 지원했습니다."
+      })
+    })
+  })
+
+  describe("unapply", () => {
+    it("남의 자리를 취소하려 하면 세션 이름과 자리 번호로 안내한다", async () => {
+      storedTeam.teamSessions = [
+        {
+          id: 100,
+          sessionId: GUITAR_ID,
+          capacity: 2,
+          members: [{ id: 1, userId: 7, index: 2 }]
+        }
+      ]
+
+      await expect(
+        service.unapply(storedTeam.id, 5, [{ sessionId: GUITAR_ID, index: 2 }])
+      ).rejects.toMatchObject({
+        detail:
+          "기타 2번 자리는 본인이 지원한 자리가 아니라 취소할 수 없습니다."
+      })
+    })
+  })
+
+  describe("팀 구성 검사", () => {
+    it("한 세션에 같은 사람이 두 번 들어 있으면 이름으로 안내한다", async () => {
+      await expect(
+        service.create(
+          {
+            ...baseTeam,
+            performanceId: OPEN_ID,
+            memberSessions: [
+              {
+                sessionId: GUITAR_ID,
+                capacity: 2,
+                members: [
+                  { userId: 5, index: 1 },
+                  { userId: 5, index: 2 }
+                ]
+              }
+            ]
+          },
+          ACTOR
+        )
+      ).rejects.toMatchObject({
+        detail: "홍길동님이 기타 세션에 두 번 들어 있습니다."
+      })
     })
   })
 })
