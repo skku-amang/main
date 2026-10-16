@@ -181,5 +181,19 @@ export function formatNotification(
         tag: teamTag(p.teamId)
       }
     }
+    case "TEAM_RECRUITMENT_DEADLINE": {
+      const p = item.payload
+      const slots = p.openSlots
+        .map((s) => `${SESSION_DISPLAY_NAME[s.sessionName]} ${s.count}자리`)
+        .join(", ")
+      return {
+        title: p.teamName,
+        body: slots
+          ? `내일 모집 마감 — ${slots} 비어 있어요`
+          : "내일 모집 마감이에요",
+        href: teamHref(p.performanceId, p.teamId),
+        tag: teamTag(p.teamId)
+      }
+    }
   }
 }

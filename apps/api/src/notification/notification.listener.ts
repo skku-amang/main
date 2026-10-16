@@ -23,6 +23,10 @@ import {
   UserSignedUpEvent
 } from "../users/users.events"
 import {
+  REMINDER_EVENTS,
+  TeamRecruitmentDeadlineEvent
+} from "../reminder/reminder.events"
+import {
   NOTIFICATION_EVENTS,
   NotificationCreatedEvent
 } from "./notification.events"
@@ -274,6 +278,38 @@ export class NotificationListener {
       await this.create([event.userId], {
         type: NotificationType.USER_APPROVED,
         payload: { userName: user.name }
+      })
+    })
+  }
+
+  @OnEvent(REMINDER_EVENTS.TEAM_RECRUITMENT_DEADLINE)
+  onTeamRecruitmentDeadline(event: TeamRecruitmentDeadlineEvent) {
+    return this.safely(async () => {
+      const team = await this.findTeam(event.teamId)
+      if (!team) return
+
+      const open = team.teamSessions.filter(
+        (s) => s.members.length < s.capacity
+      )
+      const sessions = await this.prisma.session.findMany({
+        where: { id: { in: open.map((s) => s.sessionId) } },
+        select: { id: true, name: true }
+      })
+      const nameOf = new Map(sessions.map((s) => [s.id, s.name]))
+
+      await this.create([team.leaderId], {
+        type: NotificationType.TEAM_RECRUITMENT_DEADLINE,
+        payload: {
+          teamId: team.id,
+          performanceId: team.performanceId,
+          teamName: team.name,
+          openSlots: open.flatMap((s) => {
+            const sessionName = nameOf.get(s.sessionId)
+            return sessionName
+              ? [{ sessionName, count: s.capacity - s.members.length }]
+              : []
+          })
+        }
       })
     })
   }

@@ -18,7 +18,8 @@ const SUBJECT_TYPES = {
     NotificationType.TEAM_CREATED,
     NotificationType.TEAM_LEADER_CHANGED,
     NotificationType.TEAM_FILLED,
-    NotificationType.BOOKMARKED_TEAM_SPOT_OPENED
+    NotificationType.BOOKMARKED_TEAM_SPOT_OPENED,
+    NotificationType.TEAM_RECRUITMENT_DEADLINE
   ],
   performanceId: [
     NotificationType.PERFORMANCE_CREATED,

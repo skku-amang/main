@@ -5,6 +5,7 @@ import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
+import { ScheduleModule } from "@nestjs/schedule"
 import { LoggerModule } from "nestjs-pino"
 import { pinoLoggerModuleOption } from "./common/logger/pino-logger.config"
 import { validateEnv } from "./common/config/env.schema"
@@ -23,6 +24,7 @@ import { HealthModule } from "./health/health.module"
 import { NotificationModule } from "./notification/notification.module"
 import { PushModule } from "./push/push.module"
 import { TeamBookmarkModule } from "./team-bookmark/team-bookmark.module"
+import { ReminderModule } from "./reminder/reminder.module"
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { TeamBookmarkModule } from "./team-bookmark/team-bookmark.module"
       validate: validateEnv
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     LoggerModule.forRoot(pinoLoggerModuleOption),
     PrismaModule,
     HealthModule,
@@ -48,7 +51,8 @@ import { TeamBookmarkModule } from "./team-bookmark/team-bookmark.module"
     UploadModule,
     NotificationModule,
     PushModule,
-    TeamBookmarkModule
+    TeamBookmarkModule,
+    ReminderModule
   ],
   controllers: [AppController],
   providers: [AppService]

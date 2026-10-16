@@ -19,6 +19,7 @@ import {
   PerformanceUpdatedEvent
 } from "../performance/performance.events"
 import { UserApprovedEvent, UserSignedUpEvent } from "../users/users.events"
+import { TeamRecruitmentDeadlineEvent } from "../reminder/reminder.events"
 
 const team = {
   id: 7,
@@ -157,6 +158,23 @@ describe("NotificationListener", () => {
       await expect(
         listener.onTeamMemberAdded(new TeamMemberAddedEvent(7, 1, [1], 1))
       ).resolves.toBeUndefined()
+    })
+  })
+
+  it("모집 마감 D-1은 팀장에게 세션별 빈자리 수를 담아 보낸다 (#796)", async () => {
+    await listener.onTeamRecruitmentDeadline(
+      new TeamRecruitmentDeadlineEvent(7)
+    )
+
+    expect(recipients()).toEqual([4])
+    expect(createdRows()[0]).toMatchObject({
+      type: "TEAM_RECRUITMENT_DEADLINE",
+      payload: {
+        teamId: 7,
+        performanceId: 3,
+        teamName: "팀A",
+        openSlots: [{ sessionName: "VOCAL", count: 1 }]
+      }
     })
   })
 
