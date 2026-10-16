@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -12,6 +13,7 @@ import { JwtPayload } from "@repo/shared-types"
 import { Request } from "express"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { GetNotificationsQueryDto } from "./dto/get-notifications-query.dto"
+import { MarkNotificationsReadBySubjectDto } from "./dto/mark-read-by-subject.dto"
 import { NotificationService } from "./notification.service"
 
 @Controller("notifications")
@@ -35,6 +37,16 @@ export class NotificationController {
   markAllRead(@Req() req: Request) {
     const user = req.user as JwtPayload
     return this.notificationService.markAllRead(user.sub)
+  }
+
+  /** 알림이 가리키는 팀/공연 페이지에 도달했을 때 — 그 대상의 알림을 읽음 처리 */
+  @Patch("read")
+  markReadBySubject(
+    @Req() req: Request,
+    @Body() dto: MarkNotificationsReadBySubjectDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.notificationService.markReadBySubject(user.sub, dto)
   }
 
   @Patch(":id/read")

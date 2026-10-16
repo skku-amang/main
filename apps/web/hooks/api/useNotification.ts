@@ -60,3 +60,17 @@ export const useMarkAllNotificationsRead = () => {
   const invalidate = useInvalidateNotifications()
   return useMarkAllNotificationsReadMutation({ onSuccess: invalidate })
 }
+
+const useMarkNotificationsReadBySubjectMutation = createMutationHook(
+  ApiClient.prototype.markNotificationsReadBySubject
+)
+
+/** 대상(팀/공연) 페이지 도달 시 그 대상 알림 읽음 처리. 0건이면 invalidate 생략 */
+export const useMarkNotificationsReadBySubject = () => {
+  const invalidate = useInvalidateNotifications()
+  return useMarkNotificationsReadBySubjectMutation({
+    onSuccess: (result) => {
+      if (result.count > 0) invalidate()
+    }
+  })
+}
