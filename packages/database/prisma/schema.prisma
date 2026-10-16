@@ -68,6 +68,7 @@ model User {
 
   notifications     Notification[]     @relation("notifications")
   pushSubscriptions PushSubscription[] @relation("pushSubscriptions")
+  teamBookmarks     TeamBookmark[]
 
   @@map("users")
 }
@@ -142,8 +143,22 @@ model Team {
   leader   User @relation("teamLeader", fields: [leaderId], references: [id], onDelete: Restrict)
 
   teamSessions TeamSession[] // 팀에 필요한 세션 목록
+  bookmarks    TeamBookmark[]
 
   @@map("teams")
+}
+
+// 사용자가 별표(즐겨찾기)한 팀. 본인만 보는 개인 표시
+model TeamBookmark {
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, teamId])
+  @@map("team_bookmarks")
 }
 
 model TeamSession {

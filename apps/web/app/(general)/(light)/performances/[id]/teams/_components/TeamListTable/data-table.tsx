@@ -15,6 +15,7 @@ import { ArrowDownUp, CirclePlus, Filter, Plus, X } from "lucide-react"
 import Link from "next/link"
 import {
   parseAsArrayOf,
+  parseAsBoolean,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
@@ -50,10 +51,12 @@ import {
   getSessionDisplayName,
   SESSION_DISPLAY_NAME
 } from "@/constants/session"
+import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
 import {
   getSessionsWithMissingMembers,
-  isTeamSatisfied
+  isTeamSatisfied,
+  TeamFromList
 } from "@/lib/team/teamSession"
 import { isPerformanceRecruiting, Performance } from "@repo/shared-types"
 
@@ -78,7 +81,7 @@ const SESSION_LABELS = Object.values(SESSION_DISPLAY_NAME)
 interface DataTableProps<TValue> {
   className?: string
   columns: ColumnDef<TeamColumn, TValue>[]
-  data: TeamColumn[]
+  data: TeamFromList[]
   relatedPerformances: Performance[]
   performanceId: number
 }
@@ -100,6 +103,11 @@ export function TeamListDataTable<TValue>({
     () =>
       isAuthenticated ? columns : columns.filter((c) => c.id !== "actions"),
     [isAuthenticated, columns]
+  )
+  const bookmarks = useTeamBookmarks()
+  const rows: TeamColumn[] = useMemo(
+    () => data.map((t) => ({ ...t, isBookmarked: bookmarks.has(t.id) })),
+    [data, bookmarks]
   )
   // nuqs 쿼리 동기화
   const [sortQuery, setSortQuery] = useQueryState(
@@ -138,6 +146,10 @@ export function TeamListDataTable<TValue>({
       "all"
     )
   )
+  const [bookmarkedOnly, setBookmarkedOnly] = useQueryState(
+    "bookmarked",
+    parseAsBoolean.withDefault(false)
+  )
 
   const sessionFilter = useMemo(
     () => new Set(sessionFilterArr),
@@ -167,13 +179,16 @@ export function TeamListDataTable<TValue>({
   const resetFilters = useCallback(() => {
     setSessionFilterArr(null)
     setStatusFilter("all")
-  }, [setSessionFilterArr, setStatusFilter])
+    setBookmarkedOnly(null)
+  }, [setSessionFilterArr, setStatusFilter, setBookmarkedOnly])
 
   const filteredData = useMemo(() => {
-    if (sessionFilter.size === 0 && statusFilter === "all") return data
+    if (sessionFilter.size === 0 && statusFilter === "all" && !bookmarkedOnly)
+      return rows
 
-    return data.filter((team) => {
+    return rows.filter((team) => {
       if (!team.teamSessions) return false
+      if (bookmarkedOnly && !team.isBookmarked) return false
 
       if (statusFilter === "active" && isTeamSatisfied(team.teamSessions))
         return false
@@ -191,9 +206,13 @@ export function TeamListDataTable<TValue>({
 
       return true
     })
-  }, [data, sessionFilter, statusFilter])
+  }, [rows, sessionFilter, statusFilter, bookmarkedOnly])
 
-  const filterValues: { 필요세션: FilterValue[]; 모집상태: FilterValue[] } = {
+  const filterValues: {
+    필요세션: FilterValue[]
+    모집상태: FilterValue[]
+    별표: FilterValue[]
+  } = {
     필요세션: [
       ...SESSION_LABELS.map((label) => ({
         label,
@@ -213,6 +232,13 @@ export function TeamListDataTable<TValue>({
         onChecked: (checked: boolean) =>
           setStatusFilter(checked ? "inactive" : "all"),
         checked: statusFilter === "inactive"
+      }
+    ],
+    별표: [
+      {
+        label: "별표한 팀만",
+        onChecked: (checked: boolean) => setBookmarkedOnly(checked || null),
+        checked: bookmarkedOnly
       }
     ]
   }
@@ -235,12 +261,13 @@ export function TeamListDataTable<TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     initialState: {
-      columnVisibility: { createdAt: false },
       pagination: { pageIndex: Math.max(0, pageQuery - 1) }
     },
     state: {
       sorting,
-      columnFilters
+      columnFilters,
+      // 별표 열은 빼지 않고 숨김 — 로그인 확인 전에도 sort=bookmark-* 정렬 대상이 있어야 함
+      columnVisibility: { createdAt: false, bookmark: isAuthenticated }
     }
   })
 
@@ -252,7 +279,10 @@ export function TeamListDataTable<TValue>({
     { value: "createdAt-desc", display: "최신순" },
     { value: "createdAt-asc", display: "오래된순" },
     { value: "status-asc", display: "모집중 우선" },
-    { value: "status-desc", display: "모집완료 우선" }
+    { value: "status-desc", display: "모집완료 우선" },
+    ...(isAuthenticated
+      ? [{ value: "bookmark-desc", display: "별표 우선" }]
+      : [])
   ]
 
   return (
@@ -328,6 +358,15 @@ export function TeamListDataTable<TValue>({
                     filterValues={filterValues.모집상태}
                     onSelectAll={() => setStatusFilter("all")}
                   />
+                  {isAuthenticated && (
+                    <>
+                      <Separator />
+                      <TeamListTableFilter
+                        header="별표"
+                        filterValues={filterValues.별표}
+                      />
+                    </>
+                  )}
                 </FilterPopoverContent>
               </PopoverContent>
             </Popover>
@@ -430,7 +469,9 @@ export function TeamListDataTable<TValue>({
                 <TeamHeaderButton asChild variant="outline">
                   <Filter
                     className={
-                      sessionFilter.size > 0 || statusFilter !== "all"
+                      sessionFilter.size > 0 ||
+                      statusFilter !== "all" ||
+                      bookmarkedOnly
                         ? "text-primary"
                         : "text-gray-400"
                     }
@@ -470,6 +511,12 @@ export function TeamListDataTable<TValue>({
                     header="모집상태"
                     filterValues={filterValues.모집상태}
                   />
+                  {isAuthenticated && (
+                    <TeamListTableFilter
+                      header="별표"
+                      filterValues={filterValues.별표}
+                    />
+                  )}
                 </div>
               </DrawerContent>
             </Drawer>
@@ -531,6 +578,7 @@ export function TeamListDataTable<TValue>({
                   songArtist={row.original.songArtist}
                   isFreshmenFixed={row.original.isFreshmenFixed}
                   isSelfMade={row.original.isSelfMade}
+                  isBookmarked={row.original.isBookmarked}
                   image={row.original.image}
                   leader={row.original.leader}
                   missingTeamSessions={missingMemberSessions(

@@ -12,6 +12,7 @@ import {
   Music,
   Package,
   Settings,
+  Star,
   Users,
   Youtube
 } from "lucide-react"
@@ -24,10 +25,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import SOCIAL from "@/constants/social"
 import { usePerformances } from "@/hooks/api/usePerformance"
+import { getSessionDisplayName } from "@/constants/session"
 import { useRentals } from "@/hooks/api/useRental"
 import { useAllTeams } from "@/hooks/api/useTeam"
+import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { getSessionsWithMissingMembers } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
+import { isPerformanceRecruiting } from "@repo/shared-types"
 
 const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
 
@@ -178,6 +183,70 @@ const MyTeams = ({ userId }: { userId: number }) => {
               </Link>
             </li>
           ))}
+        </ul>
+      )}
+    </Section>
+  )
+}
+
+// 지금 모집 중인 공연(가장 최근 공연)에서 별표한 팀만
+const BookmarkedTeams = () => {
+  const { data: performances } = usePerformances()
+  const { data: teams, status } = useAllTeams()
+  const bookmarks = useTeamBookmarks()
+
+  const latest = performances?.length
+    ? performances.reduce((a, b) => (a.id > b.id ? a : b))
+    : undefined
+  if (!latest || !isPerformanceRecruiting(latest)) return null
+
+  const bookmarkedTeams =
+    teams?.filter(
+      (team) => team.performanceId === latest.id && bookmarks.has(team.id)
+    ) ?? []
+
+  return (
+    <Section
+      title="별표한 팀"
+      moreHref={`${ROUTES.PERFORMANCE.TEAM.LIST(latest.id)}?bookmarked=true`}
+    >
+      {status === "pending" ? (
+        <Skeleton className="h-16 rounded-xl" />
+      ) : status === "error" ? (
+        <EmptyCard>
+          팀 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+        </EmptyCard>
+      ) : bookmarkedTeams.length === 0 ? (
+        <EmptyCard>팀 목록에서 ☆를 눌러 관심 있는 팀을 모아보세요.</EmptyCard>
+      ) : (
+        <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl bg-white shadow-sm">
+          {bookmarkedTeams.slice(0, PREVIEW_COUNT).map((team) => {
+            const missing = getSessionsWithMissingMembers(team.teamSessions)
+            return (
+              <li key={team.id}>
+                <Link
+                  href={ROUTES.PERFORMANCE.TEAM.DETAIL(
+                    team.performanceId,
+                    team.id
+                  )}
+                  className="flex items-center gap-3 px-5 py-4 hover:bg-slate-50"
+                >
+                  <Star className="size-4 shrink-0 fill-amber-400 text-amber-400" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{team.songName}</p>
+                    <p className="truncate text-sm text-slate-500">
+                      {missing.length > 0
+                        ? `모집: ${missing
+                            .map((ts) => getSessionDisplayName(ts.session.name))
+                            .join(", ")}`
+                        : "모집 완료"}
+                    </p>
+                  </div>
+                  <ChevronRight className="size-4 text-slate-300" />
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       )}
     </Section>
@@ -335,6 +404,7 @@ const HomeDashboard = () => {
       {user && (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <MyTeams userId={user.id} />
+          <BookmarkedTeams />
           <MyUpcomingRentals userId={user.id} />
         </div>
       )}

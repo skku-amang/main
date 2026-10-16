@@ -7,6 +7,7 @@ import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import TeamBookmarkButton from "@/components/TeamBookmarkButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
@@ -31,6 +32,7 @@ interface TeamCardProps {
   image?: string | null
   leader: TeamFromList["leader"]
   missingTeamSessions: TeamSessionFromList[]
+  isBookmarked: boolean
 }
 
 const TeamCard = ({
@@ -42,9 +44,10 @@ const TeamCard = ({
   isSelfMade = false,
   image,
   leader,
-  missingTeamSessions
+  missingTeamSessions,
+  isBookmarked
 }: TeamCardProps) => {
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const { canEdit } = useTeamPermission({ leaderId: leader.id })
   const isMyTeam = user?.id === leader.id
 
@@ -62,7 +65,9 @@ const TeamCard = ({
           <div
             className={cn(
               "text-md flex items-start justify-between",
-              canEdit && "pr-6"
+              // 오른쪽 위 별표(로그인 시)·⋯ 메뉴(편집 권한 시) 자리
+              isAuthenticated && "pr-8",
+              isAuthenticated && canEdit && "pr-16"
             )}
           >
             <div className="flex items-center gap-x-2">
@@ -125,14 +130,17 @@ const TeamCard = ({
         </div>
       </Link>
 
-      {/* 액션: 편집, 삭제 */}
-      {canEdit && (
-        <TeamActionsMenu
-          performanceId={performanceId}
-          teamId={id}
-          className="absolute right-1 top-4 h-8 w-8"
-        />
-      )}
+      <div className="absolute right-1 top-3 flex items-center">
+        <TeamBookmarkButton teamId={id} bookmarked={isBookmarked} />
+        {/* 액션: 편집, 삭제 */}
+        {canEdit && (
+          <TeamActionsMenu
+            performanceId={performanceId}
+            teamId={id}
+            className="h-8 w-8"
+          />
+        )}
+      </div>
     </div>
   )
 }

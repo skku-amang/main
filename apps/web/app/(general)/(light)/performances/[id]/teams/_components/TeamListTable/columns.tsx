@@ -1,7 +1,7 @@
 "use client"
 
 import { CellContext, ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Image, Paperclip } from "lucide-react"
+import { ArrowUpDown, Image, Paperclip, Star } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 
@@ -11,6 +11,7 @@ import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import SelfMadeSongBadge from "@/components/TeamBadges/SelfMadeSongBadge"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import TeamBookmarkButton from "@/components/TeamBookmarkButton"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { matchesKorean } from "@/lib/hangul-search"
@@ -23,7 +24,7 @@ import { extractYoutubeVideoId } from "@repo/shared-types"
 
 import TeamActionsMenu from "../TeamActionsMenu"
 
-export type TeamColumn = TeamFromList
+export type TeamColumn = TeamFromList & { isBookmarked: boolean }
 
 const SortButton = ({
   column,
@@ -78,6 +79,22 @@ const YoutubeCell = ({ row }: { row: any }) => {
 }
 
 export const columns: ColumnDef<TeamColumn>[] = [
+  {
+    // 정렬 '별표 우선'(bookmark-desc)의 기준이기도 함
+    id: "bookmark",
+    accessorFn: (row) => (row.isBookmarked ? 1 : 0),
+    header: ({ column }) => (
+      <SortButton column={column}>
+        <Star className="size-4" aria-label="별표" />
+      </SortButton>
+    ),
+    cell: ({ row }) => (
+      <TeamBookmarkButton
+        teamId={row.original.id}
+        bookmarked={row.original.isBookmarked}
+      />
+    )
+  },
   {
     accessorKey: "songName",
     // 곡명과 팀장·팀원 이름 중 하나라도 맞으면 검색 결과에 포함
