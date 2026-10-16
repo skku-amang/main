@@ -9,14 +9,13 @@ import {
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base"
 import * as Sentry from "@sentry/nestjs"
 import { nodeProfilingIntegration } from "@sentry/profiling-node"
+import { traceSampleRate } from "./common/trace-sampling"
 import { isHealthCheckPath } from "./health/health-path"
 
 Sentry.init({
-  // kubelet probe(5~10초 주기)는 루트에서 샘플링 제외 → 하위 Nest·Prisma 스팬까지 함께 빠짐
-  tracesSampler: ({ normalizedRequest, inheritOrSampleWith }) => {
-    if (isHealthCheckPath(normalizedRequest?.url)) return 0
-    return inheritOrSampleWith(1.0)
-  },
+  // kubelet probe 0, 스테이징 k6 봇 5%, 나머지 100% (common/trace-sampling.ts)
+  tracesSampler: ({ normalizedRequest, inheritOrSampleWith }) =>
+    traceSampleRate(normalizedRequest, inheritOrSampleWith),
   profilesSampleRate: 1.0,
   enableLogs: true,
 
