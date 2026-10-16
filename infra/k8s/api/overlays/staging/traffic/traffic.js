@@ -14,7 +14,8 @@
 //     별표한 팀 빈자리는 부원이 스테이징에서 봇 팀을 별표해 두면 '나가기' 때 온다.
 // - 봇은 PLAYGROUND_PERFORMANCE_ID 공연과 "[traffic-bot]"으로 시작하는 공연에서만 논다. 실제 공연은 안 건드린다.
 //   장비 대여는 봇1이 만든 "[traffic-bot]" 장비만 쓴다. 동방 예약은 실제 동방 슬롯(12~21시)을 차지한다 — 스테이징 테스터와 공유.
-// - 실행마다 시나리오를 "하루 목표 ÷ 그 시간대 실행 횟수" 확률로 고른다. 밤(23~09시 KST)엔 읽기·거절 확인만 한다.
+// - 실행마다 시나리오를 "하루 목표 ÷ 그 시간대 실행 횟수" 확률로 고른다. 밤(23~09시 KST)엔 데이터를 만들지 않는다
+//   (둘러보기·거절 확인·봇 알림 읽음 처리만).
 // - 실패해야 정상인 요청은 500이 아니라 정해진 오류 코드로 오는지 확인하고, 팀장이 봇이면 지원 알림 row가 생기는지도 본다.
 import http from "k6/http";
 import { check, group, sleep } from "k6";
@@ -226,15 +227,20 @@ function signup(bot1, sessionIds) {
 /** 닉네임의 base36 스탬프 → 가입 시각. pending 응답(detailedUserSelector)엔 createdAt이 없어서 이걸 쓴다 */
 const signedUpAt = (user) =>
   parseInt(String(user.nickname ?? "").slice(MEMBER_PREFIX.length), 36);
+/** 스크립트가 만든 가입 봇인지 — 사람이 같은 접두사로 만든 계정("traffic-member-test")을 자동 승인하지 않게 스탬프가 그럴듯한 epoch ms여야 한다 */
+const isScriptMember = (user) =>
+  !!user.nickname?.startsWith(MEMBER_PREFIX) &&
+  Number.isFinite(signedUpAt(user)) &&
+  signedUpAt(user) > 1.6e12;
+
+const pendingMembers = (bot1) =>
+  (data(bot1.get("/users/admin/pending")) ?? []).filter(isScriptMember);
 
 /** 두 시간 넘게 기다린 가입 봇을 승인한다 → 그 계정에 USER_APPROVED */
 function approvePending(bot1) {
   if (!bot1.me.isAdmin) return;
-  const pending = (data(bot1.get("/users/admin/pending")) ?? []).filter(
-    (u) =>
-      u.nickname?.startsWith(MEMBER_PREFIX) &&
-      Number.isFinite(signedUpAt(u)) &&
-      Date.now() - signedUpAt(u) > 2 * HOUR,
+  const pending = pendingMembers(bot1).filter(
+    (u) => Date.now() - signedUpAt(u) > 2 * HOUR,
   );
   if (!pending.length) return;
   group("가입 승인", () => {
@@ -749,8 +755,10 @@ function run() {
   }
   if (room && roll(weekend ? 1 : 3, [9, 23])) reserveRoom(pool, room);
   if (item && roll(1 / 7, [10, 20])) rentItem(bot1, item);
-  // 풀이 작을 땐 매 실행 가입시켜 빨리 채우고(2시간 뒤 승인), 찬 뒤엔 프로덕션 빈도(주 2건)
-  if (members.length < POOL_MIN ? daytime : roll(2 / 7, [10, 23]))
+  // 풀이 작을 땐 매 실행 가입시켜 빨리 채우고(2시간 뒤 승인), 찬 뒤엔 프로덕션 빈도(주 2건).
+  // 승인 대기 중인 봇도 세어 정확히 POOL_MIN명에서 멈춘다 (승인이 막혀도 무한 가입하지 않게)
+  const poolSize = members.length + (daytime ? pendingMembers(bot1).length : 0);
+  if (poolSize < POOL_MIN ? daytime : roll(2 / 7, [10, 23]))
     signup(bot1, sessionIds);
 
   expectedRejections(bot1);
