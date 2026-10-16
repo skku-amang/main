@@ -62,6 +62,11 @@ model User {
   isApproved      Boolean  @default(false)
   // 다른 부원에게 프로필(참여 팀·공연, 기수, 세션, 자기소개) 공개 여부. 기본 비공개
   isProfilePublic Boolean  @default(false)
+  // 알림 설정 (#708). 푸시만 제어하고 알림함엔 영향 없음. 시(hour)는 KST
+  mutedNotificationTypes NotificationType[] @default([])
+  quietHoursEnabled      Boolean            @default(true)
+  quietHoursStart        Int                @default(23)
+  quietHoursEnd          Int                @default(8)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

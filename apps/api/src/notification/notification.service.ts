@@ -1,14 +1,17 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { NotFoundError } from "@repo/api-client"
-import { NotificationType } from "@repo/database"
+import { NotificationType, Prisma } from "@repo/database"
 import {
   GetNotificationsQuery,
   MarkNotificationsReadBySubject,
   NotificationItemSchema,
   NotificationList,
-  UnreadNotificationCount
+  NotificationPreferences,
+  UnreadNotificationCount,
+  UpdateNotificationPreferences
 } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
+import { preferencesSelect, toPreferences } from "./preferences"
 
 /** 대상 페이지에서 "본 것"으로 칠 수 있는 알림 유형. 팀 멤버 변경은 공연 페이지에선 안 보이므로 teamId 쪽에만 */
 const SUBJECT_TYPES = {
@@ -89,6 +92,45 @@ export class NotificationService {
       data: { readAt: new Date() }
     })
     return { count }
+  }
+
+  async getPreferences(userId: number): Promise<NotificationPreferences> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: preferencesSelect
+    })
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+    return toPreferences(user)
+  }
+
+  async updatePreferences(
+    userId: number,
+    { mutedTypes, quietHours }: UpdateNotificationPreferences
+  ): Promise<NotificationPreferences> {
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(mutedTypes && { mutedNotificationTypes: mutedTypes }),
+          ...(quietHours && {
+            quietHoursEnabled: quietHours.enabled,
+            quietHoursStart: quietHours.start,
+            quietHoursEnd: quietHours.end
+          })
+        },
+        select: preferencesSelect
+      })
+      return toPreferences(user)
+    } catch (error) {
+      // 탈퇴한 뒤에도 살아 있는 토큰으로 오면 500이 아니라 404
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+      throw error
+    }
   }
 
   /** 대상(팀/공연) 페이지에 도달한 사용자의 그 대상 알림을 읽음 처리한다 */

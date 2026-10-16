@@ -14,6 +14,7 @@ import { Request } from "express"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { GetNotificationsQueryDto } from "./dto/get-notifications-query.dto"
 import { MarkNotificationsReadBySubjectDto } from "./dto/mark-read-by-subject.dto"
+import { UpdateNotificationPreferencesDto } from "./dto/update-preferences.dto"
 import { NotificationService } from "./notification.service"
 
 @Controller("notifications")
@@ -31,6 +32,22 @@ export class NotificationController {
   countUnread(@Req() req: Request) {
     const user = req.user as JwtPayload
     return this.notificationService.countUnread(user.sub)
+  }
+
+  @Get("preferences")
+  getPreferences(@Req() req: Request) {
+    const user = req.user as JwtPayload
+    return this.notificationService.getPreferences(user.sub)
+  }
+
+  /** 보낸 필드만 바꾼다. quietHours는 통째로 */
+  @Patch("preferences")
+  updatePreferences(
+    @Req() req: Request,
+    @Body() dto: UpdateNotificationPreferencesDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.notificationService.updatePreferences(user.sub, dto)
   }
 
   @Patch("read-all")
