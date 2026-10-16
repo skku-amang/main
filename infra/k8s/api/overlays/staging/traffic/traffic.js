@@ -162,7 +162,10 @@ function teamRoundTrip(bot1, bot2, team) {
     while (taken.has(index)) index++;
     const slot = [{ sessionId: ts.session.id, index }];
 
-    const before = data(bot1.get("/notifications/unread-count")).count;
+    // 안 읽은 수가 아니라 알림 번호로 비교 — 다른 실행이 겹쳐 "모두 읽음"을 해도 흔들리지 않게
+    const recent = () =>
+      data(bot1.get("/notifications?limit=10"))?.items ?? [];
+    const lastIdBefore = recent()[0]?.id ?? 0;
     if (!ok(bot2.patch(`/teams/${team.id}/apply`, slot), "봇2 지원")) return;
     think();
 
@@ -178,18 +181,19 @@ function teamRoundTrip(bot1, bot2, team) {
     );
 
     // 알림은 이벤트로 비동기 생성 — 잠깐 기다리며 확인
-    let after = before;
-    for (let i = 0; i < 5 && after <= before; i++) {
+    const isMyApply = (n) =>
+      n.id > lastIdBefore &&
+      n.type === "TEAM_MEMBER_CHANGE" &&
+      n.payload?.teamId === team.id &&
+      n.payload?.changeType === "ADDED";
+    let arrived;
+    for (let i = 0; i < 5 && !arrived; i++) {
       sleep(1);
-      after = data(bot1.get("/notifications/unread-count")).count;
+      arrived = recent().find(isMyApply);
     }
-    check(after, { "봇1에게 지원 알림 도착": (a) => a > before });
-
-    const latest = (data(bot1.get("/notifications?limit=5"))?.items ?? []).find(
-      (n) => n.type === "TEAM_MEMBER_CHANGE" && n.payload?.teamId === team.id,
-    );
-    if (latest)
-      ok(bot1.patch(`/notifications/${latest.id}/read`), "알림 하나 읽음");
+    check(arrived, { "봇1에게 지원 알림 도착": (n) => !!n });
+    if (arrived)
+      ok(bot1.patch(`/notifications/${arrived.id}/read`), "알림 하나 읽음");
 
     if (chance(0.3)) {
       // 팀 설명 수정 → 팀원(봇2)에게 수정 알림. 구성원은 지금 그대로 보낸다
