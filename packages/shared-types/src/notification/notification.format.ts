@@ -176,7 +176,7 @@ export function formatNotification(
         .join(", ")
       return {
         title: "별표한 팀에 자리가 났어요",
-        body: `${p.teamName} 팀 ${sessions ? `${sessions} ` : ""}자리가 비었어요`,
+        body: `${p.teamName} 팀 ${sessions ? `${sessions} ` : ""}자리가 났어요`,
         href: teamHref(p.performanceId, p.teamId),
         tag: teamTag(p.teamId)
       }

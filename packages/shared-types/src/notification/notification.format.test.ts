@@ -210,7 +210,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       })
     ).toEqual({
       title: "별표한 팀에 자리가 났어요",
-      body: "팀A 팀 보컬 자리가 비었어요",
+      body: "팀A 팀 보컬 자리가 났어요",
       href: "/performances/3/teams/7",
       tag: "team-7"
     })
@@ -227,6 +227,6 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
           sessionNames: []
         }
       }).body
-    ).toBe("팀A 팀 자리가 비었어요")
+    ).toBe("팀A 팀 자리가 났어요")
   })
 })
