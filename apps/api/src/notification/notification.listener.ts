@@ -489,12 +489,13 @@ export class NotificationListener {
         type: content.type,
         payload: content.payload
       })),
-      select: { id: true }
+      select: { id: true, recipientId: true }
     })
+    // 수신자↔row 쌍을 같은 row에서 뽑아 INSERT 반환 순서에 기대지 않는다
     this.eventEmitter.emit(
       NOTIFICATION_EVENTS.CREATED,
       new NotificationCreatedEvent(
-        recipientIds,
+        rows.map((r) => r.recipientId),
         content,
         rows.map((r) => r.id)
       )

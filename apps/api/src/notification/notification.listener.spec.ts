@@ -88,8 +88,9 @@ describe("NotificationListener", () => {
       teamBookmark: { findMany: jest.fn(async () => []) },
       equipmentRental: { findUnique: jest.fn(async () => rental) },
       notification: {
-        createManyAndReturn: jest.fn(async ({ data }: { data: unknown[] }) =>
-          data.map((_, i) => ({ id: i + 1 }))
+        createManyAndReturn: jest.fn(
+          async ({ data }: { data: { recipientId: number }[] }) =>
+            data.map((d, i) => ({ id: i + 1, recipientId: d.recipientId }))
         )
       }
     }

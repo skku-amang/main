@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing"
+import { NotFoundError } from "@repo/api-client"
 import { NotificationService } from "./notification.service"
 import { PrismaService } from "../prisma/prisma.service"
 
@@ -23,7 +24,9 @@ describe("NotificationService 알림 설정 (#708)", () => {
       quietHoursEnd: 8
     }
     const user = {
-      findUniqueOrThrow: jest.fn(async () => stored),
+      findUnique: jest.fn(async ({ where }: { where: { id: number } }) =>
+        where.id === stored.id ? stored : null
+      ),
       update: jest.fn(async ({ data }: { data: Partial<StoredUser> }) =>
         Object.assign(stored, data)
       )
@@ -35,6 +38,10 @@ describe("NotificationService 알림 설정 (#708)", () => {
       ]
     }).compile()
     service = module.get(NotificationService)
+  })
+
+  it("없는 사용자면 404", async () => {
+    await expect(service.getPreferences(99)).rejects.toThrow(NotFoundError)
   })
 
   it("기본값은 끈 유형 없음, 방해금지 23–08", async () => {

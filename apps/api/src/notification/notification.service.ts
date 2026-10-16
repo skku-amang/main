@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { NotFoundError } from "@repo/api-client"
-import { NotificationType } from "@repo/database"
+import { NotificationType, Prisma } from "@repo/database"
 import {
   GetNotificationsQuery,
   MarkNotificationsReadBySubject,
@@ -95,10 +95,12 @@ export class NotificationService {
   }
 
   async getPreferences(userId: number): Promise<NotificationPreferences> {
-    const user = await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: preferencesSelect
     })
+    if (!user)
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
     return toPreferences(user)
   }
 
@@ -106,19 +108,29 @@ export class NotificationService {
     userId: number,
     { mutedTypes, quietHours }: UpdateNotificationPreferences
   ): Promise<NotificationPreferences> {
-    const user = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...(mutedTypes && { mutedNotificationTypes: mutedTypes }),
-        ...(quietHours && {
-          quietHoursEnabled: quietHours.enabled,
-          quietHoursStart: quietHours.start,
-          quietHoursEnd: quietHours.end
-        })
-      },
-      select: preferencesSelect
-    })
-    return toPreferences(user)
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(mutedTypes && { mutedNotificationTypes: mutedTypes }),
+          ...(quietHours && {
+            quietHoursEnabled: quietHours.enabled,
+            quietHoursStart: quietHours.start,
+            quietHoursEnd: quietHours.end
+          })
+        },
+        select: preferencesSelect
+      })
+      return toPreferences(user)
+    } catch (error) {
+      // 탈퇴한 뒤에도 살아 있는 토큰으로 오면 500이 아니라 404
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+      throw error
+    }
   }
 
   /** 대상(팀/공연) 페이지에 도달한 사용자의 그 대상 알림을 읽음 처리한다 */

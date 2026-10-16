@@ -68,7 +68,7 @@ model PushSubscription {
 }
 ```
 
-`User`에 역관계: `notifications Notification[] @relation("notifications")`, `pushSubscriptions PushSubscription[] @relation("pushSubscriptions")`.
+`User`에 역관계: `notifications Notification[] @relation("notifications")`, `pushSubscriptions PushSubscription[] @relation("pushSubscriptions")`. 알림 설정 컬럼 `mutedNotificationTypes NotificationType[]`·`quietHoursEnabled/Start/End`도 `User`에 둔다(#708, 의미는 §3.2).
 
 **모델링 근거**:
 

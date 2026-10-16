@@ -122,6 +122,7 @@ describe("PushListener", () => {
 
     await listener.onNotificationCreated(teamCreated)
 
+    expect(updateMany).toHaveBeenCalledTimes(1)
     expect(updateMany).toHaveBeenCalledWith({
       where: { id: { in: [12] }, pushedAt: null },
       data: { pushedAt: HALF_PAST_MIDNIGHT_KST }
