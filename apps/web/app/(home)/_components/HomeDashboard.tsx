@@ -30,6 +30,7 @@ import { useRentals } from "@/hooks/api/useRental"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { formatDday, getRecruitDaysLeft } from "@/lib/performance"
 import { getMyTeams } from "@/lib/team/myTeams"
 import { getSessionsWithMissingMembers } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
@@ -107,9 +108,8 @@ const RecruitingPerformance = () => {
 
   // /performances/latest/teams와 같은 기준: 가장 최근에 만든 공연
   const latest = performances.reduce((a, b) => (a.id > b.id ? a : b))
-  // 모집 마감 = 공연 종료 일시 (isPerformanceRecruiting과 같은 기준)
   const deadline = latest.endAt ? dayjs(latest.endAt) : null
-  const daysLeft = deadline?.startOf("day").diff(dayjs().startOf("day"), "day")
+  const daysLeft = getRecruitDaysLeft(latest)
 
   return (
     <Link
@@ -128,7 +128,7 @@ const RecruitingPerformance = () => {
       </div>
       {daysLeft !== undefined && daysLeft >= 0 && (
         <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-sm font-semibold">
-          {daysLeft === 0 ? "D-Day" : `D-${daysLeft}`}
+          {formatDday(daysLeft)}
         </span>
       )}
       <ChevronRight className="size-5 shrink-0" />
