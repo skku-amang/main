@@ -1,4 +1,4 @@
-import { kstDayStart } from "./kst"
+import { kstDayStart, kstHour } from "./kst"
 
 describe("kstDayStart", () => {
   it("UTC로는 전날 오후여도 한국 날짜 기준 자정을 돌려준다", () => {
@@ -15,5 +15,14 @@ describe("kstDayStart", () => {
     const now = new Date("2026-10-16T15:10:00Z")
 
     expect(kstDayStart(now).toISOString()).toBe("2026-10-16T15:00:00.000Z")
+  })
+})
+
+describe("kstHour", () => {
+  it("UTC 시각을 한국 시로 바꾼다", () => {
+    expect(kstHour(new Date("2026-10-16T14:50:00Z"))).toBe(23)
+    expect(kstHour(new Date("2026-10-16T15:00:00Z"))).toBe(0)
+    expect(kstHour(new Date("2026-10-16T23:59:00Z"))).toBe(8)
+    expect(kstHour(new Date("2026-10-17T00:00:00Z"))).toBe(9)
   })
 })

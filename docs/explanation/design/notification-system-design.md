@@ -44,9 +44,11 @@ model Notification {
   type        NotificationType
   payload     Json             // 스냅샷 (타입별 구조, §2)
   readAt      DateTime?        // null = 안 읽음 (읽음 상태의 SSOT)
+  pushedAt    DateTime?        // 푸시 처리 시각. null = 방해금지로 미뤄 둠 (§3.2)
   createdAt   DateTime         @default(now())
 
   @@index([recipientId, readAt])
+  @@index([pushedAt])
   @@map("notifications")
 }
 
@@ -111,7 +113,8 @@ NotificationListener (apps/api/src/notification/notification.listener.ts)
    │  emit("notification.created", { recipientIds, content: { type, payload } })
    ▼
 PushListener (#546 후반)
-   └─ recipient들의 PushSubscription 전체에 web-push 발송, 응답 410 Gone → 해당 구독 삭제
+   ├─ 방해금지(23–08 KST)면 보내지 않고 pushedAt null로 둠 → 크론(§3.1)이 아침에 flush (§3.2)
+   └─ recipient들의 PushSubscription 전체에 web-push 발송, 응답 410 Gone → 해당 구독 삭제, pushedAt 기록
 ```
 
 - **두 단계 seam인 이유**: 서비스는 도메인 사실(`team.created`)만 말하고 알림·수신자·채널을 모른다(의존 방향: notification → team/performance). 푸시는 **저장된 알림에서 파생** — ADR-0003 원칙1(알림함 SSOT, 푸시 best-effort)이 코드 구조 그대로다. 채널 추가 = `notification.created` 리스너 추가.
@@ -129,6 +132,16 @@ PushListener (#546 후반)
 - **마감 정각 경계**: 지원 가능 조건이 `endAt > now`라 `endAt` 순간엔 이미 닫힌다. 그래서 "내일 마감" 창은 `(내일 00:00, 모레 00:00]` — 모레 00:00 정각 마감은 내일, 내일 00:00 정각 마감은 오늘.
 - **관측**: 실행마다 `Sentry.metrics.count("reminder.run", { reminder, result: ok | error })`, 리마인더 실패와 Redis 락 획득 실패는 `captureException` + 로그(`@nestjs/schedule`은 예외를 Logger로만 삼켜 Sentry Issue가 안 생기므로 직접 보낸다). 리마인더 하나가 실패해도 나머지는 돈다.
 - `@nestjs/schedule`은 **6.x 고정** — 12.x는 ESM 전용이라 Jest가 못 읽는다(event-emitter 12와 같은 함정).
+
+### 3.2 방해금지 시간대 (푸시 지연)
+
+"밤에 폰 울리지 마"는 알림 **생성**이 아니라 **푸시 발송**의 문제다. 그래서 리마인더나 이벤트 쪽이 아니라 `PushListener` 한 곳에서 막는다 — 새벽 탈퇴 같은 이벤트 알림까지 같이 보호되고, 알림함 row는 즉시 생겨도 무방하다.
+
+- **판정**: `isQuietHours(now)` — 전역 기본값 **23:00–08:00 KST**([quiet-hours.ts](../../../apps/api/src/push/quiet-hours.ts)). 사용자별 끄기·시간 변경은 후속(C, #708 설정 화면과 함께).
+- **미루기**: 방해금지면 `PushListener`가 발송을 건너뛰고 `Notification.pushedAt`을 null로 둔다. 평소엔 발송 뒤 `pushedAt`에 시각을 적는다 (= 푸시 처리됨).
+- **flush**: 크론 틀(§3.1)의 `deferred_push` 잡([push-deferred.service.ts](../../../apps/api/src/push/push-deferred.service.ts))이 10분마다 돌며, 방해금지가 끝나면 `pushedAt null`인 알림을 수신자마다 보낸다. **그새 인앱에서 읽었거나 하루 지난 알림은 보내지 않고 처리됨으로 닫는다** — 고정 발송 창으론 못 하는 UX.
+- **긴급 유형 bypass**: "동방 예약 1시간 전"(#797)처럼 지금 봐야 의미 있는 알림은 방해금지를 무시해야 한다(08:00 예약의 07:00 알림이 08:00에 오면 무용). 유형별 속성은 첫 긴급 유형이 생기는 #797에서 도입.
+- **마이그레이션**: 기존 row는 `pushedAt = createdAt`으로 채워 배포 직후 flush가 옛 알림을 쏟아내지 않게 한다.
 
 ## 4. API (#546 정합)
 
@@ -189,6 +202,7 @@ JWT 가드. 알림은 `recipientId = req.user`로 스코프.
 
 ## 변경 이력
 
+- **2026-10-17**: 방해금지 시간대(§3.2) — 23–08 KST엔 푸시를 미루고(`pushedAt`) 크론이 아침에 flush. 09시 고정 발송 창 대신 푸시 계층에서 모든 유형을 한 번에 보호.
 - **2026-10-17**: 시간 기반 리마인더 틀(§3.1, in-process 크론 + Redis 락 + DB 멱등) + 첫 사례 `TEAM_RECRUITMENT_DEADLINE`(모집 마감 D-1, 팀장) (#796).
 - **2026-10-16**: `BOOKMARKED_TEAM_SPOT_OPENED` 추가 — 팀원이 빠지면 그 팀을 별표한(#761) 비멤버에게 (#794).
 - **2026-10-16**: 유형 6종 추가(공연 변경·팀 삭제·팀장 교체·정원 참·가입 신청·가입 승인, #790–#793·#795 → [#800](https://github.com/skku-amang/main/pull/800)). 대상 페이지 도달 시 자동 읽음(#786 → #788): `PATCH /notifications/read { teamId | performanceId }`, 팀 상세·공연 상세·공연 팀 목록에서 호출.

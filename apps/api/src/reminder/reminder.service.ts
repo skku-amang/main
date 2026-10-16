@@ -3,7 +3,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { NotificationType } from "@repo/database"
 import { TeamRecruitmentDeadlinePayloadSchema } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
-import { kstDayStart } from "./kst"
+import { kstDayStart } from "../common/kst"
 import {
   REMINDER_EVENTS,
   TeamRecruitmentDeadlineEvent

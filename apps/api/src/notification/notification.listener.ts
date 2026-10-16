@@ -428,16 +428,21 @@ export class NotificationListener {
   private async create(recipientIds: number[], content: NotificationContent) {
     if (recipientIds.length === 0) return
 
-    await this.prisma.notification.createMany({
+    const rows = await this.prisma.notification.createManyAndReturn({
       data: recipientIds.map((recipientId) => ({
         recipientId,
         type: content.type,
         payload: content.payload
-      }))
+      })),
+      select: { id: true }
     })
     this.eventEmitter.emit(
       NOTIFICATION_EVENTS.CREATED,
-      new NotificationCreatedEvent(recipientIds, content)
+      new NotificationCreatedEvent(
+        recipientIds,
+        content,
+        rows.map((r) => r.id)
+      )
     )
   }
 

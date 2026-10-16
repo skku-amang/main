@@ -7,10 +7,12 @@ export const NOTIFICATION_EVENTS = {
 /**
  * 알림 row가 저장된 뒤 발행. 푸시 등 전달 채널이 구독한다.
  * type↔payload 상관관계를 잃지 않도록 둘을 묶은 NotificationContent로 든다.
+ * notificationIds는 recipientIds와 같은 순서 — 채널이 row에 발송 결과(pushedAt)를 남길 때 쓴다.
  */
 export class NotificationCreatedEvent {
   constructor(
     readonly recipientIds: number[],
-    readonly content: NotificationContent
+    readonly content: NotificationContent,
+    readonly notificationIds: number[]
   ) {}
 }
