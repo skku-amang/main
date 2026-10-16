@@ -79,18 +79,97 @@ describe("AuthService", () => {
     ).resolves.toHaveProperty("refreshToken")
   })
 
-  it("refresh 후 sid는 유지되고 교체 전 RT는 거부된다", async () => {
-    const login = await service.login(loginDto, {})
-    const sid = sidOf(login.refreshToken)
-    // 같은 초에 서명하면 JWT가 동일해지므로 iat가 달라지도록 기다린다
-    await new Promise((resolve) => setTimeout(resolve, 1100))
+  describe("RT 교체 (#542)", () => {
+    // Date만 가짜로 돌린다. JWT iat도 이 시계를 따르므로 초를 넘기면 서로 다른 RT가 서명된다
+    const start = new Date("2026-10-16T01:00:00Z").getTime()
+    const at = (seconds: number) => jest.setSystemTime(start + seconds * 1000)
 
-    const refreshed = await service.refreshTokens(1, sid, login.refreshToken)
+    beforeEach(() => {
+      jest.useFakeTimers({
+        doNotFake: [
+          "nextTick",
+          "setImmediate",
+          "setTimeout",
+          "setInterval",
+          "queueMicrotask"
+        ]
+      })
+      at(0)
+    })
+    afterEach(() => jest.useRealTimers())
 
-    expect(sidOf(refreshed.refreshToken)).toBe(sid)
-    await expect(
-      service.refreshTokens(1, sid, login.refreshToken)
-    ).rejects.toThrow(RefreshTokenExpiredError)
+    it("refresh 후 sid는 유지된다", async () => {
+      const login = await service.login(loginDto, {})
+      const sid = sidOf(login.refreshToken)
+      at(1)
+
+      const refreshed = await service.refreshTokens(1, sid, login.refreshToken)
+
+      expect(sidOf(refreshed.refreshToken)).toBe(sid)
+    })
+
+    it("교체 응답을 못 받은 기기가 30초 안에 직전 RT로 재시도하면 통과한다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      at(1)
+      await service.refreshTokens(1, sid, a.refreshToken) // 응답 유실
+
+      at(30)
+      await expect(
+        service.refreshTokens(1, sid, a.refreshToken)
+      ).resolves.toHaveProperty("refreshToken")
+    })
+
+    it("교체 후 30초가 지나면 직전 RT는 거부된다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      at(1)
+      await service.refreshTokens(1, sid, a.refreshToken)
+
+      at(32)
+      await expect(
+        service.refreshTokens(1, sid, a.refreshToken)
+      ).rejects.toThrow(RefreshTokenExpiredError)
+    })
+
+    it("직전 RT는 한 번만 통한다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      at(1)
+      await service.refreshTokens(1, sid, a.refreshToken)
+      at(2)
+      await service.refreshTokens(1, sid, a.refreshToken)
+
+      at(3)
+      await expect(
+        service.refreshTokens(1, sid, a.refreshToken)
+      ).rejects.toThrow(RefreshTokenExpiredError)
+    })
+
+    it("두 번 전 RT는 30초 안이어도 거부된다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      at(1)
+      const b = await service.refreshTokens(1, sid, a.refreshToken)
+      at(2)
+      await service.refreshTokens(1, sid, b.refreshToken)
+
+      at(3)
+      await expect(
+        service.refreshTokens(1, sid, a.refreshToken)
+      ).rejects.toThrow(RefreshTokenExpiredError)
+    })
+
+    it("배포 전에 만든 세션(직전 RT 필드 없음)도 현재 RT로 refresh된다", async () => {
+      const login = await service.login(loginDto, {})
+      const key = `user:1:auth-session:${sidOf(login.refreshToken)}`
+      await redis.hdel(key, "prevTokenHash", "rotatedAt")
+      at(1)
+
+      await expect(
+        service.refreshTokens(1, sidOf(login.refreshToken), login.refreshToken)
+      ).resolves.toHaveProperty("refreshToken")
+    })
   })
 
   it("로그아웃하면 그 기기만 끊기고 다른 기기는 유지된다", async () => {
