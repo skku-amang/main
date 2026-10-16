@@ -2,7 +2,6 @@ import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
 import ROUTES from "@/constants/routes"
-import { isAuthCookieBlindHost } from "@/lib/auth/authCookieScope"
 import { ACCESS_TOKEN_COOKIE } from "@repo/shared-types"
 
 /**
@@ -13,11 +12,7 @@ import { ACCESS_TOKEN_COOKIE } from "@repo/shared-types"
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  if (
-    !isAuthCookieBlindHost(req.headers.get("host")) &&
-    !req.cookies.has(ACCESS_TOKEN_COOKIE) &&
-    pathname !== ROUTES.LOGIN
-  ) {
+  if (!req.cookies.has(ACCESS_TOKEN_COOKIE) && pathname !== ROUTES.LOGIN) {
     const url = req.nextUrl.clone()
     url.pathname = ROUTES.LOGIN
     url.searchParams.set("callbackUrl", req.nextUrl.pathname)
