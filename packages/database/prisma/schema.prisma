@@ -45,6 +45,7 @@ enum NotificationType {
   USER_SIGNED_UP // 가입 신청 (운영진)
   USER_APPROVED // 가입 승인 (본인)
   BOOKMARKED_TEAM_SPOT_OPENED // 별표한 팀에 빈자리 (별표한 비멤버)
+  TEAM_RECRUITMENT_DEADLINE // 모집 마감 D-1, 빈자리 있는 팀 (팀장)
 }
 
 model User {

@@ -75,6 +75,19 @@ export const BookmarkedTeamSpotOpenedPayloadSchema = z.object({
   sessionNames: z.array(z.nativeEnum(SessionName))
 })
 
+export const TeamRecruitmentDeadlinePayloadSchema = z.object({
+  teamId: idSchema,
+  performanceId: idSchema,
+  teamName: z.string(),
+  /** 세션별 빈자리 수. 알림 시점 스냅샷 */
+  openSlots: z.array(
+    z.object({
+      sessionName: z.nativeEnum(SessionName),
+      count: z.number().int().positive()
+    })
+  )
+})
+
 const notificationBase = {
   id: idSchema,
   readAt: z.coerce.date().nullable(),
@@ -140,6 +153,11 @@ export const NotificationItemSchema = z.discriminatedUnion("type", [
     ...notificationBase,
     type: z.literal(NotificationType.BOOKMARKED_TEAM_SPOT_OPENED),
     payload: BookmarkedTeamSpotOpenedPayloadSchema
+  }),
+  z.object({
+    ...notificationBase,
+    type: z.literal(NotificationType.TEAM_RECRUITMENT_DEADLINE),
+    payload: TeamRecruitmentDeadlinePayloadSchema
   })
 ])
 

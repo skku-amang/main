@@ -229,4 +229,26 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       }).body
     ).toBe("팀A 팀 자리가 났어요")
   })
+
+  it("모집 마감 D-1: 팀장에게 세션별 빈자리 수, 팀 상세로", () => {
+    expect(
+      formatNotification({
+        type: "TEAM_RECRUITMENT_DEADLINE",
+        payload: {
+          teamId: 7,
+          performanceId: 3,
+          teamName: "팀A",
+          openSlots: [
+            { sessionName: "VOCAL", count: 1 },
+            { sessionName: "GUITAR", count: 2 }
+          ]
+        }
+      })
+    ).toEqual({
+      title: "팀A",
+      body: "내일 모집 마감 — 보컬 1자리, 기타 2자리 비어 있어요",
+      href: "/performances/3/teams/7",
+      tag: "team-7"
+    })
+  })
 })
