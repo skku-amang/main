@@ -1,0 +1,12 @@
+[
+  {
+    "id": "02432ccd-9a3e-407e-a6c4-9b6e98a28b20",
+    "name": "AMANG (staging)",
+    "domain": "amang.staging.json-server.win"
+  },
+  {
+    "id": "f2614ff4-65b5-4ed0-968f-e94bae1b2b8e",
+    "name": "AMANG",
+    "domain": "amang.json-server.win"
+  }
+]

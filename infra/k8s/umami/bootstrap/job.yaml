@@ -1,0 +1,42 @@
+# Umami가 뜬 뒤(PostSync) API로 관리자 비밀번호·사이트 목록을 선언에 맞춘다.
+# Umami에 Terraform provider가 없어 이 Job이 IaC 역할을 한다
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: umami-bootstrap
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: bootstrap
+          # node 22(내장 fetch)가 들어 있어 별도 이미지가 필요 없다. 태그는 ../deployment.yaml과 맞춘다
+          image: ghcr.io/umami-software/umami:3.4.0
+          command: ["node", "/bootstrap/bootstrap.mjs"]
+          env:
+            - name: UMAMI_URL
+              value: http://umami:3000
+          envFrom:
+            - secretRef:
+                name: umami-admin
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: umami-bootstrap

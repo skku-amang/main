@@ -1,0 +1,13 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: umami-admin
+  namespace: amang-umami
+spec:
+  encryptedData:
+    UMAMI_ADMIN_PASSWORD: AgCewklPfUZlYGienHfVQ9LSAw8Pp9B7v13T2Niap3sbuPpy2basy4F34fYtwcXGsi1WaEGS5NK9jR5Cb3HYr+ZwR8ObuMI8jls42qOwTfd1LpVT8QtQmG3j121rQRMsZ70tElWFrmWHSTluwpOi1mpwpHkTq57nfL7N1gsz3ZlXgyj1njhpj7H0Wd8HXYBE2wh+OemzQG2eKKMriwmx/uhzHa8JoScH2XfPfKAIpu6pOR7YlVh+u40V0MEqOyjqiCnoLvz9dKsi+lF6iZRt59nrdFHP9UVsae11S+2VO7tkwK06i1YIWqoLhAd4YPLLTnhFO9SYeiYNbXxY/9eHF+OKVBlU3Ojeqm9i6RFldupX5UoJqUi7DVBFPDgAuQkgIC/XBZx294BtYEm5nmP9CNJwLnqSEI/O77So371flW5l+XkPI8UwVUkPpCzCTthIOC6UTYt5KYCyhaacwEpwoPT/IGycuuGPLZ26itIsDiRlUuKrz6fE0xHyPHIJTWRkqFcbVymXWksWwogpl9s32xA6WkXw8q4UnUe/0TOssyg7y/FQ3dnKXDDhzjafJIPZ1hO2Nl9TTjK5LeNtrJe+afPaqr0W/uawTr5f5OiH8bTP4weuAP3+EDG99bcoCu1pLPlgyO0p5+UrhqPutLD6MQio4w3Qc4GuxL3mEBlbUkQvizJtMrO/Wk0PaPEHxAv7LH8KlBzDXUErjJ1/jGL/X3HQw6lim0NCNVQ=
+  template:
+    metadata:
+      name: umami-admin
+      namespace: amang-umami
