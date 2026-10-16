@@ -291,6 +291,8 @@ export class NotificationListener {
       const open = team.teamSessions.filter(
         (s) => s.members.length < s.capacity
       )
+      // 크론 판정과 리스너 사이에 마지막 자리가 찼으면 보낼 이유가 없다
+      if (open.length === 0) return
       const sessions = await this.prisma.session.findMany({
         where: { id: { in: open.map((s) => s.sessionId) } },
         select: { id: true, name: true }
