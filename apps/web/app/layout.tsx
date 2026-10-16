@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react"
 
 import PushSoftAsk from "@/components/PushSoftAsk"
 import { Toaster } from "@/components/ui/toaster"
+import UmamiAnalytics from "@/components/UmamiAnalytics"
 import VercelAnalytics from "@/components/VercelAnalytics"
 import { SEO } from "@/constants/seo"
 import Providers from "@/lib/providers"
@@ -97,6 +98,7 @@ export default function RootLayout({
           <Toaster />
           <VercelAnalytics />
           <SpeedInsights />
+          <UmamiAnalytics />
         </Providers>
       </body>
     </html>
