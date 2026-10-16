@@ -1,4 +1,11 @@
+import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http"
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http"
+import { RuntimeNodeInstrumentation } from "@opentelemetry/instrumentation-runtime-node"
+import { detectResources, envDetector } from "@opentelemetry/resources"
+import {
+  MeterProvider,
+  PeriodicExportingMetricReader
+} from "@opentelemetry/sdk-metrics"
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base"
 import * as Sentry from "@sentry/nestjs"
 import { nodeProfilingIntegration } from "@sentry/profiling-node"
@@ -29,3 +36,17 @@ Sentry.init({
     return event
   }
 })
+
+// 이벤트 루프 지연·GC·힙은 프로세스 안에서만 잴 수 있다. OTel Collector를 거쳐 Prometheus로 보낸다
+if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+  const meterProvider = new MeterProvider({
+    resource: detectResources({ detectors: [envDetector] }),
+    readers: [
+      new PeriodicExportingMetricReader({
+        exporter: new OTLPMetricExporter(),
+        exportIntervalMillis: 15_000
+      })
+    ]
+  })
+  new RuntimeNodeInstrumentation().setMeterProvider(meterProvider)
+}

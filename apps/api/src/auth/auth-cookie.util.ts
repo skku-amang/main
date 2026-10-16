@@ -34,7 +34,6 @@ export function extractRefreshToken(req: RequestWithCookies): string | null {
  *
  * - SameSite=Lax: web(amang.json-server.win)과 api(api.amang.json-server.win)는
  *   same-site(json-server.win)라 cross-subdomain 요청에도 전송됨.
- *   *.vercel.app preview는 cross-site라 미전송 — staging에서 검증.
  * - RT는 Path=/auth로 좁혀 일반 API 요청에 노출되지 않게 함.
  * - Domain=COOKIE_DOMAIN (prod: amang.json-server.win): api 서브도메인이 발급한
  *   cookie를 web 호스트(Next middleware·RSC)에서도 볼 수 있게 함.
@@ -46,15 +45,10 @@ export function extractRefreshToken(req: RequestWithCookies): string | null {
  *   presence 체크가 세션 지속 기간 내내 유효하게 함. 토큰 유효성은 항상
  *   서버의 JWT exp 검증이 결정.
  */
-// COOKIE_SAMESITE=none은 staging 전용 — *.vercel.app preview(cross-site)에서
-// 로그인 허용. None은 브라우저가 Secure를 강제하므로 secure도 함께 켠다.
-// production은 Lax 고정 (CSRF 2중 방어 유지).
-const sameSite = process.env.COOKIE_SAMESITE === "none" ? "none" : "lax"
-
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production" || sameSite === "none",
-  sameSite,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
   ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
 }
 

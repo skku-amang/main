@@ -14,7 +14,7 @@ infra/
 │           └── production/
 ├── kargo/                              # staging → production 승격 파이프라인 (Kargo Project amang)
 └── terraform/
-    └── {provider}/                     # vercel, sentry, ...
+    └── {provider}/                     # sentry, ...
 ```
 
 ArgoCD Application 정의는 **별도 레포**([homelab](https://github.com/manamana32321/homelab/tree/main/k8s/argocd/applications/apps/amang))에 있다. 신규 컴포넌트 추가 시 homelab repo에도 PR 필요.
