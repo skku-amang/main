@@ -1,6 +1,10 @@
 # 스테이징 가짜 사용자 트래픽 (#748) — 30분마다 k6가 traffic.js를 한 번 돌린다.
-# 봇 계정(traffic-bot@amang.staging.json-server.win)은 스테이징에서 가입 후 DB로 승인함 (2026-10-15).
+# 봇 계정 둘(BOT_: traffic-bot@…, id 9169, 운영진 / BOT2_: traffic-bot-2@…, id 9170)은 스테이징에서 가입 후 DB로 승인함.
+# 스크립트가 traffic-member-* 계정을 스스로 가입시키고(봇과 같은 비밀번호) 봇1이 승인해 부원 풀로 쓴다.
 # 로그인 쿠키가 amang.staging.json-server.win 도메인이라 내부 Service가 아닌 공개 주소로 요청한다.
+# TARGET_USER_ID: 알림을 받아 볼 부원(스테이징에서 푸시를 켠 운영진 계정) — 봇이 이 부원을 팀·예약에 넣어
+# 알림 유형이 골고루 가게 한다. 봇1은 스테이징 DB에서 운영진으로 올림(2026-10-17) — 시즌 공연 생성·가입 승인·
+# 팀장 되찾기·월 1회 팀 삭제에 필요. 데이터(팀·예약·가입 계정)는 프로덕션 빈도로 쌓이고 지우지 않는다.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -27,6 +31,11 @@ spec:
                   value: https://api.amang.staging.json-server.win
                 - name: ORIGIN
                   value: https://amang.staging.json-server.win
+                - name: TARGET_USER_ID
+                  value: "26"
+                # 봇이 노는 공연. 이후 시즌 공연은 이름이 "[traffic-bot]"으로 시작해 자동 인식된다
+                - name: PLAYGROUND_PERFORMANCE_ID
+                  value: "16"
               envFrom:
                 - secretRef:
                     name: traffic-bot
