@@ -13,8 +13,9 @@
 //     EQUIPMENT_RETURN_DUE, USER_SIGNED_UP(운영진), PERFORMANCE_CREATED/UPDATED, TEAM_RECRUITMENT_DEADLINE(시즌 말).
 //     별표한 팀 빈자리는 부원이 스테이징에서 봇 팀을 별표해 두면 '나가기' 때 온다.
 // - 봇은 PLAYGROUND_PERFORMANCE_ID 공연과 "[traffic-bot]"으로 시작하는 공연에서만 논다. 실제 공연은 안 건드린다.
-// - 실행마다 시나리오를 "하루 목표 ÷ 그 시간대 실행 횟수" 확률로 고른다. 밤(23~09시 KST)엔 아무것도 만들지 않는다.
-// - 실패해야 정상인 요청은 500이 아니라 정해진 오류 코드로 오는지 확인한다.
+//   장비 대여는 봇1이 만든 "[traffic-bot]" 장비만 쓴다. 동방 예약은 실제 동방 슬롯(12~21시)을 차지한다 — 스테이징 테스터와 공유.
+// - 실행마다 시나리오를 "하루 목표 ÷ 그 시간대 실행 횟수" 확률로 고른다. 밤(23~09시 KST)엔 읽기·거절 확인만 한다.
+// - 실패해야 정상인 요청은 500이 아니라 정해진 오류 코드로 오는지 확인하고, 팀장이 봇이면 지원 알림 row가 생기는지도 본다.
 import http from "k6/http";
 import { check, group, sleep } from "k6";
 
@@ -26,7 +27,7 @@ const PLAYGROUND_PERFORMANCE_ID =
 const TAG = "[traffic-bot]";
 const MEMBER_PREFIX = "traffic-member-";
 const MEMBER_DOMAIN = "amang.staging.json-server.win";
-const VOCAL = 1;
+const POOL_MIN = 6; // 풀이 이보다 작으면 매 실행 가입시켜 빨리 채운다 (팀 하나를 채우려면 서로 다른 멤버 3명쯤 필요)
 
 const SEASON_TEAM_CAP = 45;
 const SEASON_WEEKS = 4;
@@ -98,6 +99,7 @@ function login(email, password, { soft = false } = {}) {
   const params = {
     headers: { Origin: ORIGIN, "Content-Type": "application/json" },
     jar,
+    timeout: "15s", // 기본 60초 × 몇 번이면 activeDeadlineSeconds(300)를 넘긴다
   };
   const body = (b) => (b === undefined ? null : JSON.stringify(b));
   const bot = {
@@ -119,10 +121,12 @@ function login(email, password, { soft = false } = {}) {
 }
 
 const guest = {
-  get: (path) => http.get(API + path, { headers: { Origin: ORIGIN } }),
+  get: (path) =>
+    http.get(API + path, { headers: { Origin: ORIGIN }, timeout: "15s" }),
   post: (path, b) =>
     http.post(API + path, JSON.stringify(b), {
       headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+      timeout: "15s",
     }),
 };
 
@@ -175,11 +179,14 @@ function slotOf(team, userId) {
 
 // ───────────────────────── 부원 풀 (가입 봇) ─────────────────────────
 
-/** 승인된 가입 봇 중 몇 명을 골라 로그인한다. 봇2도 풀의 일원 */
-function loginPool(bot1, bot2, count) {
-  const members = (data(bot1.get("/users")) ?? []).filter((u) =>
+/** 승인된 가입 봇(GET /users는 승인 계정만 준다) */
+const approvedMembers = (bot1) =>
+  (data(bot1.get("/users")) ?? []).filter((u) =>
     u.nickname?.startsWith(MEMBER_PREFIX),
   );
+
+/** 승인된 가입 봇 중 몇 명을 골라 로그인한다. 봇2도 풀의 일원 */
+function loginPool(bot2, members, count) {
   const chosen = shuffle(members).slice(0, count);
   const pool = [bot2];
   for (const u of chosen) {
@@ -192,8 +199,8 @@ function loginPool(bot1, bot2, count) {
   return pool;
 }
 
-/** 가입 신청 → 운영진에게 USER_SIGNED_UP. 승인은 다음 실행들에서(approvePending) */
-function signup(bot1) {
+/** 가입 신청 → 운영진에게 USER_SIGNED_UP. 승인은 다음 실행들에서(approvePending). 닉네임에 가입 시각(base36)을 박는다 */
+function signup(bot1, sessionIds) {
   group("가입 신청", () => {
     const stamp = Date.now().toString(36);
     const generations = data(bot1.get("/generations")) ?? [];
@@ -201,7 +208,7 @@ function signup(bot1) {
       (a, b) => (a && a.id > b.id ? a : b),
       null,
     );
-    if (!generation) return;
+    if (!generation || !sessionIds.length) return;
     ok(
       guest.post("/auth/signup", {
         email: `${MEMBER_PREFIX}${stamp}@${MEMBER_DOMAIN}`,
@@ -209,20 +216,25 @@ function signup(bot1) {
         name: `점검 부원 ${stamp.slice(-3)}`,
         nickname: `${MEMBER_PREFIX}${stamp}`,
         generationId: generation.id,
-        sessions: [pick([1, 2, 3, 4, 5])],
+        sessions: [pick(sessionIds)],
       }),
       "POST /auth/signup",
     );
   });
 }
 
+/** 닉네임의 base36 스탬프 → 가입 시각. pending 응답(detailedUserSelector)엔 createdAt이 없어서 이걸 쓴다 */
+const signedUpAt = (user) =>
+  parseInt(String(user.nickname ?? "").slice(MEMBER_PREFIX.length), 36);
+
 /** 두 시간 넘게 기다린 가입 봇을 승인한다 → 그 계정에 USER_APPROVED */
 function approvePending(bot1) {
   if (!bot1.me.isAdmin) return;
   const pending = (data(bot1.get("/users/admin/pending")) ?? []).filter(
     (u) =>
-      u.email?.startsWith(MEMBER_PREFIX) &&
-      Date.now() - new Date(u.createdAt).getTime() > 2 * HOUR,
+      u.nickname?.startsWith(MEMBER_PREFIX) &&
+      Number.isFinite(signedUpAt(u)) &&
+      Date.now() - signedUpAt(u) > 2 * HOUR,
   );
   if (!pending.length) return;
   group("가입 승인", () => {
@@ -251,9 +263,9 @@ function latestPlayground(bot) {
  * 팀이 SEASON_TEAM_CAP개 찼거나 마감이 지났으면 새 공연을 연다(PERFORMANCE_CREATED → 승인 부원 전원).
  * 마감이 8주 넘게 남은 공연은 4주로 당긴다(1회, PERFORMANCE_UPDATED) — 시즌 말 D-1 알림이 실제로 오게.
  */
-function currentSeason(bot1, teams) {
+function currentSeason(bot1, teams, daytime) {
   const performance = latestPlayground(bot1);
-  if (!bot1.me.isAdmin) return performance;
+  if (!bot1.me.isAdmin || !daytime) return performance;
   const now = new Date();
   const teamCount = performance
     ? teams.filter((t) => t.performanceId === performance.id).length
@@ -264,6 +276,12 @@ function currentSeason(bot1, teams) {
   if (closed || teamCount >= SEASON_TEAM_CAP) {
     let created;
     group("새 시즌 공연", () => {
+      // 수동 Job이 정기 실행과 겹쳐도 시즌이 두 번 열리지 않게, 만들기 직전에 다시 본다
+      const fresh = latestPlayground(bot1);
+      if (fresh && fresh.id !== (performance && performance.id)) {
+        created = fresh;
+        return;
+      }
       const n =
         (data(bot1.get("/performances")) ?? []).filter((p) =>
           p.name.startsWith(TAG),
@@ -321,7 +339,8 @@ const SONGS = [
 ];
 
 /** 풀 멤버(또는 TARGET)가 팀장인 팀을 만든다. TARGET은 30% 팀원, 15% 팀장 */
-function createTeam(bot1, pool, performance) {
+function createTeam(bot1, pool, performance, allSessionIds) {
+  if (allSessionIds.length < 2) return;
   group("팀 생성", () => {
     const [songName, songArtist] = pick(SONGS);
     const creator = pick(pool);
@@ -332,7 +351,7 @@ function createTeam(bot1, pool, performance) {
         : chance(0.35)
           ? "member"
           : "none";
-    const sessionIds = shuffle([1, 2, 3, 4, 5, 6, 7]).slice(
+    const sessionIds = shuffle(allSessionIds).slice(
       0,
       2 + Math.floor(Math.random() * 3),
     );
@@ -380,21 +399,56 @@ function applyToTeam(bot1, pool, teams, performance) {
     const slots = freeSlots(team);
     if (!applicants.length || !slots.length) continue;
     const applicant = pick(applicants);
+    const slot = [pick(slots)];
+    // 팀장이 이번 실행에 로그인한 봇이면 알림 row가 실제로 생기는지까지 본다 (리스너가 죽어도 HTTP는 2xx라서)
+    const leader =
+      pool.find((b) => b.me.id === leaderOf(team)) ??
+      (leaderOf(team) === bot1.me.id ? bot1 : null);
+    const recent = () =>
+      leader ? (data(leader.get("/notifications?limit=10"))?.items ?? []) : [];
+    const lastIdBefore = recent()[0]?.id ?? 0;
     group("팀 지원", () => {
-      okOr(
-        applicant.patch(`/teams/${team.id}/apply`, [pick(slots)]),
-        `지원 ${team.name}`,
-        [409],
+      if (
+        !okOr(
+          applicant.patch(`/teams/${team.id}/apply`, slot),
+          `지원 ${team.name}`,
+          [409],
+        )
+      )
+        return;
+      rejects(
+        applicant.patch(`/teams/${team.id}/apply`, slot),
+        "같은 세션 중복 지원",
+        409,
       );
+      if (!leader) return;
+      const isThisApply = (n) =>
+        n.id > lastIdBefore &&
+        n.type === "TEAM_MEMBER_CHANGE" &&
+        n.payload?.teamId === team.id &&
+        n.payload?.changeType === "ADDED";
+      let arrived;
+      for (let i = 0; i < 5 && !arrived; i++) {
+        sleep(1);
+        arrived = recent().find(isThisApply);
+      }
+      check(arrived, { "팀장에게 지원 알림 도착": (n) => !!n });
     });
     return;
   }
 }
 
-/** 풀 멤버가 팀에서 나간다 → 팀원·팀장에게 TEAM_MEMBER_CHANGE, 별표한 비멤버에게 BOOKMARKED_TEAM_SPOT_OPENED */
+/**
+ * 풀 멤버가 팀에서 나간다 → 팀원·팀장에게 TEAM_MEMBER_CHANGE, 별표한 비멤버에게 BOOKMARKED_TEAM_SPOT_OPENED.
+ * TARGET이 안 들어 있는 팀을 먼저 — TARGET이 그런 팀을 별표해 두면 빈자리 알림이 닿는다
+ */
 function leaveTeam(bot1, pool, teams, performance) {
   const candidates = shuffle(
     teams.filter((t) => t.performanceId === performance.id && isBotTeam(t)),
+  ).sort(
+    (a, b) =>
+      Number(participantIds(a).includes(TARGET_USER_ID)) -
+      Number(participantIds(b).includes(TARGET_USER_ID)),
   );
   for (const summary of candidates) {
     const team = teamDetail(bot1, summary.id);
@@ -427,18 +481,18 @@ function editTeam(bot1, pool, teams, performance) {
       (bot1.me.isAdmin ? bot1 : null);
     if (!editor) continue;
     group("팀 정보 수정", () => {
+      // 같은 설명이면 변경 없음으로 처리돼 알림이 안 간다 — 지금 것은 빼고 고른다
+      const description = pick(
+        [
+          "연습 요일 바꿨어요",
+          "곡 키 반음 내림",
+          "합주 시간 조정",
+          "세션 모집 중",
+          "첫 합주 잡았어요",
+        ].filter((d) => d !== team.description),
+      );
       ok(
-        editor.put(
-          `/teams/${team.id}`,
-          teamUpdateBody(team, {
-            description: pick([
-              "연습 요일 바꿨어요",
-              "곡 키 반음 내림",
-              "합주 시간 조정",
-              "세션 모집 중",
-            ]),
-          }),
-        ),
+        editor.put(`/teams/${team.id}`, teamUpdateBody(team, { description })),
         `수정 ${team.name}`,
       );
     });
@@ -529,7 +583,7 @@ function reserveRoom(pool, room) {
       const { start, end } = roomSlot();
       const userIds = [creator.me.id];
       if (TARGET_USER_ID && chance(0.4)) userIds.push(TARGET_USER_ID);
-      const res = creator.post("/rentals", {
+      const body = {
         equipmentId: room.id,
         title: pick([
           `${TAG} 합주`,
@@ -540,10 +594,34 @@ function reserveRoom(pool, room) {
         startAt: start.toISOString(),
         endAt: end.toISOString(),
         userIds,
-      });
-      if (okOr(res, "POST /rentals (동방)", [409])) return;
+      };
+      if (!okOr(creator.post("/rentals", body), "POST /rentals (동방)", [409]))
+        continue;
+      const other = pool.find((b) => b !== creator);
+      if (other)
+        rejects(
+          other.post("/rentals", { ...body, userIds: [other.me.id] }),
+          "같은 시간 동방 예약",
+          409,
+        );
+      return;
     }
   });
+}
+
+/** 장비 대여용 봇 장비. 실제 장비(앰프 등)를 하루 종일 빌려 두지 않게 봇1이 하나 만들어 쓴다 (1회) */
+function ensureBotEquipment(bot1, equipments) {
+  const mine = equipments.find((e) => e.category !== "ROOM" && e.brand === TAG);
+  if (mine) return mine;
+  if (!bot1.me.isAdmin) return null;
+  const res = bot1.post("/equipments", {
+    brand: TAG,
+    model: "점검용 케이블",
+    category: "CABLE",
+    description: "스테이징 자동 점검용 장비입니다. 봇이 대여합니다.",
+    isAvailable: true,
+  });
+  return ok(res, "POST /equipments (봇 장비 첫 생성)") ? data(res) : null;
 }
 
 /** 장비 대여, TARGET 포함. 오늘 22시(이미 20시 넘었으면 내일) 반납 → EQUIPMENT_RETURN_DUE */
@@ -555,7 +633,7 @@ function rentItem(bot1, item) {
     okOr(
       bot1.post("/rentals", {
         equipmentId: item.id,
-        title: `${TAG} ${item.brand} ${item.model} 대여`,
+        title: `${TAG} ${item.model} 대여`,
         startAt: now.toISOString(),
         endAt: kstAt(now, dayOffset, 22).toISOString(),
         userIds: [bot1.me.id, TARGET_USER_ID],
@@ -621,12 +699,17 @@ function run() {
   const bot2 = login(__ENV.BOT2_EMAIL, __ENV.BOT2_PASSWORD);
   // 시즌 운영·승인·팀장 되찾기·삭제가 전부 운영진 권한에 기대므로, 빠지면 조용히 반쪽이 되지 않게 Job을 실패시킨다
   check(bot1.me, { "봇1은 운영진": (me) => me.isAdmin === true });
-  const pool = loginPool(bot1, bot2, 3);
-  const weekend = isWeekend(new Date());
+  const members = approvedMembers(bot1);
+  const pool = loginPool(bot2, members, 3);
+  const now = new Date();
+  const weekend = isWeekend(now);
+  const hour = SIMULATED_HOUR ?? kstHour(now);
+  const daytime = hour >= DAYTIME[0] && hour < DAYTIME[1];
+  const sessionIds = (data(bot1.get("/sessions")) ?? []).map((s) => s.id);
 
-  approvePending(bot1);
+  if (daytime) approvePending(bot1);
   let teams = data(bot1.get("/teams")) ?? [];
-  const performance = currentSeason(bot1, teams);
+  const performance = currentSeason(bot1, teams, daytime);
   const playground =
     performance &&
     (!performance.endAt || new Date(performance.endAt) > new Date());
@@ -634,14 +717,15 @@ function run() {
 
   const equipments = data(bot1.get("/equipments")) ?? [];
   const room = equipments.find((e) => e.category === "ROOM");
-  const item = equipments.find((e) => e.category !== "ROOM");
+  const item = daytime ? ensureBotEquipment(bot1, equipments) : null;
 
   browse(pick(pool));
 
   if (playground) {
-    if (roll(1.5, [10, 23])) createTeam(bot1, pool, performance);
+    if (roll(1.5, [10, 23])) createTeam(bot1, pool, performance, sessionIds);
+    // 두 번 굴리므로 반씩 — 기대값은 하루 8건, 한 실행에 최대 2건
     for (let i = 0; i < 2; i++)
-      if (roll(8, DAYTIME)) applyToTeam(bot1, pool, teams, performance);
+      if (roll(4, DAYTIME)) applyToTeam(bot1, pool, teams, performance);
     if (roll(1, DAYTIME)) leaveTeam(bot1, pool, teams, performance);
     if (roll(1, [10, 23])) editTeam(bot1, pool, teams, performance);
     if (roll(1 / 7, [10, 23]))
@@ -665,7 +749,9 @@ function run() {
   }
   if (room && roll(weekend ? 1 : 3, [9, 23])) reserveRoom(pool, room);
   if (item && roll(1 / 7, [10, 20])) rentItem(bot1, item);
-  if (roll(2 / 7, [10, 23])) signup(bot1);
+  // 풀이 작을 땐 매 실행 가입시켜 빨리 채우고(2시간 뒤 승인), 찬 뒤엔 프로덕션 빈도(주 2건)
+  if (members.length < POOL_MIN ? daytime : roll(2 / 7, [10, 23]))
+    signup(bot1, sessionIds);
 
   expectedRejections(bot1);
 
