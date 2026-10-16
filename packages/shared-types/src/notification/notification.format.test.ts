@@ -251,4 +251,41 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       tag: "team-7"
     })
   })
+
+  it("동방 예약 1시간 전: 한국 시각으로, 동방 예약 화면으로", () => {
+    expect(
+      formatNotification({
+        type: "ROOM_RESERVATION_SOON",
+        payload: {
+          rentalId: 5,
+          title: "합주",
+          startAt: new Date("2026-10-17T06:00:00Z") // 15:00 KST
+        }
+      })
+    ).toEqual({
+      title: "동방 예약 1시간 전",
+      body: "15:00 동방 예약 — 합주",
+      href: "/reservations/clubroom",
+      tag: "rental-5"
+    })
+  })
+
+  it("장비 반납: 문자열 날짜(JSON 경유)도 한국 날짜·시각으로, 장비 상세로", () => {
+    expect(
+      formatNotification({
+        type: "EQUIPMENT_RETURN_DUE",
+        payload: {
+          rentalId: 6,
+          equipmentId: 2,
+          equipmentName: "Yamaha P-125",
+          endAt: "2026-10-17T09:30:00.000Z" as unknown as Date // 18:30 KST
+        }
+      })
+    ).toEqual({
+      title: "장비 반납",
+      body: "10/17 18:30까지 Yamaha P-125 반납",
+      href: "/reservations/equipment/2",
+      tag: "rental-6"
+    })
+  })
 })

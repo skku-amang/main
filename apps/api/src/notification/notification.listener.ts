@@ -23,7 +23,9 @@ import {
   UserSignedUpEvent
 } from "../users/users.events"
 import {
+  EquipmentReturnDueEvent,
   REMINDER_EVENTS,
+  RoomReservationSoonEvent,
   TeamRecruitmentDeadlineEvent
 } from "../reminder/reminder.events"
 import {
@@ -46,6 +48,17 @@ const teamSnapshotSelect = {
 } satisfies Prisma.TeamSelect
 
 type TeamSnapshot = Prisma.TeamGetPayload<{ select: typeof teamSnapshotSelect }>
+
+const rentalSnapshotSelect = {
+  id: true,
+  title: true,
+  startAt: true,
+  endAt: true,
+  equipmentId: true,
+  renterId: true,
+  users: { select: { id: true } },
+  equipment: { select: { brand: true, model: true } }
+} satisfies Prisma.EquipmentRentalSelect
 
 /** 공연 소속 전원(모든 팀의 멤버·팀장)을 뽑기 위한 select */
 const performanceMembersSelect = {
@@ -316,6 +329,41 @@ export class NotificationListener {
     })
   }
 
+  @OnEvent(REMINDER_EVENTS.ROOM_RESERVATION_SOON)
+  onRoomReservationSoon(event: RoomReservationSoonEvent) {
+    return this.safely(async () => {
+      const rental = await this.findRental(event.rentalId)
+      if (!rental) return
+
+      await this.create(rentalMemberIds(rental), {
+        type: NotificationType.ROOM_RESERVATION_SOON,
+        payload: {
+          rentalId: rental.id,
+          title: rental.title,
+          startAt: rental.startAt
+        }
+      })
+    })
+  }
+
+  @OnEvent(REMINDER_EVENTS.EQUIPMENT_RETURN_DUE)
+  onEquipmentReturnDue(event: EquipmentReturnDueEvent) {
+    return this.safely(async () => {
+      const rental = await this.findRental(event.rentalId)
+      if (!rental) return
+
+      await this.create(rentalMemberIds(rental), {
+        type: NotificationType.EQUIPMENT_RETURN_DUE,
+        payload: {
+          rentalId: rental.id,
+          equipmentId: rental.equipmentId,
+          equipmentName: `${rental.equipment.brand} ${rental.equipment.model}`,
+          endAt: rental.endAt
+        }
+      })
+    })
+  }
+
   private async notifyMemberChange(
     event: TeamMemberAddedEvent | TeamMemberRemovedEvent,
     changeType: "ADDED" | "REMOVED"
@@ -425,6 +473,13 @@ export class NotificationListener {
     })
   }
 
+  private findRental(id: number) {
+    return this.prisma.equipmentRental.findUnique({
+      where: { id },
+      select: rentalSnapshotSelect
+    })
+  }
+
   private async create(recipientIds: number[], content: NotificationContent) {
     if (recipientIds.length === 0) return
 
@@ -462,6 +517,17 @@ function teamMemberIds(team: {
   return distinct([
     team.leaderId,
     ...team.teamSessions.flatMap((s) => s.members.map((m) => m.userId))
+  ])
+}
+
+/** 예약자(탈퇴로 null일 수 있음) ∪ 함께 쓰는 멤버 */
+function rentalMemberIds(rental: {
+  renterId: number | null
+  users: { id: number }[]
+}) {
+  return distinct([
+    ...(rental.renterId === null ? [] : [rental.renterId]),
+    ...rental.users.map((u) => u.id)
   ])
 }
 

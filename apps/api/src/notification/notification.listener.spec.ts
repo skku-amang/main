@@ -19,7 +19,22 @@ import {
   PerformanceUpdatedEvent
 } from "../performance/performance.events"
 import { UserApprovedEvent, UserSignedUpEvent } from "../users/users.events"
-import { TeamRecruitmentDeadlineEvent } from "../reminder/reminder.events"
+import {
+  EquipmentReturnDueEvent,
+  RoomReservationSoonEvent,
+  TeamRecruitmentDeadlineEvent
+} from "../reminder/reminder.events"
+
+const rental = {
+  id: 5,
+  title: "합주",
+  startAt: new Date("2026-10-17T06:00:00Z"),
+  endAt: new Date("2026-10-17T09:30:00Z"),
+  equipmentId: 2,
+  renterId: 9,
+  users: [{ id: 1 }, { id: 4 }],
+  equipment: { brand: "Yamaha", model: "P-125" }
+}
 
 const team = {
   id: 7,
@@ -40,6 +55,7 @@ describe("NotificationListener", () => {
     session: { findMany: jest.Mock }
     performance: { findUnique: jest.Mock }
     teamBookmark: { findMany: jest.Mock }
+    equipmentRental: { findUnique: jest.Mock }
     notification: { createManyAndReturn: jest.Mock }
   }
   let emit: jest.Mock
@@ -70,6 +86,7 @@ describe("NotificationListener", () => {
       },
       performance: { findUnique: jest.fn(async () => null) },
       teamBookmark: { findMany: jest.fn(async () => []) },
+      equipmentRental: { findUnique: jest.fn(async () => rental) },
       notification: {
         createManyAndReturn: jest.fn(async ({ data }: { data: unknown[] }) =>
           data.map((_, i) => ({ id: i + 1 }))
@@ -196,6 +213,44 @@ describe("NotificationListener", () => {
     )
 
     expect(prisma.notification.createManyAndReturn).not.toHaveBeenCalled()
+  })
+
+  describe("동방 예약·장비 반납 리마인더 (#797 #798)", () => {
+    it("동방 예약 1시간 전은 예약자와 멤버에게 중복 없이", async () => {
+      await listener.onRoomReservationSoon(new RoomReservationSoonEvent(5))
+
+      expect(recipients()).toEqual([1, 4, 9])
+      expect(createdRows()[0]).toMatchObject({
+        type: "ROOM_RESERVATION_SOON",
+        payload: { rentalId: 5, title: "합주", startAt: rental.startAt }
+      })
+    })
+
+    it("장비 반납은 장비 이름(브랜드 모델)과 기한을 담아", async () => {
+      await listener.onEquipmentReturnDue(new EquipmentReturnDueEvent(5))
+
+      expect(recipients()).toEqual([1, 4, 9])
+      expect(createdRows()[0]).toMatchObject({
+        type: "EQUIPMENT_RETURN_DUE",
+        payload: {
+          rentalId: 5,
+          equipmentId: 2,
+          equipmentName: "Yamaha P-125",
+          endAt: rental.endAt
+        }
+      })
+    })
+
+    it("예약자가 탈퇴해 비어 있으면 멤버에게만", async () => {
+      prisma.equipmentRental.findUnique.mockResolvedValue({
+        ...rental,
+        renterId: null
+      })
+
+      await listener.onRoomReservationSoon(new RoomReservationSoonEvent(5))
+
+      expect(recipients()).toEqual([1, 4])
+    })
   })
 
   describe("별표한 팀에 자리가 나면 (#794)", () => {

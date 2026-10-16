@@ -80,6 +80,27 @@ describe("PushListener", () => {
     expect(updateMany).not.toHaveBeenCalled()
   })
 
+  it("동방 예약 1시간 전은 방해금지 중에도 바로 보낸다", async () => {
+    jest.setSystemTime(HALF_PAST_MIDNIGHT_KST)
+
+    await listener.onNotificationCreated(
+      new NotificationCreatedEvent(
+        [3],
+        {
+          type: "ROOM_RESERVATION_SOON",
+          payload: {
+            rentalId: 5,
+            title: "합주",
+            startAt: new Date("2026-10-16T16:30:00Z")
+          }
+        },
+        [11]
+      )
+    )
+
+    expect(sendToUsers).toHaveBeenCalledTimes(1)
+  })
+
   it("발송이 실패해도 예외를 밖으로 던지지 않고 재시도하지 않는다 (처리됨 유지)", async () => {
     sendToUsers.mockRejectedValue(new Error("boom"))
 

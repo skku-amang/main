@@ -31,6 +31,14 @@ export class ReminderScheduler {
       {
         name: "team_recruitment_deadline",
         run: (now) => reminderService.remindRecruitmentDeadline(now)
+      },
+      {
+        name: "room_reservation_soon",
+        run: (now) => reminderService.remindRoomReservations(now)
+      },
+      {
+        name: "equipment_return_due",
+        run: (now) => reminderService.remindEquipmentReturns(now)
       }
     ]
   }
