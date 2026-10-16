@@ -66,6 +66,6 @@ const nextConfig = {
 export default withSentryConfig(nextConfig, {
   org: "amang-23",
   project: "web",
-  tunnelRoute: "/monitoring",
+  tunnelRoute: true,
   silent: !process.env.CI
 })
