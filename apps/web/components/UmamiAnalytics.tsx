@@ -39,11 +39,16 @@ export default function UmamiAnalytics() {
   const email = user?.email
 
   useEffect(() => {
-    window.umamiBeforeSend = async (_type, payload) =>
-      email &&
-      developerEmailHashes.has(await sha256(email.trim().toLowerCase()))
-        ? null
-        : payload
+    window.umamiBeforeSend = async (_type, payload) => {
+      // AI·테스트 도구가 조종하는 브라우저(Chrome DevTools MCP, Playwright 등)는 이 값이 true
+      if (navigator.webdriver) return null
+      if (
+        email &&
+        developerEmailHashes.has(await sha256(email.trim().toLowerCase()))
+      )
+        return null
+      return payload
+    }
   }, [email])
 
   // 로그인 확인 전에 첫 페이지뷰가 나가면 개발자 방문이 섞인다
