@@ -6,7 +6,6 @@
 ^https://([a-z0-9-]+\.)?notion\.so
 ^https://app\.slack\.com/client
 ^https://www\.figma\.com/(design|board|file)
-^https://vercel\.com/amang-homepage
 
 # 로컬 개발 URL — CI 환경에서 검증 의미 없음
 ^https?://localhost

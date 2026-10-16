@@ -58,7 +58,7 @@ export default function UmamiAnalytics() {
     <Script
       src="https://analytics.amang.json-server.win/script.js"
       data-website-id={websiteId}
-      // 로컬·Vercel 미리보기 주소에서는 기록하지 않는다
+      // 로컬 등 다른 주소에서는 기록하지 않는다
       data-domains={new URL(siteUrl).hostname}
       data-before-send="umamiBeforeSend"
       strategy="afterInteractive"
