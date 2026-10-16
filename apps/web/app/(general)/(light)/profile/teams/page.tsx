@@ -15,6 +15,7 @@ import { getSessionDisplayName } from "@/constants/session"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { getMyTeams } from "@/lib/team/myTeams"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 
 const TeamsSkeleton = () => (
@@ -49,14 +50,7 @@ const ProfileTeamsPage = () => {
     )
   }
 
-  // 내가 참여 중인 팀 필터링 (팀장이거나 멤버인 팀)
-  const myTeams =
-    allTeams?.filter((team) => {
-      if (team.leader.id === userId) return true
-      return team.teamSessions.some((ts) =>
-        ts.members.some((m) => m.user.id === userId)
-      )
-    }) ?? []
+  const myTeams = getMyTeams(allTeams, user.id)
 
   // 공연 ID → 이름 매핑
   const performanceMap = new Map(performances?.map((p) => [p.id, p.name]) ?? [])

@@ -30,6 +30,7 @@ import { useRentals } from "@/hooks/api/useRental"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { getMyTeams } from "@/lib/team/myTeams"
 import { getSessionsWithMissingMembers } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
 import { isPerformanceRecruiting } from "@repo/shared-types"
@@ -138,14 +139,7 @@ const RecruitingPerformance = () => {
 const MyTeams = ({ userId }: { userId: number }) => {
   const { data: teams, status } = useAllTeams()
 
-  const myTeams =
-    teams?.filter(
-      (team) =>
-        team.leader.id === userId ||
-        team.teamSessions.some((ts) =>
-          ts.members.some((m) => m.user.id === userId)
-        )
-    ) ?? []
+  const myTeams = getMyTeams(teams, userId)
 
   return (
     <Section title="내 팀" moreHref={ROUTES.PROFILE.TEAMS}>
