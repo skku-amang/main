@@ -24,6 +24,7 @@ import {
   useNotificationPreferences,
   useUpdateNotificationPreferences
 } from "@/hooks/api/useNotification"
+import { useCurrentUser } from "@/hooks/useCurrentUser"
 import {
   NOTIFICATION_TYPE_LABEL,
   NotificationPreferences,
@@ -40,10 +41,12 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour)
 const hourLabel = (hour: number) => `${String(hour).padStart(2, "0")}:00`
 
 const HourSelect = ({
+  label,
   value,
   onChange,
   disabled
 }: {
+  label: string
   value: number
   onChange: (hour: number) => void
   disabled: boolean
@@ -53,7 +56,7 @@ const HourSelect = ({
     onValueChange={(v) => onChange(Number(v))}
     disabled={disabled}
   >
-    <SelectTrigger className="w-24">
+    <SelectTrigger className="w-24" aria-label={label}>
       <SelectValue />
     </SelectTrigger>
     <SelectContent>
@@ -68,14 +71,20 @@ const HourSelect = ({
 
 const PreferencesForm = ({
   preferences,
+  isAdmin,
   onChange,
   saving
 }: {
   preferences: NotificationPreferences
+  isAdmin: boolean
   onChange: (patch: UpdateNotificationPreferences) => void
   saving: boolean
 }) => {
   const { mutedTypes, quietHours } = preferences
+  // 가입 신청은 운영진에게만 가는 알림 — 운영진이 아니면 행 자체를 숨긴다
+  const types = NOTIFICATION_TYPES.filter(
+    (type) => isAdmin || type !== "USER_SIGNED_UP"
+  )
 
   const setQuietHours = (patch: Partial<QuietHours>) =>
     onChange({ quietHours: { ...quietHours, ...patch } })
@@ -108,15 +117,15 @@ const PreferencesForm = ({
           />
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
-          <Label className="sr-only">시작</Label>
           <HourSelect
+            label="방해금지 시작 시각"
             value={quietHours.start}
             onChange={(start) => setQuietHours({ start })}
             disabled={saving || !quietHours.enabled}
           />
           <span className="text-slate-500">부터</span>
-          <Label className="sr-only">끝</Label>
           <HourSelect
+            label="방해금지 끝 시각"
             value={quietHours.end}
             onChange={(end) => setQuietHours({ end })}
             disabled={saving || !quietHours.enabled}
@@ -124,8 +133,9 @@ const PreferencesForm = ({
           <span className="text-slate-500">까지</span>
         </div>
         <p className="mt-3 text-xs text-slate-400">
-          자정을 넘는 구간도 돼요. 동방 예약 1시간 전 알림은 방해금지 중에도
-          바로 와요.
+          {quietHours.enabled && quietHours.start === quietHours.end
+            ? "시작과 끝이 같으면 꺼진 것과 같아요."
+            : "자정을 넘는 구간도 돼요. 동방 예약 1시간 전 알림은 방해금지 중에도 바로 와요."}
         </p>
       </section>
 
@@ -135,7 +145,7 @@ const PreferencesForm = ({
           꺼도 알림함에는 그대로 쌓여요. 폰으로 오는 푸시만 멈춰요.
         </p>
         <ul className="mt-3 divide-y divide-slate-100">
-          {NOTIFICATION_TYPES.map((type) => {
+          {types.map((type) => {
             const id = `notification-type-${type}`
             return (
               <li
@@ -169,6 +179,7 @@ const PreferencesSkeleton = () => (
 
 const ProfileNotificationsPage = () => {
   const { toast } = useToast()
+  const { user } = useCurrentUser()
   const { data: preferences, status, refetch } = useNotificationPreferences()
   const update = useUpdateNotificationPreferences()
 
@@ -220,6 +231,7 @@ const ProfileNotificationsPage = () => {
         {status === "success" && (
           <PreferencesForm
             preferences={preferences}
+            isAdmin={user?.isAdmin ?? false}
             onChange={onChange}
             saving={update.isPending}
           />

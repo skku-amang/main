@@ -143,7 +143,7 @@ PushListener (#546 후반)
 
 - **판정**: `isQuietHours(now, 사용자 설정)`([quiet-hours.ts](../../../apps/api/src/push/quiet-hours.ts)) — **수신자마다** `User.quietHours{Enabled,Start,End}`로 판정(KST 시, 기본 켜짐 23–08, start > end면 자정을 넘는 구간, 같으면 꺼진 것과 같음). 설정은 `GET/PATCH /notifications/preferences`(§4, #708).
 - **유형별 끄기(#708)**: `User.mutedNotificationTypes`에 든 유형은 푸시를 보내지 않고 바로 처리됨(`pushedAt`)으로 닫는다. 알림함에는 그대로 쌓인다 — 푸시만 끄는 기능.
-- **설정 화면**: 프로필 > 알림 설정(`/profile/notifications`) — 이 기기 푸시 켜기/끄기, 방해금지(켜기·시작·끝), 유형별 스위치. 유형 표시명은 `NOTIFICATION_TYPE_LABEL`(shared-types, 유형 추가 시 테스트가 누락을 잡음).
+- **설정 화면**: 프로필 > 알림 설정(`/profile/notifications`) — 이 기기 푸시 켜기/끄기, 방해금지(켜기·시작·끝), 유형별 스위치. 유형 표시명은 `NOTIFICATION_TYPE_LABEL`(shared-types, `Record<NotificationType, string>`이라 유형 추가 시 타입 검사가 누락을 잡음). 가입 신청은 운영진에게만 가므로 운영진에게만 행을 보인다.
 - **미루기**: 방해금지면 `PushListener`가 발송을 건너뛰고 `Notification.pushedAt`을 null로 둔다. 평소엔 **보내기 전에** `pushedAt`을 찍고(claim, `where pushedAt: null`) 보낸다 — flush와 겹쳐도 같은 row가 두 번 나가지 않고, 발송 실패는 재시도하지 않는다(best-effort, ADR-0003).
 - **flush**: 크론 틀(§3.1)의 `deferred_push` 잡([push-deferred.service.ts](../../../apps/api/src/push/push-deferred.service.ts))이 10분마다 돌며, `pushedAt null`인 알림 중 **수신자의 방해금지가 끝난 것**을 `updateManyAndReturn`으로 claim한 뒤 수신자마다 보낸다. **그새 인앱에서 읽었거나 하루 지났거나 그 사이 유형을 끈 알림은 보내지 않고 처리됨으로 닫는다** — 고정 발송 창으론 못 하는 UX.
 - **긴급 유형 bypass**: 지금 봐야 의미 있는 알림은 방해금지를 무시한다(08:00 예약의 07:00 알림이 08:00에 오면 무용). 목록은 `QUIET_HOURS_BYPASS`([quiet-hours.ts](../../../apps/api/src/push/quiet-hours.ts)) — 현재 `ROOM_RESERVATION_SOON`(#797)뿐. 반납 당일(#798)은 자정 tick에 만들어져 08:00에 푸시되는 게 오히려 적절해 bypass하지 않는다.

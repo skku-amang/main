@@ -79,10 +79,17 @@ const useUpdateNotificationPreferencesMutation = createMutationHook(
   ApiClient.prototype.updateNotificationPreferences
 )
 
-/** 설정 변경. 응답이 전체 설정이라 캐시를 그걸로 바로 바꾼다 */
+/**
+ * 설정 변경. 응답이 전체 설정이라 캐시를 그걸로 바로 바꾼다.
+ * 날아가던 refetch(포커스 복귀 등)가 늦게 도착해 바꾼 값을 덮지 않도록 먼저 취소한다
+ */
 export const useUpdateNotificationPreferences = () => {
   const queryClient = useQueryClient()
   return useUpdateNotificationPreferencesMutation({
+    onMutate: () =>
+      queryClient.cancelQueries({
+        queryKey: NOTIFICATION_PREFERENCES_QUERY_KEY
+      }),
     onSuccess: (data) =>
       queryClient.setQueryData(NOTIFICATION_PREFERENCES_QUERY_KEY, data)
   })

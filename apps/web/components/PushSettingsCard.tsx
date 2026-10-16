@@ -15,7 +15,7 @@ const LABEL: Record<string, string> = {
     "브라우저에서 알림이 차단됐어요. 브라우저 설정에서 허용한 뒤 다시 켜주세요"
 }
 
-/** 프로필 > 기기: 이 기기의 푸시 알림 켜기/끄기 */
+/** 프로필 > 로그인 기기·알림 설정: 이 기기의 푸시 알림 켜기/끄기 */
 const PushSettingsCard = () => {
   const { support, subscribed, enable, disable, isPending } =
     usePushSubscription()
