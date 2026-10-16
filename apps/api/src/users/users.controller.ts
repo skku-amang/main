@@ -42,6 +42,12 @@ export class UsersController {
     return this.userService.findPendingUsers()
   }
 
+  @Get(":id/profile")
+  getProfile(@Req() req: Request, @Param("id", ParseIntPipe) id: number) {
+    const user = req.user as JwtPayload
+    return this.userService.getProfile(id, user.sub)
+  }
+
   @Get(":id")
   async findOne(@Param("id", ParseIntPipe) id: number) {
     return this.userService.findOne(id)

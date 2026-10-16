@@ -38,6 +38,7 @@ import {
   RentalList,
   UpdateSession,
   UpdateTeam,
+  MemberProfile,
   publicUser,
   publicUserList,
   PresignedUrlRequest,
@@ -883,6 +884,19 @@ export default class ApiClient {
       `/users/${id}`,
       "GET"
     )
+  }
+
+  /**
+   * 다른 부원 프로필. 비공개면 이름·사진만 (본인은 항상 전체)
+   * @throws {NotFoundError} 사용자가 없거나 승인 전인 경우
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getMemberProfile(id: number) {
+    return this._request<
+      MemberProfile,
+      NotFoundError | AuthError | InternalServerError
+    >(`/users/${id}/profile`, "GET")
   }
 
   /**

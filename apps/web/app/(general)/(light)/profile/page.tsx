@@ -114,9 +114,21 @@ const ProfilePage = () => {
         ]}
       />
 
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="mx-auto max-w-2xl space-y-4">
         {/* 프로필 카드 */}
-        <div className="rounded-xl bg-white p-6 shadow-sm md:p-8">
+        <div className="relative rounded-xl bg-white p-6 shadow-sm md:p-8">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="absolute right-4 top-4 rounded-full"
+          >
+            <Link href={ROUTES.PROFILE.EDIT}>
+              <Pencil className="mr-1.5 size-3.5" />
+              편집
+            </Link>
+          </Button>
+
           {/* 상단: 아바타 + 기본 정보 */}
           <div className="flex flex-col items-center gap-5 md:flex-row md:items-start">
             <Avatar className="size-24 border-2 border-slate-100">
@@ -136,21 +148,9 @@ const ProfilePage = () => {
                 </p>
               )}
             </div>
-
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="shrink-0 rounded-full"
-            >
-              <Link href={ROUTES.PROFILE.EDIT}>
-                <Pencil className="mr-1.5 size-3.5" />
-                편집
-              </Link>
-            </Button>
           </div>
 
-          <hr className="my-6 border-slate-100" />
+          <hr className="my-4 border-slate-100" />
 
           {/* 상세 정보 */}
           <div className="space-y-4">

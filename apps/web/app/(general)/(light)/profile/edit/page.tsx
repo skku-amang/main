@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import ROUTES from "@/constants/routes"
 
@@ -44,7 +45,8 @@ const ProfileFormSchema = UpdateProfileSchema.pick({
   nickname: true,
   bio: true,
   sessions: true,
-  image: true
+  image: true,
+  isProfilePublic: true
 })
 
 const PasswordFormSchema = UpdatePasswordSchema.extend({
@@ -77,7 +79,7 @@ const ProfileEditPage = () => {
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const imageUpload = useImageUpload({
     onSuccess: (publicUrl) => {
-      profileForm.setValue("image", publicUrl)
+      profileForm.setValue("image", publicUrl, { shouldDirty: true })
     }
   })
 
@@ -87,8 +89,10 @@ const ProfileEditPage = () => {
       name: user?.name ?? "",
       nickname: user?.nickname ?? "",
       bio: user?.bio ?? "",
-      sessions: user?.sessions.map((s) => s.id) ?? [],
-      image: user?.image ?? undefined
+      // 체크 순서와 무관하게 비교되도록 id 오름차순 (isDirty는 배열 순서까지 비교)
+      sessions: user?.sessions.map((s) => s.id).sort((a, b) => a - b) ?? [],
+      image: user?.image ?? undefined,
+      isProfilePublic: user?.isProfilePublic ?? false
     }
   })
 
@@ -107,6 +111,7 @@ const ProfileEditPage = () => {
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: ["users"] })
+        queryClient.invalidateQueries({ queryKey: ["memberProfile"] })
         toast({ title: "프로필이 수정되었습니다." })
       })
       .catch((error) => {
@@ -321,7 +326,9 @@ const ProfileEditPage = () => {
                             onCheckedChange={(checked) =>
                               field.onChange(
                                 checked
-                                  ? [...(field.value ?? []), session.id]
+                                  ? [...(field.value ?? []), session.id].sort(
+                                      (a, b) => a - b
+                                    )
                                   : field.value?.filter(
                                       (id) => id !== session.id
                                     )
@@ -337,10 +344,35 @@ const ProfileEditPage = () => {
                 )}
               />
 
+              <FormField
+                control={profileForm.control}
+                name="isProfilePublic"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
+                    <div className="space-y-1">
+                      <FormLabel>다른 부원에게 프로필 공개</FormLabel>
+                      <FormDescription>
+                        켜면 로그인한 부원이 내 소개와 참여한 팀·공연을 볼 수
+                        있어요.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value ?? false}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={updateProfileMutation.isPending}
+                  disabled={
+                    !profileForm.formState.isDirty ||
+                    updateProfileMutation.isPending
+                  }
                   className="rounded-full"
                 >
                   <Save className="mr-1.5 size-4" />

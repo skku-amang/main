@@ -1,10 +1,12 @@
 import dayjs from "dayjs"
 import { Minus } from "lucide-react"
+import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { formatGenerationOrder } from "@/lib/utils"
@@ -82,11 +84,14 @@ const MemberSessionCard = ({
             {getSessionDisplayName(sessionName)}
             {sessionIndex}
           </div>
-          <div className="text-sm font-normal leading-3 text-slate-700 md:text-xl md:font-medium md:leading-relaxed">
+          <Link
+            href={ROUTES.MEMBER_PROFILE(user.id)}
+            className="block text-sm font-normal leading-3 text-slate-700 hover:underline md:text-xl md:font-medium md:leading-relaxed"
+          >
             {user.generation &&
               `${formatGenerationOrder(user.generation.order)}기 `}
             {user.name}
-          </div>
+          </Link>
           <div className="hidden text-sm text-gray-400 md:block">
             #{user.nickname}
           </div>

@@ -143,7 +143,12 @@ export const columns: ColumnDef<TeamColumn>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.original.leader.name}
+        <Link
+          href={ROUTES.MEMBER_PROFILE(row.original.leader.id)}
+          className="hover:underline"
+        >
+          {row.original.leader.name}
+        </Link>
         <br />
         {row.original.isFreshmenFixed && <FreshmenFixedBadge size="small" />}
       </div>
