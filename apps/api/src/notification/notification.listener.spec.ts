@@ -178,6 +178,21 @@ describe("NotificationListener", () => {
     })
   })
 
+  it("모집 마감 D-1: 그 사이 팀이 꽉 찼으면 보내지 않는다", async () => {
+    prisma.team.findUnique.mockResolvedValue({
+      ...team,
+      teamSessions: [
+        { sessionId: 1, capacity: 2, members: [{ userId: 1 }, { userId: 2 }] }
+      ]
+    })
+
+    await listener.onTeamRecruitmentDeadline(
+      new TeamRecruitmentDeadlineEvent(7)
+    )
+
+    expect(prisma.notification.createMany).not.toHaveBeenCalled()
+  })
+
   describe("별표한 팀에 자리가 나면 (#794)", () => {
     const rowsOf = (type: string) =>
       prisma.notification.createMany.mock.calls

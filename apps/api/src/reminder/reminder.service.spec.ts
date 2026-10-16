@@ -48,12 +48,12 @@ describe("ReminderService.remindRecruitmentDeadline", () => {
           async ({
             where
           }: {
-            where: { Performance: { endAt: { gte: Date; lt: Date } } }
+            where: { Performance: { endAt: { gt: Date; lte: Date } } }
           }) =>
             teams.filter((t) => {
               const endAt = t.performance.endAt
-              const { gte, lt } = where.Performance.endAt
-              return endAt !== null && endAt >= gte && endAt < lt
+              const { gt, lte } = where.Performance.endAt
+              return endAt !== null && endAt > gt && endAt <= lte
             })
         )
       },
@@ -117,12 +117,24 @@ describe("ReminderService.remindRecruitmentDeadline", () => {
         teamSessions: incomplete
       },
       // 마감 없음
-      { id: 4, performance: { endAt: null }, teamSessions: incomplete }
+      { id: 4, performance: { endAt: null }, teamSessions: incomplete },
+      // 10-18 00:00 KST 정각 — 마지막 지원 가능 순간이 10-17이라 "내일 마감"
+      {
+        id: 5,
+        performance: { endAt: new Date("2026-10-17T15:00:00Z") },
+        teamSessions: incomplete
+      },
+      // 10-17 00:00 KST 정각 — 오늘 안에 닫힘
+      {
+        id: 6,
+        performance: { endAt: new Date("2026-10-16T15:00:00Z") },
+        teamSessions: incomplete
+      }
     ]
 
     await service.remindRecruitmentDeadline(NOW)
 
-    expect(emittedTeamIds()).toEqual([1])
+    expect(emittedTeamIds()).toEqual([1, 5])
   })
 
   it("오늘 이미 보낸 팀은 건너뛰고, 어제 보낸 팀은 다시 보낸다", async () => {

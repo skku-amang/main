@@ -39,25 +39,40 @@ export class ReminderScheduler {
 
   /** @returns 락을 잡아 실제로 돌았는지 */
   async runOnce(now: Date) {
-    const locked = await this.redis.set(LOCK_KEY, "1", "PX", LOCK_TTL_MS, "NX")
+    let locked: string | null
+    try {
+      locked = await this.redis.set(LOCK_KEY, "1", "PX", LOCK_TTL_MS, "NX")
+    } catch (error) {
+      // @nestjs/schedule은 예외를 Logger.error로만 삼켜 Sentry Issue가 안 생긴다 — 직접 보낸다
+      Sentry.captureException(error)
+      this.logger.error("리마인더 락 획득 실패", error)
+      return false
+    }
     if (locked !== "OK") return false
 
     try {
       for (const reminder of this.reminders) {
-        try {
-          const count = await reminder.run(now)
-          Sentry.metrics.count("reminder.run", 1, {
-            attributes: { reminder: reminder.name, result: "ok" }
-          })
-          if (count > 0) this.logger.log(`${reminder.name}: ${count}건`)
-        } catch (error) {
-          Sentry.captureException(error)
-          this.logger.error(`${reminder.name} 실패`, error)
-        }
+        const result = await this.runReminder(reminder, now)
+        Sentry.metrics.count("reminder.run", 1, {
+          attributes: { reminder: reminder.name, result }
+        })
       }
     } finally {
+      // 실행이 TTL(5분)을 넘기면 다른 pod의 락을 지울 수 있지만, 실행은 ms 단위고 중복은 DB 멱등이 막는다
       await this.redis.del(LOCK_KEY)
     }
     return true
+  }
+
+  private async runReminder(reminder: Reminder, now: Date) {
+    try {
+      const count = await reminder.run(now)
+      if (count > 0) this.logger.log(`${reminder.name}: ${count}건`)
+      return "ok"
+    } catch (error) {
+      Sentry.captureException(error)
+      this.logger.error(`${reminder.name} 실패`, error)
+      return "error"
+    }
   }
 }

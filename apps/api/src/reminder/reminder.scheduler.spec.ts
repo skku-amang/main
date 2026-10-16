@@ -42,4 +42,12 @@ describe("ReminderScheduler", () => {
 
     await expect(redis.get("reminder:lock")).resolves.toBeNull()
   })
+
+  it("Redis가 죽어 락을 못 잡으면 돌지 않고 조용히 끝난다", async () => {
+    jest.spyOn(redis, "set").mockRejectedValue(new Error("redis down"))
+
+    await expect(scheduler.runOnce(NOW)).resolves.toBe(false)
+
+    expect(remind).not.toHaveBeenCalled()
+  })
 })
