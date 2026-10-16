@@ -29,4 +29,4 @@ configMapGenerator:
   - traffic/traffic.js
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261016145046-a1a7bf8
+  newTag: 20261016150042-1e124f9
