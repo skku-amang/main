@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -42,12 +42,11 @@ export default function LoginPage() {
 }
 
 const Login = () => {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const signupSuccess = searchParams.get("signup") === "success"
   const [isPendingApproval, setIsPendingApproval] = useState(false)
   const { toast } = useToast()
-  const { login } = useAuth()
+  const { login, isAuthenticated } = useAuth()
 
   const {
     register,
@@ -58,10 +57,21 @@ const Login = () => {
     resolver: zodResolver(LoginUserSchema)
   })
 
+  // 클라이언트 이동(router.push)은 금지. 로그아웃 상태에서 prefetch된 보호 경로는
+  // proxy의 /login redirect가 Router Cache에 남아 있어, 로그인 직후 그 캐시를 타고
+  // 다시 로그인 페이지로 돌아온다. 전체 이동으로 캐시를 버리고 새 cookie로 판정받는다.
+  const goToCallback = useCallback(() => {
+    window.location.replace(resolveCallbackUrl(searchParams.get("callbackUrl")))
+  }, [searchParams])
+
+  useEffect(() => {
+    if (isAuthenticated) goToCallback()
+  }, [isAuthenticated, goToCallback])
+
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     try {
       await login(formData)
-      router.push(resolveCallbackUrl(searchParams.get("callbackUrl")))
+      goToCallback()
     } catch (error) {
       if (error instanceof UserNotApprovedError) {
         setIsPendingApproval(true)
