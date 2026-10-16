@@ -53,6 +53,7 @@ import {
 } from "@/constants/session"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { getRosterSlots } from "@/lib/team/roster"
 import {
   getSessionsWithMissingMembers,
   isTeamSatisfied,
@@ -67,6 +68,7 @@ import {
   SelectTrigger
 } from "../Mobile/SortSelect"
 import CompactTeamList from "./CompactTeamList"
+import RosterCell from "./RosterCell"
 import { TeamColumn } from "./columns"
 import { useTeamListView } from "./useTeamListView"
 import { ViewSwitchButton, ViewToggle } from "./ViewToggle"
@@ -96,17 +98,33 @@ export function TeamListDataTable<TValue>({
   relatedPerformances,
   performanceId
 }: DataTableProps<TValue>) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const currentPerformance = relatedPerformances.find(
     (p) => p.id === performanceId
   )
   const isRecruiting =
     !currentPerformance || isPerformanceRecruiting(currentPerformance)
-  const visibleColumns = useMemo(
-    () =>
-      isAuthenticated ? columns : columns.filter((c) => c.id !== "actions"),
-    [isAuthenticated, columns]
-  )
+  // 세션 자리별로 누가 맡았는지 — '필요세션' 열 자리에 세션 자리 열들을 넣는다
+  const rosterSlots = useMemo(() => getRosterSlots(data), [data])
+  const visibleColumns = useMemo(() => {
+    const rosterColumns: ColumnDef<TeamColumn, TValue>[] = rosterSlots.map(
+      (slot) => ({
+        id: `slot-${slot.sessionName}-${slot.index}`,
+        header: () => <div className="whitespace-nowrap">{slot.label}</div>,
+        cell: ({ row }) => (
+          <RosterCell
+            team={row.original}
+            slot={slot}
+            canApply={isAuthenticated && isRecruiting}
+            viewerId={user?.id}
+          />
+        )
+      })
+    )
+    return columns
+      .filter((c) => isAuthenticated || c.id !== "actions")
+      .flatMap((c) => (c.id === "requiredSessions" ? rosterColumns : [c]))
+  }, [isAuthenticated, isRecruiting, user?.id, columns, rosterSlots])
   const bookmarks = useTeamBookmarks()
   const rows: TeamColumn[] = useMemo(
     () => data.map((t) => ({ ...t, isBookmarked: bookmarks.has(t.id) })),
@@ -616,7 +634,7 @@ export function TeamListDataTable<TValue>({
         ) : mobileView === "card" ? (
           <div className="space-y-3">{teamCards}</div>
         ) : (
-          <CompactTeamList rows={rowsOnPage} />
+          <CompactTeamList rows={rowsOnPage} slots={rosterSlots} />
         )}
 
         {/* 모바일 페이지네이션 */}

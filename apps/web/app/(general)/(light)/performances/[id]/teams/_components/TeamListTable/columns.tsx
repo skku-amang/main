@@ -1,7 +1,8 @@
 "use client"
 
 import { CellContext, ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Image, Paperclip, Star } from "lucide-react"
+import { ArrowUpDown, Image, Star } from "lucide-react"
+import { FaYoutube } from "react-icons/fa"
 import Link from "next/link"
 import React from "react"
 
@@ -23,6 +24,7 @@ import {
 import { extractYoutubeVideoId } from "@repo/shared-types"
 
 import TeamActionsMenu from "../TeamActionsMenu"
+import MemberChip from "./MemberChip"
 
 export type TeamColumn = TeamFromList & { isBookmarked: boolean }
 
@@ -68,12 +70,15 @@ const YoutubeCell = ({ row }: { row: any }) => {
 
   return (
     <button
+      type="button"
+      aria-label="영상 재생"
+      title="영상 재생"
       onClick={() =>
         play(videoId, `${row.original.songName} - ${row.original.songArtist}`)
       }
       className="flex w-full items-center justify-center"
     >
-      <Paperclip size={24} />
+      <FaYoutube size={26} className="text-[#FF0000]" />
     </button>
   )
 }
@@ -136,22 +141,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
   {
     id: "leaderName",
     accessorFn: (row) => row.leader.name,
-    header: ({ column }) => (
-      <div className="flex w-full justify-center">
-        <SortButton column={column}>팀장</SortButton>
-      </div>
-    ),
+    header: ({ column }) => <SortButton column={column}>팀장</SortButton>,
     cell: ({ row }) => (
-      <div className="text-center">
-        <Link
-          href={ROUTES.MEMBER_PROFILE(row.original.leader.id)}
-          className="hover:underline"
-        >
-          {row.original.leader.name}
-        </Link>
-        <br />
+      <MemberChip user={row.original.leader}>
         {row.original.isFreshmenFixed && <FreshmenFixedBadge size="small" />}
-      </div>
+      </MemberChip>
     )
   },
   {
@@ -195,9 +189,7 @@ export const columns: ColumnDef<TeamColumn>[] = [
   },
   {
     accessorKey: "songYoutubeVideoUrl",
-    header: () => (
-      <div className="flex items-center justify-center">영상링크</div>
-    ),
+    header: () => <div className="flex items-center justify-center">영상</div>,
     cell: ({ row }) => <YoutubeCell row={row} />
   },
   {
