@@ -155,7 +155,7 @@ export function formatNotification(
       const p = item.payload
       return {
         title: "새 가입 신청",
-        body: `${p.userName}님이 가입을 신청했어요`,
+        body: `${p.generationOrder}기 ${p.userName}님이 가입을 신청했어요`,
         href: "/admin/pending-users",
         tag: "user-signup"
       }

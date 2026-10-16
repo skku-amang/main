@@ -4,11 +4,7 @@ import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
-import {
-  USER_EVENTS,
-  UserApprovedEvent,
-  UserSignedUpEvent
-} from "./users.events"
+import { USER_EVENTS, UserApprovedEvent } from "./users.events"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
 import { memberProfileSelect, toMemberProfile } from "./member-profile"
@@ -31,7 +27,7 @@ export class UsersService {
       image = `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(userData.email)}`
 
     try {
-      const user = await this.prisma.user.create({
+      return await this.prisma.user.create({
         data: {
           ...userData,
           password: hashedPassword,
@@ -42,12 +38,6 @@ export class UsersService {
         },
         select: detailedUserSelector
       })
-      this.eventEmitter.emit(
-        USER_EVENTS.SIGNED_UP,
-        new UserSignedUpEvent(user.id)
-      )
-
-      return user
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -239,21 +229,19 @@ export class UsersService {
     })
   }
 
-  async approveUser(userId: number, actorId: number) {
+  async approveUser(userId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } })
 
     if (!user)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+    if (user.isApproved) return
 
     await this.prisma.user.update({
       where: { id: userId },
       data: { isApproved: true },
       select: detailedUserSelector
     })
-    this.eventEmitter.emit(
-      USER_EVENTS.APPROVED,
-      new UserApprovedEvent(userId, actorId)
-    )
+    this.eventEmitter.emit(USER_EVENTS.APPROVED, new UserApprovedEvent(userId))
   }
 
   async deleteUser(userId: number) {

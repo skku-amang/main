@@ -60,7 +60,8 @@ export const TeamFilledPayloadSchema = z.object({
 
 export const UserSignedUpPayloadSchema = z.object({
   userId: idSchema,
-  userName: z.string()
+  userName: z.string(),
+  generationOrder: z.number().int()
 })
 
 export const UserApprovedPayloadSchema = z.object({

@@ -396,16 +396,6 @@ export class TeamService {
 
   async remove(id: number, actorId: number) {
     const team = await this.findOne(id)
-    // 삭제 뒤엔 조회할 수 없으므로 수신자를 먼저 잡아 둔다
-    const snapshot = await this.prisma.team.findUnique({
-      where: { id },
-      select: {
-        name: true,
-        performanceId: true,
-        leaderId: true,
-        teamSessions: { select: { members: { select: { userId: true } } } }
-      }
-    })
 
     try {
       await this.prisma.team.delete({ where: { id } })
@@ -413,26 +403,22 @@ export class TeamService {
       throw error
     }
 
-    if (snapshot) {
-      const memberIds = [
-        ...new Set([
-          snapshot.leaderId,
-          ...snapshot.teamSessions.flatMap((s) =>
-            s.members.map((m) => m.userId)
-          )
-        ])
-      ]
-      this.eventEmitter.emit(
-        TEAM_EVENTS.DELETED,
-        new TeamDeletedEvent(
-          id,
-          snapshot.name,
-          snapshot.performanceId,
-          memberIds,
-          actorId
-        )
+    const memberIds = [
+      ...new Set([
+        team.leaderId,
+        ...team.teamSessions.flatMap((s) => s.members.map((m) => m.userId))
+      ])
+    ]
+    this.eventEmitter.emit(
+      TEAM_EVENTS.DELETED,
+      new TeamDeletedEvent(
+        id,
+        team.name,
+        team.performanceId,
+        memberIds,
+        actorId
       )
-    }
+    )
 
     return team
   }

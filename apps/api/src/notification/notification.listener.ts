@@ -233,7 +233,7 @@ export class NotificationListener {
       const [user, admins] = await Promise.all([
         this.prisma.user.findUnique({
           where: { id: event.userId },
-          select: { name: true }
+          select: { name: true, generation: { select: { order: true } } }
         }),
         this.prisma.user.findMany({
           where: { isAdmin: true },
@@ -246,7 +246,11 @@ export class NotificationListener {
         admins.map((a) => a.id),
         {
           type: NotificationType.USER_SIGNED_UP,
-          payload: { userId: event.userId, userName: user.name }
+          payload: {
+            userId: event.userId,
+            userName: user.name,
+            generationOrder: user.generation.order
+          }
         }
       )
     })

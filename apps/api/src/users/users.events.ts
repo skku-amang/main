@@ -8,8 +8,5 @@ export class UserSignedUpEvent {
 }
 
 export class UserApprovedEvent {
-  constructor(
-    readonly userId: number,
-    readonly actorId: number
-  ) {}
+  constructor(readonly userId: number) {}
 }

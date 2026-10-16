@@ -216,7 +216,11 @@ describe("NotificationListener", () => {
   })
 
   describe("가입 신청·승인", () => {
-    it("가입 신청은 운영진 전원에게", async () => {
+    it("가입 신청은 운영진 전원에게, 이름과 기수를 담아", async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        name: "홍길동",
+        generation: { order: 23 }
+      })
       prisma.user.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }])
 
       await listener.onUserSignedUp(new UserSignedUpEvent(5))
@@ -224,12 +228,12 @@ describe("NotificationListener", () => {
       expect(recipients()).toEqual([1, 2])
       expect(createdRows()[0]).toMatchObject({
         type: "USER_SIGNED_UP",
-        payload: { userId: 5, userName: "홍길동" }
+        payload: { userId: 5, userName: "홍길동", generationOrder: 23 }
       })
     })
 
-    it("가입 승인은 본인에게 (승인한 운영진은 수신자가 아니라 actor)", async () => {
-      await listener.onUserApproved(new UserApprovedEvent(5, 1))
+    it("가입 승인은 본인에게", async () => {
+      await listener.onUserApproved(new UserApprovedEvent(5))
 
       expect(recipients()).toEqual([5])
       expect(createdRows()[0]).toMatchObject({

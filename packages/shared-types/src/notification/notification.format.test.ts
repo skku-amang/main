@@ -97,11 +97,11 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     expect(
       formatNotification({
         type: "USER_SIGNED_UP",
-        payload: { userId: 5, userName: "홍길동" }
+        payload: { userId: 5, userName: "홍길동", generationOrder: 23 }
       })
     ).toEqual({
       title: "새 가입 신청",
-      body: "홍길동님이 가입을 신청했어요",
+      body: "23기 홍길동님이 가입을 신청했어요",
       href: "/admin/pending-users",
       tag: "user-signup"
     })
