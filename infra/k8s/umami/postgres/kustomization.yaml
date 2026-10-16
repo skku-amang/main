@@ -1,0 +1,10 @@
+# 아망 서비스 DB(infra/k8s/db)와 분리한 전용 인스턴스. Umami 업그레이드 마이그레이션이나
+# 통계 쓰기 부하가 서비스 DB에 영향을 주지 않게 한다
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - network-policy.yaml
