@@ -175,19 +175,9 @@ const TeamDetailClient = () => {
             ) : (
               <>
                 <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
-                  <li className="mb-1 md:mb-[10px]">
+                  <li>
                     ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                     선착순으로 마감됩니다
-                  </li>
-                  <li>
-                    <span className="md:hidden">
-                      ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
-                      취소할 수 있습니다
-                    </span>
-                    <span className="hidden md:inline">
-                      ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수
-                      있습니다
-                    </span>
                   </li>
                 </ul>
 
