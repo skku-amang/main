@@ -2,7 +2,8 @@
 
 import { formatNotification, NotificationItem } from "@repo/shared-types"
 
-import { cn, getRepresentativeRelativeTime } from "@/lib/utils"
+import RelativeTime from "@/components/RelativeTime"
+import { cn } from "@/lib/utils"
 
 type NotificationRowProps = {
   item: NotificationItem
@@ -34,9 +35,10 @@ const NotificationRow = ({ item, className }: NotificationRowProps) => {
           {title}
         </div>
         <div className="line-clamp-2 text-sm text-foreground/90">{body}</div>
-        <div className="mt-0.5 text-xs text-muted-foreground">
-          {getRepresentativeRelativeTime(item.createdAt)}
-        </div>
+        <RelativeTime
+          date={item.createdAt}
+          className="mt-0.5 block text-xs text-muted-foreground"
+        />
       </div>
     </div>
   )

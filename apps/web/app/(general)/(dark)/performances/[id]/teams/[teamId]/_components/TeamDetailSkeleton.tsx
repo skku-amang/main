@@ -73,7 +73,7 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
 
       {/* YouTube 영역 */}
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
-        <Skeleton className="mx-10 aspect-video h-auto w-full rounded-lg md:mx-0 md:w-full md:max-w-[1152px]" />
+        <Skeleton className="aspect-video h-auto w-full rounded-lg md:max-w-[1152px]" />
       </div>
 
       <div className="flex w-full gap-[24px] max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px]">
@@ -85,7 +85,7 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
         </div>
 
         {/* 오른쪽: 세션 카드들 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
+        <div className="flex h-full w-full flex-col gap-y-5 xl:w-[662px]">
           {/* 세션구성 */}
           <SessionSetCardSkeleton header="세션구성">
             <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">

@@ -1,9 +1,11 @@
 import dayjs from "dayjs"
 import Link from "next/link"
 
-import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
+import TeamActionsMenu from "@/components/TeamActionsMenu"
+import RelativeTime from "@/components/RelativeTime"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import TeamBookmarkButton from "@/components/TeamBookmarkButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Popover,
@@ -11,8 +13,8 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import ROUTES from "@/constants/routes"
+import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
-import { getRepresentativeRelativeTime } from "@/lib/utils"
 import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
 
 interface BasicInfoProps {
@@ -22,6 +24,7 @@ interface BasicInfoProps {
 
 const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
   const isSatisfied = isTeamSatisfied(team.teamSessions ?? [])
+  const bookmarks = useTeamBookmarks()
 
   return (
     <div className="relative h-fit w-full rounded-2xl bg-white px-[26px] py-[30px] text-lg font-semibold shadow-[0_4px_30px_0_rgba(59,130,246,0.07)] md:px-[40px] xl:w-[466px] md:py-[60px]">
@@ -50,20 +53,23 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
           <Popover>
             <PopoverTrigger className="underline decoration-dotted underline-offset-4">
-              <time dateTime={new Date(team.createdAt).toISOString()}>
-                {getRepresentativeRelativeTime(team.createdAt)}
-              </time>
+              <RelativeTime date={team.createdAt} />
             </PopoverTrigger>
             <PopoverContent className="w-auto px-3 py-2 text-sm font-normal text-slate-700">
               {dayjs(team.createdAt).format("YYYY.MM.DD HH:mm")} 생성
             </PopoverContent>
           </Popover>
         </div>
+        <TeamBookmarkButton
+          teamId={team.id}
+          bookmarked={bookmarks.has(team.id)}
+          className="ml-auto"
+        />
         {canEdit && (
-          <DeleteEditButton
-            className="ml-auto"
+          <TeamActionsMenu
             performanceId={team.performanceId}
-            team={team}
+            teamId={team.id}
+            className="size-8"
           />
         )}
       </div>

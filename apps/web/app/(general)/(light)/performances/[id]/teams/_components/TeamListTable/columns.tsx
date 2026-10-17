@@ -24,7 +24,7 @@ import {
 } from "@/lib/team/teamSession"
 import { extractYoutubeVideoId } from "@repo/shared-types"
 
-import TeamActionsMenu from "../TeamActionsMenu"
+import TeamActionsMenu from "@/components/TeamActionsMenu"
 import MemberChip from "./MemberChip"
 
 export type TeamColumn = TeamFromList & { isBookmarked: boolean }

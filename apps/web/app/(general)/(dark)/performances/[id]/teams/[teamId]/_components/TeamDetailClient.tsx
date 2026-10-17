@@ -76,20 +76,20 @@ const TeamDetailClient = () => {
           <YoutubePlayer
             videoUrl={team.songYoutubeVideoUrl}
             title={`${team.songName} 연주 영상`}
-            className="mx-10 aspect-video h-auto w-full md:mx-0 md:w-full md:max-w-[1152px]"
+            className="aspect-video h-auto w-full md:max-w-[1152px]"
           />
         )}
       </div>
 
       <div className="relative z-10 flex w-full gap-5 max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}
-        <div className="flex w-[93%] flex-col gap-y-5 md:w-full md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
+        <div className="flex w-full flex-col gap-y-5 md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
           <BasicInfo team={team} canEdit={canEdit} />
           {team.image && <PosterImage src={team.image} />}
         </div>
 
         {/* 세션 구성 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
+        <div className="flex h-full w-full flex-col gap-y-5 xl:w-[662px]">
           {/* 세션 구성 */}
           {team.teamSessions && team.teamSessions.length > 0 && (
             <SessionSetCard
@@ -175,19 +175,9 @@ const TeamDetailClient = () => {
             ) : (
               <>
                 <ul className="mb-6 mt-[12px] w-full text-xs font-normal leading-5 text-gray-600 md:mt-[16px] md:w-[537px]">
-                  <li className="mb-1 md:mb-[10px]">
+                  <li>
                     ・아래 버튼을 눌러 해당 팀에 참여 신청을 할 수 있으며,
                     선착순으로 마감됩니다
-                  </li>
-                  <li>
-                    <span className="md:hidden">
-                      ・아래 버튼을 다시 누르거나 마이페이지에 접속하여 신청을
-                      취소할 수 있습니다
-                    </span>
-                    <span className="hidden md:inline">
-                      ・해당 페이지 혹은 마이페이지를 통해 신청을 취소할 수
-                      있습니다
-                    </span>
                   </li>
                 </ul>
 
