@@ -267,7 +267,7 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
       .slice(0, PREVIEW_COUNT) ?? []
 
   return (
-    <Section title="다가오는 내 예약">
+    <Section title="다가오는 내 동방 예약">
       {status === "pending" ? (
         <Skeleton className="h-16 rounded-xl" />
       ) : status === "error" ? (
