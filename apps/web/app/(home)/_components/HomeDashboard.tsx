@@ -21,6 +21,7 @@ import { Knewave } from "next/font/google"
 import Link from "next/link"
 import { useState } from "react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
@@ -299,7 +300,16 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
                   }
                   className="flex items-center gap-3 px-5 py-4 hover:bg-slate-50"
                 >
-                  <CalendarClock className="size-5 shrink-0 text-primary" />
+                  {rental.renter ? (
+                    <Avatar className="size-8 shrink-0">
+                      <AvatarImage src={rental.renter.image ?? undefined} />
+                      <AvatarFallback className="text-xs">
+                        {rental.renter.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <CalendarClock className="size-5 shrink-0 text-primary" />
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{rental.title}</p>
                     <p className="text-sm text-slate-500">
