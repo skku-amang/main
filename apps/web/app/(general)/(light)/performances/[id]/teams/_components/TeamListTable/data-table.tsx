@@ -71,8 +71,9 @@ import {
 import CompactTeamList from "./CompactTeamList"
 import RosterCell from "./RosterCell"
 import { TeamColumn } from "./columns"
-import { useTeamListView } from "./useTeamListView"
+import { TeamListView, useTeamListView } from "./useTeamListView"
 import { ViewSwitchButton, ViewToggle } from "./ViewToggle"
+import { useViewTip, ViewTip } from "./ViewTip"
 import {
   Drawer,
   DrawerClose,
@@ -340,10 +341,13 @@ export function TeamListDataTable<TValue>({
       : [])
   ]
 
-  // 고른 적 없으면 휴대폰은 카드, 데스크톱은 표
   const [view, setView] = useTeamListView()
-  const desktopView = view ?? "table"
-  const mobileView = view ?? "card"
+  const listView = view ?? "table"
+  const [showViewTip, dismissViewTip] = useViewTip()
+  const changeView = (next: TeamListView) => {
+    setView(next)
+    dismissViewTip()
+  }
 
   const rowsOnPage = table.getRowModel().rows
   const emptyMessage = (
@@ -388,7 +392,9 @@ export function TeamListDataTable<TValue>({
 
           {/* 보기 형식, 생성, 필터 */}
           <div className="flex gap-4">
-            <ViewToggle view={desktopView} onChange={setView} />
+            <ViewTip show={showViewTip} onDismiss={dismissViewTip}>
+              <ViewToggle view={listView} onChange={changeView} />
+            </ViewTip>
 
             {/* 생성 버튼 */}
             {isRecruiting ? (
@@ -458,7 +464,7 @@ export function TeamListDataTable<TValue>({
           </div>
         </div>
 
-        {desktopView === "card" ? (
+        {listView === "card" ? (
           rowsOnPage.length ? (
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               {teamCards}
@@ -641,7 +647,9 @@ export function TeamListDataTable<TValue>({
             </Select>
 
             {/* 보기 형식 */}
-            <ViewSwitchButton view={mobileView} onChange={setView} />
+            <ViewTip show={showViewTip} onDismiss={dismissViewTip}>
+              <ViewSwitchButton view={listView} onChange={changeView} />
+            </ViewTip>
 
             {/* 생성 버튼 */}
             {isRecruiting ? (
@@ -665,7 +673,7 @@ export function TeamListDataTable<TValue>({
         {/* 팀 목록 */}
         {!rowsOnPage.length ? (
           emptyMessage
-        ) : mobileView === "card" ? (
+        ) : listView === "card" ? (
           <div className="space-y-3">{teamCards}</div>
         ) : (
           <CompactTeamList
