@@ -62,7 +62,10 @@ export default function EquipmentListPage() {
     )
   )
   const [filterOpen, setFilterOpen] = useState(false)
-  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [page, setPage] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(1).withOptions({ history: "push" })
+  )
 
   // Equipment form modal state
   const [formOpen, setFormOpen] = useState(false)
@@ -167,7 +170,7 @@ export default function EquipmentListPage() {
                 selectedCategories={selectedCategories}
                 onCategoriesChange={(categories) => {
                   setSelectedCategories(categories)
-                  setPage(1)
+                  setPage(null, { history: "replace" })
                 }}
               />
             </PopoverContent>
@@ -191,7 +194,7 @@ export default function EquipmentListPage() {
           value={search}
           onChange={(e) => {
             setSearch(e.target.value || null)
-            setPage(1)
+            setPage(null, { history: "replace" })
           }}
           className="max-w-sm"
         />
@@ -206,7 +209,7 @@ export default function EquipmentListPage() {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value || null)
-              setPage(1)
+              setPage(null, { history: "replace" })
             }}
             className="h-9 min-w-0 flex-1 border-gray-200 drop-shadow-search"
           />

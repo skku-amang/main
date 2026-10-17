@@ -232,6 +232,16 @@ function DataTableInner<TData, TValue>({
     [visibilityStorageKey]
   )
 
+  // URL-synced pagination state
+  const [urlPage, setUrlPage] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(1).withOptions({ history: "push" })
+  )
+  const [urlPageSize, setUrlPageSize] = useQueryState(
+    "pageSize",
+    parseAsInteger.withDefault(10).withOptions({ history: "replace" })
+  )
+
   // URL-synced sorting state
   const defaultSort = initialSorting[0]
   const [sortId, setSortId] = useQueryState(
@@ -259,6 +269,7 @@ function DataTableInner<TData, TValue>({
           ? updaterOrValue(sorting)
           : updaterOrValue
       const first = next[0]
+      setUrlPage(null, { history: "replace" })
       if (first) {
         setSortId(first.id)
         setSortOrder(first.desc ? "desc" : "asc")
@@ -267,17 +278,7 @@ function DataTableInner<TData, TValue>({
         setSortOrder(null)
       }
     },
-    [sorting, setSortId, setSortOrder]
-  )
-
-  // URL-synced pagination state
-  const [urlPage, setUrlPage] = useQueryState(
-    "page",
-    parseAsInteger.withDefault(1).withOptions({ history: "replace" })
-  )
-  const [urlPageSize, setUrlPageSize] = useQueryState(
-    "pageSize",
-    parseAsInteger.withDefault(10).withOptions({ history: "replace" })
+    [sorting, setSortId, setSortOrder, setUrlPage]
   )
 
   const pagination: PaginationState = useMemo(
@@ -291,7 +292,9 @@ function DataTableInner<TData, TValue>({
         typeof updaterOrValue === "function"
           ? updaterOrValue(pagination)
           : updaterOrValue
-      setUrlPage(next.pageIndex + 1)
+      setUrlPage(next.pageIndex + 1, {
+        history: next.pageSize === pagination.pageSize ? "push" : "replace"
+      })
       setUrlPageSize(next.pageSize)
     },
     [pagination, setUrlPage, setUrlPageSize]
@@ -353,8 +356,9 @@ function DataTableInner<TData, TValue>({
         urlUpdate[columnId] = match ? String(match.value) : null
       }
       setUrlFilters(urlUpdate)
+      setUrlPage(null, { history: "replace" })
     },
-    [columnFilters, searchColumn, filterColumnIds, setUrlFilters]
+    [columnFilters, searchColumn, filterColumnIds, setUrlFilters, setUrlPage]
   )
 
   // URL-synced highlighted row
@@ -409,6 +413,7 @@ function DataTableInner<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: handleSortingChange,
     onPaginationChange: handlePaginationChange,
+    autoResetPageIndex: false,
     onColumnFiltersChange: handleColumnFiltersChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onRowSelectionChange: setRowSelection,
@@ -450,9 +455,16 @@ function DataTableInner<TData, TValue>({
     const pageSize = t.getState().pagination.pageSize
     const targetPage = Math.floor(rowIndex / pageSize)
     if (t.getState().pagination.pageIndex !== targetPage) {
-      setUrlPage(targetPage + 1)
+      setUrlPage(targetPage + 1, { history: "replace" })
     }
   }, [highlightedRowId, setUrlPage])
+
+  const pageCount = table.getPageCount()
+  useEffect(() => {
+    if (pageCount > 0 && urlPage > pageCount) {
+      setUrlPage(pageCount, { history: "replace" })
+    }
+  }, [pageCount, urlPage, setUrlPage])
 
   // Scroll highlighted row into view
   useEffect(() => {
@@ -469,11 +481,12 @@ function DataTableInner<TData, TValue>({
     (value: string) => {
       if (enableGlobalSearch) {
         setGlobalFilter(value)
+        setUrlPage(null, { history: "replace" })
       } else if (searchColumn) {
         table.getColumn(searchColumn)?.setFilterValue(value || undefined)
       }
     },
-    [enableGlobalSearch, searchColumn, table]
+    [enableGlobalSearch, searchColumn, table, setUrlPage]
   )
 
   const searchDisplayValue = enableGlobalSearch

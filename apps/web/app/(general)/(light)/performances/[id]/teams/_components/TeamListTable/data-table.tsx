@@ -8,6 +8,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   SortingState,
   useReactTable
 } from "@tanstack/react-table"
@@ -21,7 +22,7 @@ import {
   parseAsStringLiteral,
   useQueryState
 } from "nuqs"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import TeamHeaderButton from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/HeaderButton"
 import TeamCard from "@/app/(general)/(light)/performances/[id]/teams/_components/Mobile/TeamCard"
@@ -141,7 +142,15 @@ export function TeamListDataTable<TValue>({
   )
   const [pageQuery, setPageQuery] = useQueryState(
     "page",
-    parseAsInteger.withDefault(1)
+    parseAsInteger.withDefault(1).withOptions({ history: "push" })
+  )
+  const resetPage = useCallback(
+    () => setPageQuery(null, { history: "replace" }),
+    [setPageQuery]
+  )
+  const pagination: PaginationState = useMemo(
+    () => ({ pageIndex: Math.max(0, pageQuery - 1), pageSize: 10 }),
+    [pageQuery]
   )
 
   // sort query → tanstack SortingState 변환
@@ -181,8 +190,9 @@ export function TeamListDataTable<TValue>({
     (value: Set<string>) => {
       const arr = [...value]
       setSessionFilterArr(arr.length > 0 ? arr : null)
+      resetPage()
     },
-    [setSessionFilterArr]
+    [setSessionFilterArr, resetPage]
   )
 
   const toggleSession = useCallback(
@@ -193,15 +203,25 @@ export function TeamListDataTable<TValue>({
         const next = arr.filter((s) => s !== session)
         return next.length > 0 ? next : null
       })
+      resetPage()
     },
-    [setSessionFilterArr]
+    [setSessionFilterArr, resetPage]
   )
 
   const resetFilters = useCallback(() => {
     setSessionFilterArr(null)
     setStatusFilter("all")
     setBookmarkedOnly(null)
-  }, [setSessionFilterArr, setStatusFilter, setBookmarkedOnly])
+    resetPage()
+  }, [setSessionFilterArr, setStatusFilter, setBookmarkedOnly, resetPage])
+
+  const changeStatusFilter = useCallback(
+    (value: "all" | "active" | "inactive") => {
+      setStatusFilter(value)
+      resetPage()
+    },
+    [setStatusFilter, resetPage]
+  )
 
   const filteredData = useMemo(() => {
     if (sessionFilter.size === 0 && statusFilter === "all" && !bookmarkedOnly)
@@ -245,20 +265,23 @@ export function TeamListDataTable<TValue>({
       {
         label: "Active",
         onChecked: (checked: boolean) =>
-          setStatusFilter(checked ? "active" : "all"),
+          changeStatusFilter(checked ? "active" : "all"),
         checked: statusFilter === "active"
       },
       {
         label: "Inactive",
         onChecked: (checked: boolean) =>
-          setStatusFilter(checked ? "inactive" : "all"),
+          changeStatusFilter(checked ? "inactive" : "all"),
         checked: statusFilter === "inactive"
       }
     ],
     별표: [
       {
         label: "별표한 팀만",
-        onChecked: (checked: boolean) => setBookmarkedOnly(checked || null),
+        onChecked: (checked: boolean) => {
+          setBookmarkedOnly(checked || null)
+          resetPage()
+        },
         checked: bookmarkedOnly
       }
     ]
@@ -272,6 +295,7 @@ export function TeamListDataTable<TValue>({
     onSortingChange: (updater) => {
       const next = typeof updater === "function" ? updater(sorting) : updater
       const first = next[0]
+      resetPage()
       if (!first) {
         setSortQuery(null)
       } else {
@@ -281,16 +305,26 @@ export function TeamListDataTable<TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    initialState: {
-      pagination: { pageIndex: Math.max(0, pageQuery - 1) }
+    onPaginationChange: (updater) => {
+      const next = typeof updater === "function" ? updater(pagination) : updater
+      setPageQuery(next.pageIndex + 1)
     },
+    autoResetPageIndex: false,
     state: {
       sorting,
+      pagination,
       columnFilters,
       // 별표 열은 빼지 않고 숨김 — 로그인 확인 전에도 sort=bookmark-* 정렬 대상이 있어야 함
       columnVisibility: { createdAt: false, bookmark: isAuthenticated }
     }
   })
+
+  const pageCount = table.getPageCount()
+  useEffect(() => {
+    if (pageCount > 0 && pageQuery > pageCount) {
+      setPageQuery(pageCount, { history: "replace" })
+    }
+  }, [pageCount, pageQuery, setPageQuery])
 
   const missingMemberSessions = getSessionsWithMissingMembers
 
@@ -346,6 +380,7 @@ export function TeamListDataTable<TValue>({
             onChange={(event) => {
               const value = event.target.value
               setSearchQuery(value || null)
+              resetPage()
               table.getColumn("songName")?.setFilterValue(value)
             }}
             className="max-w-sm"
@@ -406,7 +441,7 @@ export function TeamListDataTable<TValue>({
                   <TeamListTableFilter
                     header="모집상태"
                     filterValues={filterValues.모집상태}
-                    onSelectAll={() => setStatusFilter("all")}
+                    onSelectAll={() => changeStatusFilter("all")}
                   />
                   {isAuthenticated && (
                     <>
@@ -495,10 +530,7 @@ export function TeamListDataTable<TValue>({
             <ResponsivePagination
               currentPage={table.getState().pagination.pageIndex + 1}
               totalPages={table.getPageCount()}
-              onPageChange={(page) => {
-                table.setPageIndex(page - 1)
-                setPageQuery(page === 1 ? null : page)
-              }}
+              onPageChange={(page) => table.setPageIndex(page - 1)}
             />
           </div>
         )}
@@ -517,6 +549,7 @@ export function TeamListDataTable<TValue>({
               onChange={(event) => {
                 const value = event.target.value
                 setSearchQuery(value || null)
+                resetPage()
                 table.getColumn("songName")?.setFilterValue(value)
               }}
               className="h-9 min-w-0 flex-1 border-gray-200 drop-shadow-search"
@@ -583,9 +616,10 @@ export function TeamListDataTable<TValue>({
             {/* 정렬 */}
             <Select
               value={sortQuery || "none"}
-              onValueChange={(value) =>
+              onValueChange={(value) => {
                 setSortQuery(value === "none" ? null : value)
-              }
+                resetPage()
+              }}
             >
               <SelectTrigger aria-label="정렬">
                 <TeamHeaderButton asChild variant="outline">
@@ -648,10 +682,7 @@ export function TeamListDataTable<TValue>({
             <ResponsivePagination
               currentPage={table.getState().pagination.pageIndex + 1}
               totalPages={table.getPageCount()}
-              onPageChange={(page) => {
-                table.setPageIndex(page - 1)
-                setPageQuery(page === 1 ? null : page)
-              }}
+              onPageChange={(page) => table.setPageIndex(page - 1)}
             />
           </div>
         )}
