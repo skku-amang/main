@@ -566,7 +566,7 @@ export function TeamListDataTable<TValue>({
         )}
       </div>
 
-      {/* 모바일: 카드 보기 */}
+      {/* 모바일 */}
       <div className="md:hidden">
         {/* 헤더 */}
         <div className="space-y-3">
