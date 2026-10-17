@@ -21,6 +21,7 @@ import { Knewave } from "next/font/google"
 import Link from "next/link"
 import { useState } from "react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
@@ -251,6 +252,7 @@ const BookmarkedTeams = () => {
 const MyUpcomingRentals = ({ userId }: { userId: number }) => {
   // 쿼리 키가 렌더마다 바뀌지 않도록 마운트 시점에 한 번만 계산
   const [range] = useState(() => ({
+    type: "room" as const,
     from: dayjs().startOf("day").toDate(),
     to: dayjs().add(UPCOMING_DAYS, "day").endOf("day").toDate()
   }))
@@ -267,7 +269,7 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
       .slice(0, PREVIEW_COUNT) ?? []
 
   return (
-    <Section title="다가오는 내 예약">
+    <Section title="내 동방 예약" moreHref={ROUTES.RESERVATION.CLUBROOM}>
       {status === "pending" ? (
         <Skeleton className="h-16 rounded-xl" />
       ) : status === "error" ? (
@@ -279,7 +281,6 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
       ) : (
         <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl bg-white shadow-sm">
           {myRentals.map((rental) => {
-            const isRoom = rental.equipment.category === "ROOM"
             const start = dayjs(rental.startAt).locale("ko")
             const end = dayjs(rental.endAt).locale("ko")
             // 하루를 넘기는 예약은 끝나는 날짜도 표시
@@ -289,21 +290,23 @@ const MyUpcomingRentals = ({ userId }: { userId: number }) => {
             return (
               <li key={rental.id}>
                 <Link
-                  href={
-                    isRoom
-                      ? ROUTES.RESERVATION.CLUBROOM
-                      : ROUTES.RESERVATION.EQUIPMENT_DETAIL(rental.equipmentId)
-                  }
+                  href={ROUTES.RESERVATION.CLUBROOM}
                   className="flex items-center gap-3 px-5 py-4 hover:bg-slate-50"
                 >
-                  <CalendarClock className="size-5 shrink-0 text-primary" />
+                  {rental.renter ? (
+                    <Avatar className="size-8 shrink-0">
+                      <AvatarImage src={rental.renter.image ?? undefined} />
+                      <AvatarFallback className="text-xs">
+                        {rental.renter.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <CalendarClock className="size-5 shrink-0 text-primary" />
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{rental.title}</p>
                     <p className="text-sm text-slate-500">
-                      {isRoom
-                        ? "동방"
-                        : `${rental.equipment.brand} ${rental.equipment.model}`}{" "}
-                      · {start.format("M/D (ddd) HH:mm")}~{endLabel}
+                      동방 · {start.format("M/D (ddd) HH:mm")}~{endLabel}
                     </p>
                   </div>
                   <ChevronRight className="size-4 text-slate-300" />
