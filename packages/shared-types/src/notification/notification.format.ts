@@ -56,8 +56,6 @@ export type FormattedNotification = {
   title: string
   body: string
   href: string
-  /** 같은 tag의 푸시는 기기 알림창에서 최신 것으로 덮어쓴다 */
-  tag: string
 }
 
 /** Pick을 union 각 멤버에 분배해 type↔payload 상관관계를 유지한다 */
@@ -72,8 +70,6 @@ export type NotificationContent = DistributivePick<
 
 const teamHref = (performanceId: number, teamId: number) =>
   `/performances/${performanceId}/teams/${teamId}`
-
-const teamTag = (teamId: number) => `team-${teamId}`
 
 /** 서버(UTC)·브라우저 어디서 렌더해도 한국 시각 "15:00". payload를 거친 날짜는 문자열일 수 있어 new Date로 받는다 */
 const kstTime = new Intl.DateTimeFormat("en-GB", {
@@ -110,8 +106,7 @@ export function formatNotification(
       return {
         title: p.teamName,
         body,
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "TEAM_ATTRIBUTE_CHANGE": {
@@ -122,8 +117,7 @@ export function formatNotification(
       return {
         title: p.teamName,
         body: `팀 정보가 바뀌었습니다: ${fields}`,
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "TEAM_CREATED": {
@@ -131,8 +125,7 @@ export function formatNotification(
       return {
         title: p.performanceName,
         body: `새 팀이 생겼습니다: ${p.teamName}`,
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "PERFORMANCE_CREATED": {
@@ -140,8 +133,7 @@ export function formatNotification(
       return {
         title: "새 공연",
         body: `${p.performanceName} 팀 모집이 시작됐습니다`,
-        href: `/performances/${p.performanceId}/teams`,
-        tag: `performance-${p.performanceId}`
+        href: `/performances/${p.performanceId}/teams`
       }
     }
     case "PERFORMANCE_UPDATED": {
@@ -152,8 +144,7 @@ export function formatNotification(
       return {
         title: p.performanceName,
         body: `공연 정보가 바뀌었습니다: ${fields}`,
-        href: `/performances/${p.performanceId}`,
-        tag: `performance-${p.performanceId}`
+        href: `/performances/${p.performanceId}`
       }
     }
     case "TEAM_DELETED": {
@@ -161,8 +152,7 @@ export function formatNotification(
       return {
         title: p.performanceName,
         body: `${p.teamName} 팀이 삭제됐습니다`,
-        href: `/performances/${p.performanceId}/teams`,
-        tag: `performance-${p.performanceId}`
+        href: `/performances/${p.performanceId}/teams`
       }
     }
     case "TEAM_LEADER_CHANGED": {
@@ -172,8 +162,7 @@ export function formatNotification(
         body: p.assigned
           ? "팀장이 됐어요"
           : `팀장이 ${p.leaderName}님으로 바뀌었어요`,
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "TEAM_FILLED": {
@@ -181,8 +170,7 @@ export function formatNotification(
       return {
         title: p.teamName,
         body: "멤버가 모두 모였어요",
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "USER_SIGNED_UP": {
@@ -190,8 +178,7 @@ export function formatNotification(
       return {
         title: "새 가입 신청",
         body: `${formatGenerationOrder(p.generationOrder)}기 ${p.userName}님이 가입을 신청했어요`,
-        href: "/admin/pending-users",
-        tag: "user-signup"
+        href: "/admin/pending-users"
       }
     }
     case "USER_APPROVED": {
@@ -199,8 +186,7 @@ export function formatNotification(
       return {
         title: "가입 승인",
         body: `${p.userName}님, AMANG 가입이 승인됐어요. 환영해요!`,
-        href: "/",
-        tag: "user-approved"
+        href: "/"
       }
     }
     case "BOOKMARKED_TEAM_SPOT_OPENED": {
@@ -211,8 +197,7 @@ export function formatNotification(
       return {
         title: "별표한 팀에 자리가 났어요",
         body: `${p.teamName} 팀 ${sessions ? `${sessions} ` : ""}자리가 났어요`,
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "TEAM_RECRUITMENT_DEADLINE": {
@@ -225,8 +210,7 @@ export function formatNotification(
         body: slots
           ? `내일 모집 마감 — ${slots} 비어 있어요`
           : "내일 모집 마감이에요",
-        href: teamHref(p.performanceId, p.teamId),
-        tag: teamTag(p.teamId)
+        href: teamHref(p.performanceId, p.teamId)
       }
     }
     case "ROOM_RESERVATION_SOON": {
@@ -234,8 +218,7 @@ export function formatNotification(
       return {
         title: "동방 예약 1시간 전",
         body: `${formatKstTime(p.startAt)} 동방 예약 — ${p.title}`,
-        href: "/reservations/clubroom",
-        tag: `rental-${p.rentalId}`
+        href: "/reservations/clubroom"
       }
     }
     case "EQUIPMENT_RETURN_DUE": {
@@ -243,8 +226,7 @@ export function formatNotification(
       return {
         title: "장비 반납",
         body: `${formatKstDate(p.endAt)} ${formatKstTime(p.endAt)}까지 ${p.equipmentName} 반납`,
-        href: `/reservations/equipment/${p.equipmentId}`,
-        tag: `rental-${p.rentalId}`
+        href: `/reservations/equipment/${p.equipmentId}`
       }
     }
   }

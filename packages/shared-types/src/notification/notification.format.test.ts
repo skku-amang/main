@@ -18,8 +18,7 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "팀A",
       body: "홍길동님이 보컬, 기타 멤버로 합류했습니다",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
   })
 
@@ -53,8 +52,7 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "팀A",
       body: "팀 정보가 바뀌었습니다: 곡명, 세션 구성, 공연",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
   })
 
@@ -72,8 +70,7 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "봄 공연",
       body: "새 팀이 생겼습니다: 팀B",
-      href: "/performances/3/teams/9",
-      tag: "team-9"
+      href: "/performances/3/teams/9"
     })
   })
 
@@ -86,8 +83,7 @@ describe("formatNotification", () => {
     ).toEqual({
       title: "새 공연",
       body: "봄 공연 팀 모집이 시작됐습니다",
-      href: "/performances/3/teams",
-      tag: "performance-3"
+      href: "/performances/3/teams"
     })
   })
 })
@@ -102,8 +98,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "새 가입 신청",
       body: "37기 홍길동님이 가입을 신청했어요",
-      href: "/admin/pending-users",
-      tag: "user-signup"
+      href: "/admin/pending-users"
     })
   })
 
@@ -125,8 +120,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "가입 승인",
       body: "홍길동님, AMANG 가입이 승인됐어요. 환영해요!",
-      href: "/",
-      tag: "user-approved"
+      href: "/"
     })
   })
 
@@ -145,8 +139,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "팀A",
       body: "팀장이 됐어요",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
     expect(
       formatNotification({
@@ -169,8 +162,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "봄 공연",
       body: "공연 정보가 바뀌었습니다: 시작 일시, 장소",
-      href: "/performances/3",
-      tag: "performance-3"
+      href: "/performances/3"
     })
   })
 
@@ -187,8 +179,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "봄 공연",
       body: "팀A 팀이 삭제됐습니다",
-      href: "/performances/3/teams",
-      tag: "performance-3"
+      href: "/performances/3/teams"
     })
   })
 
@@ -201,8 +192,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "팀A",
       body: "멤버가 모두 모였어요",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
   })
 
@@ -220,8 +210,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "별표한 팀에 자리가 났어요",
       body: "팀A 팀 보컬 자리가 났어요",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
   })
 
@@ -256,8 +245,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "팀A",
       body: "내일 모집 마감 — 보컬 1자리, 기타 2자리 비어 있어요",
-      href: "/performances/3/teams/7",
-      tag: "team-7"
+      href: "/performances/3/teams/7"
     })
   })
 
@@ -274,8 +262,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "동방 예약 1시간 전",
       body: "15:00 동방 예약 — 합주",
-      href: "/reservations/clubroom",
-      tag: "rental-5"
+      href: "/reservations/clubroom"
     })
   })
 
@@ -293,8 +280,7 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
     ).toEqual({
       title: "장비 반납",
       body: "10/17 18:30까지 Yamaha P-125 반납",
-      href: "/reservations/equipment/2",
-      tag: "rental-6"
+      href: "/reservations/equipment/2"
     })
   })
 })
