@@ -31,11 +31,11 @@ import {
 } from "@/components/ui/select"
 import { useEquipments } from "@/hooks/api/useEquipment"
 import { useUsers } from "@/hooks/api/useUser"
-import { formatGenerationOrder } from "@/lib/utils"
 import {
   CreateRental,
   CreateRentalSchema,
-  RentalDetail
+  RentalDetail,
+  formatGenerationOrder
 } from "@repo/shared-types"
 
 interface RentalFormDialogProps {

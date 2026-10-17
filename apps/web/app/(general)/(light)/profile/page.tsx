@@ -26,6 +26,7 @@ import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 const ProfileSkeleton = () => (
   <div>
@@ -165,7 +166,7 @@ const ProfilePage = () => {
               <InfoRow
                 icon={<CalendarDays className="size-4" />}
                 label="기수"
-                value={`${user.generation.order / 2}기`}
+                value={`${formatGenerationOrder(user.generation.order)}기`}
               />
             )}
 

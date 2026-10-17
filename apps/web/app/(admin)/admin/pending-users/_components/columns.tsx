@@ -11,8 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
-import { formatGenerationOrder } from "@/lib/utils"
-import { DetailedUser } from "@repo/shared-types"
+import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 
 interface ColumnCallbacks {
   onApprove: (user: DetailedUser) => void

@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { getSessionDisplayName } from "@/constants/session"
 import { useUsers } from "@/hooks/api/useUser"
 import { matchesKorean } from "@/lib/hangul-search"
-import { formatGenerationOrder } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 interface MemberSelectDialogProps {
   open: boolean

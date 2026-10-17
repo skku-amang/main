@@ -1,4 +1,5 @@
 import { NotificationType, SessionName } from "@repo/database/enums"
+import { formatGenerationOrder } from "../generation/generation.format"
 import type { NotificationItem } from "./notification.schema"
 
 /** SessionName → 한글 표시명. 알림 문구·세션 UI가 함께 쓴다 */
@@ -188,7 +189,7 @@ export function formatNotification(
       const p = item.payload
       return {
         title: "새 가입 신청",
-        body: `${p.generationOrder}기 ${p.userName}님이 가입을 신청했어요`,
+        body: `${formatGenerationOrder(p.generationOrder)}기 ${p.userName}님이 가입을 신청했어요`,
         href: "/admin/pending-users",
         tag: "user-signup"
       }

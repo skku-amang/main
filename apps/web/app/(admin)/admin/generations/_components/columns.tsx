@@ -8,7 +8,6 @@ import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLin
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
 import { UserCell } from "@/app/(admin)/_components/data-table/UserCell"
-import { formatGenerationOrder } from "@/lib/utils"
 import ROUTES from "@/constants/routes"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,7 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { GenerationWithBasicUsers } from "@repo/shared-types"
+import {
+  GenerationWithBasicUsers,
+  formatGenerationOrder
+} from "@repo/shared-types"
 
 interface ColumnActions {
   onEdit: (generation: GenerationWithBasicUsers) => void

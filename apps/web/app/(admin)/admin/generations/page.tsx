@@ -12,8 +12,10 @@ import {
   useGenerations,
   useUpdateGeneration
 } from "@/hooks/api/useGeneration"
-import { formatGenerationOrder } from "@/lib/utils"
-import { GenerationWithBasicUsers } from "@repo/shared-types"
+import {
+  GenerationWithBasicUsers,
+  formatGenerationOrder
+} from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
 import { GenerationFormDialog } from "./_components/GenerationFormDialog"

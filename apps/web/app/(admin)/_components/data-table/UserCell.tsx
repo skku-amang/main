@@ -3,7 +3,7 @@
 import Link from "next/link"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { formatGenerationOrder } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 import ROUTES from "@/constants/routes"
 
 interface BasicUser {

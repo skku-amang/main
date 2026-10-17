@@ -15,7 +15,7 @@ import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useMemberProfile } from "@/hooks/api/useUser"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { formatGenerationOrder } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 const MemberProfilePage = () => {
   const userId = Number(useParams().id)

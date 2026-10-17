@@ -12,11 +12,8 @@ import {
 } from "@/components/ui/popover"
 import ROUTES from "@/constants/routes"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
-import {
-  formatGenerationOrder,
-  getRepresentativeRelativeTime
-} from "@/lib/utils"
-import { TeamDetail } from "@repo/shared-types"
+import { getRepresentativeRelativeTime } from "@/lib/utils"
+import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
 
 interface BasicInfoProps {
   team: TeamDetail
