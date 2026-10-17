@@ -68,6 +68,29 @@ export type NotificationContent = DistributivePick<
   "type" | "payload"
 >
 
+/**
+ * 알림에 프로필 사진을 띄울 부원. 받는 사람 본인이거나 특정 부원이 없는 알림은 null.
+ * 사진은 저장하지 않고 조회 때 userId로 붙인다 — 바꾼 사진이 지난 알림에도 반영되게
+ */
+export function notificationSubject(
+  item: NotificationContent
+): { userId: number; name: string } | null {
+  switch (item.type) {
+    case "TEAM_MEMBER_CHANGE":
+      return item.payload.memberId
+        ? { userId: item.payload.memberId, name: item.payload.memberName }
+        : null
+    case "TEAM_LEADER_CHANGED":
+      return item.payload.leaderId && !item.payload.assigned
+        ? { userId: item.payload.leaderId, name: item.payload.leaderName }
+        : null
+    case "USER_SIGNED_UP":
+      return { userId: item.payload.userId, name: item.payload.userName }
+    default:
+      return null
+  }
+}
+
 const teamHref = (performanceId: number, teamId: number) =>
   `/performances/${performanceId}/teams/${teamId}`
 

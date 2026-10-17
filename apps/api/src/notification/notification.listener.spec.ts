@@ -121,6 +121,7 @@ describe("NotificationListener", () => {
           performanceId: 3,
           teamName: "팀A",
           changeType: "ADDED",
+          memberId: 1,
           memberName: "홍길동",
           sessionNames: ["VOCAL", "GUITAR"]
         }
@@ -454,6 +455,7 @@ describe("NotificationListener", () => {
       expect(rows[0]!.payload).toMatchObject({
         teamId: 7,
         teamName: "팀A",
+        leaderId: 2,
         leaderName: "홍길동"
       })
     })

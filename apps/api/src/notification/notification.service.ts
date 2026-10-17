@@ -6,6 +6,7 @@ import {
   MarkNotificationsReadBySubject,
   NotificationItemSchema,
   NotificationList,
+  notificationSubject,
   NotificationPreferences,
   UnreadNotificationCount,
   UpdateNotificationPreferences
@@ -59,8 +60,25 @@ export class NotificationService {
       return []
     })
 
+    const subjectIds = [
+      ...new Set(items.flatMap((i) => notificationSubject(i)?.userId ?? []))
+    ]
+    const users = subjectIds.length
+      ? await this.prisma.user.findMany({
+          where: { id: { in: subjectIds } },
+          select: { id: true, image: true }
+        })
+      : []
+    const imageOf = new Map(users.map((u) => [u.id, u.image]))
+
     return {
-      items,
+      items: items.map((item) => {
+        const subject = notificationSubject(item)
+        return {
+          ...item,
+          subjectImage: (subject && imageOf.get(subject.userId)) ?? null
+        }
+      }),
       nextCursor: hasMore ? (page.at(-1)?.id ?? null) : null
     }
   }

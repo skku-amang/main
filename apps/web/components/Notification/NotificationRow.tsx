@@ -1,12 +1,17 @@
 "use client"
 
-import { formatNotification, NotificationItem } from "@repo/shared-types"
+import {
+  formatNotification,
+  NotificationListItem,
+  notificationSubject
+} from "@repo/shared-types"
 
 import RelativeTime from "@/components/RelativeTime"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 type NotificationRowProps = {
-  item: NotificationItem
+  item: NotificationListItem
   className?: string
 }
 
@@ -14,6 +19,7 @@ type NotificationRowProps = {
 const NotificationRow = ({ item, className }: NotificationRowProps) => {
   const { title, body } = formatNotification(item)
   const unread = item.readAt === null
+  const subject = notificationSubject(item)
 
   return (
     <div className={cn("flex w-full items-start gap-x-3", className)}>
@@ -25,6 +31,12 @@ const NotificationRow = ({ item, className }: NotificationRowProps) => {
         )}
       />
       {unread && <span className="sr-only">안 읽음</span>}
+      {subject && (
+        <Avatar aria-hidden className="size-9">
+          <AvatarImage src={item.subjectImage ?? undefined} alt="" />
+          <AvatarFallback className="text-sm">{subject.name[0]}</AvatarFallback>
+        </Avatar>
+      )}
       <div className="min-w-0 flex-1">
         <div
           className={cn(

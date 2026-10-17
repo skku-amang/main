@@ -76,12 +76,19 @@ function fakeNotificationTable(rows: Row[]) {
   }
 }
 
-async function makeService(rows: Row[]) {
+type UserRow = { id: number; image: string | null }
+
+async function makeService(rows: Row[], users: UserRow[] = []) {
   const table = fakeNotificationTable(rows)
+  const user = {
+    findMany: jest.fn(({ where }: { where: { id: { in: number[] } } }) =>
+      users.filter((u) => where.id.in.includes(u.id))
+    )
+  }
   const module: TestingModule = await Test.createTestingModule({
     providers: [
       NotificationService,
-      { provide: PrismaService, useValue: { notification: table } }
+      { provide: PrismaService, useValue: { notification: table, user } }
     ]
   }).compile()
   return { service: module.get(NotificationService), table }
@@ -128,6 +135,38 @@ describe("NotificationService", () => {
     it("남의 알림은 포함하지 않는다", async () => {
       const result = await service.findAll(2, { limit: 10 })
       expect(result.items.map((i) => i.id)).toEqual([5])
+    })
+
+    it("관련 부원의 현재 프로필 사진을 붙이고, 없거나 대상이 없으면 null (#834)", async () => {
+      const memberChange = (memberId?: number) => ({
+        teamId: 7,
+        performanceId: 3,
+        teamName: "팀A",
+        changeType: "ADDED",
+        ...(memberId && { memberId }),
+        memberName: "홍길동",
+        sessionNames: []
+      })
+      const { service } = await makeService(
+        [
+          row(40, 1, null, "TEAM_MEMBER_CHANGE", memberChange(5)),
+          row(30, 1, null, "TEAM_MEMBER_CHANGE", memberChange(6)),
+          row(20, 1, null, "TEAM_MEMBER_CHANGE", memberChange()),
+          row(10, 1, null)
+        ],
+        [
+          { id: 5, image: "https://minio/a.png" },
+          { id: 6, image: null }
+        ]
+      )
+
+      const result = await service.findAll(1, { limit: 10 })
+      expect(result.items.map((i) => [i.id, i.subjectImage])).toEqual([
+        [40, "https://minio/a.png"],
+        [30, null],
+        [20, null],
+        [10, null]
+      ])
     })
   })
 

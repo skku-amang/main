@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatNotification } from "./notification.format"
+import { formatNotification, notificationSubject } from "./notification.format"
 
 describe("formatNotification", () => {
   it("멤버 합류: 팀 이름이 제목, 세션은 한글로", () => {
@@ -282,5 +282,71 @@ describe("formatNotification — 가입·팀장·공연 변경·팀 삭제·정�
       body: "10/17 18:30까지 Yamaha P-125 반납",
       href: "/reservations/equipment/2"
     })
+  })
+})
+
+describe("notificationSubject — 알림에 사진을 띄울 부원 (#834)", () => {
+  const memberChange = {
+    teamId: 7,
+    performanceId: 3,
+    teamName: "팀A",
+    changeType: "ADDED" as const,
+    memberName: "홍길동",
+    sessionNames: []
+  }
+
+  it("팀원 합류·탈퇴: 그 팀원", () => {
+    expect(
+      notificationSubject({
+        type: "TEAM_MEMBER_CHANGE",
+        payload: { ...memberChange, memberId: 5 }
+      })
+    ).toEqual({ userId: 5, name: "홍길동" })
+  })
+
+  it("id가 없던 예전 알림은 대상 없음", () => {
+    expect(
+      notificationSubject({ type: "TEAM_MEMBER_CHANGE", payload: memberChange })
+    ).toBeNull()
+  })
+
+  it("팀장 교체: 다른 사람이 팀장이 되면 새 팀장, 내가 팀장이 되면 없음", () => {
+    const payload = {
+      teamId: 7,
+      performanceId: 3,
+      teamName: "팀A",
+      leaderName: "김철수",
+      leaderId: 6
+    }
+    expect(
+      notificationSubject({
+        type: "TEAM_LEADER_CHANGED",
+        payload: { ...payload, assigned: false }
+      })
+    ).toEqual({ userId: 6, name: "김철수" })
+    expect(
+      notificationSubject({
+        type: "TEAM_LEADER_CHANGED",
+        payload: { ...payload, assigned: true }
+      })
+    ).toBeNull()
+  })
+
+  it("가입 신청: 신청자", () => {
+    expect(
+      notificationSubject({
+        type: "USER_SIGNED_UP",
+        payload: { userId: 9, userName: "이영희", generationOrder: 23 }
+      })
+    ).toEqual({ userId: 9, name: "이영희" })
+  })
+
+  it("특정 부원이 없는 알림은 없음", () => {
+    expect(
+      notificationSubject({
+        type: "PERFORMANCE_CREATED",
+        payload: { performanceId: 3, performanceName: "봄 공연" }
+      })
+    ).toBeNull()
   })
 })

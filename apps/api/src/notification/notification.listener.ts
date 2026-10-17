@@ -234,6 +234,7 @@ export class NotificationListener {
         teamId: team.id,
         performanceId: team.performanceId,
         teamName: team.name,
+        leaderId: event.newLeaderId,
         leaderName: leader.name
       }
       // 새 팀장과 전 팀장은 문구가 달라 row를 따로 만든다. 행동한 본인은 제외
@@ -394,6 +395,7 @@ export class NotificationListener {
         performanceId: team.performanceId,
         teamName: team.name,
         changeType,
+        memberId: event.userId,
         memberName: member.name,
         sessionNames: sessions.map((s) => s.name)
       }
