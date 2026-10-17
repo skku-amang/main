@@ -29,7 +29,7 @@ const MemberSessionRequiredCheckbox = ({
       <Checkbox
         id={requiredFieldName}
         name={requiredFieldName}
-        className="h-3 w-3 md:h-5 md:w-5"
+        className="h-6 w-6 md:h-5 md:w-5"
         onCheckedChange={(e) => {
           secondPageForm.setValue(requiredFieldName, !!e)
           secondPageForm.setValue(memberFieldName, null)
