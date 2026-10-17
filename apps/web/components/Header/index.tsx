@@ -3,7 +3,6 @@
 import { Knewave } from "next/font/google"
 import Link from "next/link"
 
-import MobileBackButton from "@/components/Header/_component/MobileBackButton"
 import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -61,7 +60,6 @@ const Header = ({
           }
         )}
       >
-        <MobileBackButton />
         <Link
           href={ROUTES.HOME}
           className={cn("text-[21px]", knewave.className, "text-white")}
