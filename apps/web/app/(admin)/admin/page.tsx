@@ -3,9 +3,17 @@
 import { format } from "date-fns"
 import { Guitar, Hash, Mic, Music, Users } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useMemo } from "react"
+import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig
+} from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
@@ -139,6 +147,83 @@ function UnfilledTeamItem({
         </div>
       </div>
     </Link>
+  )
+}
+
+// --- Generation Chart ---
+
+const generationChartConfig = {
+  members: { label: "회원", color: "hsl(var(--primary))" }
+} satisfies ChartConfig
+
+const GENERATION_BAR_SIZE = 20
+const GENERATION_ROW_HEIGHT = 36
+
+function GenerationChart({
+  generations
+}: {
+  generations: { id: number; order: number; users: unknown[] }[]
+}) {
+  const router = useRouter()
+
+  const data = [...generations]
+    .sort((a, b) => b.order - a.order)
+    .slice(0, 10)
+    .map((gen) => ({
+      order: gen.order,
+      generation: `${formatGenerationOrder(gen.order)}기`,
+      members: gen.users.length
+    }))
+
+  return (
+    <ChartContainer
+      config={generationChartConfig}
+      className="aspect-auto w-full"
+      style={{ height: data.length * GENERATION_ROW_HEIGHT + 16 }}
+      role="img"
+      aria-label={`기수별 회원 수: ${data
+        .map((d) => `${d.generation} ${d.members}명`)
+        .join(", ")}`}
+    >
+      <BarChart
+        data={data}
+        layout="vertical"
+        margin={{ top: 8, right: 40, bottom: 8, left: 0 }}
+      >
+        <YAxis
+          dataKey="generation"
+          type="category"
+          axisLine={false}
+          tickLine={false}
+          width={48}
+        />
+        <XAxis dataKey="members" type="number" allowDecimals={false} hide />
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent indicator="line" />}
+        />
+        <Bar
+          dataKey="members"
+          fill="var(--color-members)"
+          radius={4}
+          barSize={GENERATION_BAR_SIZE}
+          className="cursor-pointer"
+          onClick={(entry: { payload: { order: number } }) =>
+            router.push(
+              `${ROUTES.ADMIN.USERS}?generation=${entry.payload.order}`
+            )
+          }
+        >
+          <LabelList
+            dataKey="members"
+            position="right"
+            offset={8}
+            className="fill-foreground"
+            formatter={(value: number) => `${value}명`}
+          />
+        </Bar>
+      </BarChart>
+    </ChartContainer>
   )
 }
 
@@ -358,24 +443,8 @@ export default function AdminDashboardPage() {
                 전체 보기
               </Link>
             </div>
-            <div className="flex flex-wrap gap-3 p-4">
-              {[...generations]
-                .sort((a, b) => b.order - a.order)
-                .slice(0, 10)
-                .map((gen) => (
-                  <Link
-                    key={gen.id}
-                    href={`${ROUTES.ADMIN.USERS}?generation=${gen.order}`}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all hover:bg-neutral-50 hover:shadow-sm hover:-translate-y-0.5"
-                  >
-                    <span className="font-medium">
-                      {formatGenerationOrder(gen.order)}기
-                    </span>
-                    <span className="text-neutral-400">
-                      {gen.users.length}명
-                    </span>
-                  </Link>
-                ))}
+            <div className="p-4">
+              <GenerationChart generations={generations} />
             </div>
           </div>
         )}
