@@ -53,7 +53,7 @@ const Header = ({
       {/* Mobile */}
       <nav
         className={cn(
-          "visible relative flex h-full w-full items-center justify-between px-2 py-2 md:hidden",
+          "visible relative flex h-full w-full items-center justify-end px-2 py-2 md:hidden",
           {
             "bg-primary": mode === "light" || mode === "dark",
             "bg-transparent": mode === "transparent"
@@ -62,7 +62,11 @@ const Header = ({
       >
         <Link
           href={ROUTES.HOME}
-          className={cn("text-[21px]", knewave.className, "text-white")}
+          className={cn(
+            "absolute left-1/2 -translate-x-1/2 text-[21px]",
+            knewave.className,
+            "text-white"
+          )}
         >
           Amang
         </Link>
