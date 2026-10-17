@@ -69,6 +69,7 @@ import {
   SelectTrigger
 } from "../Mobile/SortSelect"
 import CompactTeamList from "./CompactTeamList"
+import LoadMoreSentinel from "./LoadMoreSentinel"
 import RosterCell from "./RosterCell"
 import { TeamColumn } from "./columns"
 import { TeamListView, useTeamListView } from "./useTeamListView"
@@ -84,6 +85,7 @@ import {
 } from "./drawer"
 
 const SESSION_LABELS = Object.values(SESSION_DISPLAY_NAME)
+const TEAMS_PER_PAGE = 10
 
 interface DataTableProps<TValue> {
   className?: string
@@ -150,7 +152,7 @@ export function TeamListDataTable<TValue>({
     [setPageQuery]
   )
   const pagination: PaginationState = useMemo(
-    () => ({ pageIndex: Math.max(0, pageQuery - 1), pageSize: 10 }),
+    () => ({ pageIndex: Math.max(0, pageQuery - 1), pageSize: TEAMS_PER_PAGE }),
     [pageQuery]
   )
 
@@ -326,6 +328,28 @@ export function TeamListDataTable<TValue>({
       setPageQuery(pageCount, { history: "replace" })
     }
   }, [pageCount, pageQuery, setPageQuery])
+
+  // 휴대폰 표 보기는 페이지 대신 아래로 내릴 때마다 더 보여 준다. 필터·정렬·검색이 바뀌면 처음 개수로
+  const allRows = table.getPrePaginationRowModel().rows
+  const shownResetKey = JSON.stringify([
+    sortQuery,
+    searchQuery,
+    sessionFilterArr,
+    statusFilter,
+    bookmarkedOnly
+  ])
+  const [shown, setShown] = useState({
+    key: shownResetKey,
+    count: TEAMS_PER_PAGE
+  })
+  const shownCount = Math.min(
+    shown.key === shownResetKey ? shown.count : TEAMS_PER_PAGE,
+    allRows.length
+  )
+  const showMore = useCallback(
+    () => setShown({ key: shownResetKey, count: shownCount + TEAMS_PER_PAGE }),
+    [shownResetKey, shownCount]
+  )
 
   const missingMemberSessions = getSessionsWithMissingMembers
 
@@ -671,21 +695,33 @@ export function TeamListDataTable<TValue>({
         <Separator orientation="horizontal" className="my-3" />
 
         {/* 팀 목록 */}
-        {!rowsOnPage.length ? (
-          emptyMessage
-        ) : listView === "card" ? (
-          <div className="space-y-3">{teamCards}</div>
+        {listView === "card" ? (
+          rowsOnPage.length ? (
+            <div className="space-y-3">{teamCards}</div>
+          ) : (
+            emptyMessage
+          )
+        ) : allRows.length ? (
+          <>
+            <CompactTeamList
+              rows={allRows.slice(0, shownCount)}
+              slots={rosterSlots}
+              viewerId={user?.id}
+              canApply={isAuthenticated && isRecruiting}
+            />
+            {shownCount < allRows.length && (
+              <LoadMoreSentinel onVisible={showMore} />
+            )}
+            <p className="py-6 text-center text-xs text-slate-500">
+              {allRows.length}개 중 {shownCount}개 표시
+            </p>
+          </>
         ) : (
-          <CompactTeamList
-            rows={rowsOnPage}
-            slots={rosterSlots}
-            viewerId={user?.id}
-            canApply={isAuthenticated && isRecruiting}
-          />
+          emptyMessage
         )}
 
         {/* 모바일 페이지네이션 */}
-        {table.getRowModel().rows.length > 0 && (
+        {listView === "card" && rowsOnPage.length > 0 && (
           <div className="py-6">
             <ResponsivePagination
               currentPage={table.getState().pagination.pageIndex + 1}
