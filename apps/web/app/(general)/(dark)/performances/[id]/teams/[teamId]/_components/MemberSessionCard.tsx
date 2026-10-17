@@ -9,9 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { formatGenerationOrder } from "@/lib/utils"
 import type { SessionNameValue } from "@/constants/session"
-import { TeamDetail } from "@repo/shared-types"
+import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
 
 type TeamMember = TeamDetail["teamSessions"][number]["members"][number]["user"]
 

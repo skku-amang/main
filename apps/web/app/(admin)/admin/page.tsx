@@ -14,7 +14,7 @@ import { usePerformances } from "@/hooks/api/usePerformance"
 import { useSessions } from "@/hooks/api/useSession"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { useUsers } from "@/hooks/api/useUser"
-import { formatGenerationOrder } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 // --- Summary Card ---
 

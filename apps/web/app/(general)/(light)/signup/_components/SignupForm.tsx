@@ -2,7 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ConflictError, ValidationError } from "@repo/api-client"
-import { CreateUserSchema, passwordField } from "@repo/shared-types"
+import {
+  CreateUserSchema,
+  passwordField,
+  formatGenerationOrder
+} from "@repo/shared-types"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -33,7 +37,6 @@ import { getSessionDisplayName } from "@/constants/session"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import { apiClient } from "@/lib/apiClient"
-import { formatGenerationOrder } from "@/lib/utils"
 
 const confirmPasswordMergedCreateUserSchema = CreateUserSchema.merge(
   z.object({ confirmPassword: passwordField })

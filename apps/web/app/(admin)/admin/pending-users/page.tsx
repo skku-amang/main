@@ -15,9 +15,8 @@ import {
   useUpdateUser
 } from "@/hooks/api/useUser"
 import { getSessionDisplayName } from "@/constants/session"
-import { formatGenerationOrder } from "@/lib/utils"
 import { ApiError } from "@repo/api-client"
-import { DetailedUser } from "@repo/shared-types"
+import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
 

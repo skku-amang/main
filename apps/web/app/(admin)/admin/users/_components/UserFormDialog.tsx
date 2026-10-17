@@ -37,8 +37,7 @@ import { getSessionDisplayName } from "@/constants/session"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import { useImageUpload } from "@/hooks/useImageUpload"
-import { formatGenerationOrder } from "@/lib/utils"
-import { DetailedUser } from "@repo/shared-types"
+import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 
 const UserEditSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요."),

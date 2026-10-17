@@ -9,8 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
-import { formatGenerationOrder } from "@/lib/utils"
-import { isPerformanceRecruiting, TeamList } from "@repo/shared-types"
+import {
+  isPerformanceRecruiting,
+  TeamList,
+  formatGenerationOrder
+} from "@repo/shared-types"
 
 import { getColumns } from "./_components/columns"
 

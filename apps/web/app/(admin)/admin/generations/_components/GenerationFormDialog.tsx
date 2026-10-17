@@ -24,11 +24,11 @@ import { Input } from "@/components/ui/input"
 import { UserSelectContent } from "@/app/(admin)/_components/UserSelectContent"
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useUsers } from "@/hooks/api/useUser"
-import { formatGenerationOrder } from "@/lib/utils"
 import {
   CreateGeneration,
   CreateGenerationSchema,
-  GenerationWithBasicUsers
+  GenerationWithBasicUsers,
+  formatGenerationOrder
 } from "@repo/shared-types"
 
 interface GenerationFormDialogProps {

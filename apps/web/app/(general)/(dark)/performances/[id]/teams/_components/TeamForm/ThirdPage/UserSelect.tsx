@@ -18,7 +18,8 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import { cn, formatGenerationOrder } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 interface SelectableUser {
   id: number

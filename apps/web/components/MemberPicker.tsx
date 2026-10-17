@@ -18,7 +18,8 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import { koreanCommandFilter } from "@/lib/hangul-search"
-import { cn, formatGenerationOrder } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 export interface PickableMember {
   id: number

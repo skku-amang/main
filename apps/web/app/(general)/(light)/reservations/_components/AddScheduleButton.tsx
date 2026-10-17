@@ -27,11 +27,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import MemberPicker from "@/components/MemberPicker"
-import { cn, formatGenerationOrder } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { useCreateRental } from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
-import { Equipment } from "@repo/shared-types"
+import { Equipment, formatGenerationOrder } from "@repo/shared-types"
 import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options

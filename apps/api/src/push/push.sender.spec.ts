@@ -25,8 +25,7 @@ const sendNotification = webpush.sendNotification as jest.Mock
 const message = {
   title: "팀A",
   body: "홍길동님이 합류했습니다",
-  href: "/x",
-  tag: "team-1"
+  href: "/x"
 }
 
 describe("PushSender", () => {

@@ -7,7 +7,6 @@ import Link from "next/link"
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
-import { formatGenerationOrder } from "@/lib/utils"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -19,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { DetailedUser } from "@repo/shared-types"
+import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 
 interface ColumnCallbacks {
   onEdit: (user: DetailedUser) => void

@@ -27,8 +27,6 @@ self.addEventListener("push", (event) => {
     icon: "/icons/icon-192.png",
     // 안드로이드 상태바용. 알파만 쓰이므로 흰색 단색 실루엣
     badge: "/icons/badge-96.png",
-    // 같은 팀 소식은 알림창에서 최신 것으로 덮어쓰되 진동은 다시 울린다
-    ...(data.tag && { tag: data.tag, renotify: true }),
     data: { href: data.href }
   })
   // 앱 아이콘 숫자 배지 (iOS 설치 웹앱·데스크톱. 안드로이드는 점만)

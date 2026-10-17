@@ -88,8 +88,7 @@ describe("PushListener", () => {
     expect(sendToUsers).toHaveBeenCalledWith([3, 4], {
       title: "봄 공연",
       body: "새 팀이 생겼습니다: 팀B",
-      href: "/performances/1/teams/9",
-      tag: "team-9"
+      href: "/performances/1/teams/9"
     })
     expect(updateMany.mock.invocationCallOrder[0]).toBeLessThan(
       sendToUsers.mock.invocationCallOrder[0]!

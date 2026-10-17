@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SelectContent, SelectItem } from "@/components/ui/select"
-import { formatGenerationOrder } from "@/lib/utils"
+import { formatGenerationOrder } from "@repo/shared-types"
 
 interface SelectableUser {
   id: number
