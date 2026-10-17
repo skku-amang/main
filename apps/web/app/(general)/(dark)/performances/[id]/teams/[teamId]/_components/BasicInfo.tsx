@@ -2,6 +2,7 @@ import dayjs from "dayjs"
 import Link from "next/link"
 
 import TeamActionsMenu from "@/components/TeamActionsMenu"
+import RelativeTime from "@/components/RelativeTime"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import TeamBookmarkButton from "@/components/TeamBookmarkButton"
@@ -14,7 +15,6 @@ import {
 import ROUTES from "@/constants/routes"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
-import { getRepresentativeRelativeTime } from "@/lib/utils"
 import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
 
 interface BasicInfoProps {
@@ -53,9 +53,7 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
           <Popover>
             <PopoverTrigger className="underline decoration-dotted underline-offset-4">
-              <time dateTime={new Date(team.createdAt).toISOString()}>
-                {getRepresentativeRelativeTime(team.createdAt)}
-              </time>
+              <RelativeTime date={team.createdAt} />
             </PopoverTrigger>
             <PopoverContent className="w-auto px-3 py-2 text-sm font-normal text-slate-700">
               {dayjs(team.createdAt).format("YYYY.MM.DD HH:mm")} 생성

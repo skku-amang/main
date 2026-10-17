@@ -31,8 +31,10 @@ export function getRepresentativeRelativeTime(date: Date | string) {
   const diffMonths = Math.floor(diffDays / 30)
   const diffYears = Math.floor(diffDays / 365)
 
-  if (diffSeconds < 60) {
+  if (diffSeconds < 1) {
     return `방금`
+  } else if (diffSeconds < 60) {
+    return `${diffSeconds}초 전`
   } else if (diffMinutes < 60) {
     return `${diffMinutes}분 전`
   } else if (diffHours < 24) {
