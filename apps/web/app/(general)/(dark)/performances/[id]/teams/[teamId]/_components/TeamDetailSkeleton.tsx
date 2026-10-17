@@ -73,7 +73,7 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
 
       {/* YouTube 영역 */}
       <div className="relative z-10 flex w-full items-center justify-center pb-[20px] md:pb-[49px]">
-        <Skeleton className="mx-10 aspect-video h-auto w-full rounded-lg md:mx-0 md:w-full md:max-w-[1152px]" />
+        <Skeleton className="aspect-video h-auto w-full rounded-lg md:max-w-[1152px]" />
       </div>
 
       <div className="flex w-full gap-[24px] max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px]">
