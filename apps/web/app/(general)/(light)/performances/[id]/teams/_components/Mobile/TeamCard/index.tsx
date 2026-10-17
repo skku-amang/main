@@ -20,7 +20,7 @@ import {
 } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
 
-import TeamActionsMenu from "../../TeamActionsMenu"
+import TeamActionsMenu from "@/components/TeamActionsMenu"
 
 interface TeamCardProps {
   performanceId: number

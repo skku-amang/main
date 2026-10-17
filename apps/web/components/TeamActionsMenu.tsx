@@ -55,7 +55,7 @@ const TeamActionsMenu = ({
       >
         <DropdownMenuItem
           onSelect={(e) => e.preventDefault()}
-          className="flex items-center justify-center gap-x-2 px-6 py-2 selection:text-slate-700 hover:cursor-pointer"
+          className="flex items-center justify-center gap-x-2 px-6 py-2 text-destructive selection:text-slate-700 hover:cursor-pointer focus:text-destructive"
         >
           <Trash2 />
           삭제하기

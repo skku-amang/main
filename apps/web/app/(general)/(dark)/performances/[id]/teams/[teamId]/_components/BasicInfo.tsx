@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 import Link from "next/link"
 
-import DeleteEditButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/DeleteEditButton"
+import TeamActionsMenu from "@/components/TeamActionsMenu"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -60,10 +60,10 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           </Popover>
         </div>
         {canEdit && (
-          <DeleteEditButton
-            className="ml-auto"
+          <TeamActionsMenu
             performanceId={team.performanceId}
-            team={team}
+            teamId={team.id}
+            className="ml-auto size-8"
           />
         )}
       </div>
