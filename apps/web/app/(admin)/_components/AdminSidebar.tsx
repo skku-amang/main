@@ -24,6 +24,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet"
 import ROUTES from "@/constants/routes"
+import { usePendingUsers } from "@/hooks/api/useUser"
 import { cn } from "@/lib/utils"
 
 import { useUnsavedChanges } from "./UnsavedChangesContext"
@@ -48,6 +49,10 @@ const NAV_ITEMS = [
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
   const { guardNavigation } = useUnsavedChanges()
+  const { data: pendingUsers } = usePendingUsers()
+  const counts: Partial<Record<string, number>> = {
+    [ROUTES.ADMIN.PENDING_USERS]: pendingUsers?.length
+  }
 
   return (
     <nav className="flex flex-col gap-1">
@@ -55,6 +60,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         const isActive = exact
           ? pathname === href
           : pathname === href || pathname.startsWith(href)
+        const count = counts[href] ?? 0
 
         return (
           <Link
@@ -76,6 +82,17 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           >
             <Icon className="h-4 w-4" />
             {label}
+            {count > 0 && (
+              <>
+                <span className="sr-only">{`${count}명`}</span>
+                <span
+                  aria-hidden
+                  className="ml-auto min-w-5 rounded-full bg-red-500 px-1.5 text-center text-xs font-bold leading-5 text-white"
+                >
+                  {count > 99 ? "99+" : count}
+                </span>
+              </>
+            )}
           </Link>
         )
       })}
