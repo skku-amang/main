@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 
 import TeamFormBackground from "@/app/(general)/(dark)/performances/[id]/teams/_components/TeamForm/Background"
+import AuthGate from "@/components/AuthGate"
 import OleoPageHeader from "@/components/PageHeaders/OleoPageHeader"
 import ROUTES from "@/constants/routes"
 import { mapPerformance } from "@/hooks/api/mapper"
@@ -23,7 +23,6 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
   const performanceId = params.id
 
   const user = await getServerUser()
-  if (!user) redirect(ROUTES.LOGIN)
 
   // 조회 실패 시에는 폼을 그대로 보여주고 판단을 서버(팀 생성 API)에 맡김.
   // apiClient 응답의 날짜는 문자열이라 mapper로 Date 변환 후 판정
@@ -33,7 +32,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
     .catch(() => null)
   const isClosed = performance !== null && !isPerformanceRecruiting(performance)
 
-  return (
+  const content = (
     <div className="flex h-full w-full flex-col items-center justify-center">
       <TeamFormBackground />
 
@@ -64,6 +63,8 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
       )}
     </div>
   )
+
+  return user ? content : <AuthGate>{content}</AuthGate>
 }
 
 export default TeamCreatePage

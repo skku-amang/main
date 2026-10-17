@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
+import AuthGate from "@/components/AuthGate"
 import SuggestionButton from "@/components/SuggestionButton"
 import ROUTES from "@/constants/routes"
 import { getServerUser } from "@/lib/auth/server"
@@ -19,11 +20,11 @@ export default async function AdminLayout({
 }) {
   const user = await getServerUser()
 
-  if (!user?.isAdmin) {
+  if (user && !user.isAdmin) {
     redirect(ROUTES.LOGIN)
   }
 
-  return (
+  const content = (
     <UnsavedChangesProvider>
       <div className="flex h-screen">
         <AdminSidebar />
@@ -34,4 +35,6 @@ export default async function AdminLayout({
       <SuggestionButton />
     </UnsavedChangesProvider>
   )
+
+  return user ? content : <AuthGate requireAdmin>{content}</AuthGate>
 }
