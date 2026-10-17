@@ -206,6 +206,7 @@ function GenerationChart({
           dataKey="members"
           fill="var(--color-members)"
           radius={4}
+          minPointSize={8}
           barSize={GENERATION_BAR_SIZE}
           className="cursor-pointer"
           onClick={(entry: { payload: { order: number } }) =>
