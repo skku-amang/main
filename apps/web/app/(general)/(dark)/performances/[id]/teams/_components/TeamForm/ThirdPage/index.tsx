@@ -26,11 +26,17 @@ const ThirdPage = ({ form, onValid, onPrevious }: ThirdPageProps) => {
     <Form {...form}>
       <form>
         <Description header="팀원 정보" className="mb-6">
-          <CircleAlert className="h-2.5 w-2.5 text-gray-600 md:h-4 md:w-4" />
-          이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 후 멤버를
-          선택해주세요
-          <br />
-          멤버모집이 필요한 세션의 경우, 체크표시가 되어 있지 않아야 합니다
+          <ul className="space-y-1">
+            {[
+              "이미 멤버가 확정된 세션의 경우, 해당 세션에 체크표시 후 멤버를 선택해주세요",
+              "멤버모집이 필요한 세션의 경우, 체크표시가 되어 있지 않아야 합니다"
+            ].map((sentence) => (
+              <li key={sentence} className="flex items-start gap-x-2">
+                <CircleAlert className="mt-[3px] h-2.5 w-2.5 shrink-0 text-gray-600 md:mt-0 md:h-4 md:w-4" />
+                {sentence}
+              </li>
+            ))}
+          </ul>
         </Description>
 
         {/* 팀원 정보 입력 */}
