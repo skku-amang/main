@@ -4,6 +4,7 @@ import Link from "next/link"
 import TeamActionsMenu from "@/components/TeamActionsMenu"
 import FreshmenFixedBadge from "@/components/TeamBadges/FreshmenFixedBadge"
 import StatusBadge from "@/components/TeamBadges/StatusBadge"
+import TeamBookmarkButton from "@/components/TeamBookmarkButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Popover,
@@ -11,6 +12,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover"
 import ROUTES from "@/constants/routes"
+import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 import { getRepresentativeRelativeTime } from "@/lib/utils"
 import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
@@ -22,6 +24,7 @@ interface BasicInfoProps {
 
 const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
   const isSatisfied = isTeamSatisfied(team.teamSessions ?? [])
+  const bookmarks = useTeamBookmarks()
 
   return (
     <div className="relative h-fit w-full rounded-2xl bg-white px-[26px] py-[30px] text-lg font-semibold shadow-[0_4px_30px_0_rgba(59,130,246,0.07)] md:px-[40px] xl:w-[466px] md:py-[60px]">
@@ -59,11 +62,16 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
             </PopoverContent>
           </Popover>
         </div>
+        <TeamBookmarkButton
+          teamId={team.id}
+          bookmarked={bookmarks.has(team.id)}
+          className="ml-auto"
+        />
         {canEdit && (
           <TeamActionsMenu
             performanceId={team.performanceId}
             teamId={team.id}
-            className="ml-auto size-8"
+            className="size-8"
           />
         )}
       </div>
