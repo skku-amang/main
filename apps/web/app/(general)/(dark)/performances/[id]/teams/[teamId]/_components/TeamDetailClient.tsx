@@ -83,13 +83,13 @@ const TeamDetailClient = () => {
 
       <div className="relative z-10 flex w-full gap-5 max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}
-        <div className="flex w-[93%] flex-col gap-y-5 md:w-full md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
+        <div className="flex w-full flex-col gap-y-5 md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
           <BasicInfo team={team} canEdit={canEdit} />
           {team.image && <PosterImage src={team.image} />}
         </div>
 
         {/* 세션 구성 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
+        <div className="flex h-full w-full flex-col gap-y-5 xl:w-[662px]">
           {/* 세션 구성 */}
           {team.teamSessions && team.teamSessions.length > 0 && (
             <SessionSetCard

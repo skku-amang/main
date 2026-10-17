@@ -85,7 +85,7 @@ const TeamDetailSkeleton = ({ performanceId }: TeamDetailSkeletonProps) => {
         </div>
 
         {/* 오른쪽: 세션 카드들 */}
-        <div className="flex h-full w-[93%] flex-col gap-y-5 md:w-full xl:w-[662px]">
+        <div className="flex h-full w-full flex-col gap-y-5 xl:w-[662px]">
           {/* 세션구성 */}
           <SessionSetCardSkeleton header="세션구성">
             <div className="flex flex-wrap gap-x-2 gap-y-2 pt-[20px] md:pt-[40px]">
