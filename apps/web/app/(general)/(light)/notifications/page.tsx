@@ -3,6 +3,7 @@
 import { CheckCheck } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useEffect, useRef } from "react"
 
 import NotificationRow from "@/components/Notification/NotificationRow"
 import { Button } from "@/components/ui/button"
@@ -38,10 +39,27 @@ const NotificationsPage = () => {
     refetch,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
+    isFetchNextPageError
   } = useNotifications(PAGE_SIZE, { enabled: !!user })
   const markRead = useMarkNotificationRead()
   const markAllRead = useMarkAllNotificationsRead()
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  // 실패한 뒤엔 관찰을 멈춘다 — 화면에 보이는 채로 다시 붙으면 즉시 재요청이 반복됨
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel || !hasNextPage || isFetchingNextPage || isFetchNextPageError)
+      return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) fetchNextPage()
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage])
 
   const openItem = (item: NotificationItem) => {
     if (item.readAt === null) markRead.mutate([item.id])
@@ -116,14 +134,16 @@ const NotificationsPage = () => {
       )}
 
       {hasNextPage && (
-        <div className="mt-4 flex justify-center">
-          <Button
-            variant="outline"
-            disabled={isFetchingNextPage}
-            onClick={() => fetchNextPage()}
-          >
-            {isFetchingNextPage ? "불러오는 중…" : "더 보기"}
-          </Button>
+        <div ref={sentinelRef} className="mt-4 flex justify-center">
+          {isFetchNextPageError ? (
+            <Button variant="outline" onClick={() => fetchNextPage()}>
+              다시 불러오기
+            </Button>
+          ) : (
+            isFetchingNextPage && (
+              <p className="text-sm text-slate-500">불러오는 중…</p>
+            )
+          )}
         </div>
       )}
     </div>

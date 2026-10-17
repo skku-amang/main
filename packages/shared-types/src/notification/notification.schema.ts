@@ -8,6 +8,8 @@ export const TeamMemberChangePayloadSchema = z.object({
   performanceId: idSchema,
   teamName: z.string(),
   changeType: z.enum(["ADDED", "REMOVED"]),
+  /** #834 이전 알림엔 없다 */
+  memberId: idSchema.optional(),
   memberName: z.string(),
   sessionNames: z.array(z.nativeEnum(SessionName))
 })
@@ -47,6 +49,8 @@ export const TeamLeaderChangedPayloadSchema = z.object({
   teamId: idSchema,
   performanceId: idSchema,
   teamName: z.string(),
+  /** #834 이전 알림엔 없다 */
+  leaderId: idSchema.optional(),
   leaderName: z.string(),
   /** true = 받는 사람이 새 팀장 */
   assigned: z.boolean()
