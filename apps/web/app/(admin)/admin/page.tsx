@@ -156,8 +156,7 @@ const generationChartConfig = {
   members: { label: "회원", color: "hsl(var(--primary))" }
 } satisfies ChartConfig
 
-const GENERATION_BAR_SIZE = 20
-const GENERATION_ROW_HEIGHT = 36
+const GENERATION_MAX_BAR_SIZE = 28
 
 function GenerationChart({
   generations
@@ -166,9 +165,11 @@ function GenerationChart({
 }) {
   const router = useRouter()
 
+  // 최근 10개 기수를 오래된 기수 → 최신 기수 순(왼쪽 → 오른쪽)으로
   const data = [...generations]
     .sort((a, b) => b.order - a.order)
     .slice(0, 10)
+    .reverse()
     .map((gen) => ({
       order: gen.order,
       generation: `${formatGenerationOrder(gen.order)}기`,
@@ -178,8 +179,7 @@ function GenerationChart({
   return (
     <ChartContainer
       config={generationChartConfig}
-      className="aspect-auto w-full"
-      style={{ height: data.length * GENERATION_ROW_HEIGHT + 16 }}
+      className="aspect-auto h-[220px] w-full"
       role="img"
       aria-label={`기수별 회원 수: ${data
         .map((d) => `${d.generation} ${d.members}명`)
@@ -187,40 +187,39 @@ function GenerationChart({
     >
       <BarChart
         data={data}
-        layout="vertical"
-        margin={{ top: 8, right: 40, bottom: 8, left: 0 }}
+        margin={{ top: 20, right: 0, bottom: 0, left: 0 }}
+        className="cursor-pointer"
+        onClick={(state) => {
+          const order = state?.activePayload?.[0]?.payload?.order
+          if (order !== undefined)
+            router.push(`${ROUTES.ADMIN.USERS}?generation=${order}`)
+        }}
       >
-        <YAxis
+        <XAxis
           dataKey="generation"
-          type="category"
           axisLine={false}
           tickLine={false}
-          width={48}
+          interval={0}
+          fontSize={11}
+          tickFormatter={(label: string) => label.replace("기", "")}
         />
-        <XAxis dataKey="members" type="number" allowDecimals={false} hide />
+        <YAxis dataKey="members" allowDecimals={false} hide />
         <ChartTooltip
-          cursor={false}
+          cursor={{ fill: "hsl(var(--muted))" }}
           content={<ChartTooltipContent indicator="line" />}
         />
         <Bar
           dataKey="members"
           fill="var(--color-members)"
           radius={4}
-          minPointSize={8}
-          barSize={GENERATION_BAR_SIZE}
-          className="cursor-pointer"
-          onClick={(entry: { payload: { order: number } }) =>
-            router.push(
-              `${ROUTES.ADMIN.USERS}?generation=${entry.payload.order}`
-            )
-          }
+          maxBarSize={GENERATION_MAX_BAR_SIZE}
         >
           <LabelList
             dataKey="members"
-            position="right"
-            offset={8}
+            position="top"
+            offset={6}
+            fontSize={11}
             className="fill-foreground"
-            formatter={(value: number) => `${value}명`}
           />
         </Bar>
       </BarChart>
