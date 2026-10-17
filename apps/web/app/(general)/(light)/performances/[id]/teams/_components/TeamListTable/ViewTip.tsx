@@ -27,7 +27,7 @@ export const useViewTip = () => {
   return [show, dismiss] as const
 }
 
-/** 보기 전환 버튼 아래 말풍선. 숨겨진 쪽(데스크톱/휴대폰) 버튼에 붙은 건 같이 숨는다 */
+/** 휴대폰 보기 전환 버튼(아이콘만 있음) 아래 말풍선 */
 export const ViewTip = ({
   show,
   onDismiss,
@@ -42,7 +42,7 @@ export const ViewTip = ({
     {show && (
       <div
         role="status"
-        className="absolute right-0 top-full z-20 mt-2 flex w-max max-w-[220px] items-start gap-2 rounded-md border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md animate-in fade-in-0"
+        className="absolute right-0 top-full z-20 mt-2 flex w-max max-w-[200px] items-start gap-2 rounded-md border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md animate-in fade-in-0"
       >
         <span className="absolute -top-1.5 right-4 size-3 rotate-45 border-l border-t bg-popover" />
         <span>여기서 카드/표 보기를 바꿀 수 있어요</span>

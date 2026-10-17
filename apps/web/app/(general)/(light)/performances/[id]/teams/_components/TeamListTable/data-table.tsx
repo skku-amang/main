@@ -416,9 +416,7 @@ export function TeamListDataTable<TValue>({
 
           {/* 보기 형식, 생성, 필터 */}
           <div className="flex gap-4">
-            <ViewTip show={showViewTip} onDismiss={dismissViewTip}>
-              <ViewToggle view={listView} onChange={changeView} />
-            </ViewTip>
+            <ViewToggle view={listView} onChange={changeView} />
 
             {/* 생성 버튼 */}
             {isRecruiting ? (
