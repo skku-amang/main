@@ -440,7 +440,8 @@ describe("NotificationListener", () => {
           }[]
       )
 
-    it("운영진이 바꾸면 새 팀장(assigned)과 전 팀장 둘 다 받는다", async () => {
+    it("새 팀장은 assigned, 팀을 떠난 전 팀장과 나머지 팀원은 '바뀌었어요' (운영진 본인 제외)", async () => {
+      // 팀원 1·2·3 중 2가 새 팀장. 전 팀장 4는 팀에 없음. 운영진 1은 팀원이지만 행동한 본인
       prisma.team.findUnique.mockResolvedValue({ ...team, leaderId: 2 })
 
       await listener.onTeamLeaderChanged(new TeamLeaderChangedEvent(7, 2, 4, 1))
@@ -450,6 +451,7 @@ describe("NotificationListener", () => {
         rows.map((r) => [r.recipientId, r.payload.assigned]).sort()
       ).toEqual([
         [2, true],
+        [3, false],
         [4, false]
       ])
       expect(rows[0]!.payload).toMatchObject({
@@ -465,7 +467,11 @@ describe("NotificationListener", () => {
 
       await listener.onTeamLeaderChanged(new TeamLeaderChangedEvent(7, 2, 4, 4))
 
-      expect(allRows().map((r) => r.recipientId)).toEqual([2])
+      expect(
+        allRows()
+          .map((r) => r.recipientId)
+          .sort()
+      ).toEqual([1, 2, 3])
     })
   })
 
