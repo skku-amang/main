@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import dayjs from "dayjs"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -53,11 +54,11 @@ interface PerformanceFormDialogProps {
   isPending?: boolean
 }
 
+// datetime-local 입력은 로컬 시각을 받는다. toISOString()(UTC)을 넣으면 한국에선 9시간 이르게 보인다
 function toDatetimeLocal(date: Date | string | null | undefined): string {
   if (!date) return ""
-  const d = new Date(date)
-  if (isNaN(d.getTime())) return ""
-  return d.toISOString().slice(0, 16)
+  const d = dayjs(date)
+  return d.isValid() ? d.format("YYYY-MM-DDTHH:mm") : ""
 }
 
 export function PerformanceFormDialog({
