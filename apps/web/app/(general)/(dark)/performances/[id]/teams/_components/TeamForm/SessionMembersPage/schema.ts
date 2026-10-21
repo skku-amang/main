@@ -30,6 +30,7 @@ export const memberSessionRequiredBaseSchema = z.object({
   드럼1: memberSessionRequiredField({ session: "드럼", index: 1 }),
   신디1: memberSessionRequiredField({ session: "신디", index: 1 }),
   신디2: memberSessionRequiredField({ session: "신디", index: 2 }),
+  신디3: memberSessionRequiredField({ session: "신디", index: 3 }),
   현악기1: memberSessionRequiredField({ session: "현악기", index: 1 }),
   관악기1: memberSessionRequiredField({ session: "관악기", index: 1 })
 })
