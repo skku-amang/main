@@ -35,6 +35,10 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
    - Sentry가 Feedback Widget 제출을 `category=feedback` 이슈로 저장하므로 `list_events`가 아닌 `list_issues`로 조회
    - 환경·기간 필터는 필요에 따라 추가
 
+⚠️ `amang-sentry` MCP `list_issues`는 조회 창이 **24시간 고정**이라 그보다 조용한 이슈가 빠진다. 7일·90일 같은 기간은 REST API(`/organizations/amang-23/issues/?statsPeriod=<기간>&project=-1`, 토큰 `SENTRY_ACCESS_TOKEN`)로 조회한다.
+
+**이미 처리된 항목 대조**: 조회한 이슈의 shortId(`WEB-29` 등)로 GH 이슈 본문을 검색(`gh issue list -R skku-amang/main --state all --search "WEB-29 in:body"`)해, 이미 GH 이슈가 있으면 분류 대신 "✅ 이미 처리됨" 섹션으로 뺀다. 연결된 GH 이슈가 closed면 Sentry resolve 대상.
+
 두 결과를 합쳐 단일 큐로 처리. Classifier는 항목의 `category`가 `feedback`이면 먼저 💡 기능 요청 기준 검사 → 버그면 일반 플로우로 분기.
 
 **User Feedback 입구 2개** (태그로 구분):
@@ -93,6 +97,10 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 | 💡   | 사용자에게 대상 선택 프롬프트 (`g`=GH 이슈 / `n`=Notion / `s`=건너뜀). GH면 `kind: enhancement` + `from: user-feedback` + `priority: low`. Notion이면 `amang-notion` MCP로 아이디어 DB에 row 추가                                         |
 | 🙌   | **이슈 생성 안 함** — 원문·페이지만 모아 출력. 승인 시 Sentry에서 resolve (팀 동기부여용 공유는 사용자 판단)                                                                                                                              |
 
+**GH 이슈를 만든 항목은 Sentry에서 바로 resolve한다** (🔥·📝·💡-GH). 추적 책임이 GH 이슈로 넘어갔으므로, unresolved로 두면 다음 라운드 큐에 다시 섞인다. 순서: 이슈 생성 → Sentry 이슈에 `GitHub 이슈로 등록: skku-amang/main#N` 코멘트 → `status: resolved`. 같은 증상이 재발하면 Sentry가 regression으로 다시 연다.
+
+이슈 body는 [sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md)의 섹션 제목을 **그대로** 써야 이슈 템플릿 훅을 통과한다 (`## 스택트레이스`, `## 재현 조건 (추정)`, `## User Feedback (있을 경우)` 포함). 의견 버튼 제보처럼 스택트레이스가 없으면 "없음 — 의견 버튼으로 받은 제보"로 채운다.
+
 ### 5. 종료 요약
 
 ```
@@ -102,6 +110,7 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 - 👀 N3건 → 액션 없음 (다음 라운드 재검토)
 - 🚫 N4건 → 수동 archive 권장 목록 (링크)
 - 💡 N5건 → GH N개, Notion N개
+- ✅ 이미 처리됨 N6건 + GH 이슈로 옮긴 N7건 → Sentry resolve
 ```
 
 ## 출력 형식
