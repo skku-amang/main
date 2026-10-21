@@ -26,14 +26,20 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - 상태: `unresolved`
 - 기간: 최근 7일
 
-사용자가 인자로 오버라이드 가능 (예: "dev 환경 14일치"). 파라미터를 파싱해 조회 범위 조정.
+**두 번 호출 — 에러 이슈와 User Feedback은 별도 쿼리**. `amang-sentry` MCP `list_issues`는 조회 창이 **24시간 고정**이라 그보다 조용한 이슈가 빠지므로, 24시간을 넘는 기간은 REST API로 조회한다 (토큰 `SENTRY_ACCESS_TOKEN`, `.envrc.local`):
 
-**두 번 호출 — 에러 이슈와 User Feedback은 별도 쿼리**:
+```
+GET https://sentry.io/api/0/organizations/amang-23/issues/?statsPeriod=<기간>&project=-1&query=<쿼리>
+```
 
-1. **에러 이슈**: `list_issues(query="is:unresolved environment:production lastSeen:-7d")`
-2. **User Feedback**: `list_issues(query="issue.category:feedback is:unresolved")`
-   - Sentry가 Feedback Widget 제출을 `category=feedback` 이슈로 저장하므로 `list_events`가 아닌 `list_issues`로 조회
+1. **에러 이슈**: `is:unresolved environment:production lastSeen:-7d` (`statsPeriod=14d`)
+2. **User Feedback**: `issue.category:feedback is:unresolved` (`statsPeriod=90d`)
+   - Sentry가 Feedback Widget 제출을 `category=feedback` 이슈로 저장하므로 `list_events`가 아닌 이슈로 조회
    - 환경·기간 필터는 필요에 따라 추가
+
+`project=-1`은 조직 전체(현재 `web`·`api`뿐)라, 프로젝트가 늘면 응답의 `project.slug`로 거른다.
+
+**이미 처리된 항목 대조**: 조회한 이슈의 shortId(`WEB-29` 등)로 GH 이슈 본문을 검색(`gh issue list -R skku-amang/main --state all --search "WEB-29 in:body"`)해, 이미 GH 이슈가 있으면 분류 대신 "✅ 이미 처리됨" 섹션으로 빼고 Sentry resolve 대상으로 둔다 (GH 이슈 열림·닫힘 무관 — 추적 책임이 이미 GH로 넘어감).
 
 두 결과를 합쳐 단일 큐로 처리. Classifier는 항목의 `category`가 `feedback`이면 먼저 💡 기능 요청 기준 검사 → 버그면 일반 플로우로 분기.
 
@@ -53,23 +59,17 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - 에러의 경우: 메시지, 스택트레이스 상위 10줄
 - **User Feedback의 경우**: `event.contexts.feedback.message` 필드(= 유저가 입력한 **원문**)를 사용. 이슈 `description` 필드는 Sentry가 AI로 자동 생성한 영문 요약이므로 **분류·제목 용도로 쓰지 말 것**. 원문은 대부분 한국어
 
-### 🌐 언어 주의
-
-amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘둘리지 말고 `feedback.message` 원문 기준으로:
-
-- 분류(💡 vs 📝) 판단
-- GH 이슈 제목 생성 시 원문 그대로 (또는 원문 요약) 사용 — 유저 목소리 번역 손실 방지
-
 ### 2. 자동 분류 (Classifier)
 
-[triage-criteria.md](triage-criteria.md)의 기준을 우선순위대로 적용:
+[triage-criteria.md](triage-criteria.md)의 분류 기준 → 보정 규칙 순으로 적용:
 
-0. `suggestion_kind` 태그가 있으면 태그로 먼저 분기 (`praise` → 🙌 칭찬 확정, `idea` → 💡 확정, `bug` → 아래 1~5 버그 흐름)
+0. `suggestion_kind` 태그가 있으면 태그로 먼저 분기 (`praise` → 🙌 칭찬 확정, `idea` → 💡 확정, `bug` → 아래 1·2·4·5 버그 흐름, 3번 💡 검사는 건너뜀)
 1. 🔥 즉시 수정 기준 매치 검사
 2. 🚫 무시 기준 매치 검사
 3. 💡 기능 요청 기준 검사 (User Feedback일 때만)
 4. 📝 이슈 등록 기준 검사
 5. 나머지는 👀 관찰
+6. 보정 규칙 적용 (중복 요청·외부 실유저 → priority 상향, 여러 요청 묶임 → 이슈 분리). 중복으로 판정된 후속 Sentry 이슈는 새 GH 이슈 대신 원본 이슈에 voter 코멘트를 달고, Sentry에 `Duplicate of WEB-XX` 코멘트 후 resolve
 
 각 분류에 **근거(어떤 시그널을 봤는지)**를 2-3줄로 첨부.
 
@@ -91,7 +91,12 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 | 👀   | **별도 액션 없음** — Sentry는 unresolved 상태 유지. 다음 트리아지 라운드에 자연스레 다시 검토됨. (선택: 코멘트로 "observing - 다음 라운드 재평가" 추적 메모)                                                                              |
 | 🚫   | **출력만** — "Sentry 웹에서 Archive 권장" 메시지. 자동 실행 안 함                                                                                                                                                                         |
 | 💡   | 사용자에게 대상 선택 프롬프트 (`g`=GH 이슈 / `n`=Notion / `s`=건너뜀). GH면 `kind: enhancement` + `from: user-feedback` + `priority: low`. Notion이면 `amang-notion` MCP로 아이디어 DB에 row 추가                                         |
+| ✅   | **이미 처리됨** (기존 GH 이슈 있음) — `[y/n]` 승인 시 Sentry에 `GitHub 이슈로 등록: skku-amang/main#N` 코멘트 후 resolve. 한 번에 묶어 승인받아도 됨                                                                                      |
 | 🙌   | **이슈 생성 안 함** — 원문·페이지만 모아 출력. 승인 시 Sentry에서 resolve (팀 동기부여용 공유는 사용자 판단)                                                                                                                              |
+
+**GH 이슈를 만든 항목은 Sentry에서 바로 resolve한다** (🔥·📝·💡-GH). 추적 책임이 GH 이슈로 넘어갔으므로, unresolved로 두면 다음 라운드 큐에 다시 섞인다. 순서: 이슈 생성 → Sentry 이슈에 `GitHub 이슈로 등록: skku-amang/main#N` 코멘트 → `status: resolved`. 같은 증상이 재발하면 Sentry가 regression으로 다시 연다.
+
+이슈 body는 [sentry_auto.md](../../../.github/ISSUE_TEMPLATE/sentry_auto.md)의 섹션 제목을 **그대로** 써야 이슈 템플릿 훅을 통과한다 (`## 스택트레이스`, `## 재현 조건 (추정)`, `## User Feedback (있을 경우)` 포함). 의견 버튼 제보처럼 스택트레이스가 없으면 "없음 — 의견 버튼으로 받은 제보"로 채운다. Source 줄은 `[Sentry WEB-29](https://amang-23.sentry.io/issues/WEB-29)`처럼 **shortId를 글자로 포함**한다 — 다음 라운드의 기존 이슈 대조가 이 문자열로 검색한다.
 
 ### 5. 종료 요약
 
@@ -102,6 +107,7 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 - 👀 N3건 → 액션 없음 (다음 라운드 재검토)
 - 🚫 N4건 → 수동 archive 권장 목록 (링크)
 - 💡 N5건 → GH N개, Notion N개
+- ✅ 이미 처리됨 N6건 + GH 이슈로 옮긴 N7건 + 중복 N8건 → Sentry resolve
 ```
 
 ## 출력 형식
@@ -109,7 +115,15 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 ```markdown
 ## Sentry Triage (YYYY-MM-DD)
 
-조회: web + api / prod / 7d / unresolved — 총 N건
+조회: web + api / unresolved — 에러 prod 7d · 의견 90d — 총 N건
+
+### ✅ 이미 처리됨 (N건)
+
+| Sentry | GH   | 상태   |
+| ------ | ---- | ------ |
+| WEB-29 | #674 | closed |
+
+[y/n] 묶어서 Sentry resolve
 
 ### 🔥 즉시 수정 (N건)
 
@@ -139,18 +153,3 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 
 1. "동방 예약이 훨씬 편해졌어요" — /reservations/clubroom ([feedback link])
 ```
-
-## 에러 처리
-
-- **MCP 연결 실패**: 즉시 중단, 사용자에게 원인 표시. fallback 없음.
-- **GH 이슈 생성 실패**: 해당 항목만 실패 표시하고 계속 진행.
-- **라벨 부재**: `kind: bug` 등이 레포에 없을 경우 "라벨 체계가 설정되지 않았습니다. [CONTRIBUTING.md의 라벨 매니페스트](../../../CONTRIBUTING.md)를 참고하여 레포에 라벨을 생성하세요." 안내 후 중단.
-- **분류 판단 불가**: 👀(관찰)로 fallback.
-
-## 드라이런 모드
-
-사용자가 "드라이런으로", "--dry-run", "실제 실행 안 하고"를 지정하면 Actor 층의 side effect 대신 "다음 작업을 수행할 예정:" 출력만. 드라이런에서는 승인 프롬프트 생략.
-
-## 기준 조정
-
-분류 결과가 사용자 판단과 자주 어긋나면 [triage-criteria.md](triage-criteria.md) "조정 이력" 섹션에 케이스 기록 + 규칙 수정. 스킬 사용하며 진화시키는 문서.
