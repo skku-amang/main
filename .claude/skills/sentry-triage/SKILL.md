@@ -26,8 +26,6 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - 상태: `unresolved`
 - 기간: 최근 7일
 
-사용자가 인자로 오버라이드 가능 (예: "dev 환경 14일치"). 파라미터를 파싱해 조회 범위 조정.
-
 **두 번 호출 — 에러 이슈와 User Feedback은 별도 쿼리**:
 
 1. **에러 이슈**: `list_issues(query="is:unresolved environment:production lastSeen:-7d")`
@@ -56,13 +54,6 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 - tags: url, browser, environment, release
 - 에러의 경우: 메시지, 스택트레이스 상위 10줄
 - **User Feedback의 경우**: `event.contexts.feedback.message` 필드(= 유저가 입력한 **원문**)를 사용. 이슈 `description` 필드는 Sentry가 AI로 자동 생성한 영문 요약이므로 **분류·제목 용도로 쓰지 말 것**. 원문은 대부분 한국어
-
-### 🌐 언어 주의
-
-amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘둘리지 말고 `feedback.message` 원문 기준으로:
-
-- 분류(💡 vs 📝) 판단
-- GH 이슈 제목 생성 시 원문 그대로 (또는 원문 요약) 사용 — 유저 목소리 번역 손실 방지
 
 ### 2. 자동 분류 (Classifier)
 
@@ -148,14 +139,3 @@ amang 유저 피드백은 거의 한국어. AI 자동 요약 영문 title에 휘
 
 1. "동방 예약이 훨씬 편해졌어요" — /reservations/clubroom ([feedback link])
 ```
-
-## 에러 처리
-
-- **MCP 연결 실패**: 즉시 중단, 사용자에게 원인 표시. fallback 없음.
-- **GH 이슈 생성 실패**: 해당 항목만 실패 표시하고 계속 진행.
-- **라벨 부재**: `kind: bug` 등이 레포에 없을 경우 "라벨 체계가 설정되지 않았습니다. [CONTRIBUTING.md의 라벨 매니페스트](../../../CONTRIBUTING.md)를 참고하여 레포에 라벨을 생성하세요." 안내 후 중단.
-- **분류 판단 불가**: 👀(관찰)로 fallback.
-
-## 드라이런 모드
-
-사용자가 "드라이런으로", "--dry-run", "실제 실행 안 하고"를 지정하면 Actor 층의 side effect 대신 "다음 작업을 수행할 예정:" 출력만. 드라이런에서는 승인 프롬프트 생략.
