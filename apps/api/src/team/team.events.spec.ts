@@ -83,6 +83,10 @@ describe("changedTeamFields", () => {
     expect(changedTeamFields(existing, sameDto)).toEqual([])
   })
 
+  it("팀장 교체는 LEADER_CHANGED가 전담하므로 변경 필드가 아니다", () => {
+    expect(changedTeamFields(existing, { ...sameDto, leaderId: 2 })).toEqual([])
+  })
+
   it("null인 기존 값에 undefined가 오면 변경이 아니다", () => {
     expect(
       changedTeamFields(existing, { ...sameDto, description: undefined })

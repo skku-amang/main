@@ -103,7 +103,6 @@ const SCALAR_FIELDS = [
   "isFreshmenFixed",
   "isSelfMade",
   "songYoutubeVideoUrl",
-  "leaderId",
   "performanceId"
 ] as const
 
@@ -113,7 +112,7 @@ type ExistingTeam = Record<(typeof SCALAR_FIELDS)[number], unknown> & {
 
 /**
  * 수정 요청이 실제로 바꾸는 필드 이름 목록. 세션 구성(세션 집합·정원)이 바뀌면 "sessions".
- * 멤버 변경은 여기 포함하지 않는다 (diffRoster가 담당).
+ * 멤버 변경(diffRoster)과 팀장 교체(LEADER_CHANGED)는 여기 포함하지 않는다.
  */
 export function changedTeamFields(existing: ExistingTeam, dto: UpdateTeam) {
   const changed: string[] = []

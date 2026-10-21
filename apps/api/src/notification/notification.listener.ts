@@ -237,17 +237,21 @@ export class NotificationListener {
         leaderId: event.newLeaderId,
         leaderName: leader.name
       }
-      // 새 팀장과 전 팀장은 문구가 달라 row를 따로 만든다. 행동한 본인은 제외
-      for (const [recipientId, assigned] of [
-        [event.newLeaderId, true],
-        [event.formerLeaderId, false]
-      ] as const) {
-        if (recipientId === event.actorId) continue
-        await this.create([recipientId], {
+      // 새 팀장은 "팀장이 됐어요", 전 팀장(팀을 떠났어도)·팀원은 "팀장이 ○○님으로". 행동한 본인은 제외
+      if (event.newLeaderId !== event.actorId)
+        await this.create([event.newLeaderId], {
           type: NotificationType.TEAM_LEADER_CHANGED,
-          payload: { ...base, assigned }
+          payload: { ...base, assigned: true }
         })
-      }
+      await this.create(
+        distinct([event.formerLeaderId, ...teamMemberIds(team)]).filter(
+          (id) => id !== event.newLeaderId && id !== event.actorId
+        ),
+        {
+          type: NotificationType.TEAM_LEADER_CHANGED,
+          payload: { ...base, assigned: false }
+        }
+      )
     })
   }
 
