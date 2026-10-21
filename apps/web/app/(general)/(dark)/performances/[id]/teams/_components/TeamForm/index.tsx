@@ -19,13 +19,12 @@ import { SESSION_NAMES } from "@/constants/session"
 import { useQueryClient } from "@tanstack/react-query"
 import FirstPage from "./FirstPage"
 import basicInfoSchema from "./FirstPage/schema"
-import SecondPage from "./SecondPage"
 import {
   memberSessionRequiredBaseSchema,
   memberSessionRequiredField
-} from "./SecondPage/schema"
+} from "./SessionMembersPage/schema"
 import TeamFormSkeleton from "./TeamFormSkeleton"
-import ThirdPage from "./ThirdPage"
+import SessionMembersPage from "./SessionMembersPage"
 
 interface TeamCreateFormProps {
   initialData?: TeamDetail
@@ -78,7 +77,7 @@ const TeamForm = ({
     setCurrentPage(2)
   }
 
-  // Second Page
+  // 세션·팀원 (2쪽)
   function constructDefaultValues(initialData?: TeamDetail) {
     const defaultValues: {
       [key: string]: z.infer<ReturnType<typeof memberSessionRequiredField>>
@@ -223,19 +222,7 @@ const TeamForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData])
 
-  function onSecondPageValid(
-    formData: z.infer<typeof memberSessionRequiredBaseSchema>
-  ) {
-    const result = memberSessionRequiredBaseSchema.safeParse(formData)
-    if (!result.success) {
-      // console.log(result.error)
-      return
-    }
-    setCurrentPage(3)
-  }
-
-  // Third Page
-  async function onThirdPageValid(
+  async function onSessionMembersValid(
     secondPageFormData: z.infer<typeof memberSessionRequiredBaseSchema>
   ) {
     // 세션 이름별로 멤버들을 그룹화
@@ -386,19 +373,11 @@ const TeamForm = ({
           }
         />
       )}
-      {currentPage === 2 && (
-        <SecondPage
+      {currentPage >= 2 && (
+        <SessionMembersPage
           form={secondPageForm}
-          onValid={onSecondPageValid}
+          onValid={onSessionMembersValid}
           onPrevious={() => setCurrentPage(1)}
-        />
-      )}
-      {currentPage === 3 && (
-        <ThirdPage
-          form={secondPageForm}
-          onValid={onThirdPageValid}
-          onPrevious={() => setCurrentPage(2)}
-          firstPageForm={firstPageForm}
         />
       )}
     </div>
