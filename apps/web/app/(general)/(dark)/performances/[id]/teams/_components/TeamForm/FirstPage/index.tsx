@@ -202,7 +202,7 @@ const FirstPage = ({
                       form.setValue("isFreshmenFixed", !!e)
                     }
                     checked={form.watch("isFreshmenFixed")}
-                    className="h-4 w-4 rounded-md border border-gray-400"
+                    className="h-6 w-6 rounded-md border border-gray-400 md:h-4 md:w-4"
                   />
                   <Label
                     htmlFor="isFreshmenFixedInput"
@@ -242,7 +242,7 @@ const FirstPage = ({
                     name="isSelfMade"
                     onCheckedChange={(e) => form.setValue("isSelfMade", !!e)}
                     checked={form.watch("isSelfMade")}
-                    className="h-4 w-4 rounded-md border border-gray-400"
+                    className="h-6 w-6 rounded-md border border-gray-400 md:h-4 md:w-4"
                   />
                   <Label
                     htmlFor="isSelfMadeInput"
@@ -435,7 +435,7 @@ const FirstPage = ({
       {/* 페이지 이동 */}
       <Paginator
         onNext={form.handleSubmit(onValid)}
-        totalPage={3}
+        totalPage={2}
         currentPage={1}
         onPrevious={onPrevious}
         className="mt-8 md:mt-24"
