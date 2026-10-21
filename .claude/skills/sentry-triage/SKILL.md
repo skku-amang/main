@@ -57,7 +57,7 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 
 ### 2. 자동 분류 (Classifier)
 
-[triage-criteria.md](triage-criteria.md)의 기준을 우선순위대로 적용:
+[triage-criteria.md](triage-criteria.md)의 분류 기준 → 보정 규칙 순으로 적용:
 
 0. `suggestion_kind` 태그가 있으면 태그로 먼저 분기 (`praise` → 🙌 칭찬 확정, `idea` → 💡 확정, `bug` → 아래 1~5 버그 흐름)
 1. 🔥 즉시 수정 기준 매치 검사
@@ -65,6 +65,7 @@ Sentry의 unresolved 이슈와 User Feedback을 트리아지 프레임워크로 
 3. 💡 기능 요청 기준 검사 (User Feedback일 때만)
 4. 📝 이슈 등록 기준 검사
 5. 나머지는 👀 관찰
+6. 보정 규칙 적용 (중복 요청·외부 실유저 → priority 상향, 여러 요청 묶임 → 이슈 분리)
 
 각 분류에 **근거(어떤 시그널을 봤는지)**를 2-3줄로 첨부.
 
