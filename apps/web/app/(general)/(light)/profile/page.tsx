@@ -116,7 +116,7 @@ const ProfilePage = () => {
         ]}
       />
 
-      <div className="mx-auto max-w-2xl space-y-4">
+      <div className="mx-auto max-w-2xl space-y-4 pb-6">
         {/* 프로필 카드 */}
         <div className="relative rounded-xl bg-white p-6 shadow-sm md:p-8">
           <Button

@@ -1,6 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { X } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { useEffect } from "react"
@@ -30,12 +32,15 @@ interface TeamCreateFormProps {
   initialData?: TeamDetail
   /** 생성 시 미리 선택할 공연 (진입한 공연 페이지) */
   defaultPerformanceId?: number
+  /** 휴대폰 카드 우상단 닫기(X)의 이동 경로 — PC는 페이지 헤더의 뒤로가기가 대신함 */
+  closeHref: string
   className?: string
 }
 
 const TeamForm = ({
   initialData,
   defaultPerformanceId,
+  closeHref,
   className
 }: TeamCreateFormProps) => {
   const [currentPage, setCurrentPage] = useQueryState(
@@ -354,7 +359,19 @@ const TeamForm = ({
   if (!user) router.push(ROUTES.HOME)
 
   return (
-    <div className={cn(`mb-10 rounded-2xl shadow-2xl md:mb-20`, className)}>
+    <div
+      className={cn(
+        `relative mb-10 rounded-2xl shadow-2xl md:mb-20`,
+        className
+      )}
+    >
+      <Link
+        href={closeHref}
+        aria-label="닫기"
+        className="absolute right-3 top-3 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 md:hidden"
+      >
+        <X className="size-5" />
+      </Link>
       {currentPage === 1 && (
         <FirstPage
           form={firstPageForm}
