@@ -125,13 +125,19 @@ export default function WeekCalendarField({
     const start = dayjs(drag.rental.startAt)
     const end = dayjs(drag.rental.endAt)
     const minutes = snapMinutes(dy)
+    // 격자에 보이는 시간 범위(startHour ~ endHour+1시) — 밖으로 끌면 블록이 잘리거나 사라짐
+    const gridStartOf = (d: Dayjs) => d.startOf("day").add(startHour, "hour")
+    const gridEndOf = (d: Dayjs) => d.startOf("day").add(endHour + 1, "hour")
     if (drag.mode === "resize") {
-      const newEnd = end.add(minutes, "minute")
       const minEnd = start.add(SNAP_MIN, "minute")
+      const maxEnd = gridEndOf(start)
+      let newEnd = end.add(minutes, "minute")
+      if (newEnd.isBefore(minEnd)) newEnd = minEnd
+      if (newEnd.isAfter(maxEnd)) newEnd = maxEnd
       return {
         id: drag.rental.id,
         startAt: start.toDate(),
-        endAt: (newEnd.isAfter(minEnd) ? newEnd : minEnd).toDate()
+        endAt: newEnd.toDate()
       }
     }
     // 주 밖으로는 못 옮김 — 시작일이 이번 주 7일 안에 머물게
@@ -143,10 +149,18 @@ export default function WeekCalendarField({
       6 - dayIndex,
       Math.max(-dayIndex, Math.round(dx / drag.colWidth))
     )
+    // 시작 시각만 그날 보이는 범위 안에 묶고, 길이는 그대로 (밤을 넘기는 예약 허용)
+    const day = start.add(days, "day")
+    const lo = gridStartOf(day)
+    const hi = gridEndOf(day).subtract(SNAP_MIN, "minute")
+    let newStart = day.add(minutes, "minute")
+    if (newStart.isBefore(lo)) newStart = lo
+    if (newStart.isAfter(hi)) newStart = hi
+    const shift = newStart.diff(start, "minute")
     return {
       id: drag.rental.id,
-      startAt: start.add(days, "day").add(minutes, "minute").toDate(),
-      endAt: end.add(days, "day").add(minutes, "minute").toDate()
+      startAt: newStart.toDate(),
+      endAt: end.add(shift, "minute").toDate()
     }
   }
 
@@ -159,6 +173,8 @@ export default function WeekCalendarField({
     if (!canDrag(rental) || updateRental.isPending || !columnsRef.current)
       return
     const isTouch = e.pointerType === "touch"
+    // 오른쪽·가운데 버튼은 끌기로 보지 않음
+    if (!isTouch && e.button !== 0) return
     // 휴대폰은 칸이 좁아 길이 조절 없이 이동만
     if (isTouch && mode === "resize") return
 
