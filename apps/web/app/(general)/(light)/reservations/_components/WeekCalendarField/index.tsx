@@ -67,6 +67,8 @@ export default function WeekCalendarField({
 
   const columnsRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<Preview | null>(null)
+  // 진행 중인 끌기 — 있는 동안 다른 블록을 눌러도 새 끌기를 시작하지 않음
+  const dragRef = useRef<Drag | null>(null)
   // 끌기 직후 따라오는 click(상세 열기)·touchend(주 넘기기 스와이프)를 막음
   const justDraggedRef = useRef(false)
   const [preview, setPreviewState] = useState<Preview | null>(null)
@@ -170,6 +172,7 @@ export default function WeekCalendarField({
     rental: RentalDetail,
     mode: DragMode
   ) => {
+    if (dragRef.current) return
     justDraggedRef.current = false
     if (!canDrag(rental) || updateRental.isPending || !columnsRef.current)
       return
@@ -195,9 +198,11 @@ export default function WeekCalendarField({
       setPreview(computePreview(drag, 0, 0))
     }
     if (isTouch) drag.timer = setTimeout(activate, LONG_PRESS_MS)
+    dragRef.current = drag
 
     const cleanup = () => {
       clearTimeout(drag.timer)
+      dragRef.current = null
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
       window.removeEventListener("pointercancel", onCancel)
