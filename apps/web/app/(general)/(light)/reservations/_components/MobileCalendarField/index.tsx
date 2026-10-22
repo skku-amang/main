@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import MobileMonthBlock from "./MobileMonthBlock"
@@ -9,7 +10,7 @@ interface MobileCalendarFieldProps {
   selectedDate?: Dayjs | null
 }
 
-export default function MobileCalendarField({
+function MobileCalendarField({
   calendarViewMonth,
   rentals,
   onDateSelect,
@@ -61,3 +62,14 @@ export default function MobileCalendarField({
     </div>
   )
 }
+
+// 넘김 화면이 옆 장을 미리 그려 두므로, 같은 달·같은 예약·같은 선택이면 다시 그리지 않음
+export default memo(
+  MobileCalendarField,
+  (a, b) =>
+    a.calendarViewMonth.isSame(b.calendarViewMonth, "month") &&
+    a.rentals === b.rentals &&
+    a.onDateSelect === b.onDateSelect &&
+    !!a.selectedDate === !!b.selectedDate &&
+    (!a.selectedDate || a.selectedDate.isSame(b.selectedDate, "day"))
+)

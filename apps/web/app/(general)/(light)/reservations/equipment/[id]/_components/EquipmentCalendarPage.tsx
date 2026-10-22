@@ -5,7 +5,8 @@ import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import dayjs, { Dayjs } from "dayjs"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import ViewTabsList from "../../../_components/ViewTabsList"
 
 import DefaultPageHeader, {
   DefaultHomeIcon
@@ -137,10 +138,7 @@ export default function EquipmentCalendarPage() {
         </div>
         <div className="flex-1 min-w-0">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
-            <TabsList>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="month">Month</TabsTrigger>
-            </TabsList>
+            <ViewTabsList />
             <TabsContent className="relative" value="week">
               <WeekCalendarField
                 currentMonday={currentMonday}

@@ -34,16 +34,14 @@ export default function WeekLabel({
       className={`absolute flex gap-5 items-center text-gray-700 font-semibold text-xl right-1/2 translate-x-1/2 -top-[62px] ${className}`}
     >
       <ChevronLeft
-        aria-label="이전 주로 이동"
+        aria-label={mode === "week" ? "이전 주로 이동" : "이전 달로 이동"}
         role="button"
         tabIndex={0}
         className="cursor-pointer"
         onClick={() =>
-          setCurrentMonday((prev) =>
-            mode === "week"
-              ? prev.subtract(1, "week")
-              : prev.subtract(1, "month")
-          )
+          mode === "week"
+            ? setCurrentMonday((prev) => prev.subtract(1, "week"))
+            : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
         }
       />
       {mode === "week" ? (
@@ -62,14 +60,14 @@ export default function WeekLabel({
         <span className="text-nowrap">{monthLabel}</span>
       )}
       <ChevronRight
-        aria-label="다음 주로 이동"
+        aria-label={mode === "week" ? "다음 주로 이동" : "다음 달로 이동"}
         role="button"
         tabIndex={0}
         className="cursor-pointer"
         onClick={() =>
-          setCurrentMonday((prev) =>
-            mode === "week" ? prev.add(1, "week") : prev.add(1, "month")
-          )
+          mode === "week"
+            ? setCurrentMonday((prev) => prev.add(1, "week"))
+            : setCalendarViewMonth((prev) => prev.add(1, "month"))
         }
       />
     </div>
