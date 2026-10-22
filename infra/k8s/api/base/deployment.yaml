@@ -39,6 +39,13 @@ spec:
                 name: minio-s3-credentials
             - secretRef:
                 name: redis-credentials
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.namespace=amang,deployment.environment.name=$(SENTRY_ENVIRONMENT),service.instance.id=$(POD_NAME)
           livenessProbe:
             httpGet:
               path: /health/live
