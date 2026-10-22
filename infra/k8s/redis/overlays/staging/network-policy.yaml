@@ -30,7 +30,8 @@ spec:
               kubernetes.io/metadata.name: observability
           podSelector:
             matchLabels:
-              app.kubernetes.io/name: prometheus-blackbox-exporter
+              app.kubernetes.io/name: alloy
+              app.kubernetes.io/instance: alloy-gateway
       ports:
         - protocol: TCP
           port: 6379
