@@ -58,6 +58,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
       ) : (
         <TeamForm
           defaultPerformanceId={Number(performanceId)}
+          closeHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
           className="w-full bg-white px-7 py-10 md:p-20"
         />
       )}

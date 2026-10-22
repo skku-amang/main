@@ -403,12 +403,12 @@ const HomeDashboard = () => {
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-6 md:py-12">
       {!isLoading && (user ? <Greeting name={user.name} /> : <Hero />)}
+      {user && <MyUpcomingRentals userId={user.id} />}
       <RecruitingPerformance />
       {user && (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <MyTeams userId={user.id} />
           <BookmarkedTeams />
-          <MyUpcomingRentals userId={user.id} />
         </div>
       )}
       <SuggestionBanner />

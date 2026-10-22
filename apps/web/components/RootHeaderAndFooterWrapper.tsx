@@ -49,8 +49,8 @@ const RootHeaderAndFooterWrapper = ({
       <main
         className={cn(
           "h-auto min-h-full pt-[calc(var(--header-height)+var(--extra-pt))]",
-          // Footer는 md부터 보이므로 그 자리도 md부터만 비움
-          "pb-[calc(var(--extra-pb)+var(--tabbar-height))] md:pb-[calc(var(--footer-height)+var(--extra-pb)+var(--tabbar-height))]",
+          // Footer는 md부터 보이므로 그 자리도 md부터만 비움. 모바일은 마지막 요소가 탭바에 붙지 않게 1.5rem 더
+          "pb-[calc(var(--extra-pb)+var(--tabbar-height)+1.5rem)] md:pb-[calc(var(--footer-height)+var(--extra-pb)+var(--tabbar-height))]",
           mainClassName
         )}
         style={

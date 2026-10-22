@@ -144,7 +144,7 @@ const Login = () => {
               className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm"
             >
               {isPendingApproval
-                ? "가입은 완료된 계정입니다. 운영진 승인을 기다리는 중이며, 승인 후 로그인할 수 있습니다."
+                ? "운영진의 계정 승인을 기다리는 중입니다."
                 : "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."}
             </div>
           )}
