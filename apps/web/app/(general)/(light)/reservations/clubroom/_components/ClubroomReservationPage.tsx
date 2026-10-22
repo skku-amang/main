@@ -9,7 +9,7 @@ import ROUTES from "@/constants/routes"
 import MyReservationField from "../../_components/MyReservationField"
 import AddScheduleButton from "../../_components/AddScheduleButton"
 import WeekCalendarField from "../../_components/WeekCalendarField"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
 import WeekLabel from "../../_components/WeekLable"
 import MonthCalendarField from "../../_components/MonthCalendarField"
@@ -20,8 +20,8 @@ import { useRentals } from "@/hooks/api/useRental"
 import { useEquipments } from "@/hooks/api/useEquipment"
 import { RentalDetail } from "@repo/shared-types"
 import RentalDetailModal from "../../_components/RentalDetailModal"
+import PeriodPager from "../../_components/PeriodPager"
 import { Dayjs } from "dayjs"
-import { useSwipe } from "@/hooks/useSwipe"
 
 const viewOptions = ["week", "month"] as const
 const mobileTabOptions = ["schedule", "my"] as const
@@ -48,10 +48,13 @@ export default function ClubroomReservationPage() {
     const [y, m, d] = selectedDateStr.split("-").map(Number)
     return dayjs(new Date(y!, m! - 1, d!))
   })()
-  const setSelectedDate = (date: Dayjs) =>
-    setSelectedDateStr(
-      date.isSame(dayjs(), "day") ? null : date.format("YYYY-MM-DD")
-    )
+  const setSelectedDate = useCallback(
+    (date: Dayjs) =>
+      setSelectedDateStr(
+        date.isSame(dayjs(), "day") ? null : date.format("YYYY-MM-DD")
+      ),
+    [setSelectedDateStr]
+  )
 
   // Google Calendar 방식: selectedDate에서 주/월 범위 파생
   const currentMonday = selectedDate.startOf("week")
@@ -76,20 +79,23 @@ export default function ClubroomReservationPage() {
     )
   }
 
-  // 데이터 조회 범위: 현재 보고 있는 달의 시작~끝 (+전후 1주)
-  const queryRange = useMemo(() => {
-    const monthStart = calendarViewMonth
-      .startOf("month")
-      .startOf("week")
-      .toDate()
-    const monthEnd = calendarViewMonth.endOf("month").endOf("week").toDate()
-    return { from: monthStart, to: monthEnd }
-  }, [calendarViewMonth])
-
-  const { data: rentals } = useRentals({
-    type: "room",
-    ...queryRange
+  // 달마다 따로 조회해 캐시를 재사용 — 넘겨도 새로 받는 건 새로 보이는 달 하나뿐.
+  // 넘김 화면에 옆 기간도 그려야 해서 이전·현재·다음 달을 함께 씀
+  const monthQuery = (month: Dayjs) => ({
+    type: "room" as const,
+    from: month.startOf("month").startOf("week").toDate(),
+    to: month.endOf("month").endOf("week").toDate()
   })
+  const { data: prevMonthRentals } = useRentals(
+    monthQuery(calendarViewMonth.subtract(1, "month"))
+  )
+  const { data: monthRentals } = useRentals(monthQuery(calendarViewMonth))
+  const { data: nextMonthRentals } = useRentals(
+    monthQuery(calendarViewMonth.add(1, "month"))
+  )
+  // ±2달은 미리 받아 두기만 — 넘겨서 달이 바뀐 직후 새 달을 받느라 달력을 한 번 더 그리지 않게
+  useRentals(monthQuery(calendarViewMonth.subtract(2, "month")))
+  useRentals(monthQuery(calendarViewMonth.add(2, "month")))
   const { data: equipments } = useEquipments("room")
 
   const weekLabel = `${currentMonday.format("MMM DD")}–${currentMonday.add(6, "day").format("DD, YYYY")}`
@@ -99,18 +105,17 @@ export default function ClubroomReservationPage() {
     calendarStart.add(i, "day")
   )
 
-  const calendarSwipe = useSwipe({
-    onSwipeLeft: () =>
-      view === "week"
-        ? setCurrentMonday((prev) => prev.add(1, "week"))
-        : setCalendarViewMonth((prev) => prev.add(1, "month")),
-    onSwipeRight: () =>
-      view === "week"
-        ? setCurrentMonday((prev) => prev.subtract(1, "week"))
-        : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
-  })
-
-  const rentalList = rentals ?? []
+  // 달 경계 주는 양쪽 조회에 다 들어 있어 id로 중복 제거
+  const rentalList = useMemo(() => {
+    const byId = new Map<number, RentalDetail>()
+    for (const r of [
+      ...(prevMonthRentals ?? []),
+      ...(monthRentals ?? []),
+      ...(nextMonthRentals ?? [])
+    ])
+      byId.set(r.id, r)
+    return [...byId.values()]
+  }, [prevMonthRentals, monthRentals, nextMonthRentals])
   const equipmentList = equipments ?? []
 
   return (
@@ -193,25 +198,42 @@ export default function ClubroomReservationPage() {
           >
             <ViewTabsList />
           </Tabs>
-          <div {...calendarSwipe}>
-            {view === "week" ? (
-              <div className="px-2 pb-20 pt-[88px]">
-                <WeekCalendarField
-                  currentMonday={currentMonday}
+          <PeriodPager
+            onPrev={() =>
+              view === "week"
+                ? setCurrentMonday((prev) => prev.subtract(1, "week"))
+                : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
+            }
+            onNext={() =>
+              view === "week"
+                ? setCurrentMonday((prev) => prev.add(1, "week"))
+                : setCalendarViewMonth((prev) => prev.add(1, "month"))
+            }
+            panelKey={(offset) =>
+              view === "week"
+                ? currentMonday.add(offset, "week").format("YYYY-MM-DD")
+                : calendarViewMonth.add(offset, "month").format("YYYY-MM")
+            }
+            renderPanel={(offset) =>
+              view === "week" ? (
+                <div className="px-2 pb-20 pt-[88px]">
+                  <WeekCalendarField
+                    currentMonday={currentMonday.add(offset, "week")}
+                    rentals={rentalList}
+                    onRentalClick={setSelectedRental}
+                    compact
+                  />
+                </div>
+              ) : (
+                <MobileCalendarField
+                  calendarViewMonth={calendarViewMonth.add(offset, "month")}
                   rentals={rentalList}
-                  onRentalClick={setSelectedRental}
-                  compact
+                  onDateSelect={setSelectedDate}
+                  selectedDate={selectedDate}
                 />
-              </div>
-            ) : (
-              <MobileCalendarField
-                calendarViewMonth={calendarViewMonth}
-                rentals={rentalList}
-                onDateSelect={setSelectedDate}
-                selectedDate={selectedDate}
-              />
-            )}
-          </div>
+              )
+            }
+          />
           <WeekLabel
             weekLabel={weekLabel}
             setCalendarViewMonth={setCalendarViewMonth}

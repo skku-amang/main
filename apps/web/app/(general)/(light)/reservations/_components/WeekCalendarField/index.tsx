@@ -2,7 +2,7 @@
 
 import "dayjs/locale/ko"
 
-import { useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
@@ -47,7 +47,7 @@ type Preview = { id: number; startAt: Date; endAt: Date }
 const snapMinutes = (px: number) =>
   Math.round((px / ROW_H) * (60 / SNAP_MIN)) * SNAP_MIN
 
-export default function WeekCalendarField({
+function WeekCalendarField({
   currentMonday,
   rentals,
   onRentalClick,
@@ -318,6 +318,9 @@ export default function WeekCalendarField({
             canDrag={canDrag}
             draggingId={preview?.id ?? null}
             onBlockPointerDown={handleBlockPointerDown}
+            onBlockTouchMove={(e) => {
+              if (dragRef.current?.active) e.stopPropagation()
+            }}
             onBlockTouchEnd={(e) => {
               if (justDraggedRef.current) e.stopPropagation()
             }}
@@ -346,3 +349,13 @@ export default function WeekCalendarField({
     </div>
   )
 }
+
+// 넘김 화면이 옆 장을 미리 그려 두므로, 같은 주·같은 예약이면 다시 그리지 않음
+export default memo(
+  WeekCalendarField,
+  (a, b) =>
+    a.currentMonday.isSame(b.currentMonday, "day") &&
+    a.rentals === b.rentals &&
+    a.onRentalClick === b.onRentalClick &&
+    a.compact === b.compact
+)

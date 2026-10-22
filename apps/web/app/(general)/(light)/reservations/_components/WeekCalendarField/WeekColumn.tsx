@@ -21,6 +21,7 @@ interface WeekColumnProp {
     rental: RentalDetail,
     mode: DragMode
   ) => void
+  onBlockTouchMove: (e: React.TouchEvent) => void
   onBlockTouchEnd: (e: React.TouchEvent) => void
 }
 
@@ -39,6 +40,7 @@ export default function WeekColumn({
   canDrag,
   draggingId,
   onBlockPointerDown,
+  onBlockTouchMove,
   onBlockTouchEnd
 }: WeekColumnProp) {
   const date = currentMonday.add(offset, "day")
@@ -108,6 +110,7 @@ export default function WeekColumn({
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
             onPointerDown={(e) => onBlockPointerDown(e, rental, "move")}
+            onTouchMove={onBlockTouchMove}
             onTouchEnd={onBlockTouchEnd}
           >
             {!compact && heightPx > 30 && (
