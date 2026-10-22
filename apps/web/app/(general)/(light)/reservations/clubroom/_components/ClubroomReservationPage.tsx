@@ -3,7 +3,8 @@ import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import dayjs from "dayjs"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import ViewTabsList from "../../_components/ViewTabsList"
 import ROUTES from "@/constants/routes"
 import MyReservationField from "../../_components/MyReservationField"
 import AddScheduleButton from "../../_components/AddScheduleButton"
@@ -26,13 +27,10 @@ const viewOptions = ["week", "month"] as const
 const mobileTabOptions = ["schedule", "my"] as const
 
 export default function ClubroomReservationPage() {
-  // 값이 없으면 PC는 주, 휴대폰은 월
-  const [viewParam, setView] = useQueryState(
+  const [view, setView] = useQueryState(
     "view",
-    parseAsStringLiteral(viewOptions)
+    parseAsStringLiteral(viewOptions).withDefault("week")
   )
-  const view = viewParam ?? "week"
-  const mobileView = viewParam ?? "month"
   const [mobileTab, setMobileTab] = useQueryState(
     "tab",
     parseAsStringLiteral(mobileTabOptions).withDefault("schedule")
@@ -40,14 +38,20 @@ export default function ClubroomReservationPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
+  // 값이 없으면 오늘 — withDefault에 dayjs() 같은 동적 값은 hydration 불일치라 대신 null로 표현
   const [selectedDateStr, setSelectedDateStr] = useQueryState(
     "date",
-    parseAsString.withDefault(dayjs().format("YYYY-MM-DD"))
+    parseAsString
   )
-  const [y, m, d] = selectedDateStr.split("-").map(Number)
-  const selectedDate = dayjs(new Date(y!, m! - 1, d!))
+  const selectedDate = (() => {
+    if (!selectedDateStr) return dayjs().startOf("day")
+    const [y, m, d] = selectedDateStr.split("-").map(Number)
+    return dayjs(new Date(y!, m! - 1, d!))
+  })()
   const setSelectedDate = (date: Dayjs) =>
-    setSelectedDateStr(date.format("YYYY-MM-DD"))
+    setSelectedDateStr(
+      date.isSame(dayjs(), "day") ? null : date.format("YYYY-MM-DD")
+    )
 
   // Google Calendar 방식: selectedDate에서 주/월 범위 파생
   const currentMonday = selectedDate.startOf("week")
@@ -57,14 +61,19 @@ export default function ClubroomReservationPage() {
   const setCurrentMonday = (mondayOrFn: Dayjs | ((prev: Dayjs) => Dayjs)) => {
     const newMonday =
       typeof mondayOrFn === "function" ? mondayOrFn(currentMonday) : mondayOrFn
-    setSelectedDate(newMonday)
+    // 이동한 주·달에 오늘이 있으면 오늘을 선택 — 첫날 대신 오늘이 보이고 주소의 date도 빠짐
+    setSelectedDate(
+      newMonday.isSame(dayjs(), "week") ? dayjs().startOf("day") : newMonday
+    )
   }
   const setCalendarViewMonth = (
     monthOrFn: Dayjs | ((prev: Dayjs) => Dayjs)
   ) => {
     const newMonth =
       typeof monthOrFn === "function" ? monthOrFn(calendarViewMonth) : monthOrFn
-    setSelectedDate(newMonth)
+    setSelectedDate(
+      newMonth.isSame(dayjs(), "month") ? dayjs().startOf("day") : newMonth
+    )
   }
 
   // 데이터 조회 범위: 현재 보고 있는 달의 시작~끝 (+전후 1주)
@@ -92,11 +101,11 @@ export default function ClubroomReservationPage() {
 
   const calendarSwipe = useSwipe({
     onSwipeLeft: () =>
-      mobileView === "week"
+      view === "week"
         ? setCurrentMonday((prev) => prev.add(1, "week"))
         : setCalendarViewMonth((prev) => prev.add(1, "month")),
     onSwipeRight: () =>
-      mobileView === "week"
+      view === "week"
         ? setCurrentMonday((prev) => prev.subtract(1, "week"))
         : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
   })
@@ -124,10 +133,7 @@ export default function ClubroomReservationPage() {
         </div>
         <div className="flex-1 min-w-0">
           <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
-            <TabsList>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="month">Month</TabsTrigger>
-            </TabsList>
+            <ViewTabsList />
             {/* 주간 캘린더 */}
             <TabsContent className="relative" value="week">
               <WeekCalendarField
@@ -177,64 +183,50 @@ export default function ClubroomReservationPage() {
       </div>
 
       {/* 모바일 페이지 */}
-      <div className="relative mx-auto max-w-[400px] md:hidden">
-        <div className="flex justify-end px-4 pb-3">
+      <div className="relative md:hidden">
+        {/* 주/월 공용 달력 카드 — 전환 버튼과 ‹ 날짜 › 줄 위치를 두 보기가 같이 씀 */}
+        <div className="relative bg-white">
           <Tabs
-            value={mobileView}
-            onValueChange={(v) => setView(v as typeof mobileView)}
+            value={view}
+            onValueChange={(v) => setView(v as typeof view)}
+            className="absolute right-4 top-1 z-10"
           >
-            <TabsList>
-              <TabsTrigger value="month">월</TabsTrigger>
-              <TabsTrigger value="week">주</TabsTrigger>
-            </TabsList>
+            <ViewTabsList />
           </Tabs>
-        </div>
-
-        {mobileView === "week" ? (
-          <div className="relative bg-white px-2 pb-20 pt-20">
-            <WeekLabel
-              weekLabel={weekLabel}
-              setCalendarViewMonth={setCalendarViewMonth}
-              setCurrentMonday={setCurrentMonday}
-              currentMonday={currentMonday}
-              calendarViewMonth={calendarViewMonth}
-              monthLabel={monthLabel}
-              daysInCalendar={daysInCalendar}
-              mode="week"
-              className="top-6 flex w-full justify-between px-5"
-            />
-            <div {...calendarSwipe}>
-              <WeekCalendarField
-                currentMonday={currentMonday}
-                rentals={rentalList}
-                onRentalClick={setSelectedRental}
-                compact
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="relative">
-            {/* Calendar with month navigation */}
-            <div {...calendarSwipe}>
+          <div {...calendarSwipe}>
+            {view === "week" ? (
+              <div className="px-2 pb-20 pt-[88px]">
+                <WeekCalendarField
+                  currentMonday={currentMonday}
+                  rentals={rentalList}
+                  onRentalClick={setSelectedRental}
+                  compact
+                />
+              </div>
+            ) : (
               <MobileCalendarField
                 calendarViewMonth={calendarViewMonth}
                 rentals={rentalList}
                 onDateSelect={setSelectedDate}
                 selectedDate={selectedDate}
               />
-            </div>
-            <WeekLabel
-              weekLabel={weekLabel}
-              setCalendarViewMonth={setCalendarViewMonth}
-              setCurrentMonday={setCurrentMonday}
-              currentMonday={currentMonday}
-              calendarViewMonth={calendarViewMonth}
-              monthLabel={monthLabel}
-              daysInCalendar={daysInCalendar}
-              mode="month"
-              className="top-12 flex w-full justify-between px-5"
-            />
+            )}
+          </div>
+          <WeekLabel
+            weekLabel={weekLabel}
+            setCalendarViewMonth={setCalendarViewMonth}
+            setCurrentMonday={setCurrentMonday}
+            currentMonday={currentMonday}
+            calendarViewMonth={calendarViewMonth}
+            monthLabel={monthLabel}
+            daysInCalendar={daysInCalendar}
+            mode={view}
+            className="top-12 flex w-full justify-between px-5"
+          />
+        </div>
 
+        {view === "month" && (
+          <>
             {/* Mobile tab buttons (pill style matching Figma) */}
             <div className="flex gap-2 px-4 py-4">
               <button
@@ -274,7 +266,7 @@ export default function ClubroomReservationPage() {
                 />
               )}
             </div>
-          </div>
+          </>
         )}
 
         <AddScheduleButton

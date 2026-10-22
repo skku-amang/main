@@ -1,9 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import "dayjs/locale/ko"
+
+import { useEffect, useRef, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
+import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
-import WeekColumn from "./WeekColumn"
+
+import { useToast } from "@/components/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+import { useUpdateRental } from "@/hooks/api/useRental"
+import { useAuth } from "@/lib/providers/auth-provider"
+
+import WeekColumn, { DragMode } from "./WeekColumn"
 
 interface WeekCalendarFieldProp {
   currentMonday: Dayjs
@@ -16,6 +25,26 @@ interface WeekCalendarFieldProp {
 const DEFAULT_START = 9
 const DEFAULT_END = 22
 const ROW_H = 42
+const SNAP_MIN = 15
+const LONG_PRESS_MS = 400
+// 이만큼 움직이기 전엔 클릭 — 터치는 길게 누르기 전에 움직이면 스크롤로 넘김
+const MOUSE_DRAG_PX = 4
+const TOUCH_CANCEL_PX = 8
+
+type Drag = {
+  rental: RentalDetail
+  mode: DragMode
+  x0: number
+  y0: number
+  colWidth: number
+  active: boolean
+  timer?: ReturnType<typeof setTimeout>
+}
+
+type Preview = { id: number; startAt: Date; endAt: Date }
+
+const snapMinutes = (px: number) =>
+  Math.round((px / ROW_H) * (60 / SNAP_MIN)) * SNAP_MIN
 
 export default function WeekCalendarField({
   currentMonday,
@@ -29,6 +58,181 @@ export default function WeekCalendarField({
   const endHour = Math.max(DEFAULT_END, ...rentalHours)
   const slotCount = endHour - startHour + 1
   const totalMin = slotCount * 60
+
+  const { user } = useAuth()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
+  const updateRental = useUpdateRental()
+
+  const columnsRef = useRef<HTMLDivElement>(null)
+  const previewRef = useRef<Preview | null>(null)
+  // 끌기 직후 따라오는 click(상세 열기)·touchend(주 넘기기 스와이프)를 막음
+  const justDraggedRef = useRef(false)
+  const [preview, setPreviewState] = useState<Preview | null>(null)
+  const setPreview = (p: Preview | null) => {
+    previewRef.current = p
+    setPreviewState(p)
+  }
+
+  // 서버 RentalOwnerGuard·상세 창 삭제 권한과 같은 기준
+  const canDrag = (rental: RentalDetail) =>
+    !!user && (user.isAdmin || rental.users.some((u) => u.id === user.id))
+
+  const save = (
+    rental: RentalDetail,
+    startAt: Date,
+    endAt: Date,
+    isUndo = false
+  ) => {
+    updateRental.mutate([rental.id, { startAt, endAt }], {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ["rentals"] })
+        setPreview(null)
+        if (isUndo) return
+        toast({
+          title: `${dayjs(startAt).locale("ko").format("M/D (ddd) HH:mm")}~${dayjs(endAt).format("HH:mm")}로 바꿨어요`,
+          // 기본 5초는 되돌리기를 누르기엔 짧음
+          duration: 10000,
+          action: (
+            <ToastAction
+              altText="되돌리기"
+              onClick={() => {
+                setPreview({
+                  id: rental.id,
+                  startAt: rental.startAt,
+                  endAt: rental.endAt
+                })
+                save(rental, rental.startAt, rental.endAt, true)
+              }}
+            >
+              되돌리기
+            </ToastAction>
+          )
+        })
+      },
+      onError: (error) => {
+        setPreview(null)
+        toast({
+          variant: "destructive",
+          title: "바꾸지 못했어요",
+          description: error.detail ?? error.message
+        })
+      }
+    })
+  }
+
+  const computePreview = (drag: Drag, dx: number, dy: number): Preview => {
+    const start = dayjs(drag.rental.startAt)
+    const end = dayjs(drag.rental.endAt)
+    const minutes = snapMinutes(dy)
+    if (drag.mode === "resize") {
+      const newEnd = end.add(minutes, "minute")
+      const minEnd = start.add(SNAP_MIN, "minute")
+      return {
+        id: drag.rental.id,
+        startAt: start.toDate(),
+        endAt: (newEnd.isAfter(minEnd) ? newEnd : minEnd).toDate()
+      }
+    }
+    // 주 밖으로는 못 옮김 — 시작일이 이번 주 7일 안에 머물게
+    const dayIndex = Math.min(
+      6,
+      Math.max(0, start.startOf("day").diff(currentMonday, "day"))
+    )
+    const days = Math.min(
+      6 - dayIndex,
+      Math.max(-dayIndex, Math.round(dx / drag.colWidth))
+    )
+    return {
+      id: drag.rental.id,
+      startAt: start.add(days, "day").add(minutes, "minute").toDate(),
+      endAt: end.add(days, "day").add(minutes, "minute").toDate()
+    }
+  }
+
+  const handleBlockPointerDown = (
+    e: React.PointerEvent,
+    rental: RentalDetail,
+    mode: DragMode
+  ) => {
+    justDraggedRef.current = false
+    if (!canDrag(rental) || updateRental.isPending || !columnsRef.current)
+      return
+    const isTouch = e.pointerType === "touch"
+    // 휴대폰은 칸이 좁아 길이 조절 없이 이동만
+    if (isTouch && mode === "resize") return
+
+    const drag: Drag = {
+      rental,
+      mode,
+      x0: e.clientX,
+      y0: e.clientY,
+      colWidth: columnsRef.current.getBoundingClientRect().width / 7,
+      active: false
+    }
+    const activate = () => {
+      drag.active = true
+      justDraggedRef.current = true
+      navigator.vibrate?.(30)
+      setPreview(computePreview(drag, 0, 0))
+    }
+    if (isTouch) drag.timer = setTimeout(activate, LONG_PRESS_MS)
+
+    const cleanup = () => {
+      clearTimeout(drag.timer)
+      window.removeEventListener("pointermove", onMove)
+      window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onCancel)
+      window.removeEventListener("touchmove", blockScroll)
+    }
+    const onMove = (ev: PointerEvent) => {
+      const dx = ev.clientX - drag.x0
+      const dy = ev.clientY - drag.y0
+      if (!drag.active) {
+        const dist = Math.hypot(dx, dy)
+        if (isTouch) {
+          if (dist > TOUCH_CANCEL_PX) cleanup()
+          return
+        }
+        if (dist < MOUSE_DRAG_PX) return
+        activate()
+      }
+      setPreview(computePreview(drag, dx, dy))
+    }
+    const onUp = () => {
+      const wasActive = drag.active
+      cleanup()
+      if (!wasActive) return
+      const p = previewRef.current
+      const unchanged =
+        !p ||
+        (p.startAt.getTime() === new Date(rental.startAt).getTime() &&
+          p.endAt.getTime() === new Date(rental.endAt).getTime())
+      if (unchanged) setPreview(null)
+      else save(rental, p.startAt, p.endAt)
+    }
+    const onCancel = () => {
+      cleanup()
+      setPreview(null)
+    }
+    // 길게 누른 뒤 끄는 동안 화면이 스크롤되지 않게
+    const blockScroll = (ev: TouchEvent) => {
+      if (drag.active) ev.preventDefault()
+    }
+
+    window.addEventListener("pointermove", onMove)
+    window.addEventListener("pointerup", onUp)
+    window.addEventListener("pointercancel", onCancel)
+    window.addEventListener("touchmove", blockScroll, { passive: false })
+  }
+
+  const displayRentals = preview
+    ? rentals.map((r) =>
+        r.id === preview.id
+          ? { ...r, startAt: preview.startAt, endAt: preview.endAt }
+          : r
+      )
+    : rentals
 
   const [now, setNow] = useState<Date | null>(null)
   useEffect(() => {
@@ -70,14 +274,26 @@ export default function WeekCalendarField({
           )
         })}
       </div>
-      <div className="flex-1 relative flex">
+      <div ref={columnsRef} className="flex-1 relative flex">
         {Array.from({ length: 7 }).map((_, i) => (
           <WeekColumn
             nowTopPx={nowTopPx}
             offset={i}
             currentMonday={currentMonday}
-            rentals={rentals}
-            onRentalClick={onRentalClick}
+            rentals={displayRentals}
+            onRentalClick={(rental) => {
+              if (justDraggedRef.current) {
+                justDraggedRef.current = false
+                return
+              }
+              onRentalClick?.(rental)
+            }}
+            canDrag={canDrag}
+            draggingId={preview?.id ?? null}
+            onBlockPointerDown={handleBlockPointerDown}
+            onBlockTouchEnd={(e) => {
+              if (justDraggedRef.current) e.stopPropagation()
+            }}
             startHour={startHour}
             slotCount={slotCount}
             compact={compact}

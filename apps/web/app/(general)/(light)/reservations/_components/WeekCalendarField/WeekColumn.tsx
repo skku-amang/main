@@ -3,6 +3,8 @@ import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
 
+export type DragMode = "move" | "resize"
+
 interface WeekColumnProp {
   currentMonday: Dayjs
   offset: number
@@ -12,6 +14,14 @@ interface WeekColumnProp {
   startHour: number
   slotCount: number
   compact: boolean
+  canDrag: (rental: RentalDetail) => boolean
+  draggingId: number | null
+  onBlockPointerDown: (
+    e: React.PointerEvent,
+    rental: RentalDetail,
+    mode: DragMode
+  ) => void
+  onBlockTouchEnd: (e: React.TouchEvent) => void
 }
 
 const PX_PER_HOUR = 42
@@ -25,7 +35,11 @@ export default function WeekColumn({
   onRentalClick,
   startHour,
   slotCount,
-  compact
+  compact,
+  canDrag,
+  draggingId,
+  onBlockPointerDown,
+  onBlockTouchEnd
 }: WeekColumnProp) {
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
@@ -83,14 +97,18 @@ export default function WeekColumn({
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
         const color = getRentalColor(rental.id)
+        const draggable = canDrag(rental)
+        const isDragging = draggingId === rental.id
 
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden cursor-pointer ${color.hoverBg} transition-colors`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
+            onPointerDown={(e) => onBlockPointerDown(e, rental, "move")}
+            onTouchEnd={onBlockTouchEnd}
           >
             {!compact && heightPx > 30 && (
               <div
@@ -119,6 +137,15 @@ export default function WeekColumn({
             >
               {rental.title}
             </p>
+            {draggable && !compact && (
+              <div
+                className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize"
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  onBlockPointerDown(e, rental, "resize")
+                }}
+              />
+            )}
           </div>
         )
       })}

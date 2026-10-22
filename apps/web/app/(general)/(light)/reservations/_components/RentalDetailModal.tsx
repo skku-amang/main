@@ -3,6 +3,7 @@
 import { useState } from "react"
 import dayjs from "dayjs"
 import { ArrowRight, Clock, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,8 +26,30 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/hooks/use-toast"
+import ROUTES from "@/constants/routes"
 import { useDeleteRental } from "@/hooks/api/useRental"
 import { useAuth } from "@/lib/providers/auth-provider"
+
+const ParticipantChip = ({ user }: { user: RentalDetail["users"][number] }) => (
+  <Link
+    href={ROUTES.MEMBER_PROFILE(user.id)}
+    className="flex w-[140px] items-center gap-1 rounded-lg border px-2 py-1.5 transition-colors hover:bg-slate-50"
+    style={{
+      borderColor: "rgba(197, 197, 197, 0.5)",
+      borderWidth: "0.5px"
+    }}
+  >
+    <Avatar className="h-6 w-6 shrink-0">
+      {user.image && <AvatarImage src={user.image} />}
+      <AvatarFallback className="text-[10px]">
+        {user.name?.slice(0, 2)}
+      </AvatarFallback>
+    </Avatar>
+    <span className="truncate text-xs font-medium" style={{ color: "#7E7E7E" }}>
+      {user.name}
+    </span>
+  </Link>
+)
 
 interface RentalDetailModalProps {
   rental: RentalDetail | null
@@ -135,31 +158,11 @@ export default function RentalDetailModal({
         {rental.users && rental.users.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium" style={{ color: "#71717A" }}>
-              Participants
+              참여자
             </p>
             <div className="flex flex-wrap gap-1.5">
               {rental.users.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex w-[140px] items-center gap-1 rounded-lg border px-2 py-1.5"
-                  style={{
-                    borderColor: "rgba(197, 197, 197, 0.5)",
-                    borderWidth: "0.5px"
-                  }}
-                >
-                  <Avatar className="h-6 w-6 shrink-0">
-                    {user.image && <AvatarImage src={user.image} />}
-                    <AvatarFallback className="text-[10px]">
-                      {user.name?.slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span
-                    className="truncate text-xs font-medium"
-                    style={{ color: "#7E7E7E" }}
-                  >
-                    {user.name}
-                  </span>
-                </div>
+                <ParticipantChip key={user.id} user={user} />
               ))}
             </div>
           </div>
