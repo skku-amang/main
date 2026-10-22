@@ -39,11 +39,9 @@ export default function WeekLabel({
         tabIndex={0}
         className="cursor-pointer"
         onClick={() =>
-          setCurrentMonday((prev) =>
-            mode === "week"
-              ? prev.subtract(1, "week")
-              : prev.subtract(1, "month")
-          )
+          mode === "week"
+            ? setCurrentMonday((prev) => prev.subtract(1, "week"))
+            : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
         }
       />
       {mode === "week" ? (
@@ -67,9 +65,9 @@ export default function WeekLabel({
         tabIndex={0}
         className="cursor-pointer"
         onClick={() =>
-          setCurrentMonday((prev) =>
-            mode === "week" ? prev.add(1, "week") : prev.add(1, "month")
-          )
+          mode === "week"
+            ? setCurrentMonday((prev) => prev.add(1, "week"))
+            : setCalendarViewMonth((prev) => prev.add(1, "month"))
         }
       />
     </div>
