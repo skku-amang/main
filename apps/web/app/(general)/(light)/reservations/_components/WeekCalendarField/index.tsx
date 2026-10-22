@@ -9,6 +9,8 @@ interface WeekCalendarFieldProp {
   currentMonday: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  /** 휴대폰 폭용 — 요일·날짜를 세로로 쌓고 블록엔 제목만 */
+  compact?: boolean
 }
 
 const DEFAULT_START = 9
@@ -18,7 +20,8 @@ const ROW_H = 42
 export default function WeekCalendarField({
   currentMonday,
   rentals,
-  onRentalClick
+  onRentalClick,
+  compact = false
 }: WeekCalendarFieldProp) {
   // 주간 전체 rental의 시간 범위로 동적 확장
   const rentalHours = rentals.map((r) => dayjs(r.startAt).hour())
@@ -46,7 +49,9 @@ export default function WeekCalendarField({
     hour12: true
   })
   return (
-    <div className="w-full mt-7 flex bg-white rounded-xl overflow-hidden">
+    <div
+      className={`w-full flex bg-white rounded-xl overflow-hidden ${compact ? "" : "mt-7"}`}
+    >
       <div className="w-7 flex flex-col shrink-0">
         <div className="h-[42px]" />
         {Array.from({ length: slotCount }).map((_, i) => {
@@ -75,6 +80,7 @@ export default function WeekCalendarField({
             onRentalClick={onRentalClick}
             startHour={startHour}
             slotCount={slotCount}
+            compact={compact}
             key={i}
           />
         ))}
@@ -84,9 +90,12 @@ export default function WeekCalendarField({
             style={{ top: `${nowTopPx}px` }}
           >
             <div className="w-full relative">
-              <div className="absolute w-11 flex items-center justify-center -translate-y-1/2 h-4 rounded-lg text-[10px] text-white bg-destructive -left-5">
-                {timeLabel}
-              </div>
+              {/* 휴대폰에선 시간 열이 좁아 라벨이 첫 날 칸을 가림 */}
+              {!compact && (
+                <div className="absolute w-11 flex items-center justify-center -translate-y-1/2 h-4 rounded-lg text-[10px] text-white bg-destructive -left-5">
+                  {timeLabel}
+                </div>
+              )}
             </div>
           </div>
         )}

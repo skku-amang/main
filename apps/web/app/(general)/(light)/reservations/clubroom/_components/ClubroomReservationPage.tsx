@@ -20,15 +20,19 @@ import { useEquipments } from "@/hooks/api/useEquipment"
 import { RentalDetail } from "@repo/shared-types"
 import RentalDetailModal from "../../_components/RentalDetailModal"
 import { Dayjs } from "dayjs"
+import { useSwipe } from "@/hooks/useSwipe"
 
 const viewOptions = ["week", "month"] as const
 const mobileTabOptions = ["schedule", "my"] as const
 
 export default function ClubroomReservationPage() {
-  const [view, setView] = useQueryState(
+  // 값이 없으면 PC는 주, 휴대폰은 월
+  const [viewParam, setView] = useQueryState(
     "view",
-    parseAsStringLiteral(viewOptions).withDefault("week")
+    parseAsStringLiteral(viewOptions)
   )
+  const view = viewParam ?? "week"
+  const mobileView = viewParam ?? "month"
   const [mobileTab, setMobileTab] = useQueryState(
     "tab",
     parseAsStringLiteral(mobileTabOptions).withDefault("schedule")
@@ -85,6 +89,17 @@ export default function ClubroomReservationPage() {
   const daysInCalendar = Array.from({ length: 42 }, (_, i) =>
     calendarStart.add(i, "day")
   )
+
+  const calendarSwipe = useSwipe({
+    onSwipeLeft: () =>
+      mobileView === "week"
+        ? setCurrentMonday((prev) => prev.add(1, "week"))
+        : setCalendarViewMonth((prev) => prev.add(1, "month")),
+    onSwipeRight: () =>
+      mobileView === "week"
+        ? setCurrentMonday((prev) => prev.subtract(1, "week"))
+        : setCalendarViewMonth((prev) => prev.subtract(1, "month"))
+  })
 
   const rentalList = rentals ?? []
   const equipmentList = equipments ?? []
@@ -163,64 +178,104 @@ export default function ClubroomReservationPage() {
 
       {/* 모바일 페이지 */}
       <div className="relative mx-auto max-w-[400px] md:hidden">
-        {/* Calendar with month navigation */}
-        <MobileCalendarField
-          calendarViewMonth={calendarViewMonth}
-          rentals={rentalList}
-          onDateSelect={setSelectedDate}
-          selectedDate={selectedDate}
-        />
-        <WeekLabel
-          weekLabel={weekLabel}
-          setCalendarViewMonth={setCalendarViewMonth}
-          setCurrentMonday={setCurrentMonday}
-          currentMonday={currentMonday}
-          calendarViewMonth={calendarViewMonth}
-          monthLabel={monthLabel}
-          daysInCalendar={daysInCalendar}
-          mode="month"
-          className="top-12 flex w-full justify-between px-5"
-        />
-
-        {/* Mobile tab buttons (pill style matching Figma) */}
-        <div className="flex gap-2 px-4 py-4">
-          <button
-            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
-              mobileTab === "schedule"
-                ? "bg-third text-white"
-                : "bg-white text-gray-400"
-            }`}
-            onClick={() => setMobileTab("schedule")}
+        <div className="flex justify-end px-4 pb-3">
+          <Tabs
+            value={mobileView}
+            onValueChange={(v) => setView(v as typeof mobileView)}
           >
-            예약 현황
-          </button>
-          <button
-            className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
-              mobileTab === "my"
-                ? "bg-third text-white"
-                : "bg-white text-gray-400"
-            }`}
-            onClick={() => setMobileTab("my")}
-          >
-            나의 예약
-          </button>
+            <TabsList>
+              <TabsTrigger value="month">월</TabsTrigger>
+              <TabsTrigger value="week">주</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
-        {/* Mobile tab content */}
-        <div className="bg-white px-3 pb-20">
-          {mobileTab === "schedule" ? (
-            <MobileTimeSlots
-              selectedDate={selectedDate}
-              rentals={rentalList}
-              onRentalClick={setSelectedRental}
+        {mobileView === "week" ? (
+          <div className="relative bg-white px-2 pb-20 pt-20">
+            <WeekLabel
+              weekLabel={weekLabel}
+              setCalendarViewMonth={setCalendarViewMonth}
+              setCurrentMonday={setCurrentMonday}
+              currentMonday={currentMonday}
+              calendarViewMonth={calendarViewMonth}
+              monthLabel={monthLabel}
+              daysInCalendar={daysInCalendar}
+              mode="week"
+              className="top-6 flex w-full justify-between px-5"
             />
-          ) : (
-            <MobileMyReservations
-              rentals={rentalList}
-              onRentalClick={setSelectedRental}
+            <div {...calendarSwipe}>
+              <WeekCalendarField
+                currentMonday={currentMonday}
+                rentals={rentalList}
+                onRentalClick={setSelectedRental}
+                compact
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Calendar with month navigation */}
+            <div {...calendarSwipe}>
+              <MobileCalendarField
+                calendarViewMonth={calendarViewMonth}
+                rentals={rentalList}
+                onDateSelect={setSelectedDate}
+                selectedDate={selectedDate}
+              />
+            </div>
+            <WeekLabel
+              weekLabel={weekLabel}
+              setCalendarViewMonth={setCalendarViewMonth}
+              setCurrentMonday={setCurrentMonday}
+              currentMonday={currentMonday}
+              calendarViewMonth={calendarViewMonth}
+              monthLabel={monthLabel}
+              daysInCalendar={daysInCalendar}
+              mode="month"
+              className="top-12 flex w-full justify-between px-5"
             />
-          )}
-        </div>
+
+            {/* Mobile tab buttons (pill style matching Figma) */}
+            <div className="flex gap-2 px-4 py-4">
+              <button
+                className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
+                  mobileTab === "schedule"
+                    ? "bg-third text-white"
+                    : "bg-white text-gray-400"
+                }`}
+                onClick={() => setMobileTab("schedule")}
+              >
+                예약 현황
+              </button>
+              <button
+                className={`flex-1 rounded-[10px] h-[45px] text-base font-semibold transition-colors ${
+                  mobileTab === "my"
+                    ? "bg-third text-white"
+                    : "bg-white text-gray-400"
+                }`}
+                onClick={() => setMobileTab("my")}
+              >
+                나의 예약
+              </button>
+            </div>
+
+            {/* Mobile tab content */}
+            <div className="bg-white px-3 pb-20">
+              {mobileTab === "schedule" ? (
+                <MobileTimeSlots
+                  selectedDate={selectedDate}
+                  rentals={rentalList}
+                  onRentalClick={setSelectedRental}
+                />
+              ) : (
+                <MobileMyReservations
+                  rentals={rentalList}
+                  onRentalClick={setSelectedRental}
+                />
+              )}
+            </div>
+          </div>
+        )}
 
         <AddScheduleButton
           className="fixed bottom-[calc(var(--tabbar-height)+1rem)] left-4 right-4 z-50 shadow-lg"

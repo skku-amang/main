@@ -11,6 +11,7 @@ interface WeekColumnProp {
   onRentalClick?: (rental: RentalDetail) => void
   startHour: number
   slotCount: number
+  compact: boolean
 }
 
 const PX_PER_HOUR = 42
@@ -23,7 +24,8 @@ export default function WeekColumn({
   rentals,
   onRentalClick,
   startHour,
-  slotCount
+  slotCount,
+  compact
 }: WeekColumnProp) {
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
@@ -43,7 +45,9 @@ export default function WeekColumn({
   return (
     <div className="w-[14.28%] relative overflow-hidden border-x-[1.5px] border-gray-100">
       {/* 헤더: 요일 + 날짜 */}
-      <div className="w-full bg-gray-50 h-[42px] border-t-[1.5px] border-gray-100 text-xs text-black font-medium flex justify-center items-center gap-1">
+      <div
+        className={`w-full bg-gray-50 h-[42px] border-t-[1.5px] border-gray-100 text-xs text-black font-medium flex justify-center items-center ${compact ? "flex-col text-[10px] leading-none gap-0.5" : "gap-1"}`}
+      >
         <span>{dayName}</span>
         {isToday ? (
           <div className="w-5 h-5 flex items-center justify-center rounded-full bg-black text-white">
@@ -83,12 +87,12 @@ export default function WeekColumn({
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm px-1 overflow-hidden cursor-pointer ${color.hoverBg} transition-colors`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden cursor-pointer ${color.hoverBg} transition-colors`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
             onClick={() => onRentalClick?.(rental)}
           >
-            {heightPx > 30 && (
+            {!compact && heightPx > 30 && (
               <div
                 className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
               >
@@ -98,7 +102,7 @@ export default function WeekColumn({
                 </span>
               </div>
             )}
-            {heightPx > 45 && rental.users.length > 0 && (
+            {!compact && heightPx > 45 && rental.users.length > 0 && (
               <div
                 className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
               >
@@ -110,7 +114,9 @@ export default function WeekColumn({
                 </span>
               </div>
             )}
-            <p className={`text-xs font-semibold ${color.text} truncate`}>
+            <p
+              className={`font-semibold ${color.text} ${compact ? "text-[10px] leading-tight break-all" : "text-xs truncate"}`}
+            >
               {rental.title}
             </p>
           </div>
