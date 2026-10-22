@@ -34,6 +34,7 @@ const TOUCH_CANCEL_PX = 8
 type Drag = {
   rental: RentalDetail
   mode: DragMode
+  pointerId: number
   x0: number
   y0: number
   colWidth: number
@@ -130,7 +131,7 @@ export default function WeekCalendarField({
     const gridEndOf = (d: Dayjs) => d.startOf("day").add(endHour + 1, "hour")
     if (drag.mode === "resize") {
       const minEnd = start.add(SNAP_MIN, "minute")
-      const maxEnd = gridEndOf(start)
+      const maxEnd = gridEndOf(end)
       let newEnd = end.add(minutes, "minute")
       if (newEnd.isBefore(minEnd)) newEnd = minEnd
       if (newEnd.isAfter(maxEnd)) newEnd = maxEnd
@@ -181,6 +182,7 @@ export default function WeekCalendarField({
     const drag: Drag = {
       rental,
       mode,
+      pointerId: e.pointerId,
       x0: e.clientX,
       y0: e.clientY,
       colWidth: columnsRef.current.getBoundingClientRect().width / 7,
@@ -201,7 +203,9 @@ export default function WeekCalendarField({
       window.removeEventListener("pointercancel", onCancel)
       window.removeEventListener("touchmove", blockScroll)
     }
+    // 끌기를 시작한 손가락·포인터만 따라감 — 두 번째 손가락이 미리보기를 바꾸거나 저장하지 않게
     const onMove = (ev: PointerEvent) => {
+      if (ev.pointerId !== drag.pointerId) return
       const dx = ev.clientX - drag.x0
       const dy = ev.clientY - drag.y0
       if (!drag.active) {
@@ -215,7 +219,8 @@ export default function WeekCalendarField({
       }
       setPreview(computePreview(drag, dx, dy))
     }
-    const onUp = () => {
+    const onUp = (ev: PointerEvent) => {
+      if (ev.pointerId !== drag.pointerId) return
       const wasActive = drag.active
       cleanup()
       if (!wasActive) return
@@ -227,7 +232,8 @@ export default function WeekCalendarField({
       if (unchanged) setPreview(null)
       else save(rental, p.startAt, p.endAt)
     }
-    const onCancel = () => {
+    const onCancel = (ev: PointerEvent) => {
+      if (ev.pointerId !== drag.pointerId) return
       cleanup()
       setPreview(null)
     }
