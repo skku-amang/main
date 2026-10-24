@@ -3,7 +3,8 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
-import { getRentalPeopleLabel } from "@/lib/rental/people"
+import { getRentalPeopleLabel, isMyRental } from "@/lib/rental/people"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileTimeSlotsProps {
   selectedDate: Dayjs
@@ -22,6 +23,7 @@ export default function MobileTimeSlots({
   onRentalClick,
   onSlotClick
 }: MobileTimeSlotsProps) {
+  const { user } = useAuth()
   const selectedDay = selectedDate.format("YYYY-MM-DD")
   const dayRentals = rentals
     .filter((r) => dayjs(r.startAt).format("YYYY-MM-DD") === selectedDay)
@@ -97,7 +99,7 @@ export default function MobileTimeSlots({
                 return (
                   <div
                     key={rental.id}
-                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${isMyRental(rental, user?.id) ? "rounded-md ring-2 ring-inset ring-primary" : ""} ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
                     onClick={() => onRentalClick?.(rental)}
                   >
                     {/* 고른 날짜의 목록이라 날짜는 생략 */}

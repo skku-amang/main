@@ -1,7 +1,8 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
-import { getRentalPeopleLabel } from "@/lib/rental/people"
+import { getRentalPeopleLabel, isMyRental } from "@/lib/rental/people"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 export type DragMode = "move" | "resize"
 
@@ -48,6 +49,7 @@ export default function WeekColumn({
   onBlockTouchMove,
   onBlockTouchEnd
 }: WeekColumnProp) {
+  const { user } = useAuth()
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
   const dayNumber = date.format("D")
@@ -119,11 +121,12 @@ export default function WeekColumn({
         const draggable = canDrag(rental)
         const isDragging = draggingId === rental.id
         const peopleLabel = getRentalPeopleLabel(rental)
+        const mine = isMyRental(rental, user?.id)
 
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${mine ? "ring-2 ring-inset ring-primary" : ""} ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}

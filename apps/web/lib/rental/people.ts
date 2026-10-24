@@ -11,6 +11,12 @@ export function getRentalPeople(rental: RentalPeopleSource) {
   return { renter, others }
 }
 
+/** 내가 참여자로 들어간 예약 — 달력에서 테두리로 강조 */
+export const isMyRental = (
+  rental: Pick<RentalDetail, "users">,
+  userId: number | undefined
+) => userId !== undefined && rental.users.some((u) => u.id === userId)
+
 /** 블록·목록에 보일 사람 — "예약자 외 N명" */
 export function getRentalPeopleLabel(rental: RentalPeopleSource) {
   const { renter, others } = getRentalPeople(rental)
