@@ -4,7 +4,7 @@ import "dayjs/locale/ko"
 
 import { useRef, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { Clock, MapPin, Pencil, Trash2, UserRound } from "lucide-react"
+import { Clock, Package, Pencil, Trash2, UserRound } from "lucide-react"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
@@ -184,9 +184,9 @@ export default function RentalDetailModal({
             </p>
           </DetailRow>
 
-          {/* 동방 예약 화면에선 장소가 자명해서 장비 대여만 */}
+          {/* 동방 예약은 장소가 자명해서 장비 대여만 — 어떤 장비인지 */}
           {rental.equipment.category !== "ROOM" && (
-            <DetailRow icon={MapPin} label="장소">
+            <DetailRow icon={Package} label="장비">
               <p className="text-sm">
                 {rental.equipment.brand} {rental.equipment.model}
               </p>
