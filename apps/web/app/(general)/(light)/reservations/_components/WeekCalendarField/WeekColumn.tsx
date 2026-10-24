@@ -93,7 +93,7 @@ export default function WeekColumn({
             type="button"
             tabIndex={-1}
             aria-hidden
-            className={`${className} hover:bg-gray-50`}
+            className={`${className} transition-colors hover:bg-gray-50 active:bg-primary/15`}
             onClick={() => onSlotClick(slotStart)}
           />
         )

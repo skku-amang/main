@@ -66,7 +66,7 @@ export default function MobileTimeSlots({
               key={hour}
               type="button"
               aria-label={`${hourLabel}부터 예약하기`}
-              className="flex min-h-[44px] w-full text-left"
+              className="flex min-h-[44px] w-full text-left transition-colors active:bg-primary/15"
               onClick={() =>
                 onSlotClick(selectedDate.startOf("day").add(hour, "hour"))
               }
