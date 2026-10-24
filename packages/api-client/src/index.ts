@@ -746,7 +746,7 @@ export default class ApiClient {
    * 대여 생성
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ValidationError} 입력값이 올바르지 않은 경우
-   * @throws {ConflictError} 해당 시간에 이미 예약된 장비인 경우
+   * @throws {ConflictError} 해당 시간대에 이미 다른 예약이 있는 경우
    * @throws {UnprocessableEntityError} 존재하지 않는 장비 또는 유저 ID가 포함된 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */
