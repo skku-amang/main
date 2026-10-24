@@ -147,7 +147,7 @@ function RentalForm({
       setEquipmentId(equipments[0]?.id ?? null)
     }
   }, [equipments, equipmentId])
-  const [title, setTitle] = useState(editing?.title ?? "")
+  const [title, setTitle] = useState(editing?.title ?? DEFAULT_TITLE)
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initialRange
       ? { from: initialRange.start.date, to: initialRange.end.date }
