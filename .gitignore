@@ -58,3 +58,4 @@ tmp/
 *.code-workspace
 !*.code-workspace.example
 .envrc.local
+.gstack/

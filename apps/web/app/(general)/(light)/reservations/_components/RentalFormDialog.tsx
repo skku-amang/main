@@ -34,7 +34,6 @@ import {
   RentalDetail,
   formatGenerationOrder
 } from "@repo/shared-types"
-import type { DateRange } from "react-day-picker"
 
 // Generate hour/minute options
 const HOURS = Array.from({ length: 24 }, (_, i) =>
@@ -205,8 +204,7 @@ function RentalForm({
       (equipments.length === 1 ? (equipments[0]?.id ?? null) : null)
   )
 
-  // equipments prop이 비동기로 로딩될 때 equipmentId를 동기화
-  // 모바일에서 장비 셀렉터가 숨겨지므로 첫 번째 장비를 자동 선택
+  // equipments prop이 비동기로 로딩될 때 첫 번째 장비를 기본 선택
   useEffect(() => {
     if (equipments.length >= 1 && equipmentId === null) {
       setEquipmentId(equipments[0]?.id ?? null)
@@ -237,6 +235,20 @@ function RentalForm({
   }, [currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // 날짜를 누르면 그날 하루로 새로 시작, 바로 이어서 뒷날을 누르면 거기까지 늘림
+  // (기본 범위 선택은 하루짜리 예약의 날짜를 옮기려 해도 범위가 늘어나 버림)
+  const [extending, setExtending] = useState(false)
+  const handleDayPick = (day: Date) => {
+    if (extending && startDate && day > startDate) {
+      setEndDate(day)
+      setExtending(false)
+      return
+    }
+    setStartDate(day)
+    setEndDate(day)
+    setExtending(true)
+  }
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -324,7 +336,7 @@ function RentalForm({
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[600px]">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {editing ? "예약 수정" : "예약 추가"}
@@ -333,9 +345,9 @@ function RentalForm({
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* 장비 선택 (데스크톱 + 여러 장비일 때만 표시, 수정 땐 장비 그대로) */}
+          {/* 장비 선택 (여러 장비일 때만 표시, 수정 땐 장비 그대로) */}
           {!editing && equipments.length > 1 && (
-            <div className="hidden sm:block space-y-1.5">
+            <div className="space-y-1.5">
               <p className="text-sm font-medium text-muted-foreground">장비</p>
               <Select
                 onValueChange={(v) => setEquipmentId(Number(v))}
@@ -382,50 +394,7 @@ function RentalForm({
               <span>Date & Time</span>
             </div>
 
-            {/* Desktop: two calendars side by side */}
-            <div className="hidden sm:flex gap-3">
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <p className="text-sm text-muted-foreground">Start date</p>
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(date) => {
-                    setStartDate(date)
-                    // 종료일이 비어있거나 시작일보다 이전이면 자동으로 시작일과 동일하게 맞춤
-                    if (date && (!endDate || endDate < date)) {
-                      setEndDate(date)
-                    }
-                  }}
-                  disabled={disablePastDates}
-                  className="rounded-md border p-1"
-                  classNames={{
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
-                  }}
-                />
-                {errors.startDate && (
-                  <p className="text-sm text-destructive">{errors.startDate}</p>
-                )}
-              </div>
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <p className="text-sm text-muted-foreground">End date</p>
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={setEndDate}
-                  disabled={disablePastDates}
-                  className="rounded-md border p-1"
-                  classNames={{
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md aria-selected:bg-primary aria-selected:text-primary-foreground"
-                  }}
-                />
-                {errors.endDate && (
-                  <p className="text-sm text-destructive">{errors.endDate}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Mobile: range calendar */}
-            <div className="sm:hidden space-y-1.5">
+            <div className="space-y-1.5">
               <Calendar
                 mode="range"
                 selected={
@@ -433,13 +402,11 @@ function RentalForm({
                     ? { from: startDate, to: endDate }
                     : undefined
                 }
-                onSelect={(range: DateRange | undefined) => {
-                  setStartDate(range?.from)
-                  setEndDate(range?.to ?? range?.from)
-                }}
+                onSelect={(_, day) => handleDayPick(day)}
                 disabled={disablePastDates}
                 className="rounded-md border p-1 w-full"
                 classNames={{
+                  month: "w-full space-y-4",
                   head_row: "flex w-full",
                   head_cell:
                     "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem]",
@@ -455,75 +422,7 @@ function RentalForm({
               )}
             </div>
 
-            {/* Desktop: time selectors */}
-            <div className="hidden sm:flex gap-3">
-              <div className="flex-1 space-y-1.5">
-                <p className="text-sm text-muted-foreground">From</p>
-                <div className="flex items-center gap-1">
-                  <HourSelect
-                    value={startHour}
-                    onValueChange={setStartHour}
-                    placeholder="Select"
-                    triggerClassName="w-full"
-                    ariaLabel="시작 시각(시)"
-                  />
-                  <span className="text-muted-foreground">:</span>
-                  <Select value={startMinute} onValueChange={setStartMinute}>
-                    <SelectTrigger
-                      className="w-full"
-                      aria-label="시작 시각(분)"
-                    >
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MINUTES.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {errors.startTime && (
-                  <p className="text-sm text-destructive">{errors.startTime}</p>
-                )}
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <p className="text-sm text-muted-foreground">To</p>
-                <div className="flex items-center gap-1">
-                  <HourSelect
-                    value={endHour}
-                    onValueChange={setEndHour}
-                    placeholder="Select"
-                    triggerClassName="w-full"
-                    ariaLabel="종료 시각(시)"
-                    afterHour={startHour}
-                  />
-                  <span className="text-muted-foreground">:</span>
-                  <Select value={endMinute} onValueChange={setEndMinute}>
-                    <SelectTrigger
-                      className="w-full"
-                      aria-label="종료 시각(분)"
-                    >
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MINUTES.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {errors.endTime && (
-                  <p className="text-sm text-destructive">{errors.endTime}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Mobile: compact time row */}
-            <div className="flex sm:hidden items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="flex flex-1 items-center gap-1">
                 <HourSelect
                   value={startHour}
@@ -571,8 +470,7 @@ function RentalForm({
                 </Select>
               </div>
             </div>
-            {/* Mobile time errors */}
-            <div className="sm:hidden">
+            <div>
               {errors.startTime && (
                 <p className="text-sm text-destructive">{errors.startTime}</p>
               )}
