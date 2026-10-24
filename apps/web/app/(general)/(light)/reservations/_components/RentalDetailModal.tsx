@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import dayjs from "dayjs"
 import { ArrowRight, Clock, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
@@ -69,6 +69,7 @@ export default function RentalDetailModal({
   const queryClient = useQueryClient()
   const { toast } = useToast()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   if (!rental) return null
 
@@ -100,8 +101,12 @@ export default function RentalDetailModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-[486px] rounded-3xl border-0 bg-[#F0FDF4] p-6 gap-4 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.05),0px_4px_50px_0px_rgba(0,0,0,0.08)]"
-        // 첫 버튼(참여자·삭제)에 포커스가 가 엔터 한 번에 지워지지 않게
-        onOpenAutoFocus={(e) => e.preventDefault()}
+        ref={contentRef}
+        // 첫 버튼(참여자·삭제) 대신 창 자체에 포커스 — 엔터 한 번에 지워지지 않게
+        onOpenAutoFocus={(e) => {
+          e.preventDefault()
+          contentRef.current?.focus()
+        }}
       >
         <DialogHeader className="flex-row items-center justify-between gap-1.5">
           <DialogTitle

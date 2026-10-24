@@ -46,12 +46,13 @@ export default function MobileTimeSlots({
   const startHour = Math.min(DEFAULT_START, ...rentalHours)
   const endHour = Math.max(DEFAULT_END, ...rentalHours)
 
-  // 예약이 진행 중인 시간대 (시작 시간 제외, 종료 시간 이전)는 스킵 대상
+  // 예약이 걸쳐 있는 시간대 (시작 시간 제외)는 스킵 대상 — 10:00~12:30이면 11·12시
   const occupiedHours = new Set<number>()
   for (const rental of dayRentals) {
     const sH = dayjs(rental.startAt).hour()
-    const eH = dayjs(rental.endAt).hour()
-    for (let h = sH + 1; h < eH; h++) occupiedHours.add(h)
+    const end = dayjs(rental.endAt)
+    const lastHour = end.minute() > 0 ? end.hour() : end.hour() - 1
+    for (let h = sH + 1; h <= lastHour; h++) occupiedHours.add(h)
   }
 
   const hours = Array.from(

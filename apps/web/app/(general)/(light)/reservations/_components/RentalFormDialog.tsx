@@ -162,12 +162,12 @@ function RentalForm({
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
 
-  // session이 비동기로 로딩될 때 본인 ID를 참여자에 동기화
+  // session이 비동기로 로딩될 때 본인 ID를 참여자에 동기화 — 수정 땐 참여자를 다 빼도 다시 넣지 않음
   useEffect(() => {
-    if (currentUserId && selectedUserIds.length === 0) {
+    if (!editing && currentUserId && selectedUserIds.length === 0) {
       setSelectedUserIds([currentUserId])
     }
-  }, [currentUserId, selectedUserIds.length])
+  }, [editing, currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -237,7 +237,8 @@ function RentalForm({
     users?.filter((u) => selectedUserIds.includes(u.id)) ?? []
 
   return (
-    <Dialog open onOpenChange={(v) => !v && onClose()}>
+    // 저장 중에 닫으면 폼이 사라져 mutate 콜백(달력 갱신·실패 안내)이 실행되지 않음
+    <Dialog open onOpenChange={(v) => !v && !isPending && onClose()}>
       <DialogContent className="max-h-[90vh] w-fit overflow-y-auto rounded-2xl">
         {/* 화면엔 숨기고 화면 낭독기에만 전달 */}
         <DialogHeader className="sr-only">
@@ -380,6 +381,7 @@ function RentalForm({
                     <button
                       type="button"
                       onClick={() => removeUser(user.id)}
+                      aria-label={`${user.name} 빼기`}
                       className="flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/80"
                     >
                       <X size={10} />
@@ -403,6 +405,7 @@ function RentalForm({
               variant="outline"
               className="flex-1"
               onClick={onClose}
+              disabled={isPending}
             >
               취소
             </Button>
