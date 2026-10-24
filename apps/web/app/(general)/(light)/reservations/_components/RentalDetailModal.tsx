@@ -31,7 +31,6 @@ import { useToast } from "@/components/hooks/use-toast"
 import ROUTES from "@/constants/routes"
 import { useDeleteRental } from "@/hooks/api/useRental"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { getRentalPeople } from "@/lib/rental/people"
 import { getRentalColor } from "./rentalColors"
 
 type ChipUser = Pick<RentalDetail["users"][number], "id" | "name" | "image">
@@ -134,7 +133,8 @@ export default function RentalDetailModal({
   const start = dayjs(rental.startAt)
   const end = dayjs(rental.endAt)
   const sameDay = start.isSame(end, "day")
-  const { renter } = getRentalPeople(rental)
+  // '예약자'라고 못 박아 보여 주므로 대신 내세우지 않음 — 예약자 계정이 지워지면 renter는 null
+  const renter = rental.renter
   const companions = rental.users.filter((u) => u.id !== renter?.id)
   const dot = getRentalColor(rental.id, true).bg
 
@@ -181,15 +181,17 @@ export default function RentalDetailModal({
             </p>
           </DetailRow>
 
-          {renter && (
+          {(renter || companions.length > 0) && (
             <DetailRow icon={UserRound} label="사람">
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-16 shrink-0 text-xs text-muted-foreground">
-                    예약자
-                  </span>
-                  <ParticipantChip user={renter} />
-                </div>
+                {renter && (
+                  <div className="flex items-center gap-2">
+                    <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                      예약자
+                    </span>
+                    <ParticipantChip user={renter} />
+                  </div>
+                )}
                 {companions.length > 0 && (
                   <div className="flex gap-2">
                     <span className="w-16 shrink-0 pt-1.5 text-xs text-muted-foreground">
