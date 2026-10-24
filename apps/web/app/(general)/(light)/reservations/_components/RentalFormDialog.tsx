@@ -34,76 +34,14 @@ import {
   RentalDetail,
   formatGenerationOrder
 } from "@repo/shared-types"
-
-// Generate hour/minute options
-const HOURS = Array.from({ length: 24 }, (_, i) =>
-  i.toString().padStart(2, "0")
-)
-const MINUTES = Array.from({ length: 4 }, (_, i) =>
-  (i * 15).toString().padStart(2, "0")
-)
+import type { DateRange } from "react-day-picker"
 
 const DEFAULT_TITLE = "개인 연습"
 
-// 동방 사용은 대부분 9~23시 (22~06시 합주 금지)
-const FIRST_USABLE_HOUR = 9
-const LAST_USABLE_HOUR = 22
-
-/** 아직 고르지 않은 시간 목록을 열 때 먼저 보여줄 시 */
-function getInitialHour(afterHour?: string): number {
-  if (afterHour) return Math.min(Number(afterHour) + 1, 23)
-  const now = dayjs().hour()
-  return now >= FIRST_USABLE_HOUR && now <= LAST_USABLE_HOUR
-    ? now
-    : FIRST_USABLE_HOUR
-}
-
-interface HourSelectProps {
-  value: string
-  onValueChange: (value: string) => void
-  placeholder: string
-  triggerClassName?: string
-  ariaLabel: string
-  /** 종료 시간 선택 시 시작 시간 — 목록이 그 다음 시부터 보임 */
-  afterHour?: string
-}
-
-function HourSelect({
-  value,
-  onValueChange,
-  placeholder,
-  triggerClassName,
-  ariaLabel,
-  afterHour
-}: HourSelectProps) {
-  const initialHour = getInitialHour(afterHour).toString().padStart(2, "0")
-  // 열릴 때 Radix가 첫 항목(00)에 포커스를 주므로 그 다음 프레임에 옮김
-  const moveToInitialHour = useCallback((el: HTMLDivElement | null) => {
-    if (!el) return
-    requestAnimationFrame(() => {
-      el.focus({ preventScroll: true })
-      el.scrollIntoView({ block: "start" })
-    })
-  }, [])
-
-  return (
-    <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className={triggerClassName} aria-label={ariaLabel}>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {HOURS.map((h) => (
-          <SelectItem
-            key={h}
-            value={h}
-            ref={!value && h === initialHour ? moveToInitialHour : undefined}
-          >
-            {h}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
+/** "HH:mm" 시각을 그 날짜에 붙임 */
+const atTime = (date: Date, time: string) => {
+  const [h, m] = time.split(":").map(Number)
+  return dayjs(date).hour(h!).minute(m!).second(0)
 }
 
 export type RentalFormTarget =
@@ -145,8 +83,7 @@ export function useRentalForm() {
 
 const toFields = (d: Dayjs) => ({
   date: d.startOf("day").toDate(),
-  hour: d.format("HH"),
-  minute: d.format("mm")
+  time: d.format("HH:mm")
 })
 
 /** 폼 처음 값 — 빈 칸은 그 시각부터 1시간, 수정은 기존 예약 그대로 */
@@ -211,18 +148,16 @@ function RentalForm({
     }
   }, [equipments, equipmentId])
   const [title, setTitle] = useState(editing?.title ?? "")
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    initialRange?.start.date
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    initialRange
+      ? { from: initialRange.start.date, to: initialRange.end.date }
+      : undefined
   )
-  const [endDate, setEndDate] = useState<Date | undefined>(
-    initialRange?.end.date
-  )
-  const [startHour, setStartHour] = useState(initialRange?.start.hour ?? "")
-  const [startMinute, setStartMinute] = useState(
-    initialRange?.start.minute ?? ""
-  )
-  const [endHour, setEndHour] = useState(initialRange?.end.hour ?? "")
-  const [endMinute, setEndMinute] = useState(initialRange?.end.minute ?? "")
+  // 끝 날짜를 안 골랐으면 하루짜리
+  const startDate = dateRange?.from
+  const endDate = dateRange?.to ?? dateRange?.from
+  const [startTime, setStartTime] = useState(initialRange?.start.time ?? "")
+  const [endTime, setEndTime] = useState(initialRange?.end.time ?? "")
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
@@ -236,43 +171,18 @@ function RentalForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // 날짜를 누르면 그날 하루로 새로 시작, 바로 이어서 뒷날을 누르면 거기까지 늘림
-  // (기본 범위 선택은 하루짜리 예약의 날짜를 옮기려 해도 범위가 늘어나 버림)
-  const [extending, setExtending] = useState(false)
-  const handleDayPick = (day: Date) => {
-    if (extending && startDate && day > startDate) {
-      setEndDate(day)
-      setExtending(false)
-      return
-    }
-    setStartDate(day)
-    setEndDate(day)
-    setExtending(true)
-  }
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!equipmentId) newErrors.equipmentId = "장비를 선택해주세요."
-    if (!startDate) newErrors.startDate = "시작 날짜를 선택해주세요."
-    if (!endDate) newErrors.endDate = "종료 날짜를 선택해주세요."
-    if (!startHour || !startMinute)
-      newErrors.startTime = "시작 시간을 선택해주세요."
-    if (!endHour || !endMinute) newErrors.endTime = "종료 시간을 선택해주세요."
+    if (!startDate) newErrors.startDate = "날짜를 선택해주세요."
+    if (!startTime) newErrors.startTime = "시작 시간을 선택해주세요."
+    if (!endTime) newErrors.endTime = "종료 시간을 선택해주세요."
     if (selectedUserIds.length === 0)
       newErrors.users = "참여자를 최소 1명 선택해주세요."
 
-    if (
-      startDate &&
-      endDate &&
-      startHour &&
-      startMinute &&
-      endHour &&
-      endMinute
-    ) {
-      const start = dayjs(startDate)
-        .hour(Number(startHour))
-        .minute(Number(startMinute))
-      const end = dayjs(endDate).hour(Number(endHour)).minute(Number(endMinute))
+    if (startDate && endDate && startTime && endTime) {
+      const start = atTime(startDate, startTime)
+      const end = atTime(endDate, endTime)
       if (!end.isAfter(start)) {
         newErrors.endTime = "종료 시간은 시작 시간보다 뒤여야 합니다."
       }
@@ -285,16 +195,8 @@ function RentalForm({
   const handleSubmit = () => {
     if (!validate() || !equipmentId || !startDate || !endDate) return
 
-    const startAt = dayjs(startDate)
-      .hour(Number(startHour))
-      .minute(Number(startMinute))
-      .second(0)
-      .toDate()
-    const endAt = dayjs(endDate)
-      .hour(Number(endHour))
-      .minute(Number(endMinute))
-      .second(0)
-      .toDate()
+    const startAt = atTime(startDate, startTime).toDate()
+    const endAt = atTime(endDate, endTime).toDate()
 
     const fields = {
       title: title.trim() || DEFAULT_TITLE,
@@ -397,78 +299,32 @@ function RentalForm({
             <div className="space-y-1.5">
               <Calendar
                 mode="range"
-                selected={
-                  startDate || endDate
-                    ? { from: startDate, to: endDate }
-                    : undefined
-                }
-                onSelect={(_, day) => handleDayPick(day)}
+                // 범위를 다 고른 뒤 다시 누르면 새로 시작 — 하루짜리 예약 날짜를 옮길 때 범위가 늘어나지 않게
+                resetOnSelect
+                selected={dateRange}
+                onSelect={setDateRange}
                 disabled={disablePastDates}
-                className="rounded-md border p-1 w-full"
-                classNames={{
-                  month: "w-full space-y-4",
-                  head_row: "flex w-full",
-                  head_cell:
-                    "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem]",
-                  row: "flex w-full mt-2",
-                  cell: "flex-1 h-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-9 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm rounded-md"
-                }}
+                className="mx-auto rounded-md border [--cell-size:2.5rem]"
               />
-              {(errors.startDate || errors.endDate) && (
-                <p className="text-sm text-destructive">
-                  {errors.startDate || errors.endDate}
-                </p>
+              {errors.startDate && (
+                <p className="text-sm text-destructive">{errors.startDate}</p>
               )}
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="flex flex-1 items-center gap-1">
-                <HourSelect
-                  value={startHour}
-                  onValueChange={setStartHour}
-                  placeholder="HH"
-                  triggerClassName="h-9"
-                  ariaLabel="시작 시각(시)"
-                />
-                <span className="text-muted-foreground">:</span>
-                <Select value={startMinute} onValueChange={setStartMinute}>
-                  <SelectTrigger className="h-9" aria-label="시작 시각(분)">
-                    <SelectValue placeholder="MM" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MINUTES.map((m) => (
-                      <SelectItem key={m} value={m}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Input
+                type="time"
+                aria-label="시작 시각"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
               <span className="text-muted-foreground text-sm">~</span>
-              <div className="flex flex-1 items-center gap-1">
-                <HourSelect
-                  value={endHour}
-                  onValueChange={setEndHour}
-                  placeholder="HH"
-                  triggerClassName="h-9"
-                  ariaLabel="종료 시각(시)"
-                  afterHour={startHour}
-                />
-                <span className="text-muted-foreground">:</span>
-                <Select value={endMinute} onValueChange={setEndMinute}>
-                  <SelectTrigger className="h-9" aria-label="종료 시각(분)">
-                    <SelectValue placeholder="MM" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MINUTES.map((m) => (
-                      <SelectItem key={m} value={m}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Input
+                type="time"
+                aria-label="종료 시각"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
             </div>
             <div>
               {errors.startTime && (
