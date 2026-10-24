@@ -16,6 +16,9 @@ import { useEquipment } from "@/hooks/api/useEquipment"
 import { useRentals } from "@/hooks/api/useRental"
 import MyReservationField from "../../../_components/MyReservationField"
 import AddScheduleButton from "../../../_components/AddScheduleButton"
+import RentalFormDialog, {
+  useRentalForm
+} from "../../../_components/RentalFormDialog"
 import WeekCalendarField from "../../../_components/WeekCalendarField"
 import WeekLabel from "../../../_components/WeekLable"
 import MonthCalendarField from "../../../_components/MonthCalendarField"
@@ -40,6 +43,7 @@ export default function EquipmentCalendarPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
+  const rentalForm = useRentalForm()
   const [selectedDateStr, setSelectedDateStr] = useQueryState(
     "date",
     parseAsString
@@ -144,6 +148,7 @@ export default function EquipmentCalendarPage() {
                 currentMonday={currentMonday}
                 rentals={rentalList}
                 onRentalClick={setSelectedRental}
+                onSlotClick={rentalForm.openCreate}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -157,7 +162,7 @@ export default function EquipmentCalendarPage() {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentForSchedule}
+                onClick={() => rentalForm.openCreate()}
               />
             </TabsContent>
             <TabsContent value="month" className="relative">
@@ -178,7 +183,7 @@ export default function EquipmentCalendarPage() {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentForSchedule}
+                onClick={() => rentalForm.openCreate()}
               />
             </TabsContent>
           </Tabs>
@@ -236,6 +241,7 @@ export default function EquipmentCalendarPage() {
               selectedDate={selectedDate}
               rentals={rentalList}
               onRentalClick={setSelectedRental}
+              onSlotClick={rentalForm.openCreate}
             />
           ) : (
             <MobileMyReservations
@@ -248,7 +254,7 @@ export default function EquipmentCalendarPage() {
         <AddScheduleButton
           className="fixed bottom-[calc(var(--tabbar-height)+1rem)] left-4 right-4 z-50 shadow-lg"
           floating
-          equipments={equipmentForSchedule}
+          onClick={() => rentalForm.openCreate()}
           label="예약하기"
         />
       </div>
@@ -259,6 +265,15 @@ export default function EquipmentCalendarPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedRental(null)
         }}
+        onEdit={(rental) => {
+          setSelectedRental(null)
+          rentalForm.openEdit(rental)
+        }}
+      />
+      <RentalFormDialog
+        target={rentalForm.target}
+        onClose={rentalForm.close}
+        equipments={equipmentForSchedule}
       />
     </div>
   )

@@ -25,7 +25,7 @@ export class RentalService {
     })
 
     if (existingRental)
-      throw new ConflictError("해당 시간에 이미 예약된 장비입니다.")
+      throw new ConflictError("이미 다른 예약이 있는 시간대입니다.")
 
     try {
       const rental = await this.prisma.equipmentRental.create({
@@ -153,7 +153,7 @@ export class RentalService {
       })
 
       if (confilct)
-        throw new ConflictError("해당 시간에 이미 예약된 장비입니다.")
+        throw new ConflictError("이미 다른 예약이 있는 시간대입니다.")
     }
 
     try {

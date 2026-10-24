@@ -18,6 +18,7 @@ interface WeekCalendarFieldProp {
   currentMonday: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  onSlotClick?: (startAt: Dayjs) => void
   /** 휴대폰 폭용 — 요일·날짜를 세로로 쌓고 블록엔 제목만 */
   compact?: boolean
 }
@@ -51,6 +52,7 @@ function WeekCalendarField({
   currentMonday,
   rentals,
   onRentalClick,
+  onSlotClick,
   compact = false
 }: WeekCalendarFieldProp) {
   // 주간 전체 rental의 시간 범위로 동적 확장
@@ -274,11 +276,7 @@ function WeekCalendarField({
     return (clampedMin * ROW_H) / 60 + 42
   })()
 
-  const timeLabel = now?.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  })
+  const timeLabel = now && dayjs(now).format("HH:mm")
   return (
     <div
       className={`w-full flex bg-white rounded-xl overflow-hidden ${compact ? "" : "mt-7"}`}
@@ -287,16 +285,13 @@ function WeekCalendarField({
         <div className="h-[42px]" />
         {Array.from({ length: slotCount }).map((_, i) => {
           const absHour = i + startHour
-          const hour = absHour % 12 === 0 ? 12 : absHour % 12
-          const isPM = absHour >= 12
 
           return (
             <div
               key={i}
               className="text-[8px] w-full h-[42px] text-center text-gray-400"
             >
-              {hour}
-              {isPM ? "PM" : "AM"}
+              {String(absHour).padStart(2, "0")}:00
             </div>
           )
         })}
@@ -315,6 +310,17 @@ function WeekCalendarField({
               }
               onRentalClick?.(rental)
             }}
+            onSlotClick={
+              onSlotClick &&
+              ((startAt) => {
+                if (justDraggedRef.current) {
+                  justDraggedRef.current = false
+                  return
+                }
+                onSlotClick(startAt)
+              })
+            }
+            now={now}
             canDrag={canDrag}
             draggingId={preview?.id ?? null}
             onBlockPointerDown={handleBlockPointerDown}
@@ -357,5 +363,6 @@ export default memo(
     a.currentMonday.isSame(b.currentMonday, "day") &&
     a.rentals === b.rentals &&
     a.onRentalClick === b.onRentalClick &&
+    a.onSlotClick === b.onSlotClick &&
     a.compact === b.compact
 )

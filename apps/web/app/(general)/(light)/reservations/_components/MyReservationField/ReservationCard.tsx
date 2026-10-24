@@ -5,7 +5,7 @@ interface ReservationCardProps {
   title: string
   startAt: Date
   endAt: Date
-  users: { id: number; name: string }[]
+  userLabel: string
   isToday?: boolean
   onClick?: () => void
 }
@@ -14,16 +14,12 @@ export default function ReservationCard({
   title,
   startAt,
   endAt,
-  users,
+  userLabel,
   isToday,
   onClick
 }: ReservationCardProps) {
   const start = dayjs(startAt)
-  const timeRange = `${start.format("h:mmA")} - ${dayjs(endAt).format("h:mmA")}`
-  const userLabel =
-    users.length <= 1
-      ? (users[0]?.name ?? "")
-      : `${users[0]?.name} 외 ${users.length - 1}명`
+  const timeRange = `${start.format("HH:mm")} - ${dayjs(endAt).format("HH:mm")}`
 
   return (
     <div

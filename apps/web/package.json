@@ -58,7 +58,7 @@
     "nuqs": "^2.10.2",
     "path-to-regexp": "^8.4.2",
     "react": "catalog:",
-    "react-day-picker": "^8.10.2",
+    "react-day-picker": "^9.14.0",
     "react-dom": "catalog:",
     "react-easy-crop": "6.2.4",
     "react-hook-form": "^7.90.0",

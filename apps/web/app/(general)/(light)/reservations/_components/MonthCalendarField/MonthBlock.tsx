@@ -1,6 +1,8 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
+import { isMyRental } from "@/lib/rental/people"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MonthBlockProps {
   days: Dayjs[]
@@ -15,6 +17,7 @@ export default function MonthBlock({
   rentals,
   onRentalClick
 }: MonthBlockProps) {
+  const { user } = useAuth()
   return (
     <div className="grid grid-cols-7 auto-rows-[120px] border-t border-l border-gray-100">
       {days.map((d, i) => {
@@ -39,7 +42,10 @@ export default function MonthBlock({
             </div>
 
             {dayRentals.slice(0, 3).map((rental) => {
-              const color = getRentalColor(rental.id)
+              const color = getRentalColor(
+                rental.id,
+                isMyRental(rental, user?.id)
+              )
               return (
                 <div
                   key={rental.id}

@@ -8,6 +8,9 @@ import ViewTabsList from "../../_components/ViewTabsList"
 import ROUTES from "@/constants/routes"
 import MyReservationField from "../../_components/MyReservationField"
 import AddScheduleButton from "../../_components/AddScheduleButton"
+import RentalFormDialog, {
+  useRentalForm
+} from "../../_components/RentalFormDialog"
 import WeekCalendarField from "../../_components/WeekCalendarField"
 import { useCallback, useMemo, useState } from "react"
 import { useQueryState, parseAsStringLiteral, parseAsString } from "nuqs"
@@ -38,6 +41,7 @@ export default function ClubroomReservationPage() {
   const [selectedRental, setSelectedRental] = useState<RentalDetail | null>(
     null
   )
+  const rentalForm = useRentalForm()
   // 값이 없으면 오늘 — withDefault에 dayjs() 같은 동적 값은 hydration 불일치라 대신 null로 표현
   const [selectedDateStr, setSelectedDateStr] = useQueryState(
     "date",
@@ -145,6 +149,7 @@ export default function ClubroomReservationPage() {
                 currentMonday={currentMonday}
                 rentals={rentalList}
                 onRentalClick={setSelectedRental}
+                onSlotClick={rentalForm.openCreate}
               />
               <WeekLabel
                 weekLabel={weekLabel}
@@ -158,7 +163,7 @@ export default function ClubroomReservationPage() {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentList}
+                onClick={() => rentalForm.openCreate()}
               />
             </TabsContent>
             {/* 월간 캘린더 */}
@@ -180,7 +185,7 @@ export default function ClubroomReservationPage() {
               />
               <AddScheduleButton
                 className="absolute -top-[62px] right-0"
-                equipments={equipmentList}
+                onClick={() => rentalForm.openCreate()}
               />
             </TabsContent>
           </Tabs>
@@ -221,6 +226,7 @@ export default function ClubroomReservationPage() {
                     currentMonday={currentMonday.add(offset, "week")}
                     rentals={rentalList}
                     onRentalClick={setSelectedRental}
+                    onSlotClick={rentalForm.openCreate}
                     compact
                   />
                 </div>
@@ -280,6 +286,7 @@ export default function ClubroomReservationPage() {
                   selectedDate={selectedDate}
                   rentals={rentalList}
                   onRentalClick={setSelectedRental}
+                  onSlotClick={rentalForm.openCreate}
                 />
               ) : (
                 <MobileMyReservations
@@ -294,7 +301,7 @@ export default function ClubroomReservationPage() {
         <AddScheduleButton
           className="fixed bottom-[calc(var(--tabbar-height)+1rem)] left-4 right-4 z-50 shadow-lg"
           floating
-          equipments={equipmentList}
+          onClick={() => rentalForm.openCreate()}
           label="예약하기"
         />
       </div>
@@ -305,6 +312,15 @@ export default function ClubroomReservationPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedRental(null)
         }}
+        onEdit={(rental) => {
+          setSelectedRental(null)
+          rentalForm.openEdit(rental)
+        }}
+      />
+      <RentalFormDialog
+        target={rentalForm.target}
+        onClose={rentalForm.close}
+        equipments={equipmentList}
       />
     </div>
   )

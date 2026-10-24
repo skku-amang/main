@@ -3,11 +3,16 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
+import { getRentalPeopleLabel, isMyRental } from "@/lib/rental/people"
+import { getRentalColor } from "../rentalColors"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileTimeSlotsProps {
   selectedDate: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  /** 예약 없는 시간 줄 클릭 — 그 시각 정각 */
+  onSlotClick?: (startAt: Dayjs) => void
 }
 
 const DEFAULT_START = 9
@@ -16,8 +21,10 @@ const DEFAULT_END = 22
 export default function MobileTimeSlots({
   selectedDate,
   rentals,
-  onRentalClick
+  onRentalClick,
+  onSlotClick
 }: MobileTimeSlotsProps) {
+  const { user } = useAuth()
   const selectedDay = selectedDate.format("YYYY-MM-DD")
   const dayRentals = rentals
     .filter((r) => dayjs(r.startAt).format("YYYY-MM-DD") === selectedDay)
@@ -39,12 +46,13 @@ export default function MobileTimeSlots({
   const startHour = Math.min(DEFAULT_START, ...rentalHours)
   const endHour = Math.max(DEFAULT_END, ...rentalHours)
 
-  // 예약이 진행 중인 시간대 (시작 시간 제외, 종료 시간 이전)는 스킵 대상
+  // 예약이 걸쳐 있는 시간대 (시작 시간 제외)는 스킵 대상 — 10:00~12:30이면 11·12시
   const occupiedHours = new Set<number>()
   for (const rental of dayRentals) {
     const sH = dayjs(rental.startAt).hour()
-    const eH = dayjs(rental.endAt).hour()
-    for (let h = sH + 1; h < eH; h++) occupiedHours.add(h)
+    const end = dayjs(rental.endAt)
+    const lastHour = end.minute() > 0 ? end.hour() : end.hour() - 1
+    for (let h = sH + 1; h <= lastHour; h++) occupiedHours.add(h)
   }
 
   const hours = Array.from(
@@ -56,11 +64,30 @@ export default function MobileTimeSlots({
     <div className="flex flex-col">
       {hours.map((hour) => {
         const hourRentals = rentalsByHour.get(hour)
+        const hourLabel = `${String(hour).padStart(2, "0")}:00`
+        if (onSlotClick && !hourRentals) {
+          return (
+            <button
+              key={hour}
+              type="button"
+              aria-label={`${hourLabel}부터 예약하기`}
+              className="flex min-h-[44px] w-full text-left transition-colors active:bg-primary/15"
+              onClick={() =>
+                onSlotClick(selectedDate.startOf("day").add(hour, "hour"))
+              }
+            >
+              <span className="w-14 shrink-0 pt-3 text-sm font-medium text-zinc-500">
+                {hourLabel}
+              </span>
+              <span className="flex-1 self-stretch border-t border-gray-100" />
+            </button>
+          )
+        }
         return (
           <div key={hour} className="flex min-h-[44px]">
             {/* Hour label */}
             <div className="w-14 shrink-0 pt-3 text-sm font-medium text-zinc-500">
-              {String(hour).padStart(2, "0")}:00
+              {hourLabel}
             </div>
 
             {/* Separator + events */}
@@ -69,41 +96,31 @@ export default function MobileTimeSlots({
                 const start = dayjs(rental.startAt)
                 const end = dayjs(rental.endAt)
                 const timeRange = `${start.format("HH:mm")} - ${end.format("HH:mm")}`
-                const userLabel =
-                  rental.users.length <= 1
-                    ? (rental.users[0]?.name ?? "")
-                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`
+                const userLabel = getRentalPeopleLabel(rental)
+                // 내 예약은 주 보기 블록과 같은 진한 색으로 채움
+                const mine = isMyRental(rental, user?.id)
+                const solid = getRentalColor(rental.id, true)
+                const subText = mine ? "text-white/80" : "text-gray-500"
 
                 return (
                   <div
                     key={rental.id}
-                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${mine ? `rounded-md ${solid.bg} ${onRentalClick ? solid.hoverBg : ""}` : onRentalClick ? "hover:bg-gray-50" : ""} ${onRentalClick ? "cursor-pointer" : ""}`}
                     onClick={() => onRentalClick?.(rental)}
                   >
-                    {/* Day/Date */}
-                    <div className="flex w-16 shrink-0 flex-col items-center justify-center">
-                      <span className="text-sm font-semibold text-zinc-600">
-                        {start.format("ddd")}
-                      </span>
-                      <span className="text-xl font-semibold text-zinc-700">
-                        {start.format("DD")}
-                      </span>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="mx-2 h-10 w-px bg-gray-200" />
-
-                    {/* Details */}
+                    {/* 고른 날짜의 목록이라 날짜는 생략 */}
                     <div className="flex flex-1 flex-col gap-0.5 pl-2">
-                      <div className="flex items-center gap-1.5 text-gray-500">
+                      <div className={`flex items-center gap-1.5 ${subText}`}>
                         <Clock size={11} />
                         <span className="text-[11px]">{timeRange}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-gray-500">
+                      <div className={`flex items-center gap-1.5 ${subText}`}>
                         <UserRound size={11} />
                         <span className="text-[11px]">{userLabel}</span>
                       </div>
-                      <span className="text-xs font-semibold text-zinc-600">
+                      <span
+                        className={`text-xs font-semibold ${mine ? "text-white" : "text-zinc-600"}`}
+                      >
                         {rental.title}
                       </span>
                     </div>

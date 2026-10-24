@@ -1,7 +1,8 @@
 import dayjs, { Dayjs } from "dayjs"
-import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
+import { getRentalPeopleLabel, isMyRental } from "@/lib/rental/people"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 export type DragMode = "move" | "resize"
 
@@ -11,6 +12,9 @@ interface WeekColumnProp {
   nowTopPx: number
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  /** 빈 칸 클릭 — 누른 1시간 칸의 정각 */
+  onSlotClick?: (startAt: Dayjs) => void
+  now: Date | null
   startHour: number
   slotCount: number
   compact: boolean
@@ -34,6 +38,8 @@ export default function WeekColumn({
   offset,
   rentals,
   onRentalClick,
+  onSlotClick,
+  now,
   startHour,
   slotCount,
   compact,
@@ -43,6 +49,7 @@ export default function WeekColumn({
   onBlockTouchMove,
   onBlockTouchEnd
 }: WeekColumnProp) {
+  const { user } = useAuth()
   const date = currentMonday.add(offset, "day")
   const dayName = date.format("ddd")
   const dayNumber = date.format("D")
@@ -75,12 +82,24 @@ export default function WeekColumn({
       </div>
 
       {/* 시간 구간 */}
-      {Array.from({ length: slotCount }).map((_, i) => (
-        <div
-          key={i}
-          className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
-        ></div>
-      ))}
+      {Array.from({ length: slotCount }).map((_, i) => {
+        const slotStart = date.startOf("day").add(startHour + i, "hour")
+        const className =
+          "block w-full h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
+        if (!onSlotClick || !now || !slotStart.add(1, "hour").isAfter(now))
+          return <div key={i} className={className}></div>
+        // 마우스·터치 지름길 — 칸이 100개 가까이라 Tab 순서에선 빼고, 키보드는 예약하기 버튼으로
+        return (
+          <button
+            key={i}
+            type="button"
+            tabIndex={-1}
+            aria-hidden
+            className={`${className} transition-colors hover:bg-gray-50 active:bg-primary/15`}
+            onClick={() => onSlotClick(slotStart)}
+          />
+        )
+      })}
 
       {/* 예약 이벤트 블록 */}
       {dayRentals.map((rental) => {
@@ -98,48 +117,37 @@ export default function WeekColumn({
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
-        const color = getRentalColor(rental.id)
         const draggable = canDrag(rental)
         const isDragging = draggingId === rental.id
+        const peopleLabel = getRentalPeopleLabel(rental)
+        const mine = isMyRental(rental, user?.id)
+        const color = getRentalColor(rental.id, mine)
 
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5 py-0.5" : "px-1.5 py-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
-            title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
+            title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}
             onPointerDown={(e) => onBlockPointerDown(e, rental, "move")}
             onTouchMove={onBlockTouchMove}
             onTouchEnd={onBlockTouchEnd}
           >
-            {!compact && heightPx > 30 && (
-              <div
-                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
-              >
-                <Clock size={10} className="shrink-0" />
-                <span>
-                  {start.format("h:mmA")} - {end.format("h:mmA")}
-                </span>
-              </div>
-            )}
-            {!compact && heightPx > 45 && rental.users.length > 0 && (
-              <div
-                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
-              >
-                <UserRound size={10} className="shrink-0" />
-                <span className="truncate">
-                  {rental.users.length <= 1
-                    ? (rental.users[0]?.name ?? "")
-                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`}
-                </span>
-              </div>
-            )}
+            {/* PC·휴대폰 같은 내용 — 폭에 따라 글자 크기만 다름 */}
             <p
-              className={`font-semibold ${color.text} ${compact ? "text-[10px] leading-tight break-all" : "text-xs truncate"}`}
+              className={`font-semibold leading-tight break-all ${color.text} ${compact ? "text-[10px]" : "text-xs"}`}
             >
               {rental.title}
             </p>
+            {peopleLabel && (
+              <p
+                // 이름 중간에서 끊지 않고 '외 N명' 앞에서 줄바꿈, 이름이 칸보다 길 때만 글자 단위
+                className={`leading-tight break-keep [overflow-wrap:anywhere] ${color.text} opacity-70 ${compact ? "text-[9px]" : "text-[10px]"}`}
+              >
+                {peopleLabel}
+              </p>
+            )}
             {draggable && !compact && (
               <div
                 className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize"
