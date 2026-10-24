@@ -71,16 +71,19 @@ function formatDuration(start: Dayjs, end: Dayjs) {
 const DetailRow = ({
   icon: Icon,
   label,
+  firstLine = "text",
   children
 }: {
   icon: typeof Clock
   label: string
+  /** 아이콘(18px)을 첫 줄 가운데에 — 글자 줄 20px, 칩 줄 34px */
+  firstLine?: "text" | "chip"
   children: React.ReactNode
 }) => (
   <div className="flex gap-3">
     <Icon
       size={18}
-      className="mt-0.5 shrink-0 text-muted-foreground"
+      className={`${firstLine === "chip" ? "mt-2" : "mt-px"} shrink-0 text-muted-foreground`}
       aria-label={label}
     />
     <div className="min-w-0 flex-1">{children}</div>
@@ -182,7 +185,7 @@ export default function RentalDetailModal({
           </DetailRow>
 
           {(renter || companions.length > 0) && (
-            <DetailRow icon={UserRound} label="사람">
+            <DetailRow icon={UserRound} label="사람" firstLine="chip">
               <div className="flex flex-col gap-2">
                 {renter && (
                   <div className="flex items-center gap-2">
