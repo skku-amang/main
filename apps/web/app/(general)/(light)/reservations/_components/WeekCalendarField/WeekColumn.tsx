@@ -126,7 +126,7 @@ export default function WeekColumn({
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${mine ? "ring-2 ring-inset ring-primary" : ""} ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${mine && !isDragging ? "ring-2 ring-inset ring-primary" : ""} ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}
