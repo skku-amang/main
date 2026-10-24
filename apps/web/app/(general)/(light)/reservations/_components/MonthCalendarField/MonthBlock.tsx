@@ -49,7 +49,7 @@ export default function MonthBlock({
               return (
                 <div
                   key={rental.id}
-                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-1 truncate cursor-pointer`}
+                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-0.5 truncate cursor-pointer`}
                   onClick={() => onRentalClick?.(rental)}
                 >
                   {rental.title}
