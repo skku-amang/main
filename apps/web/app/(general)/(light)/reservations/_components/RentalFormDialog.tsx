@@ -239,10 +239,9 @@ function RentalForm({
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-h-[90vh] w-fit overflow-y-auto rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            {editing ? "예약 수정" : "예약 추가"}
-          </DialogTitle>
+        {/* 화면엔 숨기고 화면 낭독기에만 전달 */}
+        <DialogHeader className="sr-only">
+          <DialogTitle>{editing ? "예약 수정" : "예약 추가"}</DialogTitle>
           <DialogDescription>예약 정보를 입력해주세요</DialogDescription>
         </DialogHeader>
 
