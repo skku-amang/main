@@ -11,7 +11,7 @@ export function getRentalPeople(rental: RentalPeopleSource) {
   return { renter, others }
 }
 
-/** 내가 참여자로 들어간 예약 — 달력에서 테두리로 강조 */
+/** 내가 참여자로 들어간 예약 — 달력에서 진한 색으로 채움 */
 export const isMyRental = (
   rental: Pick<RentalDetail, "users">,
   userId: number | undefined

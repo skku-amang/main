@@ -42,11 +42,14 @@ export default function MonthBlock({
             </div>
 
             {dayRentals.slice(0, 3).map((rental) => {
-              const color = getRentalColor(rental.id)
+              const color = getRentalColor(
+                rental.id,
+                isMyRental(rental, user?.id)
+              )
               return (
                 <div
                   key={rental.id}
-                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} ${isMyRental(rental, user?.id) ? "ring-1 ring-inset ring-primary" : ""} rounded px-1 py-0.5 truncate cursor-pointer`}
+                  className={`mt-1 text-[9px] leading-tight ${color.bg} ${color.text} rounded px-1 py-0.5 truncate cursor-pointer`}
                   onClick={() => onRentalClick?.(rental)}
                 >
                   {rental.title}

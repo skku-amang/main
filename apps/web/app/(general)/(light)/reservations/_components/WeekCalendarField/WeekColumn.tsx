@@ -117,16 +117,16 @@ export default function WeekColumn({
         if (endMin <= startMin) return null
         const topPx = HEADER_PX + (startMin * PX_PER_HOUR) / 60
         const heightPx = ((endMin - startMin) * PX_PER_HOUR) / 60
-        const color = getRentalColor(rental.id)
         const draggable = canDrag(rental)
         const isDragging = draggingId === rental.id
         const peopleLabel = getRentalPeopleLabel(rental)
         const mine = isMyRental(rental, user?.id)
+        const color = getRentalColor(rental.id, mine)
 
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${mine && !isDragging ? "ring-2 ring-inset ring-primary" : ""} ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
+            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}

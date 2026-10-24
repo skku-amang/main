@@ -4,6 +4,7 @@ import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalPeopleLabel, isMyRental } from "@/lib/rental/people"
+import { getRentalColor } from "../rentalColors"
 import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileTimeSlotsProps {
@@ -95,24 +96,30 @@ export default function MobileTimeSlots({
                 const end = dayjs(rental.endAt)
                 const timeRange = `${start.format("HH:mm")} - ${end.format("HH:mm")}`
                 const userLabel = getRentalPeopleLabel(rental)
+                // 내 예약은 주 보기 블록과 같은 진한 색으로 채움
+                const mine = isMyRental(rental, user?.id)
+                const solid = getRentalColor(rental.id, true)
+                const subText = mine ? "text-white/80" : "text-gray-500"
 
                 return (
                   <div
                     key={rental.id}
-                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${isMyRental(rental, user?.id) ? "rounded-md ring-2 ring-inset ring-primary" : ""} ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                    className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${mine ? `rounded-md ${solid.bg} ${onRentalClick ? solid.hoverBg : ""}` : onRentalClick ? "hover:bg-gray-50" : ""} ${onRentalClick ? "cursor-pointer" : ""}`}
                     onClick={() => onRentalClick?.(rental)}
                   >
                     {/* 고른 날짜의 목록이라 날짜는 생략 */}
                     <div className="flex flex-1 flex-col gap-0.5 pl-2">
-                      <div className="flex items-center gap-1.5 text-gray-500">
+                      <div className={`flex items-center gap-1.5 ${subText}`}>
                         <Clock size={11} />
                         <span className="text-[11px]">{timeRange}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-gray-500">
+                      <div className={`flex items-center gap-1.5 ${subText}`}>
                         <UserRound size={11} />
                         <span className="text-[11px]">{userLabel}</span>
                       </div>
-                      <span className="text-xs font-semibold text-zinc-600">
+                      <span
+                        className={`text-xs font-semibold ${mine ? "text-white" : "text-zinc-600"}`}
+                      >
                         {rental.title}
                       </span>
                     </div>
