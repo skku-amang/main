@@ -8,6 +8,8 @@ interface MobileTimeSlotsProps {
   selectedDate: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  /** 예약 없는 시간 줄 클릭 — 그 시각 정각 */
+  onSlotClick?: (startAt: Dayjs) => void
 }
 
 const DEFAULT_START = 9
@@ -16,7 +18,8 @@ const DEFAULT_END = 22
 export default function MobileTimeSlots({
   selectedDate,
   rentals,
-  onRentalClick
+  onRentalClick,
+  onSlotClick
 }: MobileTimeSlotsProps) {
   const selectedDay = selectedDate.format("YYYY-MM-DD")
   const dayRentals = rentals
@@ -56,11 +59,30 @@ export default function MobileTimeSlots({
     <div className="flex flex-col">
       {hours.map((hour) => {
         const hourRentals = rentalsByHour.get(hour)
+        const hourLabel = `${String(hour).padStart(2, "0")}:00`
+        if (onSlotClick && !hourRentals) {
+          return (
+            <button
+              key={hour}
+              type="button"
+              aria-label={`${hourLabel}부터 예약하기`}
+              className="flex min-h-[44px] w-full text-left"
+              onClick={() =>
+                onSlotClick(selectedDate.startOf("day").add(hour, "hour"))
+              }
+            >
+              <span className="w-14 shrink-0 pt-3 text-sm font-medium text-zinc-500">
+                {hourLabel}
+              </span>
+              <span className="flex-1 self-stretch border-t border-gray-100" />
+            </button>
+          )
+        }
         return (
           <div key={hour} className="flex min-h-[44px]">
             {/* Hour label */}
             <div className="w-14 shrink-0 pt-3 text-sm font-medium text-zinc-500">
-              {String(hour).padStart(2, "0")}:00
+              {hourLabel}
             </div>
 
             {/* Separator + events */}

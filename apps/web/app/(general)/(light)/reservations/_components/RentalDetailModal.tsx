@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import dayjs from "dayjs"
-import { ArrowRight, Clock, Trash2 } from "lucide-react"
+import { ArrowRight, Clock, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
@@ -55,12 +55,14 @@ interface RentalDetailModalProps {
   rental: RentalDetail | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  onEdit: (rental: RentalDetail) => void
 }
 
 export default function RentalDetailModal({
   rental,
   open,
-  onOpenChange
+  onOpenChange,
+  onEdit
 }: RentalDetailModalProps) {
   const { user } = useAuth()
   const deleteRental = useDeleteRental()
@@ -71,7 +73,7 @@ export default function RentalDetailModal({
   if (!rental) return null
 
   const currentUserId = user?.id ?? null
-  const canDelete =
+  const canManage =
     rental.users.some((u) => u.id === currentUserId) || user?.isAdmin === true
 
   const handleDelete = () => {
@@ -96,7 +98,11 @@ export default function RentalDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[486px] rounded-3xl border-0 bg-[#F0FDF4] p-6 gap-4 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.05),0px_4px_50px_0px_rgba(0,0,0,0.08)]">
+      <DialogContent
+        className="max-w-[486px] rounded-3xl border-0 bg-[#F0FDF4] p-6 gap-4 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.05),0px_4px_50px_0px_rgba(0,0,0,0.08)]"
+        // 첫 버튼(참여자·삭제)에 포커스가 가 엔터 한 번에 지워지지 않게
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader className="flex-row items-center justify-between gap-1.5">
           <DialogTitle
             className="text-2xl font-semibold"
@@ -106,7 +112,8 @@ export default function RentalDetailModal({
           </DialogTitle>
           {/* 시안에 설명 자리가 없어 화면에는 숨기고 스크린리더에만 전달 */}
           <DialogDescription className="sr-only">
-            예약 시간과 예약자 정보입니다. 본인 예약이면 삭제할 수 있습니다.
+            예약 시간과 예약자 정보입니다. 본인 예약이면 수정·삭제할 수
+            있습니다.
           </DialogDescription>
         </DialogHeader>
 
@@ -167,18 +174,21 @@ export default function RentalDetailModal({
             </div>
           </div>
         )}
-        {/* Delete button */}
-        {canDelete && (
-          <div className="pt-2">
+        {canManage && (
+          <div className="flex gap-2 pt-2">
             <Button
-              variant="destructive"
+              variant="ghost"
               size="sm"
-              className="w-full"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={() => setShowDeleteConfirm(true)}
               disabled={deleteRental.isPending}
             >
               <Trash2 size={14} className="mr-1.5" />
-              {deleteRental.isPending ? "삭제 중..." : "예약 삭제"}
+              {deleteRental.isPending ? "삭제 중..." : "삭제"}
+            </Button>
+            <Button size="sm" className="flex-1" onClick={() => onEdit(rental)}>
+              <Pencil size={14} className="mr-1.5" />
+              수정
             </Button>
           </div>
         )}

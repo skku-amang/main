@@ -18,6 +18,7 @@ interface WeekCalendarFieldProp {
   currentMonday: Dayjs
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  onSlotClick?: (startAt: Dayjs) => void
   /** 휴대폰 폭용 — 요일·날짜를 세로로 쌓고 블록엔 제목만 */
   compact?: boolean
 }
@@ -51,6 +52,7 @@ function WeekCalendarField({
   currentMonday,
   rentals,
   onRentalClick,
+  onSlotClick,
   compact = false
 }: WeekCalendarFieldProp) {
   // 주간 전체 rental의 시간 범위로 동적 확장
@@ -315,6 +317,17 @@ function WeekCalendarField({
               }
               onRentalClick?.(rental)
             }}
+            onSlotClick={
+              onSlotClick &&
+              ((startAt) => {
+                if (justDraggedRef.current) {
+                  justDraggedRef.current = false
+                  return
+                }
+                onSlotClick(startAt)
+              })
+            }
+            now={now}
             canDrag={canDrag}
             draggingId={preview?.id ?? null}
             onBlockPointerDown={handleBlockPointerDown}
@@ -357,5 +370,6 @@ export default memo(
     a.currentMonday.isSame(b.currentMonday, "day") &&
     a.rentals === b.rentals &&
     a.onRentalClick === b.onRentalClick &&
+    a.onSlotClick === b.onSlotClick &&
     a.compact === b.compact
 )

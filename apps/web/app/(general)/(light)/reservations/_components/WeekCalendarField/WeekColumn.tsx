@@ -11,6 +11,9 @@ interface WeekColumnProp {
   nowTopPx: number
   rentals: RentalDetail[]
   onRentalClick?: (rental: RentalDetail) => void
+  /** 빈 칸 클릭 — 누른 1시간 칸의 정각 */
+  onSlotClick?: (startAt: Dayjs) => void
+  now: Date | null
   startHour: number
   slotCount: number
   compact: boolean
@@ -34,6 +37,8 @@ export default function WeekColumn({
   offset,
   rentals,
   onRentalClick,
+  onSlotClick,
+  now,
   startHour,
   slotCount,
   compact,
@@ -75,12 +80,24 @@ export default function WeekColumn({
       </div>
 
       {/* 시간 구간 */}
-      {Array.from({ length: slotCount }).map((_, i) => (
-        <div
-          key={i}
-          className="h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
-        ></div>
-      ))}
+      {Array.from({ length: slotCount }).map((_, i) => {
+        const slotStart = date.startOf("day").add(startHour + i, "hour")
+        const className =
+          "block w-full h-[42px] border-t-[1.5px] last:border-b-[1.5px] border-gray-100"
+        if (!onSlotClick || !now || !slotStart.add(1, "hour").isAfter(now))
+          return <div key={i} className={className}></div>
+        // 마우스·터치 지름길 — 칸이 100개 가까이라 Tab 순서에선 빼고, 키보드는 예약하기 버튼으로
+        return (
+          <button
+            key={i}
+            type="button"
+            tabIndex={-1}
+            aria-hidden
+            className={`${className} hover:bg-gray-50`}
+            onClick={() => onSlotClick(slotStart)}
+          />
+        )
+      })}
 
       {/* 예약 이벤트 블록 */}
       {dayRentals.map((rental) => {
