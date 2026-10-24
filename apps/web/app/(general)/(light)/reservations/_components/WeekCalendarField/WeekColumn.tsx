@@ -1,5 +1,4 @@
 import dayjs, { Dayjs } from "dayjs"
-import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
 
@@ -118,45 +117,38 @@ export default function WeekColumn({
         const color = getRentalColor(rental.id)
         const draggable = canDrag(rental)
         const isDragging = draggingId === rental.id
+        const others = rental.users.filter(
+          (u) => u.id !== rental.renter?.id
+        ).length
+        const renterName = rental.renter?.name ?? rental.users[0]?.name ?? ""
+        const peopleLabel =
+          others > 0 ? `${renterName} 외 ${others}명` : renterName
 
         return (
           <div
             key={rental.id}
             className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5" : "px-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 opacity-80 shadow-lg ring-2 ring-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
-            title={`${rental.title}\n${start.format("h:mmA")} - ${end.format("h:mmA")}`}
+            title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}
             onPointerDown={(e) => onBlockPointerDown(e, rental, "move")}
             onTouchMove={onBlockTouchMove}
             onTouchEnd={onBlockTouchEnd}
           >
-            {!compact && heightPx > 30 && (
-              <div
-                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
-              >
-                <Clock size={10} className="shrink-0" />
-                <span>
-                  {start.format("h:mmA")} - {end.format("h:mmA")}
-                </span>
-              </div>
-            )}
-            {!compact && heightPx > 45 && rental.users.length > 0 && (
-              <div
-                className={`flex items-center gap-0.5 text-[10px] ${color.text} opacity-70`}
-              >
-                <UserRound size={10} className="shrink-0" />
-                <span className="truncate">
-                  {rental.users.length <= 1
-                    ? (rental.users[0]?.name ?? "")
-                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`}
-                </span>
-              </div>
-            )}
+            {/* PC·휴대폰 같은 내용 — 폭에 따라 글자 크기만 다름 */}
             <p
-              className={`font-semibold ${color.text} ${compact ? "text-[10px] leading-tight break-all" : "text-xs truncate"}`}
+              className={`font-semibold leading-tight break-all ${color.text} ${compact ? "text-[10px]" : "text-xs"}`}
             >
               {rental.title}
             </p>
+            {peopleLabel && (
+              <p
+                // 이름 중간에서 끊지 않고 '외 N명' 앞에서 줄바꿈, 이름이 칸보다 길 때만 글자 단위
+                className={`leading-tight break-keep [overflow-wrap:anywhere] ${color.text} opacity-70 ${compact ? "text-[9px]" : "text-[10px]"}`}
+              >
+                {peopleLabel}
+              </p>
+            )}
             {draggable && !compact && (
               <div
                 className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize"
