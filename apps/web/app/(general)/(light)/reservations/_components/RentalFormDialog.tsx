@@ -238,7 +238,7 @@ function RentalForm({
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-[480px]">
+      <DialogContent className="max-h-[90vh] w-fit overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {editing ? "예약 수정" : "예약 추가"}
@@ -246,7 +246,8 @@ function RentalForm({
           <DialogDescription>예약 정보를 입력해주세요</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5">
+        {/* 가장 넓은 고정 요소(달력) 폭에 맞춤 — 칩 등은 그 안에서 줄바꿈 */}
+        <div className="w-min space-y-5">
           {/* 장비 선택 (여러 장비일 때만 표시, 수정 땐 장비 그대로) */}
           {!editing && equipments.length > 1 && (
             <div className="space-y-1.5">
