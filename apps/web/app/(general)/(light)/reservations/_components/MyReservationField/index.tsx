@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { useAuth } from "@/lib/providers/auth-provider"
 import ReservationCard from "./ReservationCard"
-import { getRentalPeopleLabel } from "../rentalPeople"
+import { getRentalPeopleLabel } from "@/lib/rental/people"
 
 interface MyReservationFieldProps {
   rentals: RentalDetail[]

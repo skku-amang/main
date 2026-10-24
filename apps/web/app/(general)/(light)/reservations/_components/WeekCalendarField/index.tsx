@@ -276,11 +276,7 @@ function WeekCalendarField({
     return (clampedMin * ROW_H) / 60 + 42
   })()
 
-  const timeLabel = now?.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  })
+  const timeLabel = now && dayjs(now).format("HH:mm")
   return (
     <div
       className={`w-full flex bg-white rounded-xl overflow-hidden ${compact ? "" : "mt-7"}`}
@@ -289,16 +285,13 @@ function WeekCalendarField({
         <div className="h-[42px]" />
         {Array.from({ length: slotCount }).map((_, i) => {
           const absHour = i + startHour
-          const hour = absHour % 12 === 0 ? 12 : absHour % 12
-          const isPM = absHour >= 12
 
           return (
             <div
               key={i}
               className="text-[8px] w-full h-[42px] text-center text-gray-400"
             >
-              {hour}
-              {isPM ? "PM" : "AM"}
+              {String(absHour).padStart(2, "0")}:00
             </div>
           )
         })}

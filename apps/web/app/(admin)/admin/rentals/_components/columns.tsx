@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
+import { getRentalPeople } from "@/lib/rental/people"
 import { RentalDetail } from "@repo/shared-types"
 
 interface ColumnActions {
@@ -111,16 +112,13 @@ export function getColumns(actions: ColumnActions): ColumnDef<RentalDetail>[] {
       ),
       meta: { label: "참여자" },
       cell: ({ row }) => {
-        const users = row.original.users
-        if (!users || users.length === 0) return "-"
-        const first = users[0]
-        if (users.length === 1) return <UserCell user={first} />
+        const { renter, others } = getRentalPeople(row.original)
+        if (!renter) return "-"
+        if (others === 0) return <UserCell user={renter} />
         return (
-          <span className="flex items-center gap-1">
-            <UserCell user={first} />
-            <span className="text-muted-foreground">
-              외 {users.length - 1}명
-            </span>
+          <span className="flex items-center gap-1 whitespace-nowrap">
+            <UserCell user={renter} />
+            <span className="text-muted-foreground">외 {others}명</span>
           </span>
         )
       }

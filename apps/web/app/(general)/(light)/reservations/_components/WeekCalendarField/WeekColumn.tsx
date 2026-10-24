@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
-import { getRentalPeopleLabel } from "../rentalPeople"
+import { getRentalPeopleLabel } from "@/lib/rental/people"
 
 export type DragMode = "move" | "resize"
 

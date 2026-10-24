@@ -19,7 +19,7 @@ export default function ReservationCard({
   onClick
 }: ReservationCardProps) {
   const start = dayjs(startAt)
-  const timeRange = `${start.format("h:mmA")} - ${dayjs(endAt).format("h:mmA")}`
+  const timeRange = `${start.format("HH:mm")} - ${dayjs(endAt).format("HH:mm")}`
 
   return (
     <div

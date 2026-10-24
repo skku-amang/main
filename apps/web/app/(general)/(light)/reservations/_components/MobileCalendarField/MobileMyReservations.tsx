@@ -3,7 +3,7 @@
 import dayjs from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
-import { getRentalPeopleLabel } from "../rentalPeople"
+import { getRentalPeopleLabel } from "@/lib/rental/people"
 import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileMyReservationsProps {
