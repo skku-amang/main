@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { getRentalColor } from "../rentalColors"
+import { getRentalPeopleLabel } from "../rentalPeople"
 
 export type DragMode = "move" | "resize"
 
@@ -117,12 +118,7 @@ export default function WeekColumn({
         const color = getRentalColor(rental.id)
         const draggable = canDrag(rental)
         const isDragging = draggingId === rental.id
-        const others = rental.users.filter(
-          (u) => u.id !== rental.renter?.id
-        ).length
-        const renterName = rental.renter?.name ?? rental.users[0]?.name ?? ""
-        const peopleLabel =
-          others > 0 ? `${renterName} 외 ${others}명` : renterName
+        const peopleLabel = getRentalPeopleLabel(rental)
 
         return (
           <div

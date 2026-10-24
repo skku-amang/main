@@ -3,6 +3,7 @@
 import dayjs from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
+import { getRentalPeopleLabel } from "../rentalPeople"
 import { useAuth } from "@/lib/providers/auth-provider"
 
 interface MobileMyReservationsProps {
@@ -41,10 +42,7 @@ export default function MobileMyReservations({
         const end = dayjs(rental.endAt)
         const isToday = start.isSame(dayjs(), "day")
         const timeRange = `${start.format("HH:mm")} - ${end.format("HH:mm")}`
-        const userLabel =
-          rental.users.length <= 1
-            ? (rental.users[0]?.name ?? "")
-            : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`
+        const userLabel = getRentalPeopleLabel(rental)
 
         return (
           <div

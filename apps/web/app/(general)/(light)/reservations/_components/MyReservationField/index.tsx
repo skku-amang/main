@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import { RentalDetail } from "@repo/shared-types"
 import { useAuth } from "@/lib/providers/auth-provider"
 import ReservationCard from "./ReservationCard"
+import { getRentalPeopleLabel } from "../rentalPeople"
 
 interface MyReservationFieldProps {
   rentals: RentalDetail[]
@@ -53,7 +54,7 @@ export default function MyReservationField({
               title={rental.title}
               startAt={rental.startAt}
               endAt={rental.endAt}
-              users={rental.users}
+              userLabel={getRentalPeopleLabel(rental)}
               isToday={dayjs(rental.startAt).isSame(dayjs(), "day")}
               onClick={onRentalClick ? () => onRentalClick(rental) : undefined}
             />

@@ -3,6 +3,7 @@
 import dayjs, { Dayjs } from "dayjs"
 import { Clock, UserRound } from "lucide-react"
 import { RentalDetail } from "@repo/shared-types"
+import { getRentalPeopleLabel } from "../rentalPeople"
 
 interface MobileTimeSlotsProps {
   selectedDate: Dayjs
@@ -91,10 +92,7 @@ export default function MobileTimeSlots({
                 const start = dayjs(rental.startAt)
                 const end = dayjs(rental.endAt)
                 const timeRange = `${start.format("HH:mm")} - ${end.format("HH:mm")}`
-                const userLabel =
-                  rental.users.length <= 1
-                    ? (rental.users[0]?.name ?? "")
-                    : `${rental.users[0]?.name} 외 ${rental.users.length - 1}명`
+                const userLabel = getRentalPeopleLabel(rental)
 
                 return (
                   <div
@@ -102,20 +100,7 @@ export default function MobileTimeSlots({
                     className={`my-1 flex items-center border-b border-gray-50 px-1 py-3 transition-colors ${onRentalClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
                     onClick={() => onRentalClick?.(rental)}
                   >
-                    {/* Day/Date */}
-                    <div className="flex w-16 shrink-0 flex-col items-center justify-center">
-                      <span className="text-sm font-semibold text-zinc-600">
-                        {start.format("ddd")}
-                      </span>
-                      <span className="text-xl font-semibold text-zinc-700">
-                        {start.format("DD")}
-                      </span>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="mx-2 h-10 w-px bg-gray-200" />
-
-                    {/* Details */}
+                    {/* 고른 날짜의 목록이라 날짜는 생략 */}
                     <div className="flex flex-1 flex-col gap-0.5 pl-2">
                       <div className="flex items-center gap-1.5 text-gray-500">
                         <Clock size={11} />
