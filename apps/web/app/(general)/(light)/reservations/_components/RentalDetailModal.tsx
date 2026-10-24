@@ -67,23 +67,29 @@ function formatDuration(start: Dayjs, end: Dayjs) {
     .join(" ")
 }
 
+/** 아이콘(18px) 위치 — 첫 글자 줄(20px)·첫 칩 줄(34px) 가운데, 또는 내용 전체 가운데 */
+const ICON_ALIGN = {
+  text: "mt-px",
+  chip: "mt-2",
+  center: "self-center"
+} as const
+
 /** 아이콘 + 내용 한 줄 */
 const DetailRow = ({
   icon: Icon,
   label,
-  firstLine = "text",
+  align = "text",
   children
 }: {
   icon: typeof Clock
   label: string
-  /** 아이콘(18px)을 첫 줄 가운데에 — 글자 줄 20px, 칩 줄 34px */
-  firstLine?: "text" | "chip"
+  align?: keyof typeof ICON_ALIGN
   children: React.ReactNode
 }) => (
   <div className="flex gap-3">
     <Icon
       size={18}
-      className={`${firstLine === "chip" ? "mt-2" : "mt-px"} shrink-0 text-muted-foreground`}
+      className={`${ICON_ALIGN[align]} shrink-0 text-muted-foreground`}
       aria-label={label}
     />
     <div className="min-w-0 flex-1">{children}</div>
@@ -166,7 +172,7 @@ export default function RentalDetailModal({
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
-          <DetailRow icon={Clock} label="시간">
+          <DetailRow icon={Clock} label="시간" align="center">
             <p className="text-sm font-medium">
               {sameDay
                 ? formatDate(start)
@@ -178,14 +184,17 @@ export default function RentalDetailModal({
             </p>
           </DetailRow>
 
-          <DetailRow icon={MapPin} label="장소">
-            <p className="text-sm">
-              {rental.equipment.brand} {rental.equipment.model}
-            </p>
-          </DetailRow>
+          {/* 동방 예약 화면에선 장소가 자명해서 장비 대여만 */}
+          {rental.equipment.category !== "ROOM" && (
+            <DetailRow icon={MapPin} label="장소">
+              <p className="text-sm">
+                {rental.equipment.brand} {rental.equipment.model}
+              </p>
+            </DetailRow>
+          )}
 
           {(renter || companions.length > 0) && (
-            <DetailRow icon={UserRound} label="사람" firstLine="chip">
+            <DetailRow icon={UserRound} label="사람" align="chip">
               <div className="flex flex-col gap-2">
                 {renter && (
                   <div className="flex items-center gap-2">
