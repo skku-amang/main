@@ -1,14 +1,17 @@
-/** Figma 기반 파스텔 톤 이벤트 색상 팔레트 + 내 예약용 진한 색 (흰 글자 대비 4.5:1 이상) */
+/** Figma 기반 파스텔 톤 이벤트 색상 팔레트 + 내 예약용 진한 색 (흰 글자 대비 4.5:1 이상)
+ * hoverFill: hover: 없이 칠하는 호버 색 — 여러 날 블록을 같이 칠할 때 */
 const RENTAL_COLORS = [
   {
     bg: "bg-blue-100",
     border: "border-blue-400",
     text: "text-blue-700",
     hoverBg: "hover:bg-blue-200",
+    hoverFill: "bg-blue-200",
     solid: {
       bg: "bg-blue-600",
       border: "border-blue-800",
-      hoverBg: "hover:bg-blue-700"
+      hoverBg: "hover:bg-blue-700",
+      hoverFill: "bg-blue-700"
     }
   },
   {
@@ -16,10 +19,12 @@ const RENTAL_COLORS = [
     border: "border-rose-400",
     text: "text-rose-700",
     hoverBg: "hover:bg-rose-200",
+    hoverFill: "bg-rose-200",
     solid: {
       bg: "bg-rose-600",
       border: "border-rose-800",
-      hoverBg: "hover:bg-rose-700"
+      hoverBg: "hover:bg-rose-700",
+      hoverFill: "bg-rose-700"
     }
   },
   {
@@ -27,10 +32,12 @@ const RENTAL_COLORS = [
     border: "border-amber-400",
     text: "text-amber-700",
     hoverBg: "hover:bg-amber-200",
+    hoverFill: "bg-amber-200",
     solid: {
       bg: "bg-amber-700",
       border: "border-amber-900",
-      hoverBg: "hover:bg-amber-800"
+      hoverBg: "hover:bg-amber-800",
+      hoverFill: "bg-amber-800"
     }
   },
   {
@@ -38,10 +45,12 @@ const RENTAL_COLORS = [
     border: "border-emerald-400",
     text: "text-emerald-700",
     hoverBg: "hover:bg-emerald-200",
+    hoverFill: "bg-emerald-200",
     solid: {
       bg: "bg-emerald-700",
       border: "border-emerald-900",
-      hoverBg: "hover:bg-emerald-800"
+      hoverBg: "hover:bg-emerald-800",
+      hoverFill: "bg-emerald-800"
     }
   },
   {
@@ -49,10 +58,12 @@ const RENTAL_COLORS = [
     border: "border-violet-400",
     text: "text-violet-700",
     hoverBg: "hover:bg-violet-200",
+    hoverFill: "bg-violet-200",
     solid: {
       bg: "bg-violet-600",
       border: "border-violet-800",
-      hoverBg: "hover:bg-violet-700"
+      hoverBg: "hover:bg-violet-700",
+      hoverFill: "bg-violet-700"
     }
   },
   {
@@ -60,10 +71,12 @@ const RENTAL_COLORS = [
     border: "border-cyan-400",
     text: "text-cyan-700",
     hoverBg: "hover:bg-cyan-200",
+    hoverFill: "bg-cyan-200",
     solid: {
       bg: "bg-cyan-700",
       border: "border-cyan-900",
-      hoverBg: "hover:bg-cyan-800"
+      hoverBg: "hover:bg-cyan-800",
+      hoverFill: "bg-cyan-800"
     }
   },
   {
@@ -71,10 +84,12 @@ const RENTAL_COLORS = [
     border: "border-orange-400",
     text: "text-orange-700",
     hoverBg: "hover:bg-orange-200",
+    hoverFill: "bg-orange-200",
     solid: {
       bg: "bg-orange-700",
       border: "border-orange-900",
-      hoverBg: "hover:bg-orange-800"
+      hoverBg: "hover:bg-orange-800",
+      hoverFill: "bg-orange-800"
     }
   },
   {
@@ -82,10 +97,12 @@ const RENTAL_COLORS = [
     border: "border-pink-400",
     text: "text-pink-700",
     hoverBg: "hover:bg-pink-200",
+    hoverFill: "bg-pink-200",
     solid: {
       bg: "bg-pink-600",
       border: "border-pink-800",
-      hoverBg: "hover:bg-pink-700"
+      hoverBg: "hover:bg-pink-700",
+      hoverFill: "bg-pink-700"
     }
   }
 ] as const

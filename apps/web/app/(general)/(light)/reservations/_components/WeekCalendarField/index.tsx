@@ -74,6 +74,7 @@ function WeekCalendarField({
   // 끌기 직후 따라오는 click(상세 열기)·touchend(주 넘기기 스와이프)를 막음
   const justDraggedRef = useRef(false)
   const [preview, setPreviewState] = useState<Preview | null>(null)
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
   const setPreview = (p: Preview | null) => {
     previewRef.current = p
     setPreviewState(p)
@@ -323,6 +324,8 @@ function WeekCalendarField({
             now={now}
             canDrag={canDrag}
             draggingId={preview?.id ?? null}
+            hoveredId={hoveredId}
+            onBlockHover={setHoveredId}
             onBlockPointerDown={handleBlockPointerDown}
             onBlockTouchMove={(e) => {
               if (dragRef.current?.active) e.stopPropagation()
