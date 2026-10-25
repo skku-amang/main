@@ -4,7 +4,7 @@ import "dayjs/locale/ko"
 
 import { useRef, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { Clock, Package, Pencil, Trash2, UserRound } from "lucide-react"
+import { Clock, Package, Pencil, Trash2, UserRound, Users } from "lucide-react"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 import { RentalDetail } from "@repo/shared-types"
@@ -144,7 +144,7 @@ export default function RentalDetailModal({
   const sameDay = start.isSame(end, "day")
   // '예약자'라고 못 박아 보여 주므로 대신 내세우지 않음 — 예약자 계정이 지워지면 renter는 null
   const renter = rental.renter
-  const companions = rental.users.filter((u) => u.id !== renter?.id)
+  const attendees = rental.users.filter((u) => u.id !== renter?.id)
   const dot = getRentalColor(rental.id, true).bg
 
   return (
@@ -193,29 +193,28 @@ export default function RentalDetailModal({
             </DetailRow>
           )}
 
-          {(renter || companions.length > 0) && (
-            <DetailRow icon={UserRound} label="사람" align="chip">
-              <div className="flex flex-col gap-2">
-                {renter && (
-                  <div className="flex items-center gap-2">
-                    <span className="w-16 shrink-0 text-xs text-muted-foreground">
-                      예약자
-                    </span>
-                    <ParticipantChip user={renter} />
-                  </div>
-                )}
-                {companions.length > 0 && (
-                  <div className="flex gap-2">
-                    <span className="w-16 shrink-0 pt-1.5 text-xs text-muted-foreground">
-                      함께하는 사람
-                    </span>
-                    <div className="flex min-w-0 flex-wrap gap-1.5">
-                      {companions.map((user) => (
-                        <ParticipantChip key={user.id} user={user} />
-                      ))}
-                    </div>
-                  </div>
-                )}
+          {renter && (
+            <DetailRow icon={UserRound} label="예약자" align="chip">
+              <div className="flex items-center gap-2">
+                <span className="w-12 shrink-0 text-xs text-muted-foreground">
+                  예약자
+                </span>
+                <ParticipantChip user={renter} />
+              </div>
+            </DetailRow>
+          )}
+
+          {attendees.length > 0 && (
+            <DetailRow icon={Users} label="참석자" align="chip">
+              <div className="flex gap-2">
+                <span className="w-12 shrink-0 pt-1.5 text-xs text-muted-foreground">
+                  참석자
+                </span>
+                <div className="flex min-w-0 flex-wrap gap-1.5">
+                  {attendees.map((user) => (
+                    <ParticipantChip key={user.id} user={user} />
+                  ))}
+                </div>
               </div>
             </DetailRow>
           )}
