@@ -160,7 +160,7 @@ export default function RentalDetailModal({
           contentRef.current?.focus()
         }}
       >
-        <DialogHeader className="flex-row items-center gap-2.5 space-y-0">
+        <DialogHeader className="flex-row items-center gap-2.5 space-y-0 text-left">
           {/* 누른 블록과 같은 색 계열 */}
           <span className={`size-3 shrink-0 rounded-full ${dot}`} />
           <DialogTitle className="min-w-0 flex-1 text-xl font-semibold">
@@ -207,13 +207,17 @@ export default function RentalDetailModal({
                 </p>
               </>
             ) : (
-              // 여러 날이면 날짜와 시각을 짝지어 — '20:00 – 10:00'이 거꾸로 읽히지 않게
+              // 여러 날이면 날짜와 시각을 짝지어 — '20:00 – 10:00'이 거꾸로 읽히지 않게.
+              // 좁으면 날짜 중간이 아니라 '–' 자리에서 줄바꿈
               <>
                 <p className="text-sm font-medium">
-                  {formatDate(start)} {start.format("HH:mm")} –
-                </p>
-                <p className="text-sm font-medium">
-                  {formatDate(end)} {end.format("HH:mm")}
+                  <span className="whitespace-nowrap">
+                    {formatDate(start)} {start.format("HH:mm")}
+                  </span>{" "}
+                  –{" "}
+                  <span className="whitespace-nowrap">
+                    {formatDate(end)} {end.format("HH:mm")}
+                  </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {formatDuration(start, end)}
