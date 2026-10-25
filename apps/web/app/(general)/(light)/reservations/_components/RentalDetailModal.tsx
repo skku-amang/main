@@ -151,6 +151,8 @@ export default function RentalDetailModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="w-[calc(100%-2rem)] max-w-[420px] gap-5 rounded-2xl focus:outline-none"
+        // 바깥을 누르거나 Esc로 닫힘
+        showCloseButton={false}
         ref={contentRef}
         // 첫 버튼(참여자·삭제) 대신 창 자체에 포커스 — 엔터 한 번에 지워지지 않게
         onOpenAutoFocus={(e) => {
@@ -158,12 +160,35 @@ export default function RentalDetailModal({
           contentRef.current?.focus()
         }}
       >
-        <DialogHeader className="flex-row items-center gap-2.5 space-y-0 pr-6">
+        <DialogHeader className="flex-row items-center gap-2.5 space-y-0">
           {/* 누른 블록과 같은 색 계열 */}
           <span className={`size-3 shrink-0 rounded-full ${dot}`} />
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="min-w-0 flex-1 text-xl font-semibold">
             {rental.title}
           </DialogTitle>
+          {canManage && (
+            <div className="-my-1 -mr-2 flex shrink-0">
+              <Button
+                variant="ghost"
+                className="size-8 p-0 text-muted-foreground"
+                aria-label="수정"
+                title="수정"
+                onClick={() => onEdit(rental)}
+              >
+                <Pencil size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                className="size-8 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                aria-label="삭제"
+                title="삭제"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={deleteRental.isPending}
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          )}
           {/* 시안에 설명 자리가 없어 화면에는 숨기고 스크린리더에만 전달 */}
           <DialogDescription className="sr-only">
             예약 시간과 예약자 정보입니다. 본인 예약이면 수정·삭제할 수
@@ -173,15 +198,28 @@ export default function RentalDetailModal({
 
         <div className="flex flex-col gap-4">
           <DetailRow icon={Clock} label="시간" align="center">
-            <p className="text-sm font-medium">
-              {sameDay
-                ? formatDate(start)
-                : `${formatDate(start)} – ${formatDate(end)}`}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {start.format("HH:mm")} – {end.format("HH:mm")} (
-              {formatDuration(start, end)})
-            </p>
+            {sameDay ? (
+              <>
+                <p className="text-sm font-medium">{formatDate(start)}</p>
+                <p className="text-sm text-muted-foreground">
+                  {start.format("HH:mm")} – {end.format("HH:mm")} (
+                  {formatDuration(start, end)})
+                </p>
+              </>
+            ) : (
+              // 여러 날이면 날짜와 시각을 짝지어 — '20:00 – 10:00'이 거꾸로 읽히지 않게
+              <>
+                <p className="text-sm font-medium">
+                  {formatDate(start)} {start.format("HH:mm")} –
+                </p>
+                <p className="text-sm font-medium">
+                  {formatDate(end)} {end.format("HH:mm")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {formatDuration(start, end)}
+                </p>
+              </>
+            )}
           </DetailRow>
 
           {/* 동방 예약은 장소가 자명해서 장비 대여만 — 어떤 장비인지 */}
@@ -207,7 +245,8 @@ export default function RentalDetailModal({
           {attendees.length > 0 && (
             <DetailRow icon={Users} label="참석자" align="chip">
               <div className="flex gap-2">
-                <span className="w-12 shrink-0 pt-1.5 text-xs text-muted-foreground">
+                {/* 칩이 여러 줄이어도 첫 칩 줄(34px) 가운데에 */}
+                <span className="flex h-[34px] w-12 shrink-0 items-center text-xs text-muted-foreground">
                   참석자
                 </span>
                 <div className="flex min-w-0 flex-wrap gap-1.5">
@@ -219,24 +258,6 @@ export default function RentalDetailModal({
             </DetailRow>
           )}
         </div>
-        {canManage && (
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={deleteRental.isPending}
-            >
-              <Trash2 size={14} className="mr-1.5" />
-              {deleteRental.isPending ? "삭제 중..." : "삭제"}
-            </Button>
-            <Button size="sm" className="flex-1" onClick={() => onEdit(rental)}>
-              <Pencil size={14} className="mr-1.5" />
-              수정
-            </Button>
-          </div>
-        )}
       </DialogContent>
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>

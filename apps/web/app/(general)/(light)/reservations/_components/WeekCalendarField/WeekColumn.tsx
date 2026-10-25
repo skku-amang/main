@@ -20,6 +20,9 @@ interface WeekColumnProp {
   compact: boolean
   canDrag: (rental: RentalDetail) => boolean
   draggingId: number | null
+  /** 여러 날 예약은 날마다 블록이 나뉘어 있어 호버를 예약 단위로 묶음 */
+  hoveredId: number | null
+  onBlockHover: (id: number | null) => void
   onBlockPointerDown: (
     e: React.PointerEvent,
     rental: RentalDetail,
@@ -45,6 +48,8 @@ export default function WeekColumn({
   compact,
   canDrag,
   draggingId,
+  hoveredId,
+  onBlockHover,
   onBlockPointerDown,
   onBlockTouchMove,
   onBlockTouchEnd
@@ -126,13 +131,18 @@ export default function WeekColumn({
         return (
           <div
             key={rental.id}
-            className={`absolute left-0.5 right-0.5 ${color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5 py-0.5" : "px-1.5 py-1"} overflow-hidden ${color.hoverBg} ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
+            className={`absolute left-0.5 right-0.5 ${hoveredId === rental.id ? color.hoverFill : color.bg} border-l-2 ${color.border} rounded-r-sm ${compact ? "px-0.5 py-0.5" : "px-1.5 py-1"} overflow-hidden ${draggable ? "cursor-grab select-none [-webkit-touch-callout:none]" : "cursor-pointer"} ${isDragging ? "z-10 shadow-xl outline-dashed outline-2 outline-primary cursor-grabbing" : "transition-colors"}`}
             style={{ top: `${topPx}px`, height: `${heightPx}px` }}
             title={`${rental.title}\n${start.format("HH:mm")} - ${end.format("HH:mm")}`}
             onClick={() => onRentalClick?.(rental)}
             onPointerDown={(e) => onBlockPointerDown(e, rental, "move")}
             onTouchMove={onBlockTouchMove}
             onTouchEnd={onBlockTouchEnd}
+            // 터치는 호버로 치지 않음 — 손을 떼도 색이 남음
+            onPointerEnter={(e) =>
+              e.pointerType === "mouse" && onBlockHover(rental.id)
+            }
+            onPointerLeave={() => onBlockHover(null)}
           >
             {/* PC·휴대폰 같은 내용 — 폭에 따라 글자 크기만 다름 */}
             <p
