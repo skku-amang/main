@@ -239,7 +239,12 @@ function RentalForm({
   return (
     // 저장 중에 닫으면 폼이 사라져 mutate 콜백(달력 갱신·실패 안내)이 실행되지 않음
     <Dialog open onOpenChange={(v) => !v && !isPending && onClose()}>
-      <DialogContent className="max-h-[90vh] w-fit overflow-y-auto rounded-2xl">
+      <DialogContent
+        className="max-h-[90vh] w-fit overflow-y-auto rounded-2xl"
+        // 입력 폼 — 바깥을 잘못 눌러 입력이 사라지지 않게. 닫기는 [취소]·Esc로 (✕는 [취소]와 중복)
+        showCloseButton={false}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         {/* 화면엔 숨기고 화면 낭독기에만 전달 */}
         <DialogHeader className="sr-only">
           <DialogTitle>{editing ? "예약 수정" : "예약 추가"}</DialogTitle>
