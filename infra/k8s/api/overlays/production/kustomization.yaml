@@ -23,4 +23,4 @@ configMapGenerator:
   - OTEL_SERVICE_NAME=amang-api
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261022072557-a1751f1
+  newTag: 20261025145218-9175965
