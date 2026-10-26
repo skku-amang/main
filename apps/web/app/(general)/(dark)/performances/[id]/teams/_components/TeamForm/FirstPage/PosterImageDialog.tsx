@@ -96,7 +96,7 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <div>
           <DialogHeader className="mb-1">
             <DialogTitle className="text-slate-900">Image Upload</DialogTitle>

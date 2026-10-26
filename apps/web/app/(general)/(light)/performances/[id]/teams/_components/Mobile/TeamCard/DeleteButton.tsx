@@ -51,7 +51,7 @@ const TeamCardDeleteButton = ({
           삭제하기
         </Button>
       </DialogTrigger>
-      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl shadow p-4">
+      <DialogContent className="inline-flex w-[343px] flex-col items-center justify-start shadow p-4">
         {/* 삭제 아이콘 및 메시지 */}
         <div className="flex flex-col items-start justify-start gap-2 self-stretch pt-5">
           {/* 삭제 아이콘 */}

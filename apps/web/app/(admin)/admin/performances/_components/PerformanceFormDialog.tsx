@@ -111,7 +111,12 @@ export function PerformanceFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="max-w-lg"
+        // 입력 창 — 바깥을 잘못 눌러 입력이 사라지지 않게. 닫기는 [취소]·Esc
+        showCloseButton={false}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>
             {isEditing ? `${editingPerformance.name} 편집` : "공연 생성"}

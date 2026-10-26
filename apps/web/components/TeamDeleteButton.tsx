@@ -52,7 +52,7 @@ const TeamDeleteButton = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className={className}>{children}</DialogTrigger>
       <DialogContent
-        className="inline-flex w-[343px] flex-col items-center justify-start rounded-xl p-4 shadow"
+        className="inline-flex w-[343px] flex-col items-center justify-start p-4 shadow"
         // 되돌릴 수 없는 작업이라 Enter 한 번에 지워지지 않도록 취소에 먼저 포커스
         onOpenAutoFocus={(e) => {
           e.preventDefault()

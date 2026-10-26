@@ -150,7 +150,7 @@ export default function RentalDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-[calc(100%-2rem)] max-w-[420px] gap-5 rounded-2xl focus:outline-none"
+        className="w-[calc(100%-2rem)] max-w-[420px] gap-5 focus:outline-none"
         // 바깥을 누르거나 Esc로 닫힘
         showCloseButton={false}
         ref={contentRef}
