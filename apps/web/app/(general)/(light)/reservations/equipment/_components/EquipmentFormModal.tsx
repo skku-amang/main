@@ -164,7 +164,7 @@ export default function EquipmentFormModal({
       }}
     >
       <DialogContent
-        className="max-w-md rounded-2xl"
+        className="max-w-md"
         // 입력 창 — 바깥을 잘못 눌러 입력이 사라지지 않게. 닫기는 [취소]·Esc
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}

@@ -54,7 +54,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined} className="rounded-2xl">
+      <DialogContent aria-describedby={undefined}>
         <div className="rounded-xl">
           <DialogHeader className="mb-1">
             <DialogTitle className="text-slate-900">Youtube Embed</DialogTitle>
