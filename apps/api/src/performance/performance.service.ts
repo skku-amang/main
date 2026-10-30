@@ -9,7 +9,8 @@ import {
   GetPerformancesQuery,
   performanceFindOneInclude,
   performanceTeamsInclude,
-  recruitingPerformanceWhere
+  recruitingPerformanceWhere,
+  validatePerformanceSchedule
 } from "@repo/shared-types"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 import {
@@ -18,6 +19,15 @@ import {
   PerformanceUpdatedEvent,
   changedPerformanceFields
 } from "./performance.events"
+
+const SCHEDULE_KEYS = [
+  "startAt",
+  "endAt",
+  "recruitStartAt",
+  "recruitEndAt",
+  "feedbackStartAt",
+  "feedbackEndAt"
+] as const
 
 @Injectable()
 export class PerformanceService {
@@ -43,7 +53,10 @@ export class PerformanceService {
     if (status === "recruiting") {
       return this.prisma.performance.findMany({
         where: recruitingPerformanceWhere(),
-        orderBy: [{ endAt: { sort: "asc", nulls: "last" } }, { id: "asc" }]
+        orderBy: [
+          { recruitEndAt: { sort: "asc", nulls: "last" } },
+          { id: "asc" }
+        ]
       })
     }
 
@@ -94,14 +107,16 @@ export class PerformanceService {
       updatePerformanceDto
     )
 
-    const startAt = updatePerformanceDto.startAt ?? performance.startAt
-    const endAt = updatePerformanceDto.endAt ?? performance.endAt
-
-    if (startAt && endAt && startAt > endAt) {
-      throw new InvalidPerformanceDateError(
-        "공연의 시작 일시는 종료 일시보다 이전이어야 합니다."
-      )
-    }
+    const merged = Object.fromEntries(
+      SCHEDULE_KEYS.map((k) => [
+        k,
+        updatePerformanceDto[k] === undefined
+          ? performance[k]
+          : updatePerformanceDto[k]
+      ])
+    )
+    const scheduleError = validatePerformanceSchedule(merged)
+    if (scheduleError) throw new InvalidPerformanceDateError(scheduleError)
 
     try {
       await this.prisma.performance.update({
