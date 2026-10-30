@@ -41,3 +41,7 @@ homelab K3s에서 돌아가는 도구. 정의는 [manamana32321/homelab](https:/
 
 1. Terraform·클러스터 매니페스트로 관리 가능한 항목 → 먼저 선언적으로 추가, 본 문서에는 정의 위치 링크만
 2. 선언 밖 정보 (수동 생성한 계정·앱·ruleset 등) → 본 문서 비고에 기록
+3. AI가 쓰는 도구를 추가·변경·제거하면 세 곳을 같은 PR에서 함께 고친다
+   - 본 문서: 해당 줄의 Web / CLI / MCP 칸
+   - [.mcp.json](../../.mcp.json): MCP 서버 정의 (MCP로 붙일 때만)
+   - [.envrc.local.example](../../.envrc.local.example): 필요한 환경변수 이름과 발급 방법 (값은 각자 `.envrc.local`)
