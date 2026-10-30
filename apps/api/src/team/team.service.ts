@@ -233,10 +233,7 @@ export class TeamService {
 
     // 잠금 판정은 요청마다 공연 날짜로 계산한다 — 운영진이 날짜를 미루면 바로 풀린다
     const stage = await this.getStage(existingTeam.performanceId)
-    if (stage && !isTeamContentOpen(stage))
-      throw new PerformanceRecruitmentClosedError(
-        "피드백 단계부터는 팀을 수정할 수 없습니다."
-      )
+    const changedFields = changedTeamFields(existingTeam, updateTeamDto)
     // 다른 공연으로 옮기면 원래 공연에서는 팀이 사라지는 것 — 구성 변경과 같이 잠근다
     const rosterChanged =
       (performanceId !== undefined &&
@@ -244,15 +241,24 @@ export class TeamService {
       (leaderId !== undefined && leaderId !== existingTeam.leaderId) ||
       rosterSignature(existingTeam.teamSessions) !==
         rosterSignature(memberSessions)
+    const freshmenToggled =
+      scalarData.isFreshmenFixed !== undefined &&
+      scalarData.isFreshmenFixed !== existingTeam.isFreshmenFixed
+    if (freshmenToggled) await this.assertAdmin(actorId)
+
+    // 운영진의 신입고정팀 토글만은 단계와 무관하게 허용한다
+    const onlyFreshmenToggle =
+      freshmenToggled &&
+      !rosterChanged &&
+      changedFields.every((f) => f === "isFreshmenFixed")
+    if (stage && !isTeamContentOpen(stage) && !onlyFreshmenToggle)
+      throw new PerformanceRecruitmentClosedError(
+        "피드백 단계부터는 팀을 수정할 수 없습니다."
+      )
     if (rosterChanged && stage && !isTeamRosterOpen(stage))
       throw new PerformanceRecruitmentClosedError(
         "모집이 끝나 팀 구성(멤버·정원·팀장)은 바꿀 수 없습니다."
       )
-    if (
-      scalarData.isFreshmenFixed !== undefined &&
-      scalarData.isFreshmenFixed !== existingTeam.isFreshmenFixed
-    )
-      await this.assertAdmin(actorId)
 
     // 들이는 공연도 모집 중이어야 한다
     if (
@@ -265,7 +271,6 @@ export class TeamService {
       )
 
     const oldImageUrl = existingTeam.image
-    const changedFields = changedTeamFields(existingTeam, updateTeamDto)
     const roster = diffRoster(existingTeam.teamSessions, memberSessions)
 
     const prismaOperaions: Prisma.PrismaPromise<any>[] = []

@@ -534,6 +534,38 @@ describe("TeamService", () => {
       ).rejects.toBeInstanceOf(ForbiddenError)
     })
 
+    it.each([
+      ["피드백", EVALUATION_ID],
+      ["종료", DONE_ID]
+    ])(
+      "%s 단계에서도 운영진은 신입고정팀 설정만은 바꿀 수 있다",
+      async (_, performanceId) => {
+        storedTeam.performanceId = performanceId
+
+        await expect(
+          service.update(
+            storedTeam.id,
+            { ...baseTeam, isFreshmenFixed: true },
+            ADMIN
+          )
+        ).resolves.toMatchObject({ id: storedTeam.id })
+      }
+    )
+
+    it("피드백 단계에서 운영진이라도 다른 필드를 함께 바꾸면 거부", async () => {
+      storedTeam.performanceId = EVALUATION_ID
+
+      await expect(
+        service.update(
+          storedTeam.id,
+          { ...baseTeam, isFreshmenFixed: true, songName: "새 곡" },
+          ADMIN
+        )
+      ).rejects.toMatchObject({
+        detail: "피드백 단계부터는 팀을 수정할 수 없습니다."
+      })
+    })
+
     it("운영진은 신입고정팀 설정을 바꿀 수 있다", async () => {
       await expect(
         service.update(
