@@ -1,6 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing"
 import { EventEmitter2 } from "@nestjs/event-emitter"
-import { PerformanceRecruitmentClosedError } from "@repo/api-client"
+import {
+  ForbiddenError,
+  PerformanceRecruitmentClosedError
+} from "@repo/api-client"
 import { TeamService } from "./team.service"
 import {
   TEAM_EVENTS,
@@ -14,16 +17,60 @@ import { PrismaService } from "../prisma/prisma.service"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 
 const DAY = 24 * 60 * 60 * 1000
-const CLOSED_ID = 1
-const OPEN_ID = 2
-const UNDATED_ID = 3
+const ago = (days: number) => new Date(Date.now() - days * DAY)
+const later = (days: number) => new Date(Date.now() + days * DAY)
+const RECRUITING_ID = 1
+const SUBMISSION_ID = 2
+const EVALUATION_ID = 3
+const DONE_ID = 4
+const PREPARING_ID = 5
+const UNDATED_RECRUIT_END_ID = 6
 const ACTOR = 99
+const ADMIN = 50
 const GUITAR_ID = 2
 
-const performanceEndAt: Record<number, Date | null> = {
-  [CLOSED_ID]: new Date(Date.now() - DAY),
-  [OPEN_ID]: new Date(Date.now() + DAY),
-  [UNDATED_ID]: null
+type Schedule = Record<
+  | "recruitStartAt"
+  | "recruitEndAt"
+  | "feedbackStartAt"
+  | "feedbackEndAt"
+  | "decidedAt"
+  | "endAt",
+  Date | null
+>
+const noDates: Schedule = {
+  recruitStartAt: null,
+  recruitEndAt: null,
+  feedbackStartAt: null,
+  feedbackEndAt: null,
+  decidedAt: null,
+  endAt: null
+}
+let schedules: Record<number, Schedule>
+const resetSchedules = () => {
+  schedules = {
+    [RECRUITING_ID]: {
+      ...noDates,
+      recruitStartAt: ago(5),
+      recruitEndAt: later(5)
+    },
+    [SUBMISSION_ID]: {
+      ...noDates,
+      recruitStartAt: ago(10),
+      recruitEndAt: ago(1),
+      feedbackStartAt: later(5)
+    },
+    [EVALUATION_ID]: {
+      ...noDates,
+      recruitStartAt: ago(10),
+      recruitEndAt: ago(5),
+      feedbackStartAt: ago(1),
+      feedbackEndAt: later(5)
+    },
+    [DONE_ID]: { ...noDates, recruitStartAt: ago(30), endAt: ago(1) },
+    [PREPARING_ID]: { ...noDates },
+    [UNDATED_RECRUIT_END_ID]: { ...noDates, recruitStartAt: ago(5) }
+  }
 }
 
 const baseTeam = {
@@ -53,15 +100,14 @@ describe("TeamService", () => {
   }
 
   beforeEach(async () => {
-    storedTeam = { id: 10, performanceId: CLOSED_ID, teamSessions: [] }
+    resetSchedules()
+    storedTeam = { id: 10, performanceId: RECRUITING_ID, teamSessions: [] }
     emit = jest.fn()
 
     const prisma = {
       performance: {
         findUnique: jest.fn(({ where }: { where: { id: number } }) =>
-          where.id in performanceEndAt
-            ? { endAt: performanceEndAt[where.id] }
-            : null
+          where.id in schedules ? schedules[where.id] : null
         )
       },
       team: {
@@ -92,7 +138,11 @@ describe("TeamService", () => {
       },
       user: {
         findUnique: jest.fn(({ where }: { where: { id: number } }) =>
-          where.id === 5 ? { name: "홍길동" } : null
+          where.id === 5
+            ? { name: "홍길동", isAdmin: false }
+            : where.id === ADMIN
+              ? { name: "운영진", isAdmin: true }
+              : null
         )
       },
       $transaction: jest.fn()
@@ -117,15 +167,22 @@ describe("TeamService", () => {
     emit.mock.calls.filter(([n]) => n === name).map(([, event]) => event)
 
   describe("create", () => {
-    it("마감된 공연에는 팀을 만들 수 없다", async () => {
+    it.each([
+      ["준비 단계", PREPARING_ID],
+      ["제출 단계", SUBMISSION_ID],
+      ["종료된", DONE_ID]
+    ])("%s 공연에는 팀을 만들 수 없다", async (_, performanceId) => {
       await expect(
-        service.create({ ...baseTeam, performanceId: CLOSED_ID }, ACTOR)
-      ).rejects.toBeInstanceOf(PerformanceRecruitmentClosedError)
+        service.create({ ...baseTeam, performanceId }, ACTOR)
+      ).rejects.toMatchObject({
+        constructor: PerformanceRecruitmentClosedError,
+        detail: "팀 모집 기간이 아닙니다."
+      })
     })
 
     it.each([
-      ["모집 중인 공연", OPEN_ID],
-      ["종료 일시가 비어 있는 공연", UNDATED_ID]
+      ["모집 중인 공연", RECRUITING_ID],
+      ["모집 종료 일시가 비어 있는 공연", UNDATED_RECRUIT_END_ID]
     ])("%s에는 팀을 만들 수 있다", async (_, performanceId) => {
       await expect(
         service.create({ ...baseTeam, performanceId }, ACTOR)
@@ -133,7 +190,7 @@ describe("TeamService", () => {
     })
 
     it("팀이 만들어지면 team.created를 발행한다", async () => {
-      await service.create({ ...baseTeam, performanceId: OPEN_ID }, ACTOR)
+      await service.create({ ...baseTeam, performanceId: RECRUITING_ID }, ACTOR)
 
       expect(emitted(TEAM_EVENTS.CREATED)).toEqual([
         new TeamCreatedEvent(storedTeam.id, ACTOR)
@@ -142,33 +199,23 @@ describe("TeamService", () => {
   })
 
   describe("update", () => {
-    it("마감된 공연의 팀도 공연을 바꾸지 않는 수정은 할 수 있다", async () => {
+    it("제출 단계 공연의 팀에서 모집 중인 공연으로 옮길 수 있다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+
       await expect(
         service.update(
           storedTeam.id,
-          { ...baseTeam, performanceId: CLOSED_ID },
+          { ...baseTeam, performanceId: RECRUITING_ID },
           ACTOR
         )
       ).resolves.toMatchObject({ id: storedTeam.id })
     })
 
-    it("마감된 공연에서 모집 중인 공연으로 옮길 수 있다", async () => {
+    it("모집 중인 공연에서 모집이 끝난 공연으로 옮길 수 없다", async () => {
       await expect(
         service.update(
           storedTeam.id,
-          { ...baseTeam, performanceId: OPEN_ID },
-          ACTOR
-        )
-      ).resolves.toMatchObject({ id: storedTeam.id })
-    })
-
-    it("모집 중인 공연에서 마감된 공연으로 옮길 수 없다", async () => {
-      storedTeam.performanceId = OPEN_ID
-
-      await expect(
-        service.update(
-          storedTeam.id,
-          { ...baseTeam, performanceId: CLOSED_ID },
+          { ...baseTeam, performanceId: SUBMISSION_ID },
           ACTOR
         )
       ).rejects.toBeInstanceOf(PerformanceRecruitmentClosedError)
@@ -276,7 +323,7 @@ describe("TeamService", () => {
         service.create(
           {
             ...baseTeam,
-            performanceId: OPEN_ID,
+            performanceId: RECRUITING_ID,
             memberSessions: [
               {
                 sessionId: GUITAR_ID,
@@ -334,6 +381,163 @@ describe("TeamService", () => {
         actorId: ACTOR
       })
       expect([...event!.memberIds].sort()).toEqual([1, 5, 6])
+    })
+  })
+
+  describe("단계별 잠금", () => {
+    const guitarSession = (members: { userId: number; index: number }[]) => ({
+      sessionId: GUITAR_ID,
+      capacity: 2,
+      members
+    })
+    const storeGuitar = (userIds: number[]) => {
+      storedTeam.teamSessions = [
+        {
+          id: 100,
+          sessionId: GUITAR_ID,
+          capacity: 2,
+          members: userIds.map((userId, i) => ({
+            id: i + 1,
+            userId,
+            index: i + 1
+          }))
+        }
+      ]
+    }
+
+    it("제출 단계에서는 지원할 수 없다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+      storeGuitar([])
+
+      await expect(
+        service.apply(storedTeam.id, 5, [{ sessionId: GUITAR_ID, index: 1 }])
+      ).rejects.toMatchObject({
+        detail: "팀 모집 기간이 아니라 지원·탈퇴할 수 없습니다."
+      })
+    })
+
+    it("제출 단계에서는 탈퇴할 수 없다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+      storeGuitar([5])
+
+      await expect(
+        service.unapply(storedTeam.id, 5, [{ sessionId: GUITAR_ID, index: 1 }])
+      ).rejects.toMatchObject({
+        detail: "팀 모집 기간이 아니라 지원·탈퇴할 수 없습니다."
+      })
+    })
+
+    it.each([
+      [
+        "멤버 추가",
+        { memberSessions: [guitarSession([{ userId: 5, index: 1 }])] }
+      ],
+      ["팀장 교체", { leaderId: 2 }],
+      ["정원 변경", { memberSessions: [{ ...guitarSession([]), capacity: 3 }] }]
+    ])("제출 단계에서 %s 거부", async (_, change) => {
+      storedTeam.performanceId = SUBMISSION_ID
+      storeGuitar([])
+
+      await expect(
+        service.update(
+          storedTeam.id,
+          { ...baseTeam, memberSessions: [guitarSession([])], ...change },
+          ACTOR
+        )
+      ).rejects.toMatchObject({
+        detail: "모집이 끝나 팀 구성(멤버·정원·팀장)은 바꿀 수 없습니다."
+      })
+    })
+
+    it("제출 단계에서 곡 정보·이름·설명은 바꿀 수 있다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+      storeGuitar([5])
+
+      await expect(
+        service.update(
+          storedTeam.id,
+          {
+            ...baseTeam,
+            name: "새 이름",
+            songName: "새 곡",
+            description: "설명",
+            memberSessions: [guitarSession([{ userId: 5, index: 1 }])]
+          },
+          ACTOR
+        )
+      ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+
+    it.each([
+      ["피드백", EVALUATION_ID],
+      ["종료", DONE_ID]
+    ])("%s 단계에서는 어떤 수정도 거부", async (_, performanceId) => {
+      storedTeam.performanceId = performanceId
+
+      await expect(
+        service.update(storedTeam.id, { ...baseTeam, songName: "새 곡" }, ACTOR)
+      ).rejects.toMatchObject({
+        detail: "피드백 단계부터는 팀을 수정할 수 없습니다."
+      })
+    })
+
+    it("모집이 끝난 팀은 삭제할 수 없다", async () => {
+      storedTeam.performanceId = DONE_ID
+
+      await expect(service.remove(storedTeam.id, ACTOR)).rejects.toMatchObject({
+        detail: "모집이 끝난 팀은 삭제할 수 없습니다."
+      })
+    })
+
+    it("운영진이 피드백 시작을 미루면 같은 팀을 다시 수정할 수 있다", async () => {
+      storedTeam.performanceId = EVALUATION_ID
+      await expect(
+        service.update(storedTeam.id, { ...baseTeam, songName: "새 곡" }, ACTOR)
+      ).rejects.toBeDefined()
+
+      schedules[EVALUATION_ID] = {
+        ...schedules[EVALUATION_ID]!,
+        feedbackStartAt: later(3),
+        feedbackEndAt: later(6)
+      }
+
+      await expect(
+        service.update(storedTeam.id, { ...baseTeam, songName: "새 곡" }, ACTOR)
+      ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+  })
+
+  describe("신입고정팀 권한", () => {
+    it("운영진이 아니면 신입고정팀 설정을 바꿀 수 없다", async () => {
+      await expect(
+        service.update(
+          storedTeam.id,
+          { ...baseTeam, isFreshmenFixed: true },
+          ACTOR
+        )
+      ).rejects.toMatchObject({
+        constructor: ForbiddenError,
+        detail: "신입고정팀 설정은 운영진만 바꿀 수 있습니다."
+      })
+    })
+
+    it("운영진이 아니면 신입고정팀으로 만들 수 없다", async () => {
+      await expect(
+        service.create(
+          { ...baseTeam, performanceId: RECRUITING_ID, isFreshmenFixed: true },
+          ACTOR
+        )
+      ).rejects.toBeInstanceOf(ForbiddenError)
+    })
+
+    it("운영진은 신입고정팀 설정을 바꿀 수 있다", async () => {
+      await expect(
+        service.update(
+          storedTeam.id,
+          { ...baseTeam, isFreshmenFixed: true },
+          ADMIN
+        )
+      ).resolves.toMatchObject({ id: storedTeam.id })
     })
   })
 })

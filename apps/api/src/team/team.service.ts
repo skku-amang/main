@@ -22,7 +22,10 @@ import {
   PerformanceRecruitmentClosedError
 } from "@repo/api-client"
 import {
-  isPerformanceRecruiting,
+  getPerformanceStage,
+  isTeamContentOpen,
+  isTeamRosterOpen,
+  PerformanceStage,
   SESSION_DISPLAY_NAME,
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
@@ -40,6 +43,24 @@ import {
   changedTeamFields,
   diffRoster
 } from "./team.events"
+
+/** 세션·정원·자리 배정을 비교용 문자열로 — 같은 사람이 자리만 옮겨도 구성 변경으로 본다 */
+const rosterSignature = (
+  sessions: {
+    sessionId: number
+    capacity: number
+    members: { userId: number; index: number }[]
+  }[]
+) =>
+  JSON.stringify(
+    [...sessions]
+      .sort((a, b) => a.sessionId - b.sessionId)
+      .map((s) => [
+        s.sessionId,
+        s.capacity,
+        s.members.map((m) => `${m.userId}:${m.index}`).sort()
+      ])
+  )
 
 @Injectable()
 export class TeamService {
@@ -69,10 +90,8 @@ export class TeamService {
     const { leaderId, memberSessions, performanceId, ...scalarData } =
       createTeamDto
 
-    await this.assertPerformanceRecruiting(
-      performanceId,
-      "종료 일시가 지난 공연에는 팀을 만들 수 없습니다."
-    )
+    await this.assertRosterOpen(performanceId, "팀 모집 기간이 아닙니다.")
+    if (scalarData.isFreshmenFixed) await this.assertAdmin(actorId)
 
     if (memberSessions.length > 0) {
       for (const session of memberSessions) {
@@ -212,14 +231,34 @@ export class TeamService {
     if (!existingTeam)
       throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
 
-    // 마감된 공연에서 빼내는 이동은 허용, 마감된 공연으로 들이는 이동만 차단
+    // 잠금 판정은 요청마다 공연 날짜로 계산한다 — 운영진이 날짜를 미루면 바로 풀린다
+    const stage = await this.getStage(existingTeam.performanceId)
+    if (stage && !isTeamContentOpen(stage))
+      throw new PerformanceRecruitmentClosedError(
+        "피드백 단계부터는 팀을 수정할 수 없습니다."
+      )
+    const rosterChanged =
+      (leaderId !== undefined && leaderId !== existingTeam.leaderId) ||
+      rosterSignature(existingTeam.teamSessions) !==
+        rosterSignature(memberSessions)
+    if (rosterChanged && stage && !isTeamRosterOpen(stage))
+      throw new PerformanceRecruitmentClosedError(
+        "모집이 끝나 팀 구성(멤버·정원·팀장)은 바꿀 수 없습니다."
+      )
+    if (
+      scalarData.isFreshmenFixed !== undefined &&
+      scalarData.isFreshmenFixed !== existingTeam.isFreshmenFixed
+    )
+      await this.assertAdmin(actorId)
+
+    // 모집이 끝난 공연에서 빼내는 이동은 허용, 모집 중이 아닌 공연으로 들이는 이동만 차단
     if (
       performanceId !== undefined &&
       performanceId !== existingTeam.performanceId
     )
-      await this.assertPerformanceRecruiting(
+      await this.assertRosterOpen(
         performanceId,
-        "종료 일시가 지난 공연으로는 팀을 옮길 수 없습니다."
+        "팀 모집 중인 공연으로만 옮길 수 있습니다."
       )
 
     const oldImageUrl = existingTeam.image
@@ -396,6 +435,10 @@ export class TeamService {
 
   async remove(id: number, actorId: number) {
     const team = await this.findOne(id)
+    await this.assertRosterOpen(
+      team.performanceId,
+      "모집이 끝난 팀은 삭제할 수 없습니다."
+    )
 
     try {
       await this.prisma.team.delete({ where: { id } })
@@ -436,6 +479,10 @@ export class TeamService {
     })
 
     if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
+    await this.assertRosterOpen(
+      team.performanceId,
+      "팀 모집 기간이 아니라 지원·탈퇴할 수 없습니다."
+    )
 
     const teamSessionMap = new Map(
       team.teamSessions.map((s) => [s.sessionId, s])
@@ -538,6 +585,10 @@ export class TeamService {
     })
 
     if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
+    await this.assertRosterOpen(
+      team.performanceId,
+      "팀 모집 기간이 아니라 지원·탈퇴할 수 없습니다."
+    )
 
     const memberIdsToDelete: number[] = []
 
@@ -591,15 +642,35 @@ export class TeamService {
     }
   }
 
-  private async assertPerformanceRecruiting(
-    performanceId: number,
-    detail: string
-  ) {
+  private async getStage(
+    performanceId: number
+  ): Promise<PerformanceStage | null> {
     const performance = await this.prisma.performance.findUnique({
       where: { id: performanceId },
-      select: { endAt: true }
+      select: {
+        recruitStartAt: true,
+        recruitEndAt: true,
+        feedbackStartAt: true,
+        feedbackEndAt: true,
+        decidedAt: true,
+        endAt: true
+      }
     })
-    if (performance && !isPerformanceRecruiting(performance))
+    return performance ? getPerformanceStage(performance) : null
+  }
+
+  private async assertRosterOpen(performanceId: number, detail: string) {
+    const stage = await this.getStage(performanceId)
+    if (stage && !isTeamRosterOpen(stage))
       throw new PerformanceRecruitmentClosedError(detail)
+  }
+
+  private async assertAdmin(actorId: number) {
+    const actor = await this.prisma.user.findUnique({
+      where: { id: actorId },
+      select: { isAdmin: true }
+    })
+    if (!actor?.isAdmin)
+      throw new ForbiddenError("신입고정팀 설정은 운영진만 바꿀 수 있습니다.")
   }
 }
