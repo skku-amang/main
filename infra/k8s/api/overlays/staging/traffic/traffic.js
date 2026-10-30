@@ -733,8 +733,11 @@ function run() {
   if (daytime) approvePending(bot1);
   let teams = data(bot1.get("/teams")) ?? [];
   const performance = currentSeason(bot1, teams, daytime);
+  // 팀 모집 단계일 때만 팀을 만들고 지원한다 (모집 시작 전이면 API가 409)
   const playground =
     performance &&
+    performance.recruitStartAt &&
+    new Date(performance.recruitStartAt) <= new Date() &&
     (!performance.recruitEndAt ||
       new Date(performance.recruitEndAt) > new Date());
   teams = data(bot1.get("/teams")) ?? [];
