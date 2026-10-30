@@ -26,5 +26,8 @@ export ARGOCD_OPTS="--grpc-web --config $HOME/.config/argocd/ai-agent.none"
 
 # Kargo ai-agent (보기 + 승격). 토큰: infra/kargo/ai-agent.yaml의 Secret을 쿠버네티스가 채움
 # kubectl --context json -n amang get secret ai-agent-token -o jsonpath='{.data.token}' | base64 -d
+# 두 변수가 있으면 CLI가 ~/.config/kargo/config를 읽지 않는다
+#  - 기본 프로젝트(kargo config set-project)도 무시 → 명령마다 --project amang
+#  - 사람이 SSO 권한으로 쓸 때는 unset KARGO_API_ADDRESS KARGO_API_TOKEN 후 실행
 export KARGO_API_ADDRESS=https://kargo.json-server.win
 export KARGO_API_TOKEN=
