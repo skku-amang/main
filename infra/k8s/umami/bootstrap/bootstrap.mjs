@@ -95,8 +95,12 @@ if (agentStatus !== 200)
   throw new Error(`ai-agent user failed: ${agentStatus}`);
 console.log(`${agent ? "updated" : "created"} ai-agent user`);
 
+// 팀 생성 API는 ID를 받지 않아 이름으로 찾는다. /api/teams는 admin이 속한 팀만 주므로 전체 목록을 본다
 async function findTeam() {
-  const { data } = await api("/api/teams?pageSize=100", { token });
+  const { data } = await api(
+    `/api/admin/teams?search=${TEAM_NAME}&pageSize=100`,
+    { token },
+  );
   return data.data.find((t) => t.name === TEAM_NAME);
 }
 
