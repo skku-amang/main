@@ -78,7 +78,6 @@ const SCHEDULE_GROUPS = [
       ["recruitStartAt", "시작"],
       ["recruitEndAt", "종료"]
     ],
-    nowButton: true,
     stages: ["RECRUITING", "SUBMISSION"]
   },
   {
@@ -89,7 +88,6 @@ const SCHEDULE_GROUPS = [
       ["feedbackStartAt", "시작"],
       ["feedbackEndAt", "종료"]
     ],
-    nowButton: true,
     stages: ["EVALUATION", "DECISION"]
   },
   {
@@ -100,7 +98,6 @@ const SCHEDULE_GROUPS = [
       ["startAt", "시작"],
       ["endAt", "종료"]
     ],
-    nowButton: false,
     stages: ["LINEUP", "DONE"]
   }
 ] as const
@@ -314,21 +311,6 @@ export function PerformanceFormDialog({
                                         }
                                       >
                                         모집 종료와 같게
-                                      </Button>
-                                    )}
-                                    {group.nowButton && (
-                                      <Button
-                                        type="button"
-                                        variant="link"
-                                        size="sm"
-                                        className="h-auto p-0 text-xs"
-                                        onClick={() =>
-                                          field.onChange(
-                                            toDatetimeLocal(new Date())
-                                          )
-                                        }
-                                      >
-                                        지금으로
                                       </Button>
                                     )}
                                   </div>
