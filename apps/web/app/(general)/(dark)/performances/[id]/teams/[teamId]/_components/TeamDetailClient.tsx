@@ -22,6 +22,13 @@ import { getMissingIndices } from "@/lib/team/teamSession"
 import YoutubePlayer from "@/components/YoutubePlayer"
 import { useNotificationSubjectRead } from "@/hooks/useNotificationSubjectRead"
 import useTeamApplication from "../_hooks/useTeamApplication"
+import { usePerformance } from "@/hooks/api/usePerformance"
+import {
+  getPerformanceStage,
+  isTeamContentOpen,
+  isTeamRosterOpen,
+  PERFORMANCE_STAGE_LABEL
+} from "@repo/shared-types"
 
 const TeamDetailClient = () => {
   const params = useParams()
@@ -32,7 +39,12 @@ const TeamDetailClient = () => {
   useNotificationSubjectRead({ teamId: id })
 
   const { data: team, isLoading, isError } = useTeam(id)
+  const { data: performance } = usePerformance(performanceId)
   const { canEdit } = useTeamPermission(team)
+  // 공연을 못 불러오면 화면은 열어 두고 판단은 서버에 맡긴다
+  const stage = performance ? getPerformanceStage(performance) : undefined
+  const rosterOpen = !stage || isTeamRosterOpen(stage)
+  const contentOpen = !stage || isTeamContentOpen(stage)
   const {
     selectedSessions,
     isSelected,
@@ -84,7 +96,7 @@ const TeamDetailClient = () => {
       <div className="relative z-10 flex w-full gap-5 max-xl:flex-col max-xl:items-center md:w-full md:max-w-[1152px] md:gap-[24px]">
         {/* 기본 정보 및 포스터*/}
         <div className="flex w-full flex-col gap-y-5 md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
-          <BasicInfo team={team} canEdit={canEdit} />
+          <BasicInfo team={team} canEdit={canEdit && contentOpen} />
           {team.image && <PosterImage src={team.image} />}
         </div>
 
@@ -142,6 +154,7 @@ const TeamDetailClient = () => {
                     user={member.user}
                     joinedAt={member.createdAt}
                     onUnapplySuccess={() => {}}
+                    canUnapply={rosterOpen}
                   />
                 ))
               )}
@@ -163,7 +176,12 @@ const TeamDetailClient = () => {
             }
             className="col-span-2 bg-white shadow-[0_4px_30px_0_rgba(59,130,246,0.07)]"
           >
-            {!isAuthLoading && !isAuthenticated ? (
+            {stage && !rosterOpen ? (
+              <div className="py-8 text-center text-sm text-gray-500">
+                지금은 {PERFORMANCE_STAGE_LABEL[stage]} 단계라 지원·탈퇴할 수
+                없습니다.
+              </div>
+            ) : !isAuthLoading && !isAuthenticated ? (
               <div className="py-8 text-center">
                 <p className="mb-4 text-sm text-gray-500">
                   로그인 후 세션에 지원할 수 있습니다.

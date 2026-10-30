@@ -237,7 +237,10 @@ export class TeamService {
       throw new PerformanceRecruitmentClosedError(
         "피드백 단계부터는 팀을 수정할 수 없습니다."
       )
+    // 다른 공연으로 옮기면 원래 공연에서는 팀이 사라지는 것 — 구성 변경과 같이 잠근다
     const rosterChanged =
+      (performanceId !== undefined &&
+        performanceId !== existingTeam.performanceId) ||
       (leaderId !== undefined && leaderId !== existingTeam.leaderId) ||
       rosterSignature(existingTeam.teamSessions) !==
         rosterSignature(memberSessions)
@@ -251,7 +254,7 @@ export class TeamService {
     )
       await this.assertAdmin(actorId)
 
-    // 모집이 끝난 공연에서 빼내는 이동은 허용, 모집 중이 아닌 공연으로 들이는 이동만 차단
+    // 들이는 공연도 모집 중이어야 한다
     if (
       performanceId !== undefined &&
       performanceId !== existingTeam.performanceId

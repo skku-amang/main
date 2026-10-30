@@ -277,8 +277,9 @@ function latestPlayground(bot) {
 }
 
 /**
- * 팀이 SEASON_TEAM_CAP개 찼거나 마감이 지났으면 새 공연을 연다(PERFORMANCE_CREATED → 승인 부원 전원).
- * 마감이 8주 넘게 남은 공연은 4주로 당긴다(1회, PERFORMANCE_UPDATED) — 시즌 말 D-1 알림이 실제로 오게.
+ * 팀이 SEASON_TEAM_CAP개 찼거나 모집 종료가 지났으면 새 공연을 연다(PERFORMANCE_CREATED → 승인 부원 전원).
+ * 모집 종료가 8주 넘게 남은 공연은 4주로 당긴다(1회, PERFORMANCE_UPDATED) — 시즌 말 D-1 알림이 실제로 오게.
+ * 모집 마감은 recruitEndAt이다 (#892). 새 공연은 모집 시작을 넣어야 팀 모집 단계가 된다.
  */
 function currentSeason(bot1, teams, daytime) {
   const performance = latestPlayground(bot1);
@@ -288,7 +289,8 @@ function currentSeason(bot1, teams, daytime) {
     ? teams.filter((t) => t.performanceId === performance.id).length
     : 0;
   const closed =
-    !performance || (performance.endAt && new Date(performance.endAt) <= now);
+    !performance ||
+    (performance.recruitEndAt && new Date(performance.recruitEndAt) <= now);
 
   if (closed || teamCount >= SEASON_TEAM_CAP) {
     let created;
@@ -310,6 +312,8 @@ function currentSeason(bot1, teams, daytime) {
         location: "스테이징 소극장",
         startAt: kstAt(now, SEASON_WEEKS * 7, 18).toISOString(),
         endAt: kstAt(now, SEASON_WEEKS * 7, 21).toISOString(),
+        recruitStartAt: now.toISOString(),
+        recruitEndAt: kstAt(now, SEASON_WEEKS * 7, 18).toISOString(),
       });
       if (ok(res, "POST /performances (새 시즌)")) created = data(res);
     });
@@ -317,14 +321,15 @@ function currentSeason(bot1, teams, daytime) {
   }
 
   if (
-    performance.endAt &&
-    new Date(performance.endAt).getTime() - now.getTime() > 8 * 7 * DAY
+    performance.recruitEndAt &&
+    new Date(performance.recruitEndAt).getTime() - now.getTime() > 8 * 7 * DAY
   ) {
     group("공연 마감을 4주 뒤로", () => {
       ok(
         bot1.patch(`/performances/${performance.id}`, {
           startAt: kstAt(now, SEASON_WEEKS * 7, 18).toISOString(),
           endAt: kstAt(now, SEASON_WEEKS * 7, 21).toISOString(),
+          recruitEndAt: kstAt(now, SEASON_WEEKS * 7, 18).toISOString(),
         }),
         "PATCH /performances/:id (마감 4주 뒤)",
       );
@@ -393,7 +398,8 @@ function createTeam(bot1, pool, performance, allSessionIds) {
         performanceId: performance.id,
         songName,
         songArtist,
-        isFreshmenFixed: chance(0.2),
+        // 신입고정팀은 운영진만 켤 수 있다 (#892)
+        isFreshmenFixed: creator.me.isAdmin === true && chance(0.2),
         isSelfMade: false,
         memberSessions,
       }),
@@ -729,7 +735,8 @@ function run() {
   const performance = currentSeason(bot1, teams, daytime);
   const playground =
     performance &&
-    (!performance.endAt || new Date(performance.endAt) > new Date());
+    (!performance.recruitEndAt ||
+      new Date(performance.recruitEndAt) > new Date());
   teams = data(bot1.get("/teams")) ?? [];
 
   const equipments = data(bot1.get("/equipments")) ?? [];

@@ -199,7 +199,7 @@ describe("TeamService", () => {
   })
 
   describe("update", () => {
-    it("제출 단계 공연의 팀에서 모집 중인 공연으로 옮길 수 있다", async () => {
+    it("제출 단계 공연의 팀은 다른 공연으로 옮겨 빠져나갈 수 없다", async () => {
       storedTeam.performanceId = SUBMISSION_ID
 
       await expect(
@@ -208,7 +208,9 @@ describe("TeamService", () => {
           { ...baseTeam, performanceId: RECRUITING_ID },
           ACTOR
         )
-      ).resolves.toMatchObject({ id: storedTeam.id })
+      ).rejects.toMatchObject({
+        detail: "모집이 끝나 팀 구성(멤버·정원·팀장)은 바꿀 수 없습니다."
+      })
     })
 
     it("모집 중인 공연에서 모집이 끝난 공연으로 옮길 수 없다", async () => {
@@ -493,7 +495,9 @@ describe("TeamService", () => {
       storedTeam.performanceId = EVALUATION_ID
       await expect(
         service.update(storedTeam.id, { ...baseTeam, songName: "새 곡" }, ACTOR)
-      ).rejects.toBeDefined()
+      ).rejects.toMatchObject({
+        detail: "피드백 단계부터는 팀을 수정할 수 없습니다."
+      })
 
       schedules[EVALUATION_ID] = {
         ...schedules[EVALUATION_ID]!,

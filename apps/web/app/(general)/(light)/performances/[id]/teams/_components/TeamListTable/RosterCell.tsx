@@ -7,7 +7,7 @@ import SlotActionButton from "./SlotActionButton"
 /**
  * 세션 자리 한 칸: 맡은 사람 이름 / 모집 / 이 팀엔 없는 자리(–).
  * - canApply면 빈자리를 '지원' 버튼으로 (로그인 + 모집 중일 때)
- * - viewerId가 맡은 자리면 이름을 강조하고 아래에 '취소' 버튼 (서버가 모집 마감 후 취소도 허용)
+ * - viewerId가 맡은 자리면 이름을 강조하고, canApply면 아래에 '취소' 버튼 (모집 중에만 — 서버도 409)
  * - compact(휴대폰)면 사진 없이 이름만 (지원·취소 버튼은 그대로)
  */
 const RosterCell = ({
@@ -36,7 +36,7 @@ const RosterCell = ({
     const isMe = viewerId !== undefined && user.id === viewerId
     return (
       <MemberChip user={user} showAvatar={!compact} isMe={isMe}>
-        {isMe && (
+        {isMe && canApply && (
           <SlotActionButton
             action="cancel"
             sessionId={cell.sessionId}
