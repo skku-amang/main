@@ -1,5 +1,5 @@
 # 로컬 개발용 AI 에이전트 계정 (특정 AI 도구에 묶이지 않음). 권한은 Kargo 기본 kargo-promoter: 보기 + 승격
-# 토큰은 아래 Secret에 쿠버네티스가 채운다. 꺼내는 법은 docs/reference/tools.md Kargo 줄
+# 토큰은 아래 Secret에 쿠버네티스가 채운다. 꺼내는 법은 .envrc.local.example Kargo 블록
 apiVersion: v1
 kind: ServiceAccount
 metadata:
