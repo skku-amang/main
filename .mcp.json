@@ -11,10 +11,6 @@
         "SLACK_TEAM_ID": "T07LTTU4WSZ"
       }
     },
-    "amang-kubernetes": {
-      "command": "direnv",
-      "args": ["exec", ".", "mcp-server-kubernetes"]
-    },
     "amang-sentry": {
       "command": "direnv",
       "args": ["exec", ".", "sentry-mcp"]
