@@ -51,24 +51,24 @@ enum NotificationType {
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
-  password        String
-  name            String
-  nickname        String   @unique
-  bio             String?
-  image           String?
-  isAdmin         Boolean  @default(false)
-  isApproved      Boolean  @default(false)
+  id                     Int                @id @default(autoincrement())
+  email                  String             @unique
+  password               String
+  name                   String
+  nickname               String             @unique
+  bio                    String?
+  image                  String?
+  isAdmin                Boolean            @default(false)
+  isApproved             Boolean            @default(false)
   // 다른 부원에게 프로필(참여 팀·공연, 기수, 세션, 자기소개) 공개 여부. 기본 비공개
-  isProfilePublic Boolean  @default(false)
+  isProfilePublic        Boolean            @default(false)
   // 알림 설정 (#708). 푸시만 제어하고 알림함엔 영향 없음. 시(hour)는 KST
   mutedNotificationTypes NotificationType[] @default([])
   quietHoursEnabled      Boolean            @default(true)
   quietHoursStart        Int                @default(23)
   quietHoursEnd          Int                @default(8)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
 
   generationId      Int
   generation        Generation  @relation(fields: [generationId], references: [id], onDelete: Restrict)
@@ -129,6 +129,15 @@ model Performance {
   location    String? // 공연 장소
   startAt     DateTime? // 공연 시작 일시
   endAt       DateTime? // 공연 종료 일시
+
+  // 진행 단계는 저장하지 않고 이 날짜들에서 계산한다 (getPerformanceStage)
+  recruitStartAt          DateTime? // 모집 시작
+  recruitEndAt            DateTime? // 모집 종료 (= 팀 구성 잠금)
+  feedbackStartAt         DateTime? // 피드백 시작 (= 녹음본 제출 마감)
+  feedbackEndAt           DateTime? // 피드백 종료
+  decidedAt               DateTime? // 운영진 확정
+  passCount               Int? // 합격 곡 수
+  penaltyPerMissingReview Float     @default(0) // 미참여 1건당 감점
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -258,9 +267,9 @@ model Notification {
   recipientId Int
   recipient   User @relation("notifications", fields: [recipientId], references: [id], onDelete: Cascade)
 
-  type    NotificationType
-  payload Json // 이벤트 시점 스냅샷. 구조는 type별 (shared-types notification.schema)
-  readAt  DateTime? // null = 안 읽음
+  type     NotificationType
+  payload  Json // 이벤트 시점 스냅샷. 구조는 type별 (shared-types notification.schema)
+  readAt   DateTime? // null = 안 읽음
   pushedAt DateTime? // 푸시 처리 시각. null = 방해금지로 미뤄 둠 (크론이 아침에 flush)
 
   createdAt DateTime @default(now())
