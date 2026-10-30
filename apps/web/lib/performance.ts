@@ -1,18 +1,16 @@
 import dayjs from "dayjs"
 
-import { isPerformanceRecruiting } from "@repo/shared-types"
+import {
+  getPerformanceStage,
+  type Performance,
+  type PerformanceSchedule
+} from "@repo/shared-types"
 
-interface PerformanceDates {
-  startAt: Date | null
-  endAt: Date | null
-}
-
-// 모집 마감 = 공연 종료 일시 (isPerformanceRecruiting과 같은 기준)
 export const getRecruitDaysLeft = ({
-  endAt
-}: Pick<PerformanceDates, "endAt">) =>
-  endAt
-    ? dayjs(endAt).startOf("day").diff(dayjs().startOf("day"), "day")
+  recruitEndAt
+}: Pick<Performance, "recruitEndAt">) =>
+  recruitEndAt
+    ? dayjs(recruitEndAt).startOf("day").diff(dayjs().startOf("day"), "day")
     : undefined
 
 export const formatDday = (daysLeft: number) =>
@@ -24,15 +22,28 @@ const compareDate = (a: Date | null, b: Date | null, order: 1 | -1) => {
   return (a.getTime() - b.getTime()) * order
 }
 
-// 모집 중은 마감 임박 순, 지난 공연은 최근 공연 순
-export const splitPerformances = <T extends PerformanceDates>(
-  performances: T[]
+// 모집 중은 마감 임박 순, 진행 중은 공연이 가까운 순, 지난 공연은 최근 공연 순
+export const splitPerformances = <
+  T extends PerformanceSchedule & Pick<Performance, "startAt">
+>(
+  performances: T[],
+  now: Date = new Date()
 ) => {
-  const recruiting = performances
-    .filter((p) => isPerformanceRecruiting(p))
-    .sort((a, b) => compareDate(a.endAt, b.endAt, 1))
-  const past = performances
-    .filter((p) => !isPerformanceRecruiting(p))
+  const withStage = performances.map((p) => ({
+    p,
+    stage: getPerformanceStage(p, now)
+  }))
+  const recruiting = withStage
+    .filter(({ stage }) => stage === "RECRUITING")
+    .map(({ p }) => p)
+    .sort((a, b) => compareDate(a.recruitEndAt, b.recruitEndAt, 1))
+  const ongoing = withStage
+    .filter(({ stage }) => stage !== "RECRUITING" && stage !== "DONE")
+    .map(({ p }) => p)
+    .sort((a, b) => compareDate(a.startAt, b.startAt, 1))
+  const past = withStage
+    .filter(({ stage }) => stage === "DONE")
+    .map(({ p }) => p)
     .sort((a, b) => compareDate(a.startAt, b.startAt, -1))
-  return { recruiting, past }
+  return { recruiting, ongoing, past }
 }

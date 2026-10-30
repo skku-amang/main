@@ -9,6 +9,7 @@ import { LuMusic } from "react-icons/lu"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import PerformanceStageBadge from "@/components/PerformanceStageBadge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
@@ -125,6 +126,7 @@ const PerformanceDetailClient = () => {
         <div className="flex w-full flex-col gap-5">
           {/* 메타 정보 */}
           <div className="space-y-3">
+            <PerformanceStageBadge performance={performance} />
             {startDate && (
               <InfoItem icon={<CalendarDays className="size-4 shrink-0" />}>
                 {formatDate(startDate)}

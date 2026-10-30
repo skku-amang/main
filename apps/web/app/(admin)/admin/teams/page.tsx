@@ -10,7 +10,9 @@ import { useToast } from "@/components/hooks/use-toast"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import {
+  getPerformanceStage,
   isPerformanceRecruiting,
+  PERFORMANCE_STAGE_LABEL,
   TeamList,
   formatGenerationOrder
 } from "@repo/shared-types"
@@ -45,13 +47,15 @@ export default function TeamsAdminPage() {
     [performances]
   )
 
-  // 마감된 공연은 현재 값으로는 보이되 새로 고를 수는 없음 (서버도 409로 거절)
+  // 모집 중이 아닌 공연은 현재 값으로는 보이되 새로 고를 수는 없음 (서버도 409로 거절)
   const performanceOptions = useMemo(
     () =>
       performances?.map((p) => {
         const recruiting = isPerformanceRecruiting(p)
         return {
-          label: recruiting ? p.name : `${p.name} (마감)`,
+          label: recruiting
+            ? p.name
+            : `${p.name} (${PERFORMANCE_STAGE_LABEL[getPerformanceStage(p)]})`,
           value: String(p.id),
           disabled: !recruiting
         }
