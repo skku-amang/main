@@ -31,3 +31,11 @@ export ARGOCD_OPTS="--grpc-web --config $HOME/.config/argocd/ai-agent.none"
 #  - 사람이 SSO 권한으로 쓸 때는 unset KARGO_API_ADDRESS KARGO_API_TOKEN 후 실행
 export KARGO_API_ADDRESS=https://kargo.json-server.win
 export KARGO_API_TOKEN=
+
+# Umami MCP (공식 @umami/mcp, 읽기 전용). ai-agent 계정(보기 전용, infra/k8s/umami/bootstrap)의 API 키
+# 발급: ai-agent로 로그인해 키 생성 (비밀번호는 umami-admin Secret의 UMAMI_AI_AGENT_PASSWORD)
+#   PW=$(kubectl --context json -n amang-umami get secret umami-admin -o jsonpath='{.data.UMAMI_AI_AGENT_PASSWORD}' | base64 -d)
+#   T=$(curl -s -X POST $UMAMI_URL/api/auth/login -H 'Content-Type: application/json' -d "{\"username\":\"ai-agent\",\"password\":\"$PW\"}" | jq -r .token)
+#   curl -s -X POST $UMAMI_URL/api/me/api-keys -H "Authorization: Bearer $T" -H 'Content-Type: application/json' -d '{"name":"local"}' | jq -r .key
+export UMAMI_URL=https://analytics.amang.json-server.win
+export UMAMI_API_TOKEN=
