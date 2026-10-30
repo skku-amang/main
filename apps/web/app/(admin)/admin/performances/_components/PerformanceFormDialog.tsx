@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
 import {
   getPerformanceStage,
   Performance,
@@ -77,7 +78,8 @@ const SCHEDULE_GROUPS = [
       ["recruitStartAt", "시작"],
       ["recruitEndAt", "종료"]
     ],
-    nowButton: true
+    nowButton: true,
+    stages: ["RECRUITING", "SUBMISSION"]
   },
   {
     title: "피드백",
@@ -87,7 +89,8 @@ const SCHEDULE_GROUPS = [
       ["feedbackStartAt", "시작"],
       ["feedbackEndAt", "종료"]
     ],
-    nowButton: true
+    nowButton: true,
+    stages: ["EVALUATION", "DECISION"]
   },
   {
     title: "공연",
@@ -97,7 +100,8 @@ const SCHEDULE_GROUPS = [
       ["startAt", "시작"],
       ["endAt", "종료"]
     ],
-    nowButton: false
+    nowButton: false,
+    stages: ["LINEUP", "DONE"]
   }
 ] as const
 
@@ -245,53 +249,103 @@ export function PerformanceFormDialog({
               )}
             />
 
-            {SCHEDULE_GROUPS.map((group) => (
-              <section key={group.title} className="space-y-2">
-                <div>
-                  <h3 className="text-sm font-semibold">{group.title}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {group.description}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {group.fields.map(([name, label]) => (
-                    <FormField
-                      key={name}
-                      control={form.control}
-                      name={name}
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center justify-between">
-                            <FormLabel>{label}</FormLabel>
-                            {group.nowButton && (
-                              <Button
-                                type="button"
-                                variant="link"
-                                size="sm"
-                                className="h-auto p-0 text-xs"
-                                onClick={() =>
-                                  field.onChange(toDatetimeLocal(new Date()))
-                                }
-                              >
-                                지금으로
-                              </Button>
-                            )}
-                          </div>
-                          <FormControl>
-                            <Input
-                              type="datetime-local"
-                              {...field}
-                              value={field.value ?? ""}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+            {/* 일정은 위에서 아래로 차례대로 지나간다 — 지금 저장하면 해당하는 단계에 색 */}
+            <ol>
+              {SCHEDULE_GROUPS.map((group, i) => {
+                const current = (group.stages as readonly string[]).includes(
+                  previewStage
+                )
+                return (
+                  <li
+                    key={group.title}
+                    className="relative pb-5 pl-9 last:pb-0"
+                  >
+                    {i < SCHEDULE_GROUPS.length - 1 && (
+                      <span
+                        aria-hidden
+                        className="absolute bottom-0 left-3 top-7 w-px bg-border"
+                      />
+                    )}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "absolute left-0 top-0 flex size-6 items-center justify-center rounded-full border text-xs font-semibold",
+                        current
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "bg-background text-muted-foreground"
                       )}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+                    >
+                      {i + 1}
+                    </span>
+                    <section className="space-y-2">
+                      <div>
+                        <h3 className="text-sm font-semibold">{group.title}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {group.description}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {group.fields.map(([name, label]) => (
+                          <FormField
+                            key={name}
+                            control={form.control}
+                            name={name}
+                            render={({ field }) => (
+                              <FormItem>
+                                <div className="flex items-center justify-between">
+                                  <FormLabel>{label}</FormLabel>
+                                  <div className="flex gap-2">
+                                    {name === "feedbackStartAt" && (
+                                      <Button
+                                        type="button"
+                                        variant="link"
+                                        size="sm"
+                                        className="h-auto p-0 text-xs"
+                                        onClick={() =>
+                                          field.onChange(
+                                            form.getValues("recruitEndAt") ??
+                                              null
+                                          )
+                                        }
+                                      >
+                                        모집 종료와 같게
+                                      </Button>
+                                    )}
+                                    {group.nowButton && (
+                                      <Button
+                                        type="button"
+                                        variant="link"
+                                        size="sm"
+                                        className="h-auto p-0 text-xs"
+                                        onClick={() =>
+                                          field.onChange(
+                                            toDatetimeLocal(new Date())
+                                          )
+                                        }
+                                      >
+                                        지금으로
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                                <FormControl>
+                                  <Input
+                                    type="datetime-local"
+                                    {...field}
+                                    value={field.value ?? ""}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  </li>
+                )
+              })}
+            </ol>
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
