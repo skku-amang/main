@@ -57,7 +57,7 @@
 
 팀이 피드백용으로 제출한 **음원·영상 파일**. **곡과 구분 필요** — 곡은 추상적 음악, 녹음본은 그 곡을 팀이 연주한 결과물 파일.
 
-- 데이터 (계획): MinIO `recordingFileKey`. 기존 운영은 `Team.songYoutubeVideoUrl`로 표현 (마이그레이션 대상).
+- 데이터 (계획): `Team.recordingUrl` — MinIO 공개 URL, 음원만. 기존 `Team.songYoutubeVideoUrl`은 피드백과 무관한 별개 필드로 유지.
 - 시점: SUBMISSION 단계에 업로드
 - 의미: **피드백의 직접 대상물**
 
@@ -86,9 +86,9 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
   - 화면 위에 떠 있는 의견 버튼 (`SuggestionButton`, 드래그로 이동): Sentry 기본 폼, 스크린샷 첨부 가능
 - ⚠️ "피드백"이라 부르지 않는다 — 피드백은 녹음본 피드백 시스템 전용 어휘. 코드 식별자도 `suggestion` 사용
 
-### 공연 라이프사이클 6단계
+### 공연 라이프사이클 7단계
 
-`PREPARING → RECRUITING → SUBMISSION → EVALUATION 🔒 → DECISION → DONE`. EVALUATION 진입 시 팀 구성·곡 메타·녹음본 모두 freeze.
+`PREPARING → RECRUITING → SUBMISSION 🔒팀 → EVALUATION 🔒전부 → DECISION → LINEUP → DONE`. 단계는 저장하지 않고 공연의 날짜 필드에서 계산한다. SUBMISSION(모집 종료) 진입 시 팀 구성이, EVALUATION 진입 시 곡 메타·녹음본까지 freeze. LINEUP = 결과 공개 + 셋리스트 구성. 상세: [피드백 시스템 설계](../explanation/design/feedback-system-design.md#4-공연-단계).
 
 > 코드 식별자(`EVALUATION` 등)는 영문 enum 유지. 한국어 본문은 "피드백 단계" 등 풀어서 사용.
 
@@ -123,5 +123,6 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
 
 ## 변경 이력
 
+- **2026-10-30**: 공연 라이프사이클 6→7단계(`LINEUP` 추가), 단계는 날짜에서 계산, 녹음본 필드 `recordingUrl` ([피드백 시스템 설계](../explanation/design/feedback-system-design.md)).
 - **2026-10-14**: "의견 보내기(Suggestion)" 추가 — 개발자 소통 창구를 피드백 시스템과 어휘 분리 ([#692](https://github.com/skku-amang/main/issues/692)).
 - **2026-05-05**: 본 파일 신설. 피드백 시스템 도메인 추가 (곡/녹음본/피드백/피드백 작성자/Pay-to-vote/공연 라이프사이클). 회장·기장 명확 분리.
