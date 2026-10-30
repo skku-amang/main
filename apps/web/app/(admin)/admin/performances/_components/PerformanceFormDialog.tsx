@@ -293,7 +293,12 @@ export function PerformanceFormDialog({
                             render={({ field }) => (
                               <FormItem>
                                 <div className="flex items-center justify-between">
-                                  <FormLabel>{label}</FormLabel>
+                                  <FormLabel>
+                                    <span className="sr-only">
+                                      {group.title}{" "}
+                                    </span>
+                                    {label}
+                                  </FormLabel>
                                   <div className="flex gap-2">
                                     {name === "feedbackStartAt" && (
                                       <Button

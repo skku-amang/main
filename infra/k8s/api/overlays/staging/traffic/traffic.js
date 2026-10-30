@@ -281,6 +281,18 @@ function latestPlayground(bot) {
  * 모집 종료가 8주 넘게 남은 공연은 4주로 당긴다(1회, PERFORMANCE_UPDATED) — 시즌 말 D-1 알림이 실제로 오게.
  * 모집 마감은 recruitEndAt이다 (#892). 새 공연은 모집 시작을 넣어야 팀 모집 단계가 된다.
  */
+// 모집 단계가 끝났는지 — API의 getPerformanceStage와 같은 기준 (모집 종료 이후 단계 어느 것이든)
+function recruitmentOver(performance, now) {
+  const reached = (at) => at && new Date(at) <= now;
+  return (
+    Boolean(performance.decidedAt) ||
+    reached(performance.recruitEndAt) ||
+    reached(performance.feedbackStartAt) ||
+    reached(performance.feedbackEndAt) ||
+    reached(performance.endAt)
+  );
+}
+
 function currentSeason(bot1, teams, daytime) {
   const performance = latestPlayground(bot1);
   if (!bot1.me.isAdmin || !daytime) return performance;
@@ -288,9 +300,7 @@ function currentSeason(bot1, teams, daytime) {
   const teamCount = performance
     ? teams.filter((t) => t.performanceId === performance.id).length
     : 0;
-  const closed =
-    !performance ||
-    (performance.recruitEndAt && new Date(performance.recruitEndAt) <= now);
+  const closed = !performance || recruitmentOver(performance, now);
 
   if (closed || teamCount >= SEASON_TEAM_CAP) {
     let created;
@@ -738,8 +748,7 @@ function run() {
     performance &&
     performance.recruitStartAt &&
     new Date(performance.recruitStartAt) <= new Date() &&
-    (!performance.recruitEndAt ||
-      new Date(performance.recruitEndAt) > new Date());
+    !recruitmentOver(performance, new Date());
   teams = data(bot1.get("/teams")) ?? [];
 
   const equipments = data(bot1.get("/equipments")) ?? [];
