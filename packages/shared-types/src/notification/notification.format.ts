@@ -155,7 +155,7 @@ export function formatNotification(
       const p = item.payload
       return {
         title: "새 공연",
-        body: `${p.performanceName} 공연이 등록됐습니다`,
+        body: `새 공연이 등록됐습니다: ${p.performanceName}`,
         href: `/performances/${p.performanceId}/teams`
       }
     }

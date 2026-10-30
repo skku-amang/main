@@ -60,6 +60,10 @@ export const validatePerformanceSchedule = (
     if (cur.at < prev.at)
       return `${cur.label} 일시는 ${prev.label} 일시보다 이후여야 합니다.`
   }
+  // 공연 종료가 지나면 무조건 종료 단계라, 그 뒤의 일정은 영영 오지 않는다
+  const last = filled.at(-1)
+  if (d.endAt && last && last.at > d.endAt)
+    return `${last.label} 일시는 공연 종료 일시보다 이전이어야 합니다.`
   return null
 }
 

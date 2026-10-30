@@ -184,6 +184,26 @@ describe("validatePerformanceSchedule", () => {
     ).toBe("피드백 종료 일시는 모집 시작 일시보다 이후여야 합니다.")
   })
 
+  it("일정이 공연 종료보다 뒤면 거부", () => {
+    expect(
+      validatePerformanceSchedule({
+        recruitStartAt: d("2026-10-01"),
+        feedbackEndAt: d("2026-11-05"),
+        endAt: d("2026-11-01")
+      })
+    ).toBe("피드백 종료 일시는 공연 종료 일시보다 이전이어야 합니다.")
+  })
+
+  it("모집 종료가 공연 종료와 같으면 허용 (옛 공연 백필)", () => {
+    expect(
+      validatePerformanceSchedule({
+        recruitStartAt: d("2026-10-01"),
+        recruitEndAt: d("2026-11-01"),
+        endAt: d("2026-11-01")
+      })
+    ).toBeNull()
+  })
+
   it("공연 종료가 시작보다 앞이면 기존 메시지", () => {
     expect(
       validatePerformanceSchedule({

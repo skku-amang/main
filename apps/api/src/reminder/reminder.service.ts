@@ -36,6 +36,9 @@ export class ReminderService {
       where: {
         Performance: {
           recruitEndAt: { gt: kstDayStart(now, 1), lte: kstDayStart(now, 2) },
+          // 지금 팀 모집 중인 공연만 (모집 시작 전·확정 뒤 제외)
+          recruitStartAt: { lte: now },
+          decidedAt: null,
           OR: [{ endAt: null }, { endAt: { gt: now } }]
         }
       },

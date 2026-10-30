@@ -17,7 +17,12 @@ const minutes = (m: number) => new Date(NOW.getTime() + m * 60_000)
 type Range = { gt: Date; lte: Date }
 type StoredTeam = {
   id: number
-  performance: { recruitEndAt: Date | null; endAt?: Date | null }
+  performance: {
+    recruitEndAt: Date | null
+    endAt?: Date | null
+    recruitStartAt?: Date | null
+    decidedAt?: Date | null
+  }
   teamSessions: { capacity: number; members: { userId: number }[] }[]
 }
 type StoredRental = {
@@ -70,17 +75,29 @@ describe("ReminderService", () => {
             where: {
               Performance: {
                 recruitEndAt: Range
+                recruitStartAt: { lte: Date }
+                decidedAt: null
                 OR: [{ endAt: null }, { endAt: { gt: Date } }]
               }
             }
           }) =>
             teams.filter((t) => {
-              const { recruitEndAt, endAt = null } = t.performance
+              const {
+                recruitEndAt,
+                endAt = null,
+                recruitStartAt = new Date(0),
+                decidedAt = null
+              } = t.performance
               const notOver =
                 endAt === null || endAt > where.Performance.OR[1].endAt.gt
+              const started =
+                recruitStartAt !== null &&
+                recruitStartAt <= where.Performance.recruitStartAt.lte
               return (
                 recruitEndAt !== null &&
                 inRange(recruitEndAt, where.Performance.recruitEndAt) &&
+                started &&
+                decidedAt === where.Performance.decidedAt &&
                 notOver
               )
             })
@@ -160,6 +177,23 @@ describe("ReminderService", () => {
         REMINDER_EVENTS.TEAM_RECRUITMENT_DEADLINE,
         new TeamRecruitmentDeadlineEvent(1)
       )
+    })
+
+    it("모집이 아직 시작되지 않은 공연은 보내지 않는다", async () => {
+      teams = [
+        {
+          id: 1,
+          performance: {
+            recruitEndAt: TOMORROW_KST,
+            recruitStartAt: new Date("2026-10-17T00:00:00Z")
+          },
+          teamSessions: incomplete
+        }
+      ]
+
+      await service.remindRecruitmentDeadline(NOW)
+
+      expect(emitted(REMINDER_EVENTS.TEAM_RECRUITMENT_DEADLINE)).toEqual([])
     })
 
     it("공연이 이미 끝났으면 모집 종료가 내일이어도 보내지 않는다", async () => {

@@ -161,7 +161,7 @@ export function PerformanceFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-lg"
+        className="max-h-[90dvh] max-w-lg overflow-y-auto"
         // 입력 창 — 바깥을 잘못 눌러 입력이 사라지지 않게. 닫기는 [취소]·Esc
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
@@ -324,7 +324,7 @@ export function PerformanceFormDialog({
                       <Input
                         type="number"
                         min={0}
-                        step={0.1}
+                        step="any"
                         placeholder="0"
                         {...field}
                         value={field.value ?? ""}
