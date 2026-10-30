@@ -17,7 +17,7 @@ const minutes = (m: number) => new Date(NOW.getTime() + m * 60_000)
 type Range = { gt: Date; lte: Date }
 type StoredTeam = {
   id: number
-  performance: { endAt: Date | null }
+  performance: { recruitEndAt: Date | null; endAt?: Date | null }
   teamSessions: { capacity: number; members: { userId: number }[] }[]
 }
 type StoredRental = {
@@ -64,10 +64,25 @@ describe("ReminderService", () => {
     const prisma = {
       team: {
         findMany: jest.fn(
-          async ({ where }: { where: { Performance: { endAt: Range } } }) =>
+          async ({
+            where
+          }: {
+            where: {
+              Performance: {
+                recruitEndAt: Range
+                OR: [{ endAt: null }, { endAt: { gt: Date } }]
+              }
+            }
+          }) =>
             teams.filter((t) => {
-              const endAt = t.performance.endAt
-              return endAt !== null && inRange(endAt, where.Performance.endAt)
+              const { recruitEndAt, endAt = null } = t.performance
+              const notOver =
+                endAt === null || endAt > where.Performance.OR[1].endAt.gt
+              return (
+                recruitEndAt !== null &&
+                inRange(recruitEndAt, where.Performance.recruitEndAt) &&
+                notOver
+              )
             })
         )
       },
@@ -128,10 +143,14 @@ describe("ReminderService", () => {
       teams = [
         {
           id: 1,
-          performance: { endAt: TOMORROW_KST },
+          performance: { recruitEndAt: TOMORROW_KST },
           teamSessions: incomplete
         },
-        { id: 2, performance: { endAt: TOMORROW_KST }, teamSessions: full }
+        {
+          id: 2,
+          performance: { recruitEndAt: TOMORROW_KST },
+          teamSessions: full
+        }
       ]
 
       await expect(service.remindRecruitmentDeadline(NOW)).resolves.toBe(1)
@@ -143,38 +162,59 @@ describe("ReminderService", () => {
       )
     })
 
+    it("공연이 이미 끝났으면 모집 종료가 내일이어도 보내지 않는다", async () => {
+      teams = [
+        {
+          id: 1,
+          performance: {
+            recruitEndAt: TOMORROW_KST,
+            endAt: new Date("2026-10-15T12:00:00Z")
+          },
+          teamSessions: incomplete
+        }
+      ]
+
+      await service.remindRecruitmentDeadline(NOW)
+
+      expect(emitted(REMINDER_EVENTS.TEAM_RECRUITMENT_DEADLINE)).toEqual([])
+    })
+
     it("'내일'은 한국 날짜 기준이다", async () => {
       teams = [
         // 10-17 23:30 KST — 내일
         {
           id: 1,
-          performance: { endAt: new Date("2026-10-17T14:30:00Z") },
+          performance: { recruitEndAt: new Date("2026-10-17T14:30:00Z") },
           teamSessions: incomplete
         },
         // 10-18 00:30 KST — 모레
         {
           id: 2,
-          performance: { endAt: new Date("2026-10-17T15:30:00Z") },
+          performance: { recruitEndAt: new Date("2026-10-17T15:30:00Z") },
           teamSessions: incomplete
         },
         // 오늘
         {
           id: 3,
-          performance: { endAt: new Date("2026-10-16T14:55:00Z") },
+          performance: { recruitEndAt: new Date("2026-10-16T14:55:00Z") },
           teamSessions: incomplete
         },
         // 마감 없음
-        { id: 4, performance: { endAt: null }, teamSessions: incomplete },
+        {
+          id: 4,
+          performance: { recruitEndAt: null },
+          teamSessions: incomplete
+        },
         // 10-18 00:00 KST 정각 — 마지막 지원 가능 순간이 10-17이라 "내일 마감"
         {
           id: 5,
-          performance: { endAt: new Date("2026-10-17T15:00:00Z") },
+          performance: { recruitEndAt: new Date("2026-10-17T15:00:00Z") },
           teamSessions: incomplete
         },
         // 10-17 00:00 KST 정각 — 오늘 안에 닫힘
         {
           id: 6,
-          performance: { endAt: new Date("2026-10-16T15:00:00Z") },
+          performance: { recruitEndAt: new Date("2026-10-16T15:00:00Z") },
           teamSessions: incomplete
         }
       ]
@@ -188,12 +228,12 @@ describe("ReminderService", () => {
       teams = [
         {
           id: 1,
-          performance: { endAt: TOMORROW_KST },
+          performance: { recruitEndAt: TOMORROW_KST },
           teamSessions: incomplete
         },
         {
           id: 2,
-          performance: { endAt: TOMORROW_KST },
+          performance: { recruitEndAt: TOMORROW_KST },
           teamSessions: incomplete
         }
       ]
@@ -227,7 +267,11 @@ describe("ReminderService", () => {
 
     it("보낼 팀이 없으면 알림 조회조차 하지 않는다", async () => {
       teams = [
-        { id: 2, performance: { endAt: TOMORROW_KST }, teamSessions: full }
+        {
+          id: 2,
+          performance: { recruitEndAt: TOMORROW_KST },
+          teamSessions: full
+        }
       ]
 
       await expect(service.remindRecruitmentDeadline(NOW)).resolves.toBe(0)
