@@ -67,12 +67,38 @@ export const toPerformancePayload = (data: AdminPerformanceForm) => ({
     : 0
 })
 
-// 진행 단계를 정하는 일정 — 순서대로 표시
-const SCHEDULE_FIELDS = [
-  ["recruitStartAt", "모집 시작"],
-  ["recruitEndAt", "모집 종료"],
-  ["feedbackStartAt", "피드백 시작 (녹음본 마감)"],
-  ["feedbackEndAt", "피드백 종료"]
+// 일정은 실제 진행 순서(모집 → 피드백 → 공연)대로 묶어 보여준다
+const SCHEDULE_GROUPS = [
+  {
+    title: "팀 모집",
+    description:
+      "팀 만들기·지원·탈퇴와 팀원·정원·팀장 변경은 이 기간에만 됩니다. 곡 정보·사진·설명·녹음본은 모집이 끝나도 피드백 시작 전까지 바꿀 수 있어요.",
+    fields: [
+      ["recruitStartAt", "시작"],
+      ["recruitEndAt", "종료"]
+    ],
+    nowButton: true
+  },
+  {
+    title: "피드백",
+    description:
+      "부원끼리 녹음본에 피드백하는 기간입니다. 시작 시각이 녹음본 마감이고, 이때부터 팀 수정이 잠기고 팀원이 가려집니다.",
+    fields: [
+      ["feedbackStartAt", "시작"],
+      ["feedbackEndAt", "종료"]
+    ],
+    nowButton: true
+  },
+  {
+    title: "공연",
+    description:
+      "실제 공연 일시입니다. 종료 일시가 지나면 '종료' 단계가 되므로, 위 일정은 모두 공연 종료 전이어야 합니다.",
+    fields: [
+      ["startAt", "시작"],
+      ["endAt", "종료"]
+    ],
+    nowButton: false
+  }
 ] as const
 
 const emptyForm: AdminPerformanceForm = {
@@ -219,79 +245,53 @@ export function PerformanceFormDialog({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startAt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>시작일시</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="datetime-local"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="endAt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>종료일시</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="datetime-local"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {SCHEDULE_FIELDS.map(([name, label]) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel>{label}</FormLabel>
-                        <Button
-                          type="button"
-                          variant="link"
-                          size="sm"
-                          className="h-auto p-0 text-xs"
-                          onClick={() =>
-                            field.onChange(toDatetimeLocal(new Date()))
-                          }
-                        >
-                          지금으로
-                        </Button>
-                      </div>
-                      <FormControl>
-                        <Input
-                          type="datetime-local"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
+            {SCHEDULE_GROUPS.map((group) => (
+              <section key={group.title} className="space-y-2">
+                <div>
+                  <h3 className="text-sm font-semibold">{group.title}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {group.description}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {group.fields.map(([name, label]) => (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>{label}</FormLabel>
+                            {group.nowButton && (
+                              <Button
+                                type="button"
+                                variant="link"
+                                size="sm"
+                                className="h-auto p-0 text-xs"
+                                onClick={() =>
+                                  field.onChange(toDatetimeLocal(new Date()))
+                                }
+                              >
+                                지금으로
+                              </Button>
+                            )}
+                          </div>
+                          <FormControl>
+                            <Input
+                              type="datetime-local"
+                              {...field}
+                              value={field.value ?? ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
