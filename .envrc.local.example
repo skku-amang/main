@@ -17,3 +17,17 @@ export SENTRY_ACCESS_TOKEN=sntryu_xxx
 # TODO: 추후 MCP 전용 Service Account 분리 (현재는 개인 토큰 사용)
 export GRAFANA_URL=https://grafana.json-server.win
 export GRAFANA_SERVICE_ACCOUNT_TOKEN=glsa_xxx
+
+# ArgoCD ai-agent (보기 + sync). 토큰 발급: homelab k8s/argocd/README.md "AI account token"
+# --config: ~/.config/argocd/config가 있으면 env 토큰이 무시되므로 없는 경로를 지정
+export ARGOCD_SERVER=argocd.json-server.win
+export ARGOCD_AUTH_TOKEN=
+export ARGOCD_OPTS="--grpc-web --config $HOME/.config/argocd/ai-agent.none"
+
+# Kargo ai-agent (보기 + 승격). 토큰: infra/kargo/ai-agent.yaml의 Secret을 쿠버네티스가 채움
+# kubectl --context json -n amang get secret ai-agent-token -o jsonpath='{.data.token}' | base64 -d
+# 두 변수가 있으면 CLI가 ~/.config/kargo/config를 읽지 않는다
+#  - 기본 프로젝트(kargo config set-project)도 무시 → 프로젝트 범위 명령(get stages, promote 등)에 --project amang
+#  - 사람이 SSO 권한으로 쓸 때는 unset KARGO_API_ADDRESS KARGO_API_TOKEN 후 실행
+export KARGO_API_ADDRESS=https://kargo.json-server.win
+export KARGO_API_TOKEN=
