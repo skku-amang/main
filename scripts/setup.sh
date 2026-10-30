@@ -149,7 +149,7 @@ if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
   read -r REPLY
   if [[ -z "$REPLY" || "$REPLY" =~ ^[Yy]$ ]]; then
     info "MCP 서버 패키지 글로벌 설치 중..."
-    pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack mcp-server-kubernetes @modelcontextprotocol/server-postgres 2>/dev/null \
+    pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack 2>/dev/null \
       && ok "MCP 서버 패키지 설치 완료" \
       || warn "MCP 서버 패키지 설치 실패 — 수동 설치가 필요합니다"
     info "Figma MCP는 공식 리모트 서버(mcp.figma.com)를 사용합니다. 첫 연결 시 브라우저에서 OAuth 로그인이 필요합니다."
