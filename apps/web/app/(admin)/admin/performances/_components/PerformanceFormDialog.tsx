@@ -24,7 +24,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Performance } from "@repo/shared-types"
+import {
+  getPerformanceStage,
+  Performance,
+  PERFORMANCE_STAGE_LABEL
+} from "@repo/shared-types"
 
 // Admin용 간소화 스키마 (posterImage 파일 업로드 제외)
 const AdminPerformanceSchema = z.object({
@@ -32,19 +36,58 @@ const AdminPerformanceSchema = z.object({
   description: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
   startAt: z.string().nullable().optional(),
-  endAt: z.string().nullable().optional()
+  endAt: z.string().nullable().optional(),
+  recruitStartAt: z.string().nullable().optional(),
+  recruitEndAt: z.string().nullable().optional(),
+  feedbackStartAt: z.string().nullable().optional(),
+  feedbackEndAt: z.string().nullable().optional(),
+  passCount: z.string().nullable().optional(),
+  penaltyPerMissingReview: z.string().nullable().optional()
 })
 
 export type AdminPerformanceForm = z.infer<typeof AdminPerformanceSchema>
 
-// datetime-local string을 Date로 변환
+const toDate = (value: string | null | undefined) =>
+  value ? new Date(value) : null
+
+// datetime-local string을 Date로, 숫자 입력 문자열을 숫자로 변환
 export const toPerformancePayload = (data: AdminPerformanceForm) => ({
   name: data.name,
   description: data.description,
   location: data.location,
-  startAt: data.startAt ? new Date(data.startAt) : null,
-  endAt: data.endAt ? new Date(data.endAt) : null
+  startAt: toDate(data.startAt),
+  endAt: toDate(data.endAt),
+  recruitStartAt: toDate(data.recruitStartAt),
+  recruitEndAt: toDate(data.recruitEndAt),
+  feedbackStartAt: toDate(data.feedbackStartAt),
+  feedbackEndAt: toDate(data.feedbackEndAt),
+  passCount: data.passCount ? Number(data.passCount) : null,
+  penaltyPerMissingReview: data.penaltyPerMissingReview
+    ? Number(data.penaltyPerMissingReview)
+    : 0
 })
+
+// 진행 단계를 정하는 일정 — 순서대로 표시
+const SCHEDULE_FIELDS = [
+  ["recruitStartAt", "모집 시작"],
+  ["recruitEndAt", "모집 종료"],
+  ["feedbackStartAt", "피드백 시작 (녹음본 마감)"],
+  ["feedbackEndAt", "피드백 종료"]
+] as const
+
+const emptyForm: AdminPerformanceForm = {
+  name: "",
+  description: null,
+  location: null,
+  startAt: null,
+  endAt: null,
+  recruitStartAt: null,
+  recruitEndAt: null,
+  feedbackStartAt: null,
+  feedbackEndAt: null,
+  passCount: null,
+  penaltyPerMissingReview: null
+}
 
 interface PerformanceFormDialogProps {
   open: boolean
@@ -72,13 +115,7 @@ export function PerformanceFormDialog({
 
   const form = useForm<AdminPerformanceForm>({
     resolver: zodResolver(AdminPerformanceSchema),
-    defaultValues: {
-      name: "",
-      description: null,
-      location: null,
-      startAt: null,
-      endAt: null
-    }
+    defaultValues: emptyForm
   })
 
   useEffect(() => {
@@ -88,16 +125,17 @@ export function PerformanceFormDialog({
         description: editingPerformance.description,
         location: editingPerformance.location,
         startAt: toDatetimeLocal(editingPerformance.startAt),
-        endAt: toDatetimeLocal(editingPerformance.endAt)
+        endAt: toDatetimeLocal(editingPerformance.endAt),
+        recruitStartAt: toDatetimeLocal(editingPerformance.recruitStartAt),
+        recruitEndAt: toDatetimeLocal(editingPerformance.recruitEndAt),
+        feedbackStartAt: toDatetimeLocal(editingPerformance.feedbackStartAt),
+        feedbackEndAt: toDatetimeLocal(editingPerformance.feedbackEndAt),
+        passCount: editingPerformance.passCount?.toString() ?? null,
+        penaltyPerMissingReview:
+          editingPerformance.penaltyPerMissingReview?.toString() ?? null
       })
     } else if (open) {
-      form.reset({
-        name: "",
-        description: null,
-        location: null,
-        startAt: null,
-        endAt: null
-      })
+      form.reset(emptyForm)
     }
   }, [open, editingPerformance, form])
 
@@ -108,6 +146,17 @@ export function PerformanceFormDialog({
       endAt: data.endAt || null
     })
   }
+
+  // 지금 저장하면 어느 단계가 되는지 — 확정 여부는 폼에서 바꾸지 않으므로 편집 중 공연 값
+  const values = form.watch()
+  const previewStage = getPerformanceStage({
+    recruitStartAt: toDate(values.recruitStartAt),
+    recruitEndAt: toDate(values.recruitEndAt),
+    feedbackStartAt: toDate(values.feedbackStartAt),
+    feedbackEndAt: toDate(values.feedbackEndAt),
+    decidedAt: editingPerformance?.decidedAt ?? null,
+    endAt: toDate(values.endAt)
+  })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -207,6 +256,89 @@ export function PerformanceFormDialog({
                 )}
               />
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {SCHEDULE_FIELDS.map(([name, label]) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>{label}</FormLabel>
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          className="h-auto p-0 text-xs"
+                          onClick={() =>
+                            field.onChange(toDatetimeLocal(new Date()))
+                          }
+                        >
+                          지금으로
+                        </Button>
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="datetime-local"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="passCount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>합격 곡 수</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        step={1}
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="penaltyPerMissingReview"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>미참여 1건당 감점</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        placeholder="0"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              지금 저장하면 단계: {PERFORMANCE_STAGE_LABEL[previewStage]}
+            </p>
 
             <DialogFooter>
               <Button
