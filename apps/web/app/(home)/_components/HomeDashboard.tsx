@@ -110,7 +110,8 @@ const RecruitingPerformance = () => {
 
   // /performances/latest/teams와 같은 기준: 가장 최근에 만든 공연
   const latest = performances.reduce((a, b) => (a.id > b.id ? a : b))
-  const deadline = latest.endAt ? dayjs(latest.endAt) : null
+  if (!isPerformanceRecruiting(latest)) return null
+  const deadline = latest.recruitEndAt ? dayjs(latest.recruitEndAt) : null
   const daysLeft = getRecruitDaysLeft(latest)
 
   return (

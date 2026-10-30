@@ -23,6 +23,8 @@ interface MemberSessionCardProps {
   joinedAt: Date | string
 
   onUnapplySuccess: (team: TeamDetail) => void
+  /** 팀 모집 단계에서만 탈퇴 가능 (서버도 409) */
+  canUnapply?: boolean
 }
 
 // TODO: Table으로 변경
@@ -33,7 +35,8 @@ const MemberSessionCard = ({
   sessionIndex,
   user,
   joinedAt,
-  onUnapplySuccess
+  onUnapplySuccess,
+  canUnapply = true
 }: MemberSessionCardProps) => {
   const { user: authUser } = useAuth()
   const queryClient = useQueryClient()
@@ -103,7 +106,7 @@ const MemberSessionCard = ({
         </div>
 
         {/* 탈퇴 버튼 */}
-        {user.id === authUser?.id && (
+        {canUnapply && user.id === authUser?.id && (
           <button
             className="absolute right-0 flex h-6 w-6 justify-center rounded-full bg-destructive "
             onClick={handleUnapply}

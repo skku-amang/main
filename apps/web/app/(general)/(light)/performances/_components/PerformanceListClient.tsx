@@ -83,7 +83,7 @@ const PerformanceSections = ({
 }: {
   performances: NonNullable<ReturnType<typeof usePerformances>["data"]>
 }) => {
-  const { recruiting, past } = splitPerformances(performances)
+  const { recruiting, ongoing, past } = splitPerformances(performances)
 
   if (performances.length === 0) {
     return (
@@ -106,7 +106,26 @@ const PerformanceSections = ({
                 posterSrc={p.image}
                 location={p.location}
                 startAt={p.startAt}
-                endAt={p.endAt}
+                recruitEndAt={p.recruitEndAt}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {ongoing.length > 0 && (
+        <Section title="진행 중">
+          <div className="divide-y divide-slate-100 overflow-hidden rounded-xl bg-white shadow-sm md:grid md:grid-cols-3 md:gap-5 md:divide-y-0 md:overflow-visible md:rounded-none md:bg-transparent md:shadow-none xl:grid-cols-4">
+            {ongoing.map((p) => (
+              <PastPerformanceCard
+                key={p.id}
+                id={p.id}
+                name={p.name}
+                posterSrc={p.image}
+                location={p.location}
+                startAt={p.startAt}
+                recruitEndAt={p.recruitEndAt}
+                schedule={p}
               />
             ))}
           </div>
@@ -124,7 +143,7 @@ const PerformanceSections = ({
                 posterSrc={p.image}
                 location={p.location}
                 startAt={p.startAt}
-                endAt={p.endAt}
+                recruitEndAt={p.recruitEndAt}
               />
             ))}
           </div>

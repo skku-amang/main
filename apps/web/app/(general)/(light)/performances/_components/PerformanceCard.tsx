@@ -8,10 +8,12 @@ import Link from "next/link"
 import { IoLocationSharp } from "react-icons/io5"
 import { LuMusic } from "react-icons/lu"
 
+import PerformanceStageBadge from "@/components/PerformanceStageBadge"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { formatDday, getRecruitDaysLeft } from "@/lib/performance"
 import { cn } from "@/lib/utils"
+import type { PerformanceSchedule } from "@repo/shared-types"
 
 interface PerformanceCardProp {
   id: number
@@ -19,7 +21,9 @@ interface PerformanceCardProp {
   posterSrc: string | null
   location: string | null
   startAt: Date | null
-  endAt: Date | null
+  recruitEndAt: Date | null
+  /** 넘기면 단계 배지를 보여준다 (진행 중 공연) */
+  schedule?: PerformanceSchedule
 }
 
 const formatDate = (date: Date | null) =>
@@ -62,9 +66,9 @@ export const RecruitingPerformanceCard = ({
   posterSrc,
   location,
   startAt,
-  endAt
+  recruitEndAt
 }: PerformanceCardProp) => {
-  const daysLeft = getRecruitDaysLeft({ endAt })
+  const daysLeft = getRecruitDaysLeft({ recruitEndAt })
 
   return (
     <div className="relative overflow-hidden rounded-xl bg-white shadow-sm transition-shadow hover:shadow-lg">
@@ -92,7 +96,7 @@ export const RecruitingPerformanceCard = ({
         </div>
         <p className="text-sm text-slate-500">
           {formatDate(startAt)} 공연
-          {endAt && ` · ${formatDate(endAt)} 모집 마감`}
+          {recruitEndAt && ` · ${formatDate(recruitEndAt)} 모집 마감`}
         </p>
         <Location location={location} />
         <Button asChild className="relative mt-3 w-full md:w-fit">
@@ -112,7 +116,8 @@ export const PastPerformanceCard = ({
   name,
   posterSrc,
   location,
-  startAt
+  startAt,
+  schedule
 }: PerformanceCardProp) => (
   <Link
     href={ROUTES.PERFORMANCE.DETAIL(id)}
@@ -124,7 +129,10 @@ export const PastPerformanceCard = ({
       className="aspect-[3/2] w-24 rounded-md md:w-full md:rounded-none"
     />
     <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:p-4">
-      <h3 className="truncate font-semibold">{name}</h3>
+      <div className="flex min-w-0 items-center gap-2">
+        <h3 className="truncate font-semibold">{name}</h3>
+        {schedule && <PerformanceStageBadge performance={schedule} />}
+      </div>
       <p className="text-sm text-slate-500">{formatDate(startAt)}</p>
       <Location location={location} />
     </div>
