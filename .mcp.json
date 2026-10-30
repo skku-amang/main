@@ -15,10 +15,6 @@
       "command": "direnv",
       "args": ["exec", ".", "mcp-server-kubernetes"]
     },
-    "amang-postgres": {
-      "command": "direnv",
-      "args": ["exec", ".", "sh", "-c", "mcp-server-postgres $DATABASE_URL"]
-    },
     "amang-sentry": {
       "command": "direnv",
       "args": ["exec", ".", "sentry-mcp"]
