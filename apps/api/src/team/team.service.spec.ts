@@ -93,6 +93,7 @@ type StoredSession = {
 describe("TeamService", () => {
   let service: TeamService
   let emit: jest.Mock
+  let findFirstTeam: jest.Mock
   let storedTeam: {
     id: number
     performanceId: number
@@ -119,6 +120,7 @@ describe("TeamService", () => {
           songYoutubeVideoUrl: null
         })),
         create: jest.fn(() => storedTeam),
+        findFirst: (findFirstTeam = jest.fn(() => null)),
         update: jest.fn(),
         delete: jest.fn()
       },
@@ -156,8 +158,10 @@ describe("TeamService", () => {
           provide: ObjectStorageService,
           useValue: {
             deleteObjectSafely: jest.fn(),
-            isOwnObjectUrl: (url: string, folder: string) =>
-              url.startsWith(`https://s3.test/amang/${folder}/`)
+            ownObjectKey: (url: string) =>
+              url.startsWith("https://s3.test/amang/")
+                ? url.slice("https://s3.test/amang/".length)
+                : null
           }
         },
         { provide: EventEmitter2, useValue: { emit } }
@@ -582,7 +586,8 @@ describe("TeamService", () => {
   })
 
   describe("updateRecording", () => {
-    const own = "https://s3.test/amang/recordings/abc.mp3"
+    const own =
+      "https://s3.test/amang/recordings/a70e315b-d6c3-4e8c-8610-9f89f8f734a5.mp3"
 
     it("제출 단계에는 녹음본을 올릴 수 있다", async () => {
       storedTeam.performanceId = SUBMISSION_ID
@@ -607,11 +612,23 @@ describe("TeamService", () => {
 
     it.each([
       "https://evil.example/x.mp3",
-      "https://s3.test/amang/images/a.png"
+      "https://s3.test/amang/images/a.png",
+      "https://s3.test/amang/recordings/../images/a.png",
+      "https://s3.test/amang/recordings/sub/a.mp3"
     ])("우리 recordings/ 주소가 아니면 거부: %s", async (url) => {
       await expect(
         service.updateRecording(storedTeam.id, url)
       ).rejects.toMatchObject({ detail: "녹음본 주소가 올바르지 않습니다." })
+    })
+
+    it("다른 팀이 쓰는 녹음본 주소는 거부", async () => {
+      findFirstTeam.mockReturnValueOnce({ id: 99 })
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).rejects.toMatchObject({
+        detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
+      })
     })
   })
 })

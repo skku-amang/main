@@ -77,9 +77,21 @@ export class ObjectStorageService implements OnModuleInit {
     return { uploadUrl, publicUrl }
   }
 
-  /** 이 저장소의 `folder/` 아래 객체 주소인지 */
-  isOwnObjectUrl(url: string, folder: string) {
-    return url.startsWith(this.generatePublicUrl(`${folder}/`))
+  /**
+   * 이 저장소·버킷의 공개 주소면 객체 키를, 아니면 null.
+   * 정규화하면 달라지는 주소(`..`, `%2e%2e`)·쿼리·해시는 받지 않는다 — 삭제할 때 쓰는 키와 어긋나지 않게
+   */
+  ownObjectKey(url: string): string | null {
+    let parsed: URL
+    try {
+      parsed = new URL(url)
+    } catch {
+      return null
+    }
+    if (parsed.href !== url || parsed.search || parsed.hash) return null
+
+    const base = this.generatePublicUrl("")
+    return url.startsWith(base) ? url.slice(base.length) : null
   }
 
   async deleteObject(url: string) {

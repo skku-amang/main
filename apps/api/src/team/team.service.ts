@@ -44,6 +44,9 @@ import {
   diffRoster
 } from "./team.events"
 
+/** presign이 만드는 녹음본 키 모양 — recordings/<uuid><확장자>, 하위 경로 없음 */
+const RECORDING_KEY = /^recordings\/[0-9a-f-]{36}(\.[A-Za-z0-9]{1,8})?$/
+
 /** 세션·정원·자리 배정을 비교용 문자열로 — 같은 사람이 자리만 옮겨도 구성 변경으로 본다 */
 const rosterSignature = (
   sessions: {
@@ -454,11 +457,18 @@ export class TeamService {
       throw new PerformanceRecruitmentClosedError(
         "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
       )
-    if (
-      recordingUrl &&
-      !this.objectStorageService.isOwnObjectUrl(recordingUrl, "recordings")
-    )
-      throw new ValidationError("녹음본 주소가 올바르지 않습니다.")
+    if (recordingUrl) {
+      const key = this.objectStorageService.ownObjectKey(recordingUrl)
+      if (!key || !RECORDING_KEY.test(key))
+        throw new ValidationError("녹음본 주소가 올바르지 않습니다.")
+      // 남의 녹음본을 가져다 쓰거나, 가져온 뒤 지워서 상대 파일을 없애지 못하게
+      const owner = await this.prisma.team.findFirst({
+        where: { recordingUrl, NOT: { id } },
+        select: { id: true }
+      })
+      if (owner)
+        throw new ValidationError("다른 팀의 녹음본 주소는 쓸 수 없습니다.")
+    }
 
     await this.prisma.team.update({ where: { id }, data: { recordingUrl } })
     if (team.recordingUrl && team.recordingUrl !== recordingUrl)
