@@ -48,7 +48,7 @@ const UserEditSchema = z.object({
     .url({ message: "유효한 이미지 주소(URL)를 입력해 주세요." })
     .nullable()
     .optional(),
-  generationId: z.number({ invalid_type_error: "기수를 선택해주세요." }).int(),
+  generationId: z.number({ error: "기수를 선택해주세요." }).int(),
   sessions: z
     .array(z.number().int())
     .min(1, "최소 하나의 세션을 선택해야 합니다.")

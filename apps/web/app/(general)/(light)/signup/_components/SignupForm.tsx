@@ -117,13 +117,12 @@ const SignupForm = () => {
           label="이름"
           placeholder="김아망"
           description={
-            confirmPasswordMergedCreateUserSchema._def.schema.shape.name
-              .description
+            confirmPasswordMergedCreateUserSchema.shape.name.description
           }
           required={
             !(
-              confirmPasswordMergedCreateUserSchema._def.schema.shape
-                .name instanceof z.ZodOptional
+              confirmPasswordMergedCreateUserSchema.shape.name instanceof
+              z.ZodOptional
             )
           }
         />
@@ -133,13 +132,12 @@ const SignupForm = () => {
           label="닉네임"
           placeholder="베이스 !== 기타"
           description={
-            confirmPasswordMergedCreateUserSchema._def.schema.shape.nickname
-              .description
+            confirmPasswordMergedCreateUserSchema.shape.nickname.description
           }
           required={
             !(
-              confirmPasswordMergedCreateUserSchema._def.schema.shape
-                .nickname instanceof z.ZodOptional
+              confirmPasswordMergedCreateUserSchema.shape.nickname instanceof
+              z.ZodOptional
             )
           }
         />
@@ -149,13 +147,12 @@ const SignupForm = () => {
           label="이메일"
           placeholder="example@g.skku.edu"
           description={
-            confirmPasswordMergedCreateUserSchema._def.schema.shape.email
-              .description
+            confirmPasswordMergedCreateUserSchema.shape.email.description
           }
           required={
             !(
-              confirmPasswordMergedCreateUserSchema._def.schema.shape
-                .email instanceof z.ZodOptional
+              confirmPasswordMergedCreateUserSchema.shape.email instanceof
+              z.ZodOptional
             )
           }
         />
@@ -165,13 +162,12 @@ const SignupForm = () => {
           label="비밀번호"
           placeholder="비밀번호"
           description={
-            confirmPasswordMergedCreateUserSchema._def.schema.shape.password
-              .description
+            confirmPasswordMergedCreateUserSchema.shape.password.description
           }
           required={
             !(
-              confirmPasswordMergedCreateUserSchema._def.schema.shape
-                .password instanceof z.ZodOptional
+              confirmPasswordMergedCreateUserSchema.shape.password instanceof
+              z.ZodOptional
             )
           }
           inputType="password"
@@ -182,12 +178,11 @@ const SignupForm = () => {
           label="비밀번호 확인"
           placeholder="비밀번호 확인"
           description={
-            confirmPasswordMergedCreateUserSchema._def.schema.shape.password
-              .description
+            confirmPasswordMergedCreateUserSchema.shape.password.description
           }
           required={
             !(
-              confirmPasswordMergedCreateUserSchema._def.schema.shape
+              confirmPasswordMergedCreateUserSchema.shape
                 .confirmPassword instanceof z.ZodOptional
             )
           }
@@ -203,7 +198,7 @@ const SignupForm = () => {
                 <SimpleLabel
                   required={
                     !(
-                      confirmPasswordMergedCreateUserSchema._def.schema.shape
+                      confirmPasswordMergedCreateUserSchema.shape
                         .generationId instanceof z.ZodOptional
                     )
                   }
@@ -249,7 +244,7 @@ const SignupForm = () => {
                 <SimpleLabel
                   required={
                     !(
-                      confirmPasswordMergedCreateUserSchema._def.schema.shape
+                      confirmPasswordMergedCreateUserSchema.shape
                         .sessions instanceof z.ZodOptional
                     )
                   }

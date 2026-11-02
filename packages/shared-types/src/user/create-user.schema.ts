@@ -24,7 +24,7 @@ export const CreateUserSchema = z
     name: safeString({ max: 50, message: "이름은 비워둘 수 없습니다." }),
     nickname: safeString({ max: 30, message: "닉네임은 비워둘 수 없습니다." }),
     generationId: z
-      .number({ invalid_type_error: "기수 ID는 숫자여야 합니다." })
+      .number({ error: "기수 ID는 숫자여야 합니다." })
       .int("기수 ID는 정수여야 합니다."),
     sessions: z
       .array(z.number().int("세션 ID는 정수여야 합니다."))

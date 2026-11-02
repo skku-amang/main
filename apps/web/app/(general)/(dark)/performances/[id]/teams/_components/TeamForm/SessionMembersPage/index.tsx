@@ -1,5 +1,5 @@
 import { CircleAlert, Plus, X } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
 import MemberPicker from "@/components/MemberPicker"
@@ -16,7 +16,11 @@ type SessionForm = z.infer<typeof memberSessionRequiredBaseSchema>
 type SlotKey = keyof SessionForm
 
 interface SessionMembersPageProps {
-  form: ReturnType<typeof useForm<SessionForm>>
+  form: UseFormReturn<
+    z.input<typeof memberSessionRequiredBaseSchema>,
+    unknown,
+    SessionForm
+  >
   onValid: (formData: SessionForm) => void
   onPrevious: () => void
 }
@@ -37,7 +41,8 @@ const SessionMembersPage = ({
   onPrevious
 }: SessionMembersPageProps) => {
   const { data: users } = useUsers()
-  const values = form.watch()
+  // defaultValues가 모든 자리를 채우므로 .default() 때문에 optional인 입력 타입과 달리 값은 항상 완전하다
+  const values = form.watch() as SessionForm
   const groups = groupSlotsBySession(values)
   const isActive = (key: SlotKey) => values[key].required
 

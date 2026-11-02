@@ -8,18 +8,20 @@ import { z } from "zod"
 export const CreateSessionSchema = z
   .object({
     name: z.nativeEnum(SessionName, {
-      required_error: "세션 이름은 필수 항목입니다.",
-      invalid_type_error: "세션 이름은 유효한 값이어야 합니다."
+      error: (issue) =>
+        issue.input === undefined
+          ? "세션 이름은 필수 항목입니다."
+          : "세션 이름은 유효한 값이어야 합니다."
     }),
     icon: z
-      .string({ invalid_type_error: "아이콘은 문자열이어야 합니다." })
+      .string({ error: "아이콘은 문자열이어야 합니다." })
       .url({
         message: "아이콘은 유효한 URL이어야 합니다."
       })
       .optional(),
 
     leaderId: z
-      .number({ invalid_type_error: "세션장 ID는 숫자여야 합니다." })
+      .number({ error: "세션장 ID는 숫자여야 합니다." })
       .int("세션장 ID는 정수여야 합니다.")
       .optional()
   })
