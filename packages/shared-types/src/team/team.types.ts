@@ -3,6 +3,9 @@ import { basicUserSelector, publicUserSelector } from "../user/user.types"
 
 export type { Team }
 
+/** 피드백 기간에 가린 팀장·멤버 자리에 들어가는 사용자 id (실제 사용자 아님) */
+export const HIDDEN_USER_ID = 0
+
 export const teamWithBasicUsersInclude = {
   leader: {
     select: basicUserSelector
@@ -53,5 +56,6 @@ type TeamWithPublicUsers = Prisma.TeamGetPayload<{
   include: typeof teamWithPublicUsersInclude
 }>
 
-export type TeamList = TeamWithBasicUsers[]
-export type TeamDetail = TeamWithPublicUsers
+/** membersHidden: 피드백 기간이라 팀장·멤버가 HIDDEN_USER_ID 자리표시로 바뀐 응답 */
+export type TeamList = (TeamWithBasicUsers & { membersHidden?: boolean })[]
+export type TeamDetail = TeamWithPublicUsers & { membersHidden?: boolean }

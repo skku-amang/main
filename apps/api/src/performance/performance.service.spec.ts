@@ -39,12 +39,14 @@ describe("PerformanceService", () => {
             performance: {
               create: jest.fn(async () => ({ id: 3 })),
               findUnique: jest.fn(async () => existing),
+              findMany: jest.fn(async () => [{ ...existing, decidedAt: null }]),
               findAll: jest.fn(),
               findTeamsByPerformanceId: jest.fn(),
               findOne: jest.fn(),
               update: jest.fn(),
               delete: jest.fn()
-            }
+            },
+            user: { findUnique: jest.fn(async () => ({ isAdmin: false })) }
           }
         },
         {
@@ -72,6 +74,43 @@ describe("PerformanceService", () => {
       PERFORMANCE_EVENTS.CREATED,
       new PerformanceCreatedEvent(3, 42)
     )
+  })
+
+  describe("피드백 기간 팀원 가림", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const decisionStage = {
+      ...existing,
+      startAt: new Date(Date.now() + 10 * DAY),
+      endAt: new Date(Date.now() + 11 * DAY),
+      recruitStartAt: new Date(Date.now() - 10 * DAY),
+      recruitEndAt: new Date(Date.now() - 8 * DAY),
+      feedbackStartAt: new Date(Date.now() - 5 * DAY),
+      feedbackEndAt: new Date(Date.now() - 1 * DAY),
+      decidedAt: null,
+      teams: [
+        {
+          id: 1,
+          performanceId: 3,
+          leaderId: 9,
+          leader: { id: 9, name: "팀장" },
+          teamSessions: []
+        }
+      ]
+    }
+
+    it("집계 단계 공연의 팀 목록과 상세의 팀장을 가린다", async () => {
+      const prismaMock = prisma as unknown as {
+        performance: { findUnique: jest.Mock; findMany: jest.Mock }
+      }
+      prismaMock.performance.findUnique.mockResolvedValue(decisionStage)
+      prismaMock.performance.findMany.mockResolvedValue([decisionStage])
+
+      const teams = await service.findTeamsByPerformanceId(3, 5)
+      const detail = await service.findOne(3, undefined)
+
+      expect(teams[0]?.leader.name).toBe("비공개")
+      expect(detail.teams[0]?.leader.name).toBe("비공개")
+    })
   })
 
   describe("공연 변경 이벤트", () => {

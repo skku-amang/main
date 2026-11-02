@@ -3,10 +3,33 @@ import { Prisma } from "@repo/database"
 
 type ProfileRow = Prisma.UserGetPayload<{ select: typeof memberProfileSelect }>
 
-const performance = (id: number, startAt: string) => ({
+const noDates: Record<
+  | "recruitStartAt"
+  | "recruitEndAt"
+  | "feedbackStartAt"
+  | "feedbackEndAt"
+  | "decidedAt"
+  | "endAt",
+  Date | null
+> = {
+  recruitStartAt: null,
+  recruitEndAt: null,
+  feedbackStartAt: null,
+  feedbackEndAt: null,
+  decidedAt: null,
+  endAt: null
+}
+const performance = (
+  id: number,
+  startAt: string,
+  schedule: Partial<typeof noDates> = {}
+) => ({
   id,
   name: `공연${id}`,
-  startAt: new Date(startAt)
+  startAt: new Date(startAt),
+  ...noDates,
+  endAt: new Date(startAt),
+  ...schedule
 })
 const team = (id: number, perf: ReturnType<typeof performance>) => ({
   id,
@@ -80,6 +103,26 @@ describe("toMemberProfile", () => {
         performance: "공연2"
       },
       { id: 10, isLeader: true, sessions: ["DRUM"], performance: "공연1" }
+    ])
+  })
+
+  it("피드백 단계 공연의 팀은 프로필 팀 목록에서 빠지고 일정은 응답에 없다", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const evaluating = performance(3, "2027-01-01", {
+      feedbackStartAt: new Date(Date.now() - DAY),
+      feedbackEndAt: new Date(Date.now() + DAY)
+    })
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(10, spring), team(30, evaluating)] }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([20, 10])
+    expect(Object.keys(profile.teams[1]?.performance ?? {}).sort()).toEqual([
+      "id",
+      "name",
+      "startAt"
     ])
   })
 })

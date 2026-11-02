@@ -44,14 +44,19 @@ export class PerformanceController {
 
   @Get(":id/teams")
   @Public()
-  findTeamsByPerformanceId(@Param("id", ParseIntPipe) id: number) {
-    return this.performanceService.findTeamsByPerformanceId(id)
+  findTeamsByPerformanceId(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request
+  ) {
+    const user = req.user as JwtPayload | undefined
+    return this.performanceService.findTeamsByPerformanceId(id, user?.sub)
   }
 
   @Get(":id")
   @Public()
-  findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.performanceService.findOne(id)
+  findOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as JwtPayload | undefined
+    return this.performanceService.findOne(id, user?.sub)
   }
 
   @Patch(":id")

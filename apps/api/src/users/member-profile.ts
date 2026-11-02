@@ -1,11 +1,29 @@
 import { Prisma } from "@repo/database"
-import { MemberProfile, MemberProfileTeam } from "@repo/shared-types"
+import {
+  getPerformanceStage,
+  isMemberMaskedStage,
+  MemberProfile,
+  MemberProfileTeam
+} from "@repo/shared-types"
 
 const profileTeamSelect = {
   id: true,
   songName: true,
   songArtist: true,
-  Performance: { select: { id: true, name: true, startAt: true } }
+  Performance: {
+    select: {
+      id: true,
+      name: true,
+      startAt: true,
+      // 피드백 기간 팀원 가림 판정용. 응답에는 넣지 않는다
+      recruitStartAt: true,
+      recruitEndAt: true,
+      feedbackStartAt: true,
+      feedbackEndAt: true,
+      decidedAt: true,
+      endAt: true
+    }
+  }
 } satisfies Prisma.TeamSelect
 
 export const memberProfileSelect = {
@@ -35,7 +53,8 @@ type ProfileTeamRow = ProfileRow["leadingTeams"][number]
 
 export function toMemberProfile(
   user: ProfileRow,
-  viewerId: number
+  viewerId: number,
+  now: Date = new Date()
 ): MemberProfile {
   const base = {
     id: user.id,
@@ -57,7 +76,11 @@ export function toMemberProfile(
         id: team.id,
         songName: team.songName,
         songArtist: team.songArtist,
-        performance: team.Performance,
+        performance: {
+          id: team.Performance.id,
+          name: team.Performance.name,
+          startAt: team.Performance.startAt
+        },
         isLeader: false,
         sessions: []
       }
@@ -65,9 +88,14 @@ export function toMemberProfile(
     }
     return found
   }
-  for (const team of user.leadingTeams) entry(team).isLeader = true
+  // 피드백 기간 공연의 팀은 빼고 응답한다 — 안 빼면 팀원 가림이 여기로 샌다 (설계 5.2)
+  const visible = (team: ProfileTeamRow) =>
+    !isMemberMaskedStage(getPerformanceStage(team.Performance, now))
+  for (const team of user.leadingTeams.filter(visible))
+    entry(team).isLeader = true
   for (const { teamSession } of user.joinedTeams)
-    entry(teamSession.team).sessions.push(teamSession.session.name)
+    if (visible(teamSession.team))
+      entry(teamSession.team).sessions.push(teamSession.session.name)
 
   return {
     ...base,
