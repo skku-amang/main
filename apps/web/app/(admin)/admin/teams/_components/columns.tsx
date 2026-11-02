@@ -1,5 +1,6 @@
 "use client"
 
+import RecordingCell from "./RecordingCell"
 import { ColumnDef } from "@tanstack/react-table"
 import { Eye, EllipsisVertical, ExternalLink, Trash2 } from "lucide-react"
 import Link from "next/link"
@@ -72,7 +73,9 @@ export function getColumns(
   actions: ColumnActions,
   teams: TeamItem[],
   performanceMap?: Map<number, string>,
-  performanceOptions?: { label: string; value: string; disabled?: boolean }[]
+  performanceOptions?: { label: string; value: string; disabled?: boolean }[],
+  /** 공연별 팀 내용 수정 가능 여부 — 녹음본 올리기 버튼 노출 */
+  contentOpenByPerformance?: Map<number, boolean>
 ): ColumnDef<TeamItem>[] {
   const performanceName = (id: number) => performanceMap?.get(id) ?? String(id)
 
@@ -250,7 +253,15 @@ export function getColumns(
         <DataTableColumnHeader column={column} title="녹음본" />
       ),
       meta: { label: "녹음본" },
-      cell: ({ row }) => (row.original.recordingUrl ? "제출" : "미제출")
+      cell: ({ row }) => (
+        <RecordingCell
+          teamId={row.original.id}
+          recordingUrl={row.original.recordingUrl}
+          canUpload={
+            contentOpenByPerformance?.get(row.original.performanceId) ?? false
+          }
+        />
+      )
     },
     {
       accessorKey: "isFreshmenFixed",
