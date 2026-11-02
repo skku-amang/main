@@ -1,5 +1,6 @@
 "use client"
 
+import { ApiError } from "@repo/api-client"
 import { useQueryClient } from "@tanstack/react-query"
 import { useCallback, useMemo, useState } from "react"
 
@@ -15,7 +16,7 @@ import {
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { Performance } from "@repo/shared-types"
 
-import { getColumns } from "./_components/columns"
+import { getColumns, SCHEDULE_COLUMN_KEYS } from "./_components/columns"
 import {
   AdminPerformanceForm,
   PerformanceFormDialog,
@@ -48,7 +49,7 @@ export default function PerformancesAdminPage() {
   const handleCellUpdate = useCallback(
     async (rowId: number, columnId: string, value: unknown) => {
       const payload: Record<string, unknown> = {}
-      if (columnId === "startAt" || columnId === "endAt") {
+      if (SCHEDULE_COLUMN_KEYS.includes(columnId)) {
         payload[columnId] = value ? new Date(value as string) : null
       } else {
         payload[columnId] = value
@@ -60,7 +61,10 @@ export default function PerformancesAdminPage() {
       } catch (error) {
         toast({
           title: "수정에 실패했습니다.",
-          description: (error as Error).message,
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : (error as Error).message,
           variant: "destructive"
         })
         throw error
