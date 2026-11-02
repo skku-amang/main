@@ -43,6 +43,8 @@ import {
   publicUserList,
   PresignedUrlRequest,
   PresignedUrlResponse,
+  RecordingPresignedUrlRequest,
+  UpdateTeamRecording,
   GetNotificationsQuery,
   NotificationItem,
   NotificationList,
@@ -461,6 +463,27 @@ export default class ApiClient {
       | ConflictError
       | InternalServerError
     >(`/teams/${id}`, "PUT", teamData)
+  }
+
+  /**
+   * 팀 녹음본 올리기·바꾸기·지우기 (`recordingUrl: null` = 삭제)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 팀장·운영진이 아닌 경우
+   * @throws {NotFoundError} 팀이 없는 경우
+   * @throws {ValidationError} 녹음본 주소가 이 저장소의 녹음본이 아닌 경우
+   * @throws {PerformanceRecruitmentClosedError} 피드백 단계부터
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public updateTeamRecording(id: number, data: UpdateTeamRecording) {
+    return this._request<
+      TeamDetail,
+      | AuthError
+      | ForbiddenError
+      | NotFoundError
+      | ValidationError
+      | PerformanceRecruitmentClosedError
+      | InternalServerError
+    >(`/teams/${id}/recording`, "PATCH", data)
   }
 
   /**
@@ -1126,6 +1149,14 @@ export default class ApiClient {
       PresignedUrlResponse,
       AuthError | ValidationError | InternalServerError
     >(`/uploads/presigned-url`, "POST", request)
+  }
+
+  /** 녹음본(음원, 50MB 이하) 업로드용 presigned URL */
+  public getRecordingPresignedUrl(request: RecordingPresignedUrlRequest) {
+    return this._request<
+      PresignedUrlResponse,
+      AuthError | ValidationError | InternalServerError
+    >(`/uploads/presigned-url/recording`, "POST", request)
   }
 
   /**

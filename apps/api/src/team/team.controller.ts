@@ -14,6 +14,7 @@ import {
 import { TeamService } from "./team.service"
 import { CreateTeamDto } from "./dto/create-team.dto"
 import { UpdateTeamDto } from "./dto/update-team.dto"
+import { UpdateTeamRecordingDto } from "./dto/update-team-recording.dto"
 import { TeamApplicationDto } from "./dto/team-application.dto"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { TeamOwnerGuard } from "../auth/guards/team-owner.guard"
@@ -53,6 +54,15 @@ export class TeamController {
   ) {
     const user = req.user as JwtPayload
     return this.teamService.update(id, updateTeamDto, user.sub)
+  }
+
+  @Patch(":id/recording")
+  @UseGuards(TeamOwnerGuard)
+  updateRecording(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: UpdateTeamRecordingDto
+  ) {
+    return this.teamService.updateRecording(id, dto.recordingUrl)
   }
 
   @Delete(":id")

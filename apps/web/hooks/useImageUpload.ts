@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 
 import { useGetPresignedUrl } from "@/hooks/api/useUpload"
+import { putFileWithProgress } from "@/lib/upload"
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@repo/shared-types"
 
 interface UseImageUploadOptions {
@@ -56,26 +57,9 @@ export function useImageUpload(options?: UseImageUploadOptions) {
         { filename: targetFile.name, contentType: targetFile.type }
       ])
 
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-        xhrRef.current = xhr
-
-        xhr.upload.addEventListener("progress", (e) => {
-          if (e.lengthComputable) {
-            setProgress(Math.round((e.loaded / e.total) * 100))
-          }
-        })
-        xhr.addEventListener("load", () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve()
-          else reject(new Error("Upload failed"))
-        })
-        xhr.addEventListener("error", () => reject(new Error("Upload failed")))
-        xhr.addEventListener("abort", () =>
-          reject(new Error("Upload cancelled"))
-        )
-        xhr.open("PUT", uploadUrl)
-        xhr.setRequestHeader("Content-Type", targetFile.type)
-        xhr.send(targetFile)
+      await putFileWithProgress(uploadUrl, targetFile, {
+        onProgress: setProgress,
+        xhrRef
       })
 
       xhrRef.current = null

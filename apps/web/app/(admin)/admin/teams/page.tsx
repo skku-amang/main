@@ -11,6 +11,7 @@ import { usePerformances } from "@/hooks/api/usePerformance"
 import { useAllTeams, useDeleteTeam, useUpdateTeam } from "@/hooks/api/useTeam"
 import {
   getPerformanceStage,
+  isTeamContentOpen,
   isPerformanceRecruiting,
   PERFORMANCE_STAGE_LABEL,
   TeamList,
@@ -95,6 +96,17 @@ export default function TeamsAdminPage() {
     [teams]
   )
 
+  const contentOpenByPerformance = useMemo(
+    () =>
+      new Map(
+        performances?.map((p) => [
+          p.id,
+          isTeamContentOpen(getPerformanceStage(p))
+        ]) ?? []
+      ),
+    [performances]
+  )
+
   const columns = useMemo(
     () =>
       getColumns(
@@ -106,9 +118,10 @@ export default function TeamsAdminPage() {
         },
         teams ?? [],
         performanceMap,
-        performanceOptions
+        performanceOptions,
+        contentOpenByPerformance
       ),
-    [teams, performanceMap, performanceOptions]
+    [teams, performanceMap, performanceOptions, contentOpenByPerformance]
   )
 
   const handleCellUpdate = async (

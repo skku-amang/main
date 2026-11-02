@@ -1,3 +1,4 @@
+import { Prisma } from "@repo/database"
 import { Test, TestingModule } from "@nestjs/testing"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import {
@@ -93,6 +94,8 @@ type StoredSession = {
 describe("TeamService", () => {
   let service: TeamService
   let emit: jest.Mock
+  let findFirstTeam: jest.Mock
+  let updateTeam: jest.Mock
   let storedTeam: {
     id: number
     performanceId: number
@@ -119,7 +122,8 @@ describe("TeamService", () => {
           songYoutubeVideoUrl: null
         })),
         create: jest.fn(() => storedTeam),
-        update: jest.fn(),
+        findFirst: (findFirstTeam = jest.fn(() => null)),
+        update: (updateTeam = jest.fn()),
         delete: jest.fn()
       },
       teamSession: {
@@ -154,7 +158,13 @@ describe("TeamService", () => {
         { provide: PrismaService, useValue: prisma },
         {
           provide: ObjectStorageService,
-          useValue: { deleteObjectSafely: jest.fn() }
+          useValue: {
+            deleteObjectSafely: jest.fn(),
+            ownObjectKey: (url: string) =>
+              url.startsWith("https://s3.test/amang/")
+                ? url.slice("https://s3.test/amang/".length)
+                : null
+          }
         },
         { provide: EventEmitter2, useValue: { emit } }
       ]
@@ -574,6 +584,68 @@ describe("TeamService", () => {
           ADMIN
         )
       ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+  })
+
+  describe("updateRecording", () => {
+    const own =
+      "https://s3.test/amang/recordings/a70e315b-d6c3-4e8c-8610-9f89f8f734a5.mp3"
+
+    it("제출 단계에는 녹음본을 올릴 수 있다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+
+    it.each([
+      ["교체", own],
+      ["삭제", null]
+    ])("피드백 단계에는 %s도 거부", async (_, url) => {
+      storedTeam.performanceId = EVALUATION_ID
+
+      await expect(
+        service.updateRecording(storedTeam.id, url)
+      ).rejects.toMatchObject({
+        detail: "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
+      })
+    })
+
+    it.each([
+      "https://evil.example/x.mp3",
+      "https://s3.test/amang/images/a.png",
+      "https://s3.test/amang/recordings/../images/a.png",
+      "https://s3.test/amang/recordings/sub/a.mp3"
+    ])("우리 recordings/ 주소가 아니면 거부: %s", async (url) => {
+      await expect(
+        service.updateRecording(storedTeam.id, url)
+      ).rejects.toMatchObject({ detail: "녹음본 주소가 올바르지 않습니다." })
+    })
+
+    it("동시에 저장해 DB 유일 제약에 걸려도 같은 문구로 거부", async () => {
+      updateTeam.mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError("unique", {
+          code: "P2002",
+          clientVersion: "test"
+        })
+      )
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).rejects.toMatchObject({
+        detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
+      })
+    })
+
+    it("다른 팀이 쓰는 녹음본 주소는 거부", async () => {
+      findFirstTeam.mockReturnValueOnce({ id: 99 })
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).rejects.toMatchObject({
+        detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
+      })
     })
   })
 })

@@ -2,6 +2,8 @@ import { Body, Controller, Post, UseGuards } from "@nestjs/common"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 import { PresignedUrlRequestDto } from "./dto/presigned-url.dto"
+import { RecordingPresignedUrlRequestDto } from "./dto/recording-presigned-url.dto"
+import { RECORDING_EXTENSION_BY_TYPE } from "@repo/shared-types"
 
 @Controller("uploads")
 @UseGuards(AccessTokenGuard)
@@ -14,6 +16,17 @@ export class UploadController {
       "images",
       dto.filename,
       dto.contentType
+    )
+  }
+
+  @Post("presigned-url/recording")
+  async getRecordingPresignedUrl(@Body() dto: RecordingPresignedUrlRequestDto) {
+    return this.objectStorageService.getPresignedUploadUrl(
+      "recordings",
+      dto.filename,
+      dto.contentType,
+      dto.size,
+      RECORDING_EXTENSION_BY_TYPE[dto.contentType]
     )
   }
 }

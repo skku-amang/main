@@ -44,6 +44,9 @@ import {
   diffRoster
 } from "./team.events"
 
+/** presign이 만드는 녹음본 키 모양 — recordings/<uuid><확장자>, 하위 경로 없음 */
+const RECORDING_KEY = /^recordings\/[0-9a-f-]{36}(\.[A-Za-z0-9]{1,8})?$/
+
 /** 세션·정원·자리 배정을 비교용 문자열로 — 같은 사람이 자리만 옮겨도 구성 변경으로 본다 */
 const rosterSignature = (
   sessions: {
@@ -439,6 +442,49 @@ export class TeamService {
       }
       throw error
     }
+  }
+
+  /** 녹음본 올리기·바꾸기·지우기 (null). 팀 수정(PUT)과 따로 — 팀 폼이 모르는 필드라 실수로 지우지 않게 */
+  async updateRecording(id: number, recordingUrl: string | null) {
+    const team = await this.prisma.team.findUnique({
+      where: { id },
+      select: { performanceId: true, recordingUrl: true }
+    })
+    if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
+
+    const stage = await this.getStage(team.performanceId)
+    if (stage && !isTeamContentOpen(stage))
+      throw new PerformanceRecruitmentClosedError(
+        "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
+      )
+    if (recordingUrl) {
+      const key = this.objectStorageService.ownObjectKey(recordingUrl)
+      if (!key || !RECORDING_KEY.test(key))
+        throw new ValidationError("녹음본 주소가 올바르지 않습니다.")
+      // 남의 녹음본을 가져다 쓰거나, 가져온 뒤 지워서 상대 파일을 없애지 못하게
+      const owner = await this.prisma.team.findFirst({
+        where: { recordingUrl, NOT: { id } },
+        select: { id: true }
+      })
+      if (owner)
+        throw new ValidationError("다른 팀의 녹음본 주소는 쓸 수 없습니다.")
+    }
+
+    try {
+      await this.prisma.team.update({ where: { id }, data: { recordingUrl } })
+    } catch (error) {
+      // 위 확인과 저장 사이에 다른 팀이 같은 주소를 저장한 경우 (DB 유일 제약)
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      )
+        throw new ValidationError("다른 팀의 녹음본 주소는 쓸 수 없습니다.")
+      throw error
+    }
+    if (team.recordingUrl && team.recordingUrl !== recordingUrl)
+      this.objectStorageService.deleteObjectSafely(team.recordingUrl)
+
+    return this.findOne(id)
   }
 
   async remove(id: number, actorId: number) {

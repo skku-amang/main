@@ -20,6 +20,10 @@ export const useTeam = createQueryHook(
 
 export const useUpdateTeam = createMutationHook(ApiClient.prototype.updateTeam)
 
+export const useUpdateTeamRecording = createMutationHook(
+  ApiClient.prototype.updateTeamRecording
+)
+
 export const useDeleteTeam = createMutationHook(ApiClient.prototype.deleteTeam)
 
 export const useApplyToTeam = createMutationHook(
