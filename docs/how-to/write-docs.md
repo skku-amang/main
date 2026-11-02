@@ -60,7 +60,7 @@
 
 ## 6. 디렉토리 구조
 
-`docs/` 아래 4칸(`tutorials/`·`how-to/`·`reference/`·`explanation/`) + 진입점 [docs/README.md](../README.md). ADR은 `explanation/adr/`, 설계 명세는 `explanation/design/`. 구현 계획은 커밋하지 않는다 (루트 [AGENTS.md](../../AGENTS.md) "문서" 참고). `explanation/design/plans/`의 기존 계획서는 이 규칙 전 기록이다. 파일 목록은 GitHub UI가 자동 표시하므로 인덱스를 손으로 유지하지 않는다.
+`docs/` 아래 4칸(`tutorials/`·`how-to/`·`reference/`·`explanation/`) + 진입점 [docs/README.md](../README.md). ADR은 `explanation/adr/`, 설계 명세·계획은 `explanation/design/`. 파일 목록은 GitHub UI가 자동 표시하므로 인덱스를 손으로 유지하지 않는다.
 
 ## 7. 자동 검증
 
