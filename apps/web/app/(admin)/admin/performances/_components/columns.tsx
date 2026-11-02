@@ -24,6 +24,44 @@ interface ColumnActions {
   onDelete: (performance: Performance) => void
 }
 
+// 진행 순서대로 — 공연 편집 창의 타임라인과 같은 순서
+const SCHEDULE_COLUMNS = [
+  ["recruitStartAt", "모집 시작"],
+  ["recruitEndAt", "모집 종료"],
+  ["feedbackStartAt", "피드백 시작"],
+  ["feedbackEndAt", "피드백 종료"],
+  ["startAt", "공연 시작"],
+  ["endAt", "공연 종료"]
+] as const
+
+export const SCHEDULE_COLUMN_KEYS: readonly string[] = SCHEDULE_COLUMNS.map(
+  ([key]) => key
+)
+
+function dateColumn(
+  key: (typeof SCHEDULE_COLUMNS)[number][0],
+  label: string
+): ColumnDef<Performance> {
+  return {
+    accessorKey: key,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={label} />
+    ),
+    meta: { label, editable: { type: "date" } },
+    cell: (ctx) => {
+      const value = ctx.row.original[key]
+      return (
+        <EditableCell
+          cellContext={ctx}
+          displayValue={
+            value ? format(new Date(value), "yyyy-MM-dd HH:mm") : "-"
+          }
+        />
+      )
+    }
+  }
+}
+
 export function getColumns(
   actions: ColumnActions,
   teamCountMap?: Map<number, number>
@@ -100,42 +138,7 @@ export function getColumns(
       filterFn: (row, _columnId, filterValue) =>
         row.original.location === filterValue
     },
-    {
-      accessorKey: "startAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="시작일" />
-      ),
-      meta: { label: "시작일", editable: { type: "date" } },
-      cell: (ctx) => {
-        const startAt = ctx.row.original.startAt
-        return (
-          <EditableCell
-            cellContext={ctx}
-            displayValue={
-              startAt ? format(new Date(startAt), "yyyy-MM-dd HH:mm") : "-"
-            }
-          />
-        )
-      }
-    },
-    {
-      accessorKey: "endAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="종료일" />
-      ),
-      meta: { label: "종료일", editable: { type: "date" } },
-      cell: (ctx) => {
-        const endAt = ctx.row.original.endAt
-        return (
-          <EditableCell
-            cellContext={ctx}
-            displayValue={
-              endAt ? format(new Date(endAt), "yyyy-MM-dd HH:mm") : "-"
-            }
-          />
-        )
-      }
-    },
+    ...SCHEDULE_COLUMNS.map(([key, label]) => dateColumn(key, label)),
     {
       id: "stage",
       header: ({ column }) => (
