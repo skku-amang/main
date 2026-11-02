@@ -28,8 +28,6 @@
     "*.{js,jsx,mjs,cjs,ts,tsx,json,css,md}": "prettier --check"
   },
   "pnpm": {
-    "overrides": {
-      "multer@>=2.0.0 <2.5.0": "^2.5.0"
-    }
+    "overrides": {}
   }
 }
