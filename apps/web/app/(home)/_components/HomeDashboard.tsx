@@ -32,7 +32,11 @@ import { useRentals } from "@/hooks/api/useRental"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { formatDday, getRecruitDaysLeft } from "@/lib/performance"
+import {
+  formatDday,
+  getRecruitDaysLeft,
+  splitPerformances
+} from "@/lib/performance"
 import { getMyTeams } from "@/lib/team/myTeams"
 import { getSessionsWithMissingMembers } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
@@ -108,21 +112,23 @@ const RecruitingPerformance = () => {
   if (status === "pending") return <Skeleton className="h-20 rounded-xl" />
   if (!performances?.length) return null
 
-  // /performances/latest/teams와 같은 기준: 가장 최근에 만든 공연
-  const latest = performances.reduce((a, b) => (a.id > b.id ? a : b))
-  if (!isPerformanceRecruiting(latest)) return null
-  const deadline = latest.recruitEndAt ? dayjs(latest.recruitEndAt) : null
-  const daysLeft = getRecruitDaysLeft(latest)
+  // 새 공연을 미리 만들어 둬도 지금 모집 중인 공연이 보이게 — 마감 임박순 첫 번째
+  const recruiting = splitPerformances(performances).recruiting[0]
+  if (!recruiting) return null
+  const deadline = recruiting.recruitEndAt
+    ? dayjs(recruiting.recruitEndAt)
+    : null
+  const daysLeft = getRecruitDaysLeft(recruiting)
 
   return (
     <Link
-      href={ROUTES.PERFORMANCE.TEAM.LIST(latest.id)}
+      href={ROUTES.PERFORMANCE.TEAM.LIST(recruiting.id)}
       className="flex items-center gap-4 rounded-xl bg-primary p-5 text-white shadow-sm transition-opacity hover:opacity-90"
     >
       <Music className="size-8 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-xs text-white/70">팀 모집 중</p>
-        <p className="truncate text-lg font-semibold">{latest.name}</p>
+        <p className="truncate text-lg font-semibold">{recruiting.name}</p>
         {deadline && (
           <p className="text-xs text-white/70">
             {deadline.locale("ko").format("YYYY.MM.DD (ddd)")} 마감
