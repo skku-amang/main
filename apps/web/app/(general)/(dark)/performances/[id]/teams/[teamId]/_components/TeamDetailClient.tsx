@@ -6,6 +6,7 @@ import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import PosterImage from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/PosterImage"
+import RecordingCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/RecordingCard"
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import TeamDetailSkeleton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/TeamDetailSkeleton"
 import NotFoundPage from "@/app/_(errors)/NotFound"
@@ -98,6 +99,7 @@ const TeamDetailClient = () => {
         <div className="flex w-full flex-col gap-y-5 md:gap-y-[24px] xl:w-[466px] xl:shrink-0">
           <BasicInfo team={team} canEdit={canEdit && contentOpen} />
           {team.image && <PosterImage src={team.image} />}
+          <RecordingCard team={team} canEdit={canEdit && contentOpen} />
         </div>
 
         {/* 세션 구성 */}

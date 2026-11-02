@@ -245,6 +245,14 @@ export function getColumns(
     },
     ...buildSessionColumns(teams),
     {
+      accessorKey: "recordingUrl",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="녹음본" />
+      ),
+      meta: { label: "녹음본" },
+      cell: ({ row }) => (row.original.recordingUrl ? "제출" : "미제출")
+    },
+    {
       accessorKey: "isFreshmenFixed",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="신입생 고정" />
