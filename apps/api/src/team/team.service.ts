@@ -441,6 +441,32 @@ export class TeamService {
     }
   }
 
+  /** 녹음본 올리기·바꾸기·지우기 (null). 팀 수정(PUT)과 따로 — 팀 폼이 모르는 필드라 실수로 지우지 않게 */
+  async updateRecording(id: number, recordingUrl: string | null) {
+    const team = await this.prisma.team.findUnique({
+      where: { id },
+      select: { performanceId: true, recordingUrl: true }
+    })
+    if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
+
+    const stage = await this.getStage(team.performanceId)
+    if (stage && !isTeamContentOpen(stage))
+      throw new PerformanceRecruitmentClosedError(
+        "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
+      )
+    if (
+      recordingUrl &&
+      !this.objectStorageService.isOwnObjectUrl(recordingUrl, "recordings")
+    )
+      throw new ValidationError("녹음본 주소가 올바르지 않습니다.")
+
+    await this.prisma.team.update({ where: { id }, data: { recordingUrl } })
+    if (team.recordingUrl && team.recordingUrl !== recordingUrl)
+      this.objectStorageService.deleteObjectSafely(team.recordingUrl)
+
+    return this.findOne(id)
+  }
+
   async remove(id: number, actorId: number) {
     const team = await this.findOne(id)
     await this.assertRosterOpen(

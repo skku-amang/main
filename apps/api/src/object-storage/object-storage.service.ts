@@ -54,10 +54,12 @@ export class ObjectStorageService implements OnModuleInit {
     this.logger.log("Object storage initialization attempt completed")
   }
 
+  /** contentLength를 주면 서명에 넣어 그 크기가 아닌 업로드는 저장소가 거부한다 */
   async getPresignedUploadUrl(
     folder: string,
     filename: string,
-    contentType: string
+    contentType: string,
+    contentLength?: number
   ) {
     const ext = path.extname(filename)
     const key = `${folder}/${randomUUID()}${ext}`
@@ -65,13 +67,19 @@ export class ObjectStorageService implements OnModuleInit {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
-      ContentType: contentType
+      ContentType: contentType,
+      ContentLength: contentLength
     })
 
     const uploadUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 })
     const publicUrl = this.generatePublicUrl(key)
 
     return { uploadUrl, publicUrl }
+  }
+
+  /** 이 저장소의 `folder/` 아래 객체 주소인지 */
+  isOwnObjectUrl(url: string, folder: string) {
+    return url.startsWith(this.generatePublicUrl(`${folder}/`))
   }
 
   async deleteObject(url: string) {

@@ -154,7 +154,11 @@ describe("TeamService", () => {
         { provide: PrismaService, useValue: prisma },
         {
           provide: ObjectStorageService,
-          useValue: { deleteObjectSafely: jest.fn() }
+          useValue: {
+            deleteObjectSafely: jest.fn(),
+            isOwnObjectUrl: (url: string, folder: string) =>
+              url.startsWith(`https://s3.test/amang/${folder}/`)
+          }
         },
         { provide: EventEmitter2, useValue: { emit } }
       ]
@@ -574,6 +578,40 @@ describe("TeamService", () => {
           ADMIN
         )
       ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+  })
+
+  describe("updateRecording", () => {
+    const own = "https://s3.test/amang/recordings/abc.mp3"
+
+    it("제출 단계에는 녹음본을 올릴 수 있다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+
+    it.each([
+      ["교체", own],
+      ["삭제", null]
+    ])("피드백 단계에는 %s도 거부", async (_, url) => {
+      storedTeam.performanceId = EVALUATION_ID
+
+      await expect(
+        service.updateRecording(storedTeam.id, url)
+      ).rejects.toMatchObject({
+        detail: "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
+      })
+    })
+
+    it.each([
+      "https://evil.example/x.mp3",
+      "https://s3.test/amang/images/a.png"
+    ])("우리 recordings/ 주소가 아니면 거부: %s", async (url) => {
+      await expect(
+        service.updateRecording(storedTeam.id, url)
+      ).rejects.toMatchObject({ detail: "녹음본 주소가 올바르지 않습니다." })
     })
   })
 })

@@ -158,6 +158,7 @@ model Team {
   isFreshmenFixed     Boolean @default(false) // 신입생 고정 여부
   isSelfMade          Boolean @default(false) // 자작곡 여부
   songYoutubeVideoUrl String? // 유튜브 영상 URL
+  recordingUrl        String? // 녹음본 URL (음원, MinIO recordings/)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
