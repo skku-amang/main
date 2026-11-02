@@ -22,3 +22,4 @@
 
 - 프로젝트 개요·기술 스택·명령어: 루트 [README.md](../README.md), [AGENTS.md](../AGENTS.md)
 - 이슈·브랜치·PR·커밋 규칙: [CONTRIBUTING.md](../CONTRIBUTING.md)
+
