@@ -1,5 +1,6 @@
 "use client"
 
+import FeedbackStatusBadge from "@/components/FeedbackStatusBadge"
 import { CellContext, ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Image, Star } from "lucide-react"
 import { FaYoutube } from "react-icons/fa"
@@ -139,6 +140,11 @@ export const columns: ColumnDef<TeamColumn>[] = [
               <Image size={15} className="text-neutral-800" strokeWidth={1.5} />
             </span>
           )}
+          <FeedbackStatusBadge
+            performanceId={row.original.performanceId}
+            teamId={row.original.id}
+            className="ml-1"
+          />
         </div>
 
         {/* 아티스트명 */}
