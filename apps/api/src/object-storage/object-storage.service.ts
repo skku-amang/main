@@ -59,9 +59,10 @@ export class ObjectStorageService implements OnModuleInit {
     folder: string,
     filename: string,
     contentType: string,
-    contentLength?: number
+    contentLength?: number,
+    extension?: string
   ) {
-    const ext = path.extname(filename)
+    const ext = extension ?? path.extname(filename)
     const key = `${folder}/${randomUUID()}${ext}`
 
     const command = new PutObjectCommand({

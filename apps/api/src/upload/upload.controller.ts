@@ -3,6 +3,7 @@ import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
 import { PresignedUrlRequestDto } from "./dto/presigned-url.dto"
 import { RecordingPresignedUrlRequestDto } from "./dto/recording-presigned-url.dto"
+import { RECORDING_EXTENSION_BY_TYPE } from "@repo/shared-types"
 
 @Controller("uploads")
 @UseGuards(AccessTokenGuard)
@@ -24,7 +25,8 @@ export class UploadController {
       "recordings",
       dto.filename,
       dto.contentType,
-      dto.size
+      dto.size,
+      RECORDING_EXTENSION_BY_TYPE[dto.contentType]
     )
   }
 }

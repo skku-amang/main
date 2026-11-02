@@ -34,3 +34,30 @@ describe("ObjectStorageService.ownObjectKey", () => {
     expect(storage.ownObjectKey(url)).toBeNull()
   })
 })
+
+describe("ObjectStorageService.getPresignedUploadUrl", () => {
+  const values: Record<string, string> = {
+    S3_ENDPOINT: "http://localhost:9000",
+    S3_BUCKET: "amang",
+    S3_ACCESS_KEY: "a",
+    S3_SECRET_KEY: "b"
+  }
+  const config = {
+    get: (key: string, fallback?: string) => values[key] ?? fallback,
+    getOrThrow: (key: string) => values[key]
+  } as unknown as ConfigService
+  const storage = new ObjectStorageService(config)
+
+  it("확장자를 따로 주면 파일명 확장자 대신 그걸 쓴다", async () => {
+    const { publicUrl } = await storage.getPresignedUploadUrl(
+      "recordings",
+      "track.m4a-backup",
+      "audio/x-m4a",
+      10,
+      ".m4a"
+    )
+    expect(publicUrl).toMatch(
+      /^http:\/\/localhost:9000\/amang\/recordings\/[0-9a-f-]{36}\.m4a$/
+    )
+  })
+})

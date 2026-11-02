@@ -248,7 +248,9 @@ export function getColumns(
     },
     ...buildSessionColumns(teams),
     {
-      accessorKey: "recordingUrl",
+      id: "recording",
+      // 정렬·CSV는 주소 대신 제출 여부로
+      accessorFn: (row) => (row.recordingUrl ? "제출" : "미제출"),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="녹음본" />
       ),

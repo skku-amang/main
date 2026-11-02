@@ -1,3 +1,4 @@
+import { Prisma } from "@repo/database"
 import { Test, TestingModule } from "@nestjs/testing"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import {
@@ -94,6 +95,7 @@ describe("TeamService", () => {
   let service: TeamService
   let emit: jest.Mock
   let findFirstTeam: jest.Mock
+  let updateTeam: jest.Mock
   let storedTeam: {
     id: number
     performanceId: number
@@ -121,7 +123,7 @@ describe("TeamService", () => {
         })),
         create: jest.fn(() => storedTeam),
         findFirst: (findFirstTeam = jest.fn(() => null)),
-        update: jest.fn(),
+        update: (updateTeam = jest.fn()),
         delete: jest.fn()
       },
       teamSession: {
@@ -619,6 +621,21 @@ describe("TeamService", () => {
       await expect(
         service.updateRecording(storedTeam.id, url)
       ).rejects.toMatchObject({ detail: "녹음본 주소가 올바르지 않습니다." })
+    })
+
+    it("동시에 저장해 DB 유일 제약에 걸려도 같은 문구로 거부", async () => {
+      updateTeam.mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError("unique", {
+          code: "P2002",
+          clientVersion: "test"
+        })
+      )
+
+      await expect(
+        service.updateRecording(storedTeam.id, own)
+      ).rejects.toMatchObject({
+        detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
+      })
     })
 
     it("다른 팀이 쓰는 녹음본 주소는 거부", async () => {

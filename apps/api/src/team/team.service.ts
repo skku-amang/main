@@ -470,7 +470,17 @@ export class TeamService {
         throw new ValidationError("다른 팀의 녹음본 주소는 쓸 수 없습니다.")
     }
 
-    await this.prisma.team.update({ where: { id }, data: { recordingUrl } })
+    try {
+      await this.prisma.team.update({ where: { id }, data: { recordingUrl } })
+    } catch (error) {
+      // 위 확인과 저장 사이에 다른 팀이 같은 주소를 저장한 경우 (DB 유일 제약)
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      )
+        throw new ValidationError("다른 팀의 녹음본 주소는 쓸 수 없습니다.")
+      throw error
+    }
     if (team.recordingUrl && team.recordingUrl !== recordingUrl)
       this.objectStorageService.deleteObjectSafely(team.recordingUrl)
 

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { MAX_RECORDING_SIZE } from "../constants/file-validation"
+import {
+  ACCEPTED_AUDIO_TYPES,
+  MAX_RECORDING_SIZE,
+  RECORDING_EXTENSION_BY_TYPE
+} from "../constants/file-validation"
 import { UpdateTeamRecordingSchema } from "../team/update-team-recording.schema"
 import { UpdateTeamSchema } from "../team/update-team.schema"
 import { RecordingPresignedUrlRequestSchema } from "./presigned-url.schema"
@@ -78,5 +82,14 @@ describe("UpdateTeamSchema", () => {
       recordingUrl: "https://s3.test/amang/recordings/a.mp3"
     })
     expect("recordingUrl" in parsed).toBe(false)
+  })
+})
+
+describe("RECORDING_EXTENSION_BY_TYPE", () => {
+  it("허용 음원 타입마다 mp3·m4a·wav 중 하나", () => {
+    for (const type of ACCEPTED_AUDIO_TYPES)
+      expect([".mp3", ".m4a", ".wav"]).toContain(
+        RECORDING_EXTENSION_BY_TYPE[type]
+      )
   })
 })

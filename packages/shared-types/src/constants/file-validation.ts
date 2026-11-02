@@ -12,6 +12,16 @@ export const ACCEPTED_AUDIO_TYPES = [
 
 export const MAX_RECORDING_SIZE = 50 * 1024 * 1024 // 50MB
 
+/** 저장 키의 확장자는 파일명이 아니라 형식에서 정한다 — 이상한 파일명이 와도 키 모양이 일정하게 */
+export const RECORDING_EXTENSION_BY_TYPE: Record<string, string> = {
+  "audio/mpeg": ".mp3",
+  "audio/mp4": ".m4a",
+  "audio/x-m4a": ".m4a",
+  "audio/wav": ".wav",
+  "audio/x-wav": ".wav",
+  "audio/wave": ".wav"
+}
+
 export const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
