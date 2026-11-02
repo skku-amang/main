@@ -27,6 +27,7 @@ export const config = {
     "/admin/:path*",
     "/profile/:path*",
     "/profiles/:path*",
+    "/performances/:id/feedback",
     "/performances/:id/teams/create",
     "/performances/:id/teams/:teamId/edit"
   ]

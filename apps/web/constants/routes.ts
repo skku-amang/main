@@ -17,6 +17,8 @@ const ROUTES = {
   PERFORMANCE: {
     LIST: "/performances",
     DETAIL: (id: number) => `/performances/${id}`,
+    FEEDBACK: (id: number, teamId?: number) =>
+      `/performances/${id}/feedback${teamId ? `?team=${teamId}` : ""}`,
     TEAM: {
       CREATE: (performanceId: number) =>
         `/performances/${performanceId}/teams/create`,
