@@ -2,6 +2,14 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**실행 완료** — [#904](https://github.com/skku-amang/main/pull/904)에서 실행했다. 이 문서는 실행 전 계획 기록이고, 현재 규칙의 기준은 [설계 문서 4절](../feedback-system-design.md#4-공연-단계)이다. 실행 중 바뀐 점:
+
+- 백필: `recruitStartAt = LEAST(createdAt, endAt)` (공연이 끝난 뒤 등록된 공연도 순서가 깨지지 않게)
+- 일정 검증: 마지막 일정 ≤ 공연 종료 추가
+- 운영진은 피드백 단계 이후에도 신입고정 설정만은 바꿀 수 있음
+- 다른 공연으로 옮기기는 출발 공연 기준으로도 잠금 (제출 단계부터)
+- 운영진 공연 폼: "지금으로" 버튼 대신 세로 타임라인 + "모집 종료와 같게"
+
 **Goal:** 공연에 날짜 필드를 넣고, 단계(7개)를 날짜에서 계산해 팀 생성·지원·수정을 단계에 따라 열고 잠근다.
 
 **Architecture:** 단계는 저장하지 않는다. `@repo/shared-types`의 `getPerformanceStage(dates, now)` 하나를 서버(team.service 잠금, reminder, 목록 where)와 웹(배지, 버튼 노출, 목록 분리)이 같이 쓴다. 지금 `Performance.endAt`이 겸하던 "모집 마감"을 `recruitEndAt`으로 옮기고, `isPerformanceRecruiting`은 `stage === "RECRUITING"`의 얇은 래퍼로 남겨 호출처 교체를 한 PR에 담는다. 마이그레이션이 옛 공연에 `recruitStartAt = createdAt`, `recruitEndAt = endAt`을 채워 현재 동작을 보존한다.
