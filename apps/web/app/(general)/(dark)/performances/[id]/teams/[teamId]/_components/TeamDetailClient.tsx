@@ -131,6 +131,12 @@ const TeamDetailClient = () => {
             </SessionSetCard>
           )}
 
+          {team.membersHidden && (
+            <p className="rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-600">
+              피드백 기간에는 팀원이 비공개예요
+            </p>
+          )}
+
           {/* 마감된 세션 */}
           <SessionSetCard
             header="마감된 세션"

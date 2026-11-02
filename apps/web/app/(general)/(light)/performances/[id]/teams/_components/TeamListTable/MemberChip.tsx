@@ -1,7 +1,5 @@
-import Link from "next/link"
-
+import ProfileLink from "@/components/ProfileLink"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import ROUTES from "@/constants/routes"
 import { cn } from "@/lib/utils"
 
 /**
@@ -23,8 +21,8 @@ const MemberChip = ({
   <div className="flex items-center gap-1.5">
     {showAvatar && (
       // 이름 링크와 같은 곳이라 키보드·화면낭독기에선 건너뜀
-      <Link
-        href={ROUTES.MEMBER_PROFILE(user.id)}
+      <ProfileLink
+        userId={user.id}
         tabIndex={-1}
         aria-hidden
         className="shrink-0"
@@ -35,18 +33,18 @@ const MemberChip = ({
             {user.name[0]}
           </AvatarFallback>
         </Avatar>
-      </Link>
+      </ProfileLink>
     )}
     <div className="flex flex-col items-start gap-1">
-      <Link
-        href={ROUTES.MEMBER_PROFILE(user.id)}
+      <ProfileLink
+        userId={user.id}
         className={cn(
           "whitespace-nowrap text-sm hover:underline",
           isMe ? "font-semibold text-primary" : "text-slate-500"
         )}
       >
         {user.name}
-      </Link>
+      </ProfileLink>
       {children}
     </div>
   </div>
