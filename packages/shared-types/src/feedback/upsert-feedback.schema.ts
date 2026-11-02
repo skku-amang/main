@@ -21,9 +21,9 @@ export const UpsertFeedbackSchema = z
       .string()
       .trim()
       .max(FEEDBACK_COMMENT_MAX)
+      .transform((v) => (v === "" ? null : v))
       .nullable()
       .optional()
-      .transform((v) => (v === "" ? null : v))
   })
   .refine((v) => Object.values(v).some((field) => field !== undefined), {
     message: "바꿀 항목이 없습니다."

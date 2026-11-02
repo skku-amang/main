@@ -86,6 +86,7 @@ model User {
   notifications     Notification[]     @relation("notifications")
   pushSubscriptions PushSubscription[] @relation("pushSubscriptions")
   teamBookmarks     TeamBookmark[]
+  feedbacks         Feedback[]
 
   @@map("users")
 }
@@ -171,8 +172,32 @@ model Team {
 
   teamSessions TeamSession[] // 팀에 필요한 세션 목록
   bookmarks    TeamBookmark[]
+  feedbacks    Feedback[]
 
   @@map("teams")
+}
+
+// 녹음본 피드백 한 건 (작성자 × 팀). 점수는 누르는 즉시 저장되므로 nullable — 셋 다 있어야 완료
+model Feedback {
+  id Int @id @default(autoincrement())
+
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  reviewerId Int
+  reviewer   User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  teamScore       Int? // 팀 완성도 1~5
+  individualScore Int? // 개인 완성도 1~5
+  preferenceScore Int? // 선호도 1~5
+  comment         String? // 점수와 무관한 자유 의견
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, reviewerId])
+  @@index([reviewerId])
+  @@map("feedbacks")
 }
 
 // 사용자가 별표(즐겨찾기)한 팀. 본인만 보는 개인 표시
