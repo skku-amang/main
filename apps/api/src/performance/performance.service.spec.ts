@@ -46,7 +46,8 @@ describe("PerformanceService", () => {
               update: jest.fn(),
               delete: jest.fn()
             },
-            user: { findUnique: jest.fn(async () => ({ isAdmin: false })) }
+            user: { findUnique: jest.fn(async () => ({ isAdmin: false })) },
+            teamMember: { findMany: jest.fn(async () => []) }
           }
         },
         {

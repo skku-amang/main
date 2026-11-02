@@ -76,6 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     apiClient.setOnTokenExpired(async () => {
       try {
         await TokenManager.getInstance().refresh()
+        // 공개 조회 API는 만료 토큰을 비로그인으로 처리해 401 없이 응답한다 (피드백 기간이면 팀원을 가림).
+        // 갱신 전에 받아 둔 그런 응답이 캐시에 남지 않게 다시 불러온다
+        void queryClient.invalidateQueries({
+          predicate: (query) => query.queryKey[0] !== ME_QUERY_KEY[0]
+        })
         return true
       } catch (error) {
         if (isTransientFailure(error)) {

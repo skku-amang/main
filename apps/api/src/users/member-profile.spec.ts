@@ -125,4 +125,19 @@ describe("toMemberProfile", () => {
       "startAt"
     ])
   })
+
+  it("본인 프로필에서는 피드백 단계 공연의 팀도 보인다", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const evaluating = performance(3, "2027-01-01", {
+      feedbackStartAt: new Date(Date.now() - DAY),
+      feedbackEndAt: new Date(Date.now() + DAY)
+    })
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(30, evaluating)], joinedTeams: [] }),
+      7
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([30])
+  })
 })

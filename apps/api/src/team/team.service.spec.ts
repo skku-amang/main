@@ -153,7 +153,8 @@ describe("TeamService", () => {
       },
       teamMember: {
         createMany: jest.fn(),
-        deleteMany: jest.fn()
+        deleteMany: jest.fn(),
+        findMany: jest.fn(() => [])
       },
       session: {
         findUnique: jest.fn(({ where }: { where: { id: number } }) =>

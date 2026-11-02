@@ -82,6 +82,14 @@ const prisma = {
     findUnique: jest.fn(({ where }: { where: { id: number } }) => ({
       isAdmin: where.id === ADMIN
     }))
+  },
+  teamMember: {
+    // 멤버 2(멤버1)는 모든 팀의 세션 멤버
+    findMany: jest.fn(({ where }: { where: { userId: number } }) =>
+      where.userId === 2
+        ? [10, 11, 12].map((teamId) => ({ teamSession: { teamId } }))
+        : []
+    )
   }
 } as unknown as PrismaService
 
@@ -138,6 +146,19 @@ describe("maskTeamsFor", () => {
     const result = await maskTeamsFor(prisma, teams, undefined)
 
     expect(result[1]?.leader.name).toBe("비공개")
+  })
+
+  // 본인 팀 사람들은 이미 안다 — 가려도 막는 정보가 없고 "내 팀" 목록만 사라진다
+  it("본인이 팀장인 팀은 가리지 않는다", async () => {
+    const result = await maskTeamsFor(prisma, teams, 1)
+
+    expect(result.map((t) => t.leader.name)).toEqual(["팀장", "팀장", "팀장"])
+  })
+
+  it("본인이 멤버인 팀은 가리지 않는다", async () => {
+    const result = await maskTeamsFor(prisma, teams, 2)
+
+    expect(result[1]?.membersHidden).toBeUndefined()
   })
 
   it("운영진에게는 가리지 않는다", async () => {

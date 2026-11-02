@@ -16,6 +16,7 @@ const HIDDEN_USER: Record<string, unknown> = {
 }
 
 type MaskableTeam = {
+  id: number
   performanceId: number
   leaderId: number
   leader: object
@@ -52,6 +53,7 @@ export const maskTeam = <T extends MaskableTeam>(
 
 /**
  * 피드백·집계 단계 공연의 팀은 운영진이 아니면(비로그인 포함) 팀원을 가린다 (설계 5.2).
+ * 본인이 소속된 팀(팀장·세션 멤버)은 예외 — 이미 아는 사람들이라 가려도 막는 정보가 없다.
  */
 export const maskTeamsFor = async <T extends MaskableTeam>(
   prisma: PrismaService,
@@ -83,5 +85,22 @@ export const maskTeamsFor = async <T extends MaskableTeam>(
   if (viewerId !== undefined && (await isUserAdmin(prisma, viewerId)))
     return teams
 
-  return teams.map((t) => (masked.has(t.performanceId) ? maskTeam(t) : t))
+  const ownTeamIds = new Set<number>()
+  if (viewerId !== undefined) {
+    const candidates = teams.filter((t) => masked.has(t.performanceId))
+    for (const t of candidates)
+      if (t.leaderId === viewerId) ownTeamIds.add(t.id)
+    const memberships = await prisma.teamMember.findMany({
+      where: {
+        userId: viewerId,
+        teamSession: { teamId: { in: candidates.map((t) => t.id) } }
+      },
+      select: { teamSession: { select: { teamId: true } } }
+    })
+    for (const m of memberships) ownTeamIds.add(m.teamSession.teamId)
+  }
+
+  return teams.map((t) =>
+    masked.has(t.performanceId) && !ownTeamIds.has(t.id) ? maskTeam(t) : t
+  )
 }
