@@ -7,7 +7,13 @@ export const PerformanceObjectSchema = z.object({
   image: z.string().nullable().optional(),
   location: safeNullableString({ max: 200 }),
   startAt: z.coerce.date().nullable().optional(),
-  endAt: z.coerce.date().nullable().optional()
+  endAt: z.coerce.date().nullable().optional(),
+  recruitStartAt: z.coerce.date().nullable().optional(),
+  recruitEndAt: z.coerce.date().nullable().optional(),
+  feedbackStartAt: z.coerce.date().nullable().optional(),
+  feedbackEndAt: z.coerce.date().nullable().optional(),
+  passCount: z.number().int().positive().nullable().optional(),
+  penaltyPerMissingReview: z.number().min(0).optional()
 })
 
 export const PartialPerformanceObjectSchema = PerformanceObjectSchema.partial()
@@ -18,11 +24,50 @@ export const GetPerformancesQuerySchema = z.object({
 
 export type GetPerformancesQuery = z.infer<typeof GetPerformancesQuerySchema>
 
-export const dateValidationRefine = (
-  data: z.infer<typeof PartialPerformanceObjectSchema>
-) => {
-  if (data.startAt && data.endAt) {
-    return data.endAt >= data.startAt
+type ScheduleDates = Partial<
+  Record<
+    | "startAt"
+    | "endAt"
+    | "recruitStartAt"
+    | "recruitEndAt"
+    | "feedbackStartAt"
+    | "feedbackEndAt",
+    Date | null | undefined
+  >
+>
+
+const SCHEDULE_ORDER = [
+  ["recruitStartAt", "모집 시작"],
+  ["recruitEndAt", "모집 종료"],
+  ["feedbackStartAt", "피드백 시작"],
+  ["feedbackEndAt", "피드백 종료"]
+] as const
+
+/** 일정 순서가 깨졌으면 사용자 문구를, 아니면 null. 비어 있는 날짜는 건너뛴다. */
+export const validatePerformanceSchedule = (
+  d: ScheduleDates
+): string | null => {
+  if (d.startAt && d.endAt && d.endAt < d.startAt)
+    return "종료 일시는 시작 일시보다 이후여야 합니다."
+
+  const filled = SCHEDULE_ORDER.flatMap(([key, label]) => {
+    const at = d[key]
+    return at ? [{ at, label }] : []
+  })
+  for (let i = 1; i < filled.length; i++) {
+    const prev = filled[i - 1]!
+    const cur = filled[i]!
+    if (cur.at < prev.at)
+      return `${cur.label} 일시는 ${prev.label} 일시보다 이후여야 합니다.`
   }
-  return true
+  // 공연 종료가 지나면 무조건 종료 단계라, 그 뒤의 일정은 영영 오지 않는다
+  const last = filled.at(-1)
+  if (d.endAt && last && last.at > d.endAt)
+    return `${last.label} 일시는 공연 종료 일시보다 이전이어야 합니다.`
+  return null
+}
+
+export const scheduleRefine = (d: ScheduleDates, ctx: z.RefinementCtx) => {
+  const message = validatePerformanceSchedule(d)
+  if (message) ctx.addIssue({ code: "custom", message })
 }

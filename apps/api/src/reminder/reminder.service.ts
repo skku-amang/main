@@ -31,11 +31,15 @@ export class ReminderService {
    * @returns 이벤트를 낸 팀 수
    */
   async remindRecruitmentDeadline(now: Date) {
-    // 지원 가능 조건이 endAt > now 라서 endAt 정각은 이미 닫힌 뒤 → 내일 00:00 마감은 "오늘 마감"
+    // 모집 종료 정각이면 이미 닫힌 뒤(getPerformanceStage) → 내일 00:00 마감은 "오늘 마감"
     const teams = await this.prisma.team.findMany({
       where: {
         Performance: {
-          endAt: { gt: kstDayStart(now, 1), lte: kstDayStart(now, 2) }
+          recruitEndAt: { gt: kstDayStart(now, 1), lte: kstDayStart(now, 2) },
+          // 지금 팀 모집 중인 공연만 (모집 시작 전·확정 뒤 제외)
+          recruitStartAt: { lte: now },
+          decidedAt: null,
+          OR: [{ endAt: null }, { endAt: { gt: now } }]
         }
       },
       select: {

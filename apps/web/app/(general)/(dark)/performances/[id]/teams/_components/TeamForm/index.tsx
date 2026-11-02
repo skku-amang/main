@@ -1,5 +1,6 @@
 "use client"
 
+import { ApiError } from "@repo/api-client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { X } from "lucide-react"
 import Link from "next/link"
@@ -309,10 +310,13 @@ const TeamForm = ({
           refetchType: "all"
         })
         router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
-      } catch {
+      } catch (error) {
         toast({
           title: "오류",
-          description: "팀 생성 중 오류가 발생했습니다.",
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : "팀 생성 중 오류가 발생했습니다.",
           variant: "destructive"
         })
       }
@@ -346,10 +350,13 @@ const TeamForm = ({
           refetchType: "all"
         })
         router.push(ROUTES.PERFORMANCE.TEAM.DETAIL(data.performanceId, data.id))
-      } catch {
+      } catch (error) {
         toast({
           title: "오류",
-          description: "팀 수정 중 오류가 발생했습니다.",
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : "팀 수정 중 오류가 발생했습니다.",
           variant: "destructive"
         })
       }

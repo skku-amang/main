@@ -22,6 +22,10 @@
     "amang-grafana": {
       "command": "direnv",
       "args": ["exec", ".", "mcp-grafana"]
+    },
+    "amang-umami": {
+      "command": "direnv",
+      "args": ["exec", ".", "npx", "-y", "@umami/mcp@0.2.0"]
     }
   }
 }

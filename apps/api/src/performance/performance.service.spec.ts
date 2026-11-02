@@ -1,3 +1,4 @@
+import { InvalidPerformanceDateError } from "@repo/api-client"
 import { Test, TestingModule } from "@nestjs/testing"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { PerformanceService } from "./performance.service"
@@ -12,6 +13,20 @@ import { ObjectStorageService } from "../object-storage/object-storage.service"
 describe("PerformanceService", () => {
   let service: PerformanceService
   let emit: jest.Mock
+  let prisma: { performance: { findUnique: jest.Mock } }
+  const existing = {
+    id: 3,
+    name: "봄 공연",
+    location: "소극장",
+    startAt: new Date("2026-11-01T10:00:00Z"),
+    endAt: new Date("2026-11-01T12:00:00Z"),
+    recruitStartAt: null,
+    recruitEndAt: null,
+    feedbackStartAt: null,
+    feedbackEndAt: null,
+    image: null,
+    teams: []
+  }
 
   beforeEach(async () => {
     emit = jest.fn()
@@ -23,15 +38,7 @@ describe("PerformanceService", () => {
           useValue: {
             performance: {
               create: jest.fn(async () => ({ id: 3 })),
-              findUnique: jest.fn(async () => ({
-                id: 3,
-                name: "봄 공연",
-                location: "소극장",
-                startAt: new Date("2026-11-01T10:00:00Z"),
-                endAt: new Date("2026-11-01T12:00:00Z"),
-                image: null,
-                teams: []
-              })),
+              findUnique: jest.fn(async () => existing),
               findAll: jest.fn(),
               findTeamsByPerformanceId: jest.fn(),
               findOne: jest.fn(),
@@ -51,6 +58,7 @@ describe("PerformanceService", () => {
     }).compile()
 
     service = module.get<PerformanceService>(PerformanceService)
+    prisma = module.get(PrismaService)
   })
 
   it("should be defined", () => {
@@ -74,6 +82,44 @@ describe("PerformanceService", () => {
         PERFORMANCE_EVENTS.UPDATED,
         new PerformanceUpdatedEvent(3, ["startAt"], 42)
       )
+    })
+
+    it("날짜 하나만 바꿔도 기존 일정과 합쳐 순서를 검증한다", async () => {
+      prisma.performance.findUnique.mockResolvedValueOnce({
+        ...existing,
+        recruitEndAt: new Date("2026-10-10T00:00:00Z")
+      })
+
+      await expect(
+        service.update(
+          3,
+          { feedbackStartAt: new Date("2026-10-09T00:00:00Z") },
+          42
+        )
+      ).rejects.toThrow(
+        new InvalidPerformanceDateError(
+          "피드백 시작 일시는 모집 종료 일시보다 이후여야 합니다."
+        )
+      )
+    })
+
+    it("null로 지우는 날짜는 기존 값을 쓰지 않는다", async () => {
+      prisma.performance.findUnique.mockResolvedValueOnce({
+        ...existing,
+        recruitEndAt: new Date("2026-10-10T00:00:00Z"),
+        feedbackStartAt: new Date("2026-10-20T00:00:00Z")
+      })
+
+      await expect(
+        service.update(
+          3,
+          {
+            recruitEndAt: null,
+            feedbackStartAt: new Date("2026-10-05T00:00:00Z")
+          },
+          42
+        )
+      ).resolves.toBeDefined()
     })
 
     it("설명만 바뀌면 발행하지 않는다", async () => {

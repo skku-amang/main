@@ -108,6 +108,11 @@ export const TRANSFORM_CONFIGS = {
   performance: {
     startAt: FIELD_TRANSFORMERS.toNullableDate,
     endAt: FIELD_TRANSFORMERS.toNullableDate,
+    recruitStartAt: FIELD_TRANSFORMERS.toNullableDate,
+    recruitEndAt: FIELD_TRANSFORMERS.toNullableDate,
+    feedbackStartAt: FIELD_TRANSFORMERS.toNullableDate,
+    feedbackEndAt: FIELD_TRANSFORMERS.toNullableDate,
+    decidedAt: FIELD_TRANSFORMERS.toNullableDate,
     createdAt: FIELD_TRANSFORMERS.toDate,
     updatedAt: FIELD_TRANSFORMERS.toDate
   },

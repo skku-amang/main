@@ -8,6 +8,7 @@ import Link from "next/link"
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
 import { DataTableColumnHeader } from "@/app/(admin)/_components/data-table/DataTableColumnHeader"
 import { EditableCell } from "@/app/(admin)/_components/data-table/EditableCell"
+import PerformanceStageBadge from "@/components/PerformanceStageBadge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -134,6 +135,14 @@ export function getColumns(
           />
         )
       }
+    },
+    {
+      id: "stage",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="단계" />
+      ),
+      meta: { label: "단계" },
+      cell: ({ row }) => <PerformanceStageBadge performance={row.original} />
     },
     {
       id: "teamCount",

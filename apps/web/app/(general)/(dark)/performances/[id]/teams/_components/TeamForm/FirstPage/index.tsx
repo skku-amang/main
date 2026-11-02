@@ -192,25 +192,6 @@ const FirstPage = ({
                     {form.formState.errors.songName.message}
                   </div>
                 )}
-
-                {/* 신입고정 여부 */}
-                <div className="flex items-center gap-x-2">
-                  <Checkbox
-                    id="isFreshmenFixedInput"
-                    name="isFreshmenFixed"
-                    onCheckedChange={(e) =>
-                      form.setValue("isFreshmenFixed", !!e)
-                    }
-                    checked={form.watch("isFreshmenFixed")}
-                    className="h-6 w-6 rounded-md border border-gray-400 md:h-4 md:w-4"
-                  />
-                  <Label
-                    htmlFor="isFreshmenFixedInput"
-                    className="text-sm font-medium text-neutral-500"
-                  >
-                    신입고정곡입니다
-                  </Label>
-                </div>
               </div>
 
               {/* 아티스트 입력 */}
