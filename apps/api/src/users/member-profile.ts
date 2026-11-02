@@ -54,6 +54,7 @@ type ProfileTeamRow = ProfileRow["leadingTeams"][number]
 export function toMemberProfile(
   user: ProfileRow,
   viewerId: number,
+  viewerIsAdmin = false,
   now: Date = new Date()
 ): MemberProfile {
   const base = {
@@ -89,8 +90,9 @@ export function toMemberProfile(
     return found
   }
   // 피드백 기간 공연의 팀은 빼고 응답한다 — 안 빼면 팀원 가림이 여기로 샌다 (설계 5.2).
-  // 본인 프로필은 예외 (본인 팀은 가리지 않음)
+  // 운영진과 본인 프로필은 예외 (팀원 가림과 같은 규칙)
   const visible = (team: ProfileTeamRow) =>
+    viewerIsAdmin ||
     user.id === viewerId ||
     !isMemberMaskedStage(getPerformanceStage(team.Performance, now))
   for (const team of user.leadingTeams.filter(visible))

@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from "@nestjs/common"
+import { ExecutionContext, Injectable, Logger } from "@nestjs/common"
 import { Reflector } from "@nestjs/core"
 import { AuthGuard } from "@nestjs/passport"
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
@@ -18,6 +18,8 @@ import {
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard("jwt-access") {
+  private readonly logger = new Logger(AccessTokenGuard.name)
+
   constructor(private reflector: Reflector) {
     super()
   }
@@ -35,8 +37,10 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     if (this.isPublic(context)) {
       try {
         await super.canActivate(context)
-      } catch {
-        // 비로그인으로 계속
+      } catch (error) {
+        // 토큰 문제가 아닌 예외는 전역 필터를 안 거치므로 여기서 남긴다
+        if (!(error instanceof AuthError))
+          this.logger.warn(`optional auth failed: ${String(error)}`)
       }
       return true
     }
@@ -52,6 +56,8 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     status?: any
   ): TUser {
     if (this.isPublic(context)) {
+      if (err && !(err instanceof AuthError))
+        this.logger.warn(`optional auth failed: ${String(err)}`)
       return (err || info || !user ? undefined : user) as TUser
     }
 
