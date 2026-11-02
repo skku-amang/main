@@ -6,8 +6,31 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  # 문서(docs/, 루트 *.md)만 바뀐 PR은 검사·이미지 빌드를 건너뛴다
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      code: ${{ github.event_name != 'pull_request' || steps.filter.outputs.code == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@v4
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          predicate-quantifier: every
+          filters: |
+            code:
+              - '!docs/**'
+              - '!*.md'
+
   verify:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +63,9 @@ jobs:
         run: pnpm turbo test
 
   build-image:
-    needs: verify
+    needs: [changes, verify]
+    # matrix job은 건너뛰면 필수 체크 이름이 안 생겨 머지가 막히므로 job은 돌리고 빌드 step만 skip
+    if: ${{ !failure() && !cancelled() }}
     permissions:
       contents: read
       packages: write
@@ -48,3 +73,4 @@ jobs:
     with:
       # PR에서는 빌드 검증만 하고 레지스트리에는 올리지 않는다
       push: ${{ github.event_name == 'push' }}
+      skip: ${{ needs.changes.outputs.code != 'true' }}

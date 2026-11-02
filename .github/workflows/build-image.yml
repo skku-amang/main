@@ -9,6 +9,9 @@ on:
         description: "레지스트리에 올릴지 여부. PR에서는 false로 호출해 빌드 검증만 한다"
         type: boolean
         default: true
+      skip:
+        type: boolean
+        default: false
   # 레지스트리 일시 장애 등으로 push만 실패했을 때 검사 재실행 없이 재시도
   workflow_dispatch:
     inputs:
@@ -60,6 +63,7 @@ jobs:
         run: echo "tag=$(TZ=UTC git show -s --format=%cd --date=format-local:%Y%m%d%H%M%S HEAD)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push ${{ matrix.app.name }} image
+        if: ${{ !inputs.skip }}
         uses: docker/build-push-action@v7
         with:
           context: .
