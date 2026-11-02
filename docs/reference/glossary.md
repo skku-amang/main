@@ -12,7 +12,7 @@
 
 음악 동아리의 행사 단위. AMANG의 한 공연 = 한 피드백 라이프사이클의 단위.
 
-- 데이터: `Performance` 엔티티 ([schema.prisma:96-112](../../packages/database/prisma/schema.prisma#L96-L112))
+- 데이터: `Performance` 엔티티 ([schema.prisma:123-148](../../packages/database/prisma/schema.prisma#L123-L148))
 - 한 공연 안에 다수의 Team
 
 ### Team / 팀

@@ -82,7 +82,7 @@ describe("formatNotification", () => {
       })
     ).toEqual({
       title: "새 공연",
-      body: "봄 공연 팀 모집이 시작됐습니다",
+      body: "새 공연이 등록됐습니다: 봄 공연",
       href: "/performances/3/teams"
     })
   })
