@@ -2,6 +2,7 @@
 
 import SessionSetCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/SessionSetCard"
 import { Button } from "@/components/ui/button"
+import WaveformPlayer from "@/components/WaveformPlayer"
 import { useRecordingUpload } from "@/hooks/useRecordingUpload"
 import { ACCEPTED_AUDIO_TYPES, type TeamDetail } from "@repo/shared-types"
 
@@ -28,14 +29,7 @@ const RecordingCard = ({ team, canEdit }: RecordingCardProps) => {
     >
       <div className="mt-4 space-y-3 md:mt-6">
         {team.recordingUrl ? (
-          // 가사·대사가 아닌 연주 녹음이라 자막 트랙이 없다
-          // eslint-disable-next-line jsx-a11y/media-has-caption
-          <audio
-            controls
-            preload="metadata"
-            src={team.recordingUrl}
-            className="w-full"
-          />
+          <WaveformPlayer src={team.recordingUrl} />
         ) : (
           <p className="text-sm text-gray-500">아직 녹음본이 없어요.</p>
         )}

@@ -3,15 +3,12 @@
 import { Pause, Play } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+import {
+  announceRecordingPlay,
+  formatPlaybackTime as formatTime,
+  onOtherRecordingPlay
+} from "@/lib/recordingPlayback"
 import { cn } from "@/lib/utils"
-
-// 목록에서 여러 곡이 겹쳐 나오지 않게 — 하나가 재생되면 나머지는 멈춘다
-const PLAY_EVENT = "amang:recording-play"
-
-const formatTime = (sec: number) =>
-  Number.isFinite(sec)
-    ? `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`
-    : "0:00"
 
 /** 표 칸에 들어가는 작은 녹음본 재생 버튼 */
 const RecordingPlayButton = ({
@@ -26,19 +23,16 @@ const RecordingPlayButton = ({
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(Number.NaN)
 
-  useEffect(() => {
-    const onOtherPlay = (e: Event) => {
-      if ((e as CustomEvent<string>).detail !== src) audioRef.current?.pause()
-    }
-    window.addEventListener(PLAY_EVENT, onOtherPlay)
-    return () => window.removeEventListener(PLAY_EVENT, onOtherPlay)
-  }, [src])
+  useEffect(
+    () => onOtherRecordingPlay(src, () => audioRef.current?.pause()),
+    [src]
+  )
 
   function toggle() {
     const audio = audioRef.current
     if (!audio) return
     if (audio.paused) {
-      window.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: src }))
+      announceRecordingPlay(src)
       void audio.play()
     } else {
       audio.pause()
