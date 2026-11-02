@@ -204,7 +204,9 @@ const TeamForm = ({
     return defaultValues
   }
   const secondPageForm = useForm<
-    z.infer<typeof memberSessionRequiredBaseSchema>
+    z.input<typeof memberSessionRequiredBaseSchema>,
+    unknown,
+    z.output<typeof memberSessionRequiredBaseSchema>
   >({
     resolver: zodResolver(memberSessionRequiredBaseSchema),
     defaultValues: constructDefaultValues(initialData)

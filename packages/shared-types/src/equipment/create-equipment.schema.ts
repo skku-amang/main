@@ -6,7 +6,7 @@ export const CreateEquipmentSchema = z.object({
   brand: safeString({ max: 100, message: "장비 브랜드 명은 필수입니다." }),
   model: safeString({ max: 100, message: "장비 모델 명은 필수입니다." }),
   category: z.nativeEnum(EquipCategory, {
-    required_error: "장비 카테고리는 필수입니다."
+    error: "장비 카테고리는 필수입니다."
   }),
   isAvailable: z.boolean().optional(),
   description: safeNullableString({ max: 500 }),

@@ -58,7 +58,7 @@ const formSchema = z.object({
   brand: z.string().min(1, "장비 브랜드 명은 필수입니다."),
   model: z.string().min(1, "장비 모델 명은 필수입니다."),
   category: z.nativeEnum(EquipCategory, {
-    required_error: "장비 카테고리는 필수입니다."
+    error: "장비 카테고리는 필수입니다."
   }),
   description: z.string().optional(),
   image: z.string().url().nullable().optional()

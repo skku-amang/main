@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -62,7 +63,11 @@ export function RentalFormDialog({
   const { data: users } = useUsers()
   const isEditing = !!editingRental
 
-  const form = useForm<CreateRental>({
+  const form = useForm<
+    z.input<typeof CreateRentalSchema>,
+    unknown,
+    CreateRental
+  >({
     resolver: zodResolver(CreateRentalSchema),
     defaultValues: {
       title: "",
@@ -164,7 +169,7 @@ export function RentalFormDialog({
                       value={
                         field.value instanceof Date
                           ? formatDatetimeLocal(field.value)
-                          : (field.value ?? "")
+                          : String(field.value ?? "")
                       }
                       onChange={(e) =>
                         field.onChange(
@@ -190,7 +195,7 @@ export function RentalFormDialog({
                       value={
                         field.value instanceof Date
                           ? formatDatetimeLocal(field.value)
-                          : (field.value ?? "")
+                          : String(field.value ?? "")
                       }
                       onChange={(e) =>
                         field.onChange(

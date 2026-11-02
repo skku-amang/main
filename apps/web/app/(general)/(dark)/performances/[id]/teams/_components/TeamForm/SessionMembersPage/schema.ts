@@ -13,8 +13,8 @@ export const memberSessionRequiredField = ({
 }) =>
   z.object({
     session: z.string().default(session).readonly(),
-    index: z.number({ required_error: "필수 항목" }).default(index).readonly(),
-    required: z.boolean({ required_error: "필수 항목" }).default(required),
+    index: z.number({ error: "필수 항목" }).default(index).readonly(),
+    required: z.boolean({ error: "필수 항목" }).default(required),
     member: z.union([z.number(), z.null()]).default(member ?? null)
   })
 

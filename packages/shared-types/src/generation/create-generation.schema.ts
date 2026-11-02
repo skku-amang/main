@@ -7,11 +7,11 @@ import { z } from "zod"
 export const CreateGenerationSchema = z
   .object({
     order: z
-      .number({ invalid_type_error: "기수는 숫자여야 합니다." })
+      .number({ error: "기수는 숫자여야 합니다." })
       .multipleOf(0.5, { message: "기수는 0.5 단위여야 합니다." }),
 
     leaderId: z
-      .number({ invalid_type_error: "기장 ID는 숫자여야 합니다." })
+      .number({ error: "기장 ID는 숫자여야 합니다." })
       .int("기장 ID는 정수여야 합니다.")
       .optional()
   })
