@@ -7,10 +7,7 @@ on:
   pull_request:
 
 jobs:
-  # 문서만 바뀐 PR은 검사·이미지 빌드를 건너뛴다. 필수 체크라 job은 그대로 돌고 step만 skip
-  # (workflow paths-ignore나 job if는 체크가 안 떠서 머지가 막힘).
-  # 문서 = docs/와 루트 *.md (docs-lint.yml 범위). 앱·패키지 안 md는 prettier --check 대상이라 제외
-  # main push는 항상 돈다 — Kargo는 최신 main 커밋의 이미지가 있어야 Freight를 만든다 (infra/kargo/warehouse.yaml)
+  # 문서(docs/, 루트 *.md)만 바뀐 PR은 검사·이미지 빌드를 건너뛴다
   changes:
     runs-on: ubuntu-latest
     permissions:
@@ -30,47 +27,42 @@ jobs:
 
   verify:
     needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        if: needs.changes.outputs.code == 'true'
         uses: actions/checkout@v7
 
       - name: Install pnpm
-        if: needs.changes.outputs.code == 'true'
         uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        if: needs.changes.outputs.code == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: "pnpm"
 
       - name: Install dependencies
-        if: needs.changes.outputs.code == 'true'
         run: pnpm install
 
       - name: Generate Prisma Client
-        if: needs.changes.outputs.code == 'true'
         run: pnpm turbo db:generate
 
       - name: Run Lint & Type Check
-        if: needs.changes.outputs.code == 'true'
         run: pnpm turbo lint check-types
 
       - name: Check Format
-        if: needs.changes.outputs.code == 'true'
         run: pnpm turbo format
 
       # check-types가 ^build에 의존하므로 packages가 이미 빌드됨
       # test가 ^build에 의존하므로 api도 빌드됨
       - name: Run Tests
-        if: needs.changes.outputs.code == 'true'
         run: pnpm turbo test
 
   build-image:
     needs: [changes, verify]
+    # matrix job은 건너뛰면 필수 체크 이름이 안 생겨 머지가 막히므로 job은 돌리고 빌드 step만 skip
+    if: ${{ !failure() && !cancelled() }}
     permissions:
       contents: read
       packages: write
