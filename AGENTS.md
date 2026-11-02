@@ -15,7 +15,7 @@ AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance
 
 ## 문서
 
-문서는 [Diátaxis](https://diataxis.fr/) 체계로 [`docs/`](docs/README.md)에 정리되어 있다. 새 문서 추가 시 목적에 맞는 칸(tutorials/how-to/reference/explanation)을 고른다. 설계 명세(spec)는 [docs/explanation/design/](docs/explanation/design/)에 쓴다. 구현 계획(plan)은 작업하는 동안만 쓰는 AI 실행자용 문서라 레포에 커밋하지 않는다 — gitignore된 `.tmp/plans/`에 두고, 실행 기록은 PR·커밋·이슈가 맡는다. 지금 규칙의 기준은 설계 문서다.
+문서는 [Diátaxis](https://diataxis.fr/) 체계로 [`docs/`](docs/README.md)에 정리되어 있다. 새 문서 추가 시 목적에 맞는 칸(tutorials/how-to/reference/explanation)을 고른다. 설계 명세(spec)는 [docs/explanation/design/](docs/explanation/design/)에 쓴다.
 
 ## Conventions
 
