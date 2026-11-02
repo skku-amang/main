@@ -8,21 +8,29 @@ import {
 } from "@repo/api-client"
 import { Response } from "express"
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "../auth-cookie.util"
+import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
 import { AccessTokenGuard } from "./access-token.guard"
 
 describe("AccessTokenGuard", () => {
   const clearCookie = jest.fn()
   const res = { clearCookie } as unknown as Response
 
+  const privateHandler = () => undefined
+  const publicHandler = () => undefined
+  Reflect.defineMetadata(IS_PUBLIC_KEY, true, publicHandler)
+
   const contextWithCookies = (
     cookies: Record<string, string>,
-    path = "/auth/me"
+    path = "/auth/me",
+    handler: () => void = privateHandler
   ) =>
     ({
       switchToHttp: () => ({
         getRequest: () => ({ cookies, path }),
         getResponse: () => res
-      })
+      }),
+      getHandler: () => handler,
+      getClass: () => AccessTokenGuard
     }) as unknown as ExecutionContext
 
   const guard = new AccessTokenGuard(new Reflector())
@@ -123,5 +131,52 @@ describe("AccessTokenGuard", () => {
     expect(
       guard.handleRequest(null, payload, null, contextWithCookies({}))
     ).toBe(payload)
+  })
+
+  describe("공개 조회 API", () => {
+    const publicContext = (cookies: Record<string, string>) =>
+      contextWithCookies(cookies, "/teams/1", publicHandler)
+
+    it("유효한 토큰이면 사용자 정보를 넘긴다", () => {
+      const payload = { sub: 1 }
+
+      expect(guard.handleRequest(null, payload, null, publicContext({}))).toBe(
+        payload
+      )
+    })
+
+    it("토큰이 없으면 비로그인으로 통과시킨다", () => {
+      expect(
+        guard.handleRequest(
+          null,
+          null,
+          { message: "No auth token" },
+          publicContext({})
+        )
+      ).toBeUndefined()
+    })
+
+    it("만료된 토큰이면 오류 없이 비로그인으로 통과시키고 cookie를 지우지 않는다", () => {
+      expect(
+        guard.handleRequest(
+          null,
+          null,
+          expiredInfo,
+          publicContext({ [ACCESS_TOKEN_COOKIE]: "expired-at" })
+        )
+      ).toBeUndefined()
+      expect(clearCookie).not.toHaveBeenCalled()
+    })
+
+    it("형식이 깨진 토큰이면 비로그인으로 통과시킨다", () => {
+      expect(
+        guard.handleRequest(
+          null,
+          null,
+          new JsonWebTokenError("invalid signature"),
+          publicContext({ [ACCESS_TOKEN_COOKIE]: "garbage" })
+        )
+      ).toBeUndefined()
+    })
   })
 })

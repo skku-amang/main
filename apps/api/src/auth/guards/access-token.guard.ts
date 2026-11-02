@@ -22,20 +22,26 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     super()
   }
 
-  canActivate(context: ExecutionContext) {
-    // 1. Reflector를 사용해 'isPublic' 메타데이터를 확인
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+  private isPublic(context: ExecutionContext) {
+    return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass()
     ])
+  }
 
-    // 2. 'isPublic'이 true이면, 즉시 접근을 허용
-    if (isPublic) {
+  async canActivate(context: ExecutionContext) {
+    // 공개 API도 토큰이 있으면 읽는다 (운영진에게만 보이는 정보가 있음).
+    // 토큰이 없거나 깨져도 비로그인으로 통과 — handleRequest가 user를 비운다
+    if (this.isPublic(context)) {
+      try {
+        await super.canActivate(context)
+      } catch {
+        // 비로그인으로 계속
+      }
       return true
     }
 
-    // 3. 'isPublic'이 아니면, 원래의 JWT 인증 로직을 실행
-    return super.canActivate(context)
+    return (await super.canActivate(context)) as boolean
   }
 
   handleRequest<TUser = JwtPayload>(
@@ -45,6 +51,10 @@ export class AccessTokenGuard extends AuthGuard("jwt-access") {
     context: ExecutionContext,
     status?: any
   ): TUser {
+    if (this.isPublic(context)) {
+      return (err || info || !user ? undefined : user) as TUser
+    }
+
     if (info) {
       if (info instanceof TokenExpiredError) {
         const req = context.switchToHttp().getRequest<Request>()
