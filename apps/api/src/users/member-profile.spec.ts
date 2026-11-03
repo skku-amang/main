@@ -156,4 +156,41 @@ describe("toMemberProfile", () => {
     expect(asAdmin.teams.map((t) => t.id)).toEqual([30])
     expect(asMember.teams).toEqual([])
   })
+
+  it("집계 단계 공연의 팀도 다른 사람에게는 빠진다", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const deciding = performance(4, "2027-01-01", {
+      feedbackStartAt: new Date(Date.now() - 3 * DAY),
+      feedbackEndAt: new Date(Date.now() - DAY),
+      endAt: new Date(Date.now() + 2 * DAY)
+    })
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(40, deciding)], joinedTeams: [] }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams).toEqual([])
+  })
+
+  it("팀원으로 참여한 피드백 단계 공연의 팀도 다른 사람에게는 빠진다", () => {
+    const profile = toMemberProfile(
+      row({
+        leadingTeams: [],
+        joinedTeams: [
+          {
+            teamSession: {
+              session: { name: "DRUM" },
+              team: team(30, evaluatingPerformance())
+            }
+          },
+          { teamSession: { session: { name: "DRUM" }, team: team(10, spring) } }
+        ]
+      }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([10])
+  })
 })
