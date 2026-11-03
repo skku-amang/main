@@ -38,6 +38,16 @@ const team = (id: number, perf: ReturnType<typeof performance>) => ({
   Performance: perf
 })
 
+// 피드백 단계 공연. 공연 종료도 지금 기준이라야 날짜가 지나도 DONE이 되지 않는다
+const evaluatingPerformance = () => {
+  const DAY = 24 * 60 * 60 * 1000
+  return performance(3, "2027-01-01", {
+    feedbackStartAt: new Date(Date.now() - DAY),
+    feedbackEndAt: new Date(Date.now() + DAY),
+    endAt: new Date(Date.now() + 2 * DAY)
+  })
+}
+
 const spring = performance(1, "2026-04-01")
 const fall = performance(2, "2026-10-03")
 
@@ -107,11 +117,7 @@ describe("toMemberProfile", () => {
   })
 
   it("피드백 단계 공연의 팀은 프로필 팀 목록에서 빠지고 일정은 응답에 없다", () => {
-    const DAY = 24 * 60 * 60 * 1000
-    const evaluating = performance(3, "2027-01-01", {
-      feedbackStartAt: new Date(Date.now() - DAY),
-      feedbackEndAt: new Date(Date.now() + DAY)
-    })
+    const evaluating = evaluatingPerformance()
     const profile = toMemberProfile(
       row({ leadingTeams: [team(10, spring), team(30, evaluating)] }),
       99
@@ -127,11 +133,7 @@ describe("toMemberProfile", () => {
   })
 
   it("본인 프로필에서는 피드백 단계 공연의 팀도 보인다", () => {
-    const DAY = 24 * 60 * 60 * 1000
-    const evaluating = performance(3, "2027-01-01", {
-      feedbackStartAt: new Date(Date.now() - DAY),
-      feedbackEndAt: new Date(Date.now() + DAY)
-    })
+    const evaluating = evaluatingPerformance()
     const profile = toMemberProfile(
       row({ leadingTeams: [team(30, evaluating)], joinedTeams: [] }),
       7
@@ -142,11 +144,7 @@ describe("toMemberProfile", () => {
   })
 
   it("운영진은 다른 사람 프로필에서도 피드백 단계 공연의 팀을 본다", () => {
-    const DAY = 24 * 60 * 60 * 1000
-    const evaluating = performance(3, "2027-01-01", {
-      feedbackStartAt: new Date(Date.now() - DAY),
-      feedbackEndAt: new Date(Date.now() + DAY)
-    })
+    const evaluating = evaluatingPerformance()
     const someonesRow = row({
       leadingTeams: [team(30, evaluating)],
       joinedTeams: []
