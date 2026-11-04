@@ -14,9 +14,15 @@ export const performanceFindOneInclude = {
   }
 } satisfies Prisma.PerformanceInclude
 
-export type PerformanceDetail = Prisma.PerformanceGetPayload<{
+type PerformanceWithTeamLeaders = Prisma.PerformanceGetPayload<{
   include: typeof performanceFindOneInclude
 }>
+
+export type PerformanceDetail = Omit<PerformanceWithTeamLeaders, "teams"> & {
+  teams: (PerformanceWithTeamLeaders["teams"][number] & {
+    membersHidden?: boolean
+  })[]
+}
 
 export const performanceTeamsInclude = {
   teams: {
@@ -43,7 +49,9 @@ type PerformanceWithTeams = Prisma.PerformanceGetPayload<{
   include: typeof performanceTeamsInclude
 }>
 
-export type PerformanceTeamsList = PerformanceWithTeams["teams"]
+export type PerformanceTeamsList = (PerformanceWithTeams["teams"][number] & {
+  membersHidden?: boolean
+})[]
 
 export const PERFORMANCE_STAGES = [
   "PREPARING",
@@ -96,6 +104,10 @@ export const getPerformanceStage = (
   if (reached(p.recruitStartAt, now)) return "RECRUITING"
   return "PREPARING"
 }
+
+/** 피드백·집계 단계 — 운영진이 아니면 그 공연 팀의 팀원을 가린다 (설계 5.2) */
+export const isMemberMaskedStage = (stage: PerformanceStage) =>
+  stage === "EVALUATION" || stage === "DECISION"
 
 export const isPerformanceRecruiting = (
   p: PerformanceSchedule,

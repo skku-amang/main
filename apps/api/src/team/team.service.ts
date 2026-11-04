@@ -27,11 +27,14 @@ import {
   isTeamRosterOpen,
   PerformanceStage,
   SESSION_DISPLAY_NAME,
+  TeamDetail,
+  TeamList,
   teamWithBasicUsersInclude,
   teamWithPublicUsersInclude
 } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
+import { maskTeamsFor } from "./team-masking"
 import {
   TEAM_EVENTS,
   TeamCreatedEvent,
@@ -174,7 +177,7 @@ export class TeamService {
         new TeamCreatedEvent(team.id, actorId)
       )
 
-      return this.findOne(team.id)
+      return this.findOne(team.id, actorId)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
@@ -198,22 +201,23 @@ export class TeamService {
     }
   }
 
-  async findAll() {
+  async findAll(viewerId: number | undefined): Promise<TeamList> {
     const teams = await this.prisma.team.findMany({
       include: teamWithBasicUsersInclude
     })
 
-    return teams
+    return maskTeamsFor(this.prisma, teams, viewerId)
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, viewerId: number | undefined): Promise<TeamDetail> {
     const team = await this.prisma.team.findUnique({
       where: { id },
       include: teamWithPublicUsersInclude
     })
     if (!team) throw new NotFoundError(`ID가 ${id}인 팀을 찾을 수 없습니다.`)
 
-    return team
+    const [visible] = await maskTeamsFor(this.prisma, [team], viewerId)
+    return visible ?? team
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto, actorId: number) {
@@ -420,7 +424,7 @@ export class TeamService {
           new TeamMemberAddedEvent(id, userId, sessionIds, actorId)
         )
 
-      return this.findOne(id)
+      return this.findOne(id, actorId)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
@@ -484,11 +488,11 @@ export class TeamService {
     if (team.recordingUrl && team.recordingUrl !== recordingUrl)
       this.objectStorageService.deleteObjectSafely(team.recordingUrl)
 
-    return this.findOne(id)
+    return this.findOne(id, undefined)
   }
 
   async remove(id: number, actorId: number) {
-    const team = await this.findOne(id)
+    const team = await this.findOne(id, actorId)
     await this.assertRosterOpen(
       team.performanceId,
       "모집이 끝난 팀은 삭제할 수 없습니다."
@@ -600,7 +604,7 @@ export class TeamService {
         )
       )
 
-      return this.findOne(id)
+      return this.findOne(id, userId)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
@@ -690,7 +694,7 @@ export class TeamService {
           userId
         )
       )
-      return this.findOne(id)
+      return this.findOne(id, userId)
     } catch (error) {
       throw error
     }

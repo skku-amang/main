@@ -80,9 +80,11 @@ export default function TeamsAdminPage() {
               </AvatarFallback>
             </Avatar>
             <span>{leader.name}</span>
-            <span className="text-xs text-muted-foreground">
-              {formatGenerationOrder(leader.generation.order)}기
-            </span>
+            {leader.generation && (
+              <span className="text-xs text-muted-foreground">
+                {formatGenerationOrder(leader.generation.order)}기
+              </span>
+            )}
           </div>
         )
       }))

@@ -3,10 +3,33 @@ import { Prisma } from "@repo/database"
 
 type ProfileRow = Prisma.UserGetPayload<{ select: typeof memberProfileSelect }>
 
-const performance = (id: number, startAt: string) => ({
+const noDates: Record<
+  | "recruitStartAt"
+  | "recruitEndAt"
+  | "feedbackStartAt"
+  | "feedbackEndAt"
+  | "decidedAt"
+  | "endAt",
+  Date | null
+> = {
+  recruitStartAt: null,
+  recruitEndAt: null,
+  feedbackStartAt: null,
+  feedbackEndAt: null,
+  decidedAt: null,
+  endAt: null
+}
+const performance = (
+  id: number,
+  startAt: string,
+  schedule: Partial<typeof noDates> = {}
+) => ({
   id,
   name: `공연${id}`,
-  startAt: new Date(startAt)
+  startAt: new Date(startAt),
+  ...noDates,
+  endAt: new Date(startAt),
+  ...schedule
 })
 const team = (id: number, perf: ReturnType<typeof performance>) => ({
   id,
@@ -14,6 +37,16 @@ const team = (id: number, perf: ReturnType<typeof performance>) => ({
   songArtist: `가수${id}`,
   Performance: perf
 })
+
+// 피드백 단계 공연. 공연 종료도 지금 기준이라야 날짜가 지나도 DONE이 되지 않는다
+const evaluatingPerformance = () => {
+  const DAY = 24 * 60 * 60 * 1000
+  return performance(3, "2027-01-01", {
+    feedbackStartAt: new Date(Date.now() - DAY),
+    feedbackEndAt: new Date(Date.now() + DAY),
+    endAt: new Date(Date.now() + 2 * DAY)
+  })
+}
 
 const spring = performance(1, "2026-04-01")
 const fall = performance(2, "2026-10-03")
@@ -81,5 +114,83 @@ describe("toMemberProfile", () => {
       },
       { id: 10, isLeader: true, sessions: ["DRUM"], performance: "공연1" }
     ])
+  })
+
+  it("피드백 단계 공연의 팀은 프로필 팀 목록에서 빠지고 일정은 응답에 없다", () => {
+    const evaluating = evaluatingPerformance()
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(10, spring), team(30, evaluating)] }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([20, 10])
+    expect(Object.keys(profile.teams[1]?.performance ?? {}).sort()).toEqual([
+      "id",
+      "name",
+      "startAt"
+    ])
+  })
+
+  it("본인 프로필에서는 피드백 단계 공연의 팀도 보인다", () => {
+    const evaluating = evaluatingPerformance()
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(30, evaluating)], joinedTeams: [] }),
+      7
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([30])
+  })
+
+  it("운영진은 다른 사람 프로필에서도 피드백 단계 공연의 팀을 본다", () => {
+    const evaluating = evaluatingPerformance()
+    const someonesRow = row({
+      leadingTeams: [team(30, evaluating)],
+      joinedTeams: []
+    })
+    const asAdmin = toMemberProfile(someonesRow, 99, true)
+    const asMember = toMemberProfile(someonesRow, 99, false)
+    if (!asAdmin.isPublic || !asMember.isPublic) throw new Error("공개여야 함")
+
+    expect(asAdmin.teams.map((t) => t.id)).toEqual([30])
+    expect(asMember.teams).toEqual([])
+  })
+
+  it("집계 단계 공연의 팀도 다른 사람에게는 빠진다", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const deciding = performance(4, "2027-01-01", {
+      feedbackStartAt: new Date(Date.now() - 3 * DAY),
+      feedbackEndAt: new Date(Date.now() - DAY),
+      endAt: new Date(Date.now() + 2 * DAY)
+    })
+    const profile = toMemberProfile(
+      row({ leadingTeams: [team(40, deciding)], joinedTeams: [] }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams).toEqual([])
+  })
+
+  it("팀원으로 참여한 피드백 단계 공연의 팀도 다른 사람에게는 빠진다", () => {
+    const profile = toMemberProfile(
+      row({
+        leadingTeams: [],
+        joinedTeams: [
+          {
+            teamSession: {
+              session: { name: "DRUM" },
+              team: team(30, evaluatingPerformance())
+            }
+          },
+          { teamSession: { session: { name: "DRUM" }, team: team(10, spring) } }
+        ]
+      }),
+      99
+    )
+    if (!profile.isPublic) throw new Error("공개여야 함")
+
+    expect(profile.teams.map((t) => t.id)).toEqual([10])
   })
 })

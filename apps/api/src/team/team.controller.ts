@@ -35,14 +35,16 @@ export class TeamController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.teamService.findAll()
+  findAll(@Req() req: Request) {
+    const user = req.user as JwtPayload | undefined
+    return this.teamService.findAll(user?.sub)
   }
 
   @Get(":id")
   @Public()
-  findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.teamService.findOne(id)
+  findOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as JwtPayload | undefined
+    return this.teamService.findOne(id, user?.sub)
   }
 
   @Put(":id")

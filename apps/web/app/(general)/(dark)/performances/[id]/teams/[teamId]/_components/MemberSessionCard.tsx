@@ -1,12 +1,11 @@
 import dayjs from "dayjs"
 import { Minus } from "lucide-react"
-import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 
 import { useToast } from "@/components/hooks/use-toast"
 import { useUnapplyFromTeam } from "@/hooks/api/useTeam"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import ROUTES from "@/constants/routes"
+import ProfileLink from "@/components/ProfileLink"
 import { getSessionDisplayName } from "@/constants/session"
 import { useAuth } from "@/lib/providers/auth-provider"
 import type { SessionNameValue } from "@/constants/session"
@@ -86,17 +85,19 @@ const MemberSessionCard = ({
             {getSessionDisplayName(sessionName)}
             {sessionIndex}
           </div>
-          <Link
-            href={ROUTES.MEMBER_PROFILE(user.id)}
+          <ProfileLink
+            userId={user.id}
             className="block text-sm font-normal leading-3 text-slate-700 hover:underline md:text-xl md:font-medium md:leading-relaxed"
           >
             {user.generation &&
               `${formatGenerationOrder(user.generation.order)}기 `}
             {user.name}
-          </Link>
-          <div className="hidden text-sm text-gray-400 md:block">
-            #{user.nickname}
-          </div>
+          </ProfileLink>
+          {user.nickname && (
+            <div className="hidden text-sm text-gray-400 md:block">
+              #{user.nickname}
+            </div>
+          )}
           <time
             dateTime={new Date(joinedAt).toISOString()}
             className="mt-1 block text-xs text-gray-400 md:mt-0"

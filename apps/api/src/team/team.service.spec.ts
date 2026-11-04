@@ -111,11 +111,31 @@ describe("TeamService", () => {
       performance: {
         findUnique: jest.fn(({ where }: { where: { id: number } }) =>
           where.id in schedules ? schedules[where.id] : null
+        ),
+        findMany: jest.fn(({ where }: { where: { id: { in: number[] } } }) =>
+          where.id.in.map((id) => ({ id, ...schedules[id] }))
         )
       },
       team: {
+        findMany: jest.fn(() => [
+          {
+            ...baseTeam,
+            id: 1,
+            performanceId: RECRUITING_ID,
+            leader: { id: 1, name: "팀장" },
+            teamSessions: []
+          },
+          {
+            ...baseTeam,
+            id: 2,
+            performanceId: EVALUATION_ID,
+            leader: { id: 1, name: "팀장" },
+            teamSessions: []
+          }
+        ]),
         findUnique: jest.fn(() => ({
           ...baseTeam,
+          leader: { id: 1, name: "팀장" },
           ...storedTeam,
           description: null,
           image: null,
@@ -133,7 +153,8 @@ describe("TeamService", () => {
       },
       teamMember: {
         createMany: jest.fn(),
-        deleteMany: jest.fn()
+        deleteMany: jest.fn(),
+        findMany: jest.fn(() => [])
       },
       session: {
         findUnique: jest.fn(({ where }: { where: { id: number } }) =>
@@ -175,6 +196,27 @@ describe("TeamService", () => {
 
   const emitted = (name: string) =>
     emit.mock.calls.filter(([n]) => n === name).map(([, event]) => event)
+
+  describe("피드백 기간 팀원 가림", () => {
+    it("findAll은 피드백 단계 공연의 팀만 가리고 모집 중 공연 팀은 그대로 둔다", async () => {
+      const teams = await service.findAll(5)
+
+      expect(teams.map((t) => t.leader.name)).toEqual(["팀장", "비공개"])
+    })
+
+    it("피드백 단계 공연의 팀 상세는 운영진이 아니면 가린다", async () => {
+      storedTeam.performanceId = EVALUATION_ID
+
+      expect((await service.findOne(10, undefined)).leader.name).toBe("비공개")
+      expect((await service.findOne(10, 5)).membersHidden).toBe(true)
+    })
+
+    it("운영진에게는 팀 상세를 가리지 않는다", async () => {
+      storedTeam.performanceId = EVALUATION_ID
+
+      expect((await service.findOne(10, ADMIN)).leader.name).toBe("팀장")
+    })
+  })
 
   describe("create", () => {
     it.each([

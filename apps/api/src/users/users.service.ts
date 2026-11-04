@@ -4,6 +4,7 @@ import { ConflictError, NotFoundError, ValidationError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../prisma/prisma.service"
+import { isUserAdmin } from "../auth/is-admin.util"
 import { USER_EVENTS, UserApprovedEvent } from "./users.events"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { publicUserSelector, detailedUserSelector } from "@repo/shared-types"
@@ -99,7 +100,11 @@ export class UsersService {
     if (!user)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
-    return toMemberProfile(user, viewerId)
+    return toMemberProfile(
+      user,
+      viewerId,
+      await isUserAdmin(this.prisma, viewerId)
+    )
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {

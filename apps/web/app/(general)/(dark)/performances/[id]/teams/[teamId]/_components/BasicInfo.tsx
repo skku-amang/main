@@ -1,5 +1,4 @@
 import dayjs from "dayjs"
-import Link from "next/link"
 
 import TeamActionsMenu from "@/components/TeamActionsMenu"
 import RelativeTime from "@/components/RelativeTime"
@@ -12,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import ROUTES from "@/constants/routes"
+import ProfileLink from "@/components/ProfileLink"
 import { useTeamBookmarks } from "@/hooks/api/useTeamBookmark"
 import { isTeamSatisfied } from "@/lib/team/teamSession"
 import { TeamDetail, formatGenerationOrder } from "@repo/shared-types"
@@ -42,14 +41,14 @@ const BasicInfo = ({ team, canEdit = false }: BasicInfoProps) => {
           <AvatarImage src={team.leader?.image ?? undefined} />
           <AvatarFallback>{team.leader?.name.substring(0, 1)}</AvatarFallback>
         </Avatar>
-        <Link
-          href={ROUTES.MEMBER_PROFILE(team.leader.id)}
+        <ProfileLink
+          userId={team.leader.id}
           className="text-xs font-medium leading-3 text-primary hover:underline md:text-base"
         >
           {team.leader.generation &&
             `${formatGenerationOrder(team.leader.generation.order)}기 `}
           {team.leader.name}
-        </Link>
+        </ProfileLink>
         <div className="text-xs font-light leading-3 text-gray-400 md:text-base md:font-normal">
           <Popover>
             <PopoverTrigger className="underline decoration-dotted underline-offset-4">

@@ -7,12 +7,15 @@ import { NotFoundError, InvalidPerformanceDateError } from "@repo/api-client"
 import { Prisma } from "@repo/database"
 import {
   GetPerformancesQuery,
+  PerformanceDetail,
   performanceFindOneInclude,
   performanceTeamsInclude,
+  PerformanceTeamsList,
   recruitingPerformanceWhere,
   validatePerformanceSchedule
 } from "@repo/shared-types"
 import { ObjectStorageService } from "../object-storage/object-storage.service"
+import { maskTeamsFor } from "../team/team-masking"
 import {
   PERFORMANCE_EVENTS,
   PerformanceCreatedEvent,
@@ -46,7 +49,7 @@ export class PerformanceService {
       new PerformanceCreatedEvent(performance.id, actorId)
     )
 
-    return this.findOne(performance.id)
+    return this.findOne(performance.id, actorId)
   }
 
   async findAll(status?: GetPerformancesQuery["status"]) {
@@ -66,7 +69,10 @@ export class PerformanceService {
     return performances
   }
 
-  async findTeamsByPerformanceId(id: number) {
+  async findTeamsByPerformanceId(
+    id: number,
+    viewerId: number | undefined
+  ): Promise<PerformanceTeamsList> {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
       include: performanceTeamsInclude
@@ -74,10 +80,13 @@ export class PerformanceService {
 
     if (!performance)
       throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
-    return performance.teams
+    return maskTeamsFor(this.prisma, performance.teams, viewerId)
   }
 
-  async findOne(id: number) {
+  async findOne(
+    id: number,
+    viewerId: number | undefined
+  ): Promise<PerformanceDetail> {
     const performance = await this.prisma.performance.findUnique({
       where: { id },
       include: performanceFindOneInclude
@@ -86,7 +95,10 @@ export class PerformanceService {
     if (!performance)
       throw new NotFoundError(`ID가 ${id}인 공연을 찾을 수 없습니다.`)
 
-    return performance
+    return {
+      ...performance,
+      teams: await maskTeamsFor(this.prisma, performance.teams, viewerId)
+    }
   }
 
   async update(
@@ -136,7 +148,7 @@ export class PerformanceService {
       )
         this.objectStorageService.deleteObjectSafely(oldImageUrl)
 
-      return this.findOne(id)
+      return this.findOne(id, actorId)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
@@ -152,7 +164,7 @@ export class PerformanceService {
   }
 
   async remove(id: number) {
-    const performance = await this.findOne(id)
+    const performance = await this.findOne(id, undefined)
     try {
       await this.prisma.performance.delete({ where: { id } })
     } catch (error) {
