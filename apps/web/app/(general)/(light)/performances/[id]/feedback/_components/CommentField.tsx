@@ -3,7 +3,10 @@ import { useEffect, useRef, useState } from "react"
 
 const SAVE_DELAY_MS = 800
 
-/** 자유 의견. 입력을 멈추고 잠시 뒤, 또는 칸을 떠날 때 저장 */
+/**
+ * 자유 의견. 입력을 멈추고 잠시 뒤, 칸을 떠날 때, 줄이 접히거나 페이지를 떠날 때 저장.
+ * 저장에 실패하면 다음 입력·포커스 해제 때 다시 보낸다.
+ */
 const CommentField = ({
   value,
   disabled,
@@ -11,18 +14,25 @@ const CommentField = ({
 }: {
   value: string | null
   disabled: boolean
-  onSave: (comment: string) => void
+  onSave: (comment: string) => Promise<boolean>
 }) => {
   const [draft, setDraft] = useState(value ?? "")
   const saved = useRef(value ?? "")
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // 접힐 때(언마운트) 정리 함수가 최신 값을 쓰도록
+  const latest = useRef({ draft, onSave })
+  latest.current = { draft, onSave }
 
   const flush = () => {
     if (timer.current) clearTimeout(timer.current)
     timer.current = null
-    if (draft === saved.current) return
-    saved.current = draft
-    onSave(draft)
+    const { draft: text, onSave: save } = latest.current
+    if (text === saved.current) return
+    const previous = saved.current
+    saved.current = text
+    void save(text).then((ok) => {
+      if (!ok && saved.current === text) saved.current = previous
+    })
   }
 
   useEffect(() => {
@@ -31,9 +41,11 @@ const CommentField = ({
     return () => {
       if (timer.current) clearTimeout(timer.current)
     }
-    // flush는 매 렌더 새로 만들어지지만 draft가 같으면 같은 일을 한다
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // flush는 latest ref로 최신 값을 읽으므로 draft만 보면 된다
   }, [draft])
+
+  // iOS Safari는 다른 곳을 탭해도 blur가 안 날 때가 많다 — 사라질 때 남은 의견을 저장
+  useEffect(() => () => flush(), [])
 
   return (
     <textarea

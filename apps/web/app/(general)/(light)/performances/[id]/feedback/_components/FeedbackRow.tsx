@@ -72,7 +72,7 @@ const FeedbackRow = ({
   readOnly: boolean
   onToggle: () => void
   onScore: (key: FeedbackDimensionKey, score: number) => void
-  onComment: (comment: string) => void
+  onComment: (comment: string) => Promise<boolean>
 }) => {
   const own = status === "OWN"
 

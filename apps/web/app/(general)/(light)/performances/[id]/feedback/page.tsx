@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 import { toast } from "@/components/hooks/use-toast"
 import DefaultPageHeader, {
@@ -82,8 +82,17 @@ const FeedbackPage = () => {
   const reviewable = targets.filter((t) => statusOf(t.id) !== "OWN")
   const doneCount = reviewable.filter((t) => statusOf(t.id) === "DONE").length
   const firstOpen = reviewable.find((t) => OPEN.includes(statusOf(t.id)))
-  const expandedId =
-    teamParam === COLLAPSED ? null : (teamParam ?? firstOpen?.id ?? null)
+  const expandedId = teamParam === COLLAPSED ? null : teamParam
+
+  // 처음 들어왔을 때 한 번만 첫 미완료 곡을 펼친다. 매 렌더 다시 고르면
+  // 마지막 점수를 누르는 순간 다음 곡으로 넘어가 버린다 (설계: 자동으로 넘어가지 않음)
+  const initialPicked = useRef(false)
+  useEffect(() => {
+    if (initialPicked.current || !mine || !teams) return
+    initialPicked.current = true
+    if (teamParam === null && firstOpen)
+      void setTeamParam(firstOpen.id, { history: "replace" })
+  }, [mine, teams, teamParam, firstOpen, setTeamParam])
 
   useEffect(() => {
     if (expandedId === null) return
@@ -92,21 +101,36 @@ const FeedbackPage = () => {
       ?.scrollIntoView({ block: "start", behavior: "smooth" })
   }, [expandedId])
 
+  // 같은 팀 저장은 한 줄로 세운다 (연타 시 서버 도착 순서 = 누른 순서).
+  // 저장이 하나도 안 남으면 서버 값으로 다시 맞춘다 — 화면만 바뀐 값이 남지 않게
+  const queues = useRef(new Map<number, Promise<unknown>>())
+  const pending = useRef(0)
   const save = async (teamId: number, patch: UpsertFeedback) => {
     const key = myFeedbackKey(performanceId)
+    await queryClient.cancelQueries({ queryKey: key })
     queryClient.setQueryData<MyFeedbackSummary>(
       key,
       (prev) => prev && applyPatch(prev, teamId, patch)
     )
+    pending.current += 1
+    const run = (queues.current.get(teamId) ?? Promise.resolve())
+      .catch(() => undefined)
+      .then(() => upsert([teamId, patch]))
+    queues.current.set(teamId, run)
     try {
-      await upsert([teamId, patch])
+      await run
+      return true
     } catch {
       toast({
         variant: "destructive",
         title: "저장하지 못했어요",
         description: "잠시 후 다시 눌러 주세요."
       })
-      void queryClient.invalidateQueries({ queryKey: key })
+      return false
+    } finally {
+      pending.current -= 1
+      if (pending.current === 0)
+        void queryClient.invalidateQueries({ queryKey: key })
     }
   }
 
@@ -196,7 +220,7 @@ const FeedbackPage = () => {
                 onScore={(key: FeedbackDimensionKey, score) =>
                   void save(team.id, { [key]: score })
                 }
-                onComment={(comment) => void save(team.id, { comment })}
+                onComment={(comment) => save(team.id, { comment })}
               />
             ))}
           </ul>
