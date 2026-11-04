@@ -15,7 +15,12 @@ export async function proxy(req: NextRequest) {
   if (!req.cookies.has(ACCESS_TOKEN_COOKIE) && pathname !== ROUTES.LOGIN) {
     const url = req.nextUrl.clone()
     url.pathname = ROUTES.LOGIN
-    url.searchParams.set("callbackUrl", req.nextUrl.pathname)
+    // 로그인 뒤 같은 곳으로 — 쿼리(?team= 등)까지 넘긴다
+    url.search = ""
+    url.searchParams.set(
+      "callbackUrl",
+      `${req.nextUrl.pathname}${req.nextUrl.search}`
+    )
     return NextResponse.redirect(url)
   }
 
