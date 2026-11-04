@@ -147,7 +147,7 @@ const FeedbackPage = () => {
       ]}
     >
       {mine?.eligible && reviewable.length > 0 && (
-        <div className="w-full max-w-md">
+        <div className="mx-auto w-full max-w-md">
           <p className="text-sm text-neutral-500">
             {doneCount} / {reviewable.length} 완료
           </p>
