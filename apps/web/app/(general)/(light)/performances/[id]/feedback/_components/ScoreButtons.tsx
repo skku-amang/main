@@ -7,41 +7,57 @@ const SCORES = Array.from(
   (_, i) => FEEDBACK_SCORE_MIN + i
 )
 
-/** 문항 하나의 1~5 버튼. 누르는 즉시 onChange (저장은 부모가) */
+/**
+ * 문항 하나의 1~5 선택. 고르는 즉시 onChange (저장은 부모가).
+ * 기본 radio라 키보드 방향키로 옮겨 고를 수 있다.
+ */
 const ScoreButtons = ({
+  name,
   label,
   value,
   disabled,
   onChange
 }: {
+  /** 같은 페이지의 다른 문항·팀과 겹치지 않는 radio 묶음 이름 */
+  name: string
   label: string
   value: number | null
   disabled: boolean
   onChange: (score: number) => void
 }) => (
-  <div className="flex items-center justify-between gap-3 py-1.5">
-    <span className="text-sm text-slate-700">{label}</span>
-    <div role="radiogroup" aria-label={label} className="flex gap-1.5">
+  <fieldset
+    disabled={disabled}
+    className="flex items-center justify-between gap-3 py-1.5"
+  >
+    <legend className="sr-only">{label}</legend>
+    <span aria-hidden className="text-sm text-slate-700">
+      {label}
+    </span>
+    <div className="flex gap-1.5">
       {SCORES.map((score) => (
-        <button
+        <label
           key={score}
-          type="button"
-          role="radio"
-          aria-checked={value === score}
-          disabled={disabled}
-          onClick={() => onChange(score)}
           className={cn(
-            "size-9 rounded-full border text-sm tabular-nums transition-colors disabled:opacity-50",
+            "flex size-9 cursor-pointer items-center justify-center rounded-full border text-sm tabular-nums transition-colors focus-within:ring-2 focus-within:ring-blue-900 focus-within:ring-offset-1",
+            disabled && "cursor-default opacity-50",
             value === score
               ? "border-blue-900 bg-blue-900 font-semibold text-white"
               : "border-slate-300 text-slate-600 hover:border-blue-900"
           )}
         >
+          <input
+            type="radio"
+            name={name}
+            value={score}
+            checked={value === score}
+            onChange={() => onChange(score)}
+            className="sr-only"
+          />
           {score}
-        </button>
+        </label>
       ))}
     </div>
-  </div>
+  </fieldset>
 )
 
 export default ScoreButtons

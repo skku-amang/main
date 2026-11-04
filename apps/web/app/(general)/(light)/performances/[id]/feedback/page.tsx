@@ -82,7 +82,10 @@ const FeedbackPage = () => {
   const reviewable = targets.filter((t) => statusOf(t.id) !== "OWN")
   const doneCount = reviewable.filter((t) => statusOf(t.id) === "DONE").length
   const firstOpen = reviewable.find((t) => OPEN.includes(statusOf(t.id)))
-  const expandedId = teamParam === COLLAPSED ? null : teamParam
+  // 주소에 본인 팀·대상 아닌 팀이 와도 펼치지 않는다 (저장하면 거부됨)
+  const expandedId = reviewable.some((t) => t.id === teamParam)
+    ? teamParam
+    : null
 
   // 처음 들어왔을 때 한 번만 첫 미완료 곡을 펼친다. 매 렌더 다시 고르면
   // 마지막 점수를 누르는 순간 다음 곡으로 넘어가 버린다 (설계: 자동으로 넘어가지 않음)
@@ -100,6 +103,22 @@ const FeedbackPage = () => {
       .getElementById(`feedback-team-${expandedId}`)
       ?.scrollIntoView({ block: "start", behavior: "smooth" })
   }, [expandedId])
+
+  // 마감 시각이 지나면 단계를 다시 받아 입력을 막는다 (열어 둔 채 마감을 넘기는 경우)
+  const feedbackEndAt = performance?.feedbackEndAt
+  useEffect(() => {
+    if (!feedbackEndAt || mine?.stage !== "EVALUATION") return
+    const ms = new Date(feedbackEndAt).getTime() - Date.now() + 1000
+    if (ms <= 0 || ms > 2 ** 31 - 1) return
+    const timer = setTimeout(
+      () =>
+        void queryClient.invalidateQueries({
+          queryKey: myFeedbackKey(performanceId)
+        }),
+      ms
+    )
+    return () => clearTimeout(timer)
+  }, [feedbackEndAt, mine?.stage, performanceId, queryClient])
 
   // 같은 팀 저장은 한 줄로 세운다 (연타 시 서버 도착 순서 = 누른 순서).
   // 저장이 하나도 안 남으면 서버 값으로 다시 맞춘다 — 화면만 바뀐 값이 남지 않게

@@ -141,6 +141,7 @@ const FeedbackRow = ({
             {FEEDBACK_DIMENSIONS.map(({ key, label }) => (
               <ScoreButtons
                 key={key}
+                name={`feedback-${team.id}-${key}`}
                 label={label}
                 value={row?.[key] ?? null}
                 disabled={readOnly}

@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
 
 const LABEL: Record<FeedbackStatus, string> = {
   DONE: "✔ 피드백 완료",
-  PARTIAL: "피드백 전",
+  PARTIAL: "◐ 피드백 일부만",
   NONE: "피드백 전",
   OWN: "본인 팀",
   NOT_TARGET: "미제출"

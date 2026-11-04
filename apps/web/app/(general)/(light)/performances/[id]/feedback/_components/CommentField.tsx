@@ -44,6 +44,15 @@ const CommentField = ({
     // flush는 latest ref로 최신 값을 읽으므로 draft만 보면 된다
   }, [draft])
 
+  // 다른 기기에서 고친 의견이 다시 불러와지면, 여기서 쓰던 중이 아닐 때만 반영한다
+  useEffect(() => {
+    if (draft !== saved.current) return
+    setDraft(value ?? "")
+    saved.current = value ?? ""
+    // value가 바뀔 때만 맞춘다 — draft를 넣으면 입력 중에 덮어쓴다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   // iOS Safari는 다른 곳을 탭해도 blur가 안 날 때가 많다 — 사라질 때 남은 의견을 저장
   useEffect(() => () => flush(), [])
 
