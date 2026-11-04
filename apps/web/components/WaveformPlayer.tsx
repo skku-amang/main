@@ -13,6 +13,9 @@ import { cn } from "@/lib/utils"
 
 type Status = "loading" | "ready" | "error"
 
+// 잠금화면 컨트롤을 지금 쥐고 있는 재생기. 사라질 때 자기 것일 때만 비운다
+let mediaSessionOwner: string | null = null
+
 /**
  * 소리 크기 파형으로 그린 녹음본 재생기. 세게 치는 구간을 눈으로 찾아 누르면 거기로 이동한다.
  * 파형을 못 그리면(코덱 없는 브라우저, 네트워크 오류) 기본 재생기로 돌아간다.
@@ -20,11 +23,16 @@ type Status = "loading" | "ready" | "error"
 const WaveformPlayer = ({
   src,
   height = 64,
-  className
+  className,
+  title,
+  artist
 }: {
   src: string
   height?: number
   className?: string
+  /** 있으면 잠금화면·알림센터 재생 컨트롤에 곡 정보를 띄운다 (Media Session) */
+  title?: string
+  artist?: string
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const wavesurferRef = useRef<WaveSurfer | null>(null)
@@ -60,7 +68,19 @@ const WaveformPlayer = ({
         setDuration(d)
         setStatus("ready")
       })
-      instance.on("play", () => setPlaying(true))
+      instance.on("play", () => {
+        setPlaying(true)
+        if (title && "mediaSession" in navigator) {
+          mediaSessionOwner = src
+          navigator.mediaSession.metadata = new MediaMetadata({ title, artist })
+          navigator.mediaSession.setActionHandler("play", () => {
+            void instance?.play()
+          })
+          navigator.mediaSession.setActionHandler("pause", () => {
+            instance?.pause()
+          })
+        }
+      })
       instance.on("pause", () => setPlaying(false))
       instance.on("finish", () => setPlaying(false))
       instance.on("timeupdate", setCurrent)
@@ -72,8 +92,14 @@ const WaveformPlayer = ({
       cancelled = true
       instance?.destroy()
       wavesurferRef.current = null
+      if (mediaSessionOwner === src && "mediaSession" in navigator) {
+        mediaSessionOwner = null
+        navigator.mediaSession.metadata = null
+        navigator.mediaSession.setActionHandler("play", null)
+        navigator.mediaSession.setActionHandler("pause", null)
+      }
     }
-  }, [src, height])
+  }, [src, height, title, artist])
 
   useEffect(
     () => onOtherRecordingPlay(src, () => wavesurferRef.current?.pause()),

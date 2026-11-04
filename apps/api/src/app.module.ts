@@ -15,6 +15,7 @@ import { AuthModule } from "./auth/auth.module"
 import { GenerationModule } from "./generation/generation.module"
 import { SessionModule } from "./session/session.module"
 import { TeamModule } from "./team/team.module"
+import { FeedbackModule } from "./feedback/feedback.module"
 import { PerformanceModule } from "./performance/performance.module"
 import { EquipmentModule } from "./equipment/equipment.module"
 import { RentalModule } from "./rental/rental.module"
@@ -44,6 +45,7 @@ import { ReminderModule } from "./reminder/reminder.module"
     GenerationModule,
     SessionModule,
     TeamModule,
+    FeedbackModule,
     PerformanceModule,
     EquipmentModule,
     RentalModule,
