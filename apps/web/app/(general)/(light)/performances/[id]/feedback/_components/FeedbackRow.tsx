@@ -51,6 +51,7 @@ const StatusChip = ({
 const FeedbackRow = ({
   team,
   status,
+  position,
   row,
   expanded,
   readOnly,
@@ -67,6 +68,8 @@ const FeedbackRow = ({
     recordingUrl: string | null
   }
   status: FeedbackStatus
+  /** 본인 팀을 뺀 목록에서 몇 번째인지. 본인 팀은 없음 */
+  position: { n: number; total: number } | undefined
   row: FeedbackRowData | undefined
   expanded: boolean
   readOnly: boolean
@@ -99,6 +102,11 @@ const FeedbackRow = ({
               own ? "text-slate-400" : "text-slate-900"
             )}
           >
+            {position && (
+              <span className="mr-1.5 text-sm font-normal tabular-nums text-slate-400">
+                [{position.n}/{position.total}]
+              </span>
+            )}
             {team.songName}
             <span className="ml-1.5 text-sm font-normal text-slate-500">
               {team.songArtist}

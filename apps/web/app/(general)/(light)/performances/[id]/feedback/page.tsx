@@ -147,7 +147,7 @@ const FeedbackPage = () => {
       ]}
     >
       {mine?.eligible && reviewable.length > 0 && (
-        <div className="mx-auto w-full max-w-md">
+        <div className="w-full">
           <p className="text-sm text-neutral-500">
             {doneCount} / {reviewable.length} 완료
           </p>
@@ -209,6 +209,14 @@ const FeedbackPage = () => {
                 key={team.id}
                 team={team}
                 status={statusOf(team.id)}
+                position={
+                  reviewable.some((t) => t.id === team.id)
+                    ? {
+                        n: reviewable.findIndex((t) => t.id === team.id) + 1,
+                        total: reviewable.length
+                      }
+                    : undefined
+                }
                 row={mine.feedbacks.find((f) => f.teamId === team.id)}
                 expanded={team.id === expandedId}
                 readOnly={readOnly}
