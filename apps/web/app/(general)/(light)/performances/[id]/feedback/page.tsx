@@ -11,6 +11,7 @@ import {
 } from "@repo/shared-types"
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs"
@@ -20,6 +21,7 @@ import { toast } from "@/components/hooks/use-toast"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import ROUTES from "@/constants/routes"
 import {
@@ -243,12 +245,12 @@ const FeedbackPage = () => {
                 고칠 수 있어요
               </p>
             )}
-            <Link
-              href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-              className="mt-2 inline-block underline"
-            >
-              팀 목록으로
-            </Link>
+            <Button asChild className="mt-3">
+              <Link href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}>
+                팀 목록으로
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
           </div>
         )}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
@@ -271,7 +273,7 @@ const FeedbackPage = () => {
           )}
         </div>
         {visible.length === 0 ? (
-          !finished && <Notice>남은 곡이 없어요.</Notice>
+          <Notice>남은 곡이 없어요.</Notice>
         ) : (
           <ul className="flex flex-col gap-2">
             {visible.map((team) => (
