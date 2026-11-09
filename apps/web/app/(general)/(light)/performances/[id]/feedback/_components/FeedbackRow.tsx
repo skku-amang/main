@@ -16,10 +16,6 @@ import ScoreButtons from "./ScoreButtons"
 
 type FeedbackRowData = MyFeedbackSummary["feedbacks"][number]
 
-const LABEL: Record<FeedbackDimensionKey, string> = Object.fromEntries(
-  FEEDBACK_DIMENSIONS.map(({ key, label }) => [key, label])
-) as Record<FeedbackDimensionKey, string>
-
 const StatusChip = ({
   status,
   row
@@ -38,11 +34,7 @@ const StatusChip = ({
   if (status === "PARTIAL")
     return (
       <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-        ◐{" "}
-        {missingDimensions(row)
-          .map((key) => LABEL[key])
-          .join("·")}{" "}
-        빠짐
+        ◐ {missingDimensions(row).length}개 빠짐
       </span>
     )
   return <span className="text-xs text-slate-400">○</span>
@@ -148,7 +140,7 @@ const FeedbackRow = ({
       {expanded && team.recordingUrl && (
         <div className="border-t border-slate-100 px-4 pb-4 pt-3">
           {team.image && (
-            <div className="relative mb-3 aspect-[3/4] w-40 overflow-hidden rounded-md">
+            <div className="relative mx-auto mb-3 aspect-[3/4] w-40 overflow-hidden rounded-md">
               <Image
                 src={team.image}
                 alt={`${team.songName} 포스터`}
