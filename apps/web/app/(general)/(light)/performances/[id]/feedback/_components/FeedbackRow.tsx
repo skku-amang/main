@@ -5,7 +5,8 @@ import {
   missingDimensions,
   MyFeedbackSummary
 } from "@repo/shared-types"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Music } from "lucide-react"
+import Image from "next/image"
 
 import WaveformPlayer from "@/components/WaveformPlayer"
 import { cn } from "@/lib/utils"
@@ -65,6 +66,7 @@ const FeedbackRow = ({
     songName: string
     songArtist: string
     description: string | null
+    image: string | null
     recordingUrl: string | null
   }
   status: FeedbackStatus
@@ -95,6 +97,24 @@ const FeedbackRow = ({
         aria-expanded={expanded}
         className="flex w-full items-center gap-3 px-4 py-3 text-left disabled:cursor-default"
       >
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded bg-slate-100 text-slate-400",
+            own && "opacity-50"
+          )}
+        >
+          {team.image ? (
+            <Image
+              src={team.image}
+              alt=""
+              fill
+              sizes="40px"
+              className="object-cover"
+            />
+          ) : (
+            <Music className="size-4" />
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <p
             className={cn(
@@ -127,6 +147,17 @@ const FeedbackRow = ({
 
       {expanded && team.recordingUrl && (
         <div className="border-t border-slate-100 px-4 pb-4 pt-3">
+          {team.image && (
+            <div className="relative mb-3 aspect-[3/4] w-40 overflow-hidden rounded-md">
+              <Image
+                src={team.image}
+                alt={`${team.songName} 포스터`}
+                fill
+                sizes="160px"
+                className="object-cover"
+              />
+            </div>
+          )}
           {team.description && (
             <p className="mb-3 whitespace-pre-line text-sm text-slate-600">
               {team.description}

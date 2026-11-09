@@ -18,6 +18,7 @@ const CommentField = ({
 }) => {
   const [draft, setDraft] = useState(value ?? "")
   const saved = useRef(value ?? "")
+  const saving = useRef(0)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // 접힐 때(언마운트) 정리 함수가 최신 값을 쓰도록
   const latest = useRef({ draft, onSave })
@@ -30,7 +31,9 @@ const CommentField = ({
     if (text === saved.current) return
     const previous = saved.current
     saved.current = text
+    saving.current += 1
     void save(text).then((ok) => {
+      saving.current -= 1
       if (!ok && saved.current === text) saved.current = previous
     })
   }
@@ -46,7 +49,8 @@ const CommentField = ({
 
   // 다른 기기에서 고친 의견이 다시 불러와지면, 여기서 쓰던 중이 아닐 때만 반영한다
   useEffect(() => {
-    if (draft !== saved.current) return
+    // 저장 중에 저장 전 값이 다시 불러와져도 쓴 글을 덮지 않는다. 저장이 끝나면 페이지가 다시 불러온다
+    if (saving.current > 0 || draft !== saved.current) return
     setDraft(value ?? "")
     saved.current = value ?? ""
     // value가 바뀔 때만 맞춘다 — draft를 넣으면 입력 중에 덮어쓴다

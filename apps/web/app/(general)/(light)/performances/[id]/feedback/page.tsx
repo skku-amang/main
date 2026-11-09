@@ -109,13 +109,13 @@ const FeedbackPage = () => {
   useEffect(() => {
     if (!feedbackEndAt || mine?.stage !== "EVALUATION") return
     const ms = new Date(feedbackEndAt).getTime() - Date.now() + 1000
-    if (ms <= 0 || ms > 2 ** 31 - 1) return
+    if (ms > 2 ** 31 - 1) return
     const timer = setTimeout(
       () =>
         void queryClient.invalidateQueries({
           queryKey: myFeedbackKey(performanceId)
         }),
-      ms
+      Math.max(ms, 0)
     )
     return () => clearTimeout(timer)
   }, [feedbackEndAt, mine?.stage, performanceId, queryClient])
