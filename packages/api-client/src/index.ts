@@ -45,6 +45,8 @@ import {
   PresignedUrlResponse,
   RecordingPresignedUrlRequest,
   UpdateTeamRecording,
+  UpsertFeedback,
+  MyFeedbackSummary,
   GetNotificationsQuery,
   NotificationItem,
   NotificationList,
@@ -484,6 +486,38 @@ export default class ApiClient {
       | PerformanceRecruitmentClosedError
       | InternalServerError
     >(`/teams/${id}/recording`, "PATCH", data)
+  }
+
+  /**
+   * 내 피드백 현황 (자격·본인 팀·대상 팀·내가 쓴 피드백). 단계와 무관하게 자기 것만
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {NotFoundError} 공연이 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getMyFeedback(performanceId: number) {
+    return this._request<
+      MyFeedbackSummary,
+      AuthError | NotFoundError | InternalServerError
+    >(`/performances/${performanceId}/feedback/mine`, "GET")
+  }
+
+  /**
+   * 팀에 내 피드백 저장 (보낸 필드만 바꿈)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 피드백 기간이 아니거나, 자격이 없거나, 본인 팀인 경우
+   * @throws {ValidationError} 점수가 1~5 정수가 아니거나 녹음본 없는 팀인 경우
+   * @throws {NotFoundError} 팀이 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public upsertFeedback(teamId: number, data: UpsertFeedback) {
+    return this._request<
+      unknown,
+      | AuthError
+      | ForbiddenError
+      | ValidationError
+      | NotFoundError
+      | InternalServerError
+    >(`/teams/${teamId}/feedback`, "PUT", data)
   }
 
   /**

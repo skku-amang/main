@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation"
 
 import ApplyButton from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/ApplyButton"
+import FeedbackEntry from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/FeedbackEntry"
 import BasicInfo from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/BasicInfo"
 import MemberSessionCard from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/MemberSessionCard"
 import PosterImage from "@/app/(general)/(dark)/performances/[id]/teams/[teamId]/_components/PosterImage"
@@ -100,6 +101,7 @@ const TeamDetailClient = () => {
           <BasicInfo team={team} canEdit={canEdit && contentOpen} />
           {team.image && <PosterImage src={team.image} />}
           <RecordingCard team={team} canEdit={canEdit && contentOpen} />
+          <FeedbackEntry performanceId={performanceId} teamId={team.id} />
         </div>
 
         {/* 세션 구성 */}

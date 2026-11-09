@@ -20,6 +20,7 @@ import {
 } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
 
+import FeedbackStatusBadge from "@/components/FeedbackStatusBadge"
 import TeamActionsMenu from "@/components/TeamActionsMenu"
 
 interface TeamCardProps {
@@ -78,6 +79,11 @@ const TeamCard = ({
                     <Image className="h-3 w-3 font-normal text-neutral-500" />
                   </span>
                 )}
+                <FeedbackStatusBadge
+                  performanceId={performanceId}
+                  teamId={id}
+                  className="ml-1"
+                />
               </h4>
             </div>
 

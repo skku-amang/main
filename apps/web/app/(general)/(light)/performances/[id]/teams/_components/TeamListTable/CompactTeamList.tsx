@@ -1,3 +1,4 @@
+import FeedbackStatusBadge from "@/components/FeedbackStatusBadge"
 import { Row } from "@tanstack/react-table"
 import Link from "next/link"
 
@@ -62,6 +63,10 @@ const CompactTeamList = ({
                   <p className="truncate text-xs text-slate-500">
                     {team.songArtist}
                   </p>
+                  <FeedbackStatusBadge
+                    performanceId={team.performanceId}
+                    teamId={team.id}
+                  />
                 </Link>
               </div>
             </td>
