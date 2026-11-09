@@ -5,7 +5,6 @@ import {
   isPerformanceRecruiting,
   isTeamContentOpen,
   isMemberMaskedStage,
-  PERFORMANCE_STAGES,
   isTeamRosterOpen,
   PERFORMANCE_STAGES
 } from "./performance.types"
