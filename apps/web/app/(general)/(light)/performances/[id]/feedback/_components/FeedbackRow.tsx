@@ -161,11 +161,13 @@ const FeedbackRow = ({
             artist={team.name}
           />
           <div className="mt-3">
-            {FEEDBACK_DIMENSIONS.map(({ key, label }) => (
+            {FEEDBACK_DIMENSIONS.map(({ key, label, hint, max }) => (
               <ScoreButtons
                 key={key}
                 name={`feedback-${team.id}-${key}`}
                 label={label}
+                hint={hint}
+                max={max}
                 value={row?.[key] ?? null}
                 disabled={readOnly}
                 onChange={(score) => onScore(key, score)}

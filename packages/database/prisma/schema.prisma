@@ -187,8 +187,8 @@ model Feedback {
   reviewerId Int
   reviewer   User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
-  teamScore       Int? // 팀 완성도 1~5
-  individualScore Int? // 개인 완성도 1~5
+  teamScore       Int? // 팀 완성도 1~10
+  individualScore Int? // 개인 완성도 1~10
   preferenceScore Int? // 선호도 1~5
   comment         String? // 점수와 무관한 자유 의견
 

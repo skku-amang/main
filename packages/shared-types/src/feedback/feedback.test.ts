@@ -119,13 +119,19 @@ describe("orderFeedbackTeams", () => {
 })
 
 describe("UpsertFeedbackSchema", () => {
-  it("1~5 정수만 받는다", () => {
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 6 }).success).toBe(false)
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 0 }).success).toBe(false)
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 2.5 }).success).toBe(
-      false
-    )
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 5 }).success).toBe(true)
+  it.each([
+    ["teamScore", 10],
+    ["individualScore", 10],
+    ["preferenceScore", 5]
+  ])("%s는 1~%i 정수만 받는다 (구글 폼과 같은 배점)", (key, max) => {
+    const accepts = (value: number) =>
+      UpsertFeedbackSchema.safeParse({ [key]: value }).success
+
+    expect(accepts(1)).toBe(true)
+    expect(accepts(max)).toBe(true)
+    expect(accepts(0)).toBe(false)
+    expect(accepts(max + 1)).toBe(false)
+    expect(accepts(2.5)).toBe(false)
   })
 
   it("빈 객체는 거부한다", () => {

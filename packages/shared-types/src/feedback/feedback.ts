@@ -1,14 +1,31 @@
 import type { PerformanceStage } from "../performance/performance.types"
 
 export const FEEDBACK_SCORE_MIN = 1
-export const FEEDBACK_SCORE_MAX = 5
 export const FEEDBACK_COMMENT_MAX = 2000
 
-/** 문항은 고정 (설계 5.2). 폼·계산·집계 화면이 전부 이 배열을 돈다. weight = 32기 스크립트 2:2:1 */
+/** 문항은 고정 (설계 5.2). 폼·계산·집계 화면이 전부 이 배열을 돈다. weight = 32기 스크립트 2:2:1, max·hint = 구글 폼 */
 export const FEEDBACK_DIMENSIONS = [
-  { key: "teamScore", label: "팀 완성도", weight: 2 },
-  { key: "individualScore", label: "개인 완성도", weight: 2 },
-  { key: "preferenceScore", label: "선호도", weight: 1 }
+  {
+    key: "teamScore",
+    label: "팀 완성도",
+    weight: 2,
+    max: 10,
+    hint: "박자, 악기들의 합, 구성 등을 고려한 전체적인 완성도"
+  },
+  {
+    key: "individualScore",
+    label: "개인 완성도",
+    weight: 2,
+    max: 10,
+    hint: "각 악기의 숙련도에 점수를 매긴 뒤, 그 평균에 해당하는 점수"
+  },
+  {
+    key: "preferenceScore",
+    label: "선호도",
+    weight: 1,
+    max: 5,
+    hint: "실력과 무관한 개인 기호. 공연에 오르면 좋을 곡, 관객 호응이 좋을 곡, 좋아하는 장르 등"
+  }
 ] as const
 
 export type FeedbackDimensionKey = (typeof FEEDBACK_DIMENSIONS)[number]["key"]
