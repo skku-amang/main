@@ -211,6 +211,12 @@ describe("TeamService", () => {
       expect((await service.findOne(10, 5)).membersHidden).toBe(true)
     })
 
+    it("제출 단계 공연의 팀 상세도 운영진이 아니면 가린다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+
+      expect((await service.findOne(10, 5)).leader.name).toBe("비공개")
+    })
+
     it("운영진에게는 팀 상세를 가리지 않는다", async () => {
       storedTeam.performanceId = EVALUATION_ID
 
@@ -517,7 +523,7 @@ describe("TeamService", () => {
             description: "설명",
             memberSessions: [guitarSession([{ userId: 5, index: 1 }])]
           },
-          ACTOR
+          baseTeam.leaderId
         )
       ).resolves.toMatchObject({ id: storedTeam.id })
     })
@@ -637,8 +643,20 @@ describe("TeamService", () => {
       storedTeam.performanceId = SUBMISSION_ID
 
       await expect(
-        service.updateRecording(storedTeam.id, own)
+        service.updateRecording(storedTeam.id, own, baseTeam.leaderId)
       ).resolves.toMatchObject({ id: storedTeam.id })
+    })
+
+    it("제출 단계에 팀장이 올리면 응답에서 자기 팀이 가려지지 않는다", async () => {
+      storedTeam.performanceId = SUBMISSION_ID
+
+      const team = await service.updateRecording(
+        storedTeam.id,
+        own,
+        baseTeam.leaderId
+      )
+
+      expect(team.leader.name).toBe("팀장")
     })
 
     it.each([
@@ -648,7 +666,7 @@ describe("TeamService", () => {
       storedTeam.performanceId = EVALUATION_ID
 
       await expect(
-        service.updateRecording(storedTeam.id, url)
+        service.updateRecording(storedTeam.id, url, baseTeam.leaderId)
       ).rejects.toMatchObject({
         detail: "피드백 단계부터는 녹음본을 바꿀 수 없습니다."
       })
@@ -661,7 +679,7 @@ describe("TeamService", () => {
       "https://s3.test/amang/recordings/sub/a.mp3"
     ])("우리 recordings/ 주소가 아니면 거부: %s", async (url) => {
       await expect(
-        service.updateRecording(storedTeam.id, url)
+        service.updateRecording(storedTeam.id, url, baseTeam.leaderId)
       ).rejects.toMatchObject({ detail: "녹음본 주소가 올바르지 않습니다." })
     })
 
@@ -674,7 +692,7 @@ describe("TeamService", () => {
       )
 
       await expect(
-        service.updateRecording(storedTeam.id, own)
+        service.updateRecording(storedTeam.id, own, baseTeam.leaderId)
       ).rejects.toMatchObject({
         detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
       })
@@ -684,7 +702,7 @@ describe("TeamService", () => {
       findFirstTeam.mockReturnValueOnce({ id: 99 })
 
       await expect(
-        service.updateRecording(storedTeam.id, own)
+        service.updateRecording(storedTeam.id, own, baseTeam.leaderId)
       ).rejects.toMatchObject({
         detail: "다른 팀의 녹음본 주소는 쓸 수 없습니다."
       })

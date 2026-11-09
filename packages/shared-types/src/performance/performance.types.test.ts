@@ -4,6 +4,7 @@ import {
   getPerformanceStage,
   isPerformanceRecruiting,
   isTeamContentOpen,
+  isMemberMaskedStage,
   isTeamRosterOpen,
   PERFORMANCE_STAGES
 } from "./performance.types"
@@ -149,6 +150,15 @@ describe("isTeamRosterOpen / isTeamContentOpen", () => {
   it.each(PERFORMANCE_STAGES)("%s", (s) => {
     expect(isTeamRosterOpen(s)).toBe(s === "RECRUITING")
     expect(isTeamContentOpen(s)).toBe(s === "RECRUITING" || s === "SUBMISSION")
+  })
+})
+
+describe("isMemberMaskedStage", () => {
+  // 모집이 끝나 팀이 확정되면 결과 공개 전까지 가린다
+  it.each(PERFORMANCE_STAGES)("%s", (stage) => {
+    expect(isMemberMaskedStage(stage)).toBe(
+      ["SUBMISSION", "EVALUATION", "DECISION"].includes(stage)
+    )
   })
 })
 
