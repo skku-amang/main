@@ -85,7 +85,7 @@ const FeedbackRow = ({
     <li
       id={`feedback-team-${team.id}`}
       className={cn(
-        "scroll-mt-4 rounded-lg border bg-white",
+        "scroll-mt-24 rounded-lg border bg-white",
         expanded ? "border-blue-900" : "border-slate-200",
         own && "bg-slate-50"
       )}
