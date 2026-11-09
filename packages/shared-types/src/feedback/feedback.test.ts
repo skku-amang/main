@@ -7,6 +7,7 @@ import {
   isFeedbackComplete,
   missingDimensions,
   MyFeedbackSummary,
+  nextFeedbackTeamId,
   orderFeedbackTeams
 } from "./feedback"
 import { UpsertFeedbackSchema } from "./upsert-feedback.schema"
@@ -115,6 +116,50 @@ describe("orderFeedbackTeams", () => {
     ]
 
     expect(orderFeedbackTeams(teams).map((t) => t.id)).toEqual([2, 1, 3])
+  })
+})
+
+describe("nextFeedbackTeamId", () => {
+  const ORDER = [1, 2, 3, 4, 5]
+  const summary = (
+    doneTeamIds: number[],
+    partialTeamIds: number[] = []
+  ): MyFeedbackSummary => ({
+    stage: "EVALUATION",
+    eligible: true,
+    ownTeamIds: [1],
+    targetTeamIds: ORDER,
+    feedbacks: [
+      ...doneTeamIds.map((teamId) => ({ teamId, score: 3 })),
+      ...partialTeamIds.map((teamId) => ({ teamId, score: null }))
+    ].map(({ teamId, score }) => ({
+      teamId,
+      teamScore: 3,
+      individualScore: score,
+      preferenceScore: score,
+      comment: null,
+      updatedAt: "2026-11-09T00:00:00.000Z"
+    }))
+  })
+
+  it("지금 곡 뒤에서 완료한 곡을 건너뛰고 안 끝낸 곡으로 간다", () => {
+    expect(nextFeedbackTeamId(ORDER, 2, summary([2, 3]))).toBe(4)
+  })
+
+  it("일부만 채운 곡도 안 끝낸 곡이다", () => {
+    expect(nextFeedbackTeamId(ORDER, 2, summary([3], [4]))).toBe(4)
+  })
+
+  it("뒤에 없으면 앞쪽의 빠뜨린 곡으로 돌아간다", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 4, 5]))).toBe(3)
+  })
+
+  it("본인 팀으로는 가지 않는다", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 3, 4, 5]))).toBeNull()
+  })
+
+  it("지금 곡이 안 끝났어도 다른 곡이 없으면 null", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 3, 4], [5]))).toBeNull()
   })
 })
 

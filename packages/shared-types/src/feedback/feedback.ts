@@ -99,6 +99,24 @@ export const getFeedbackStatus = (
   return isFeedbackComplete(row) ? "DONE" : "PARTIAL"
 }
 
+/** "다음 곡" 목적지. 지금 곡 뒤의 안 끝낸 곡, 없으면 앞쪽의 빠뜨린 곡. 지금 곡 말고 없으면 null */
+export const nextFeedbackTeamId = (
+  orderedTeamIds: number[],
+  currentId: number,
+  mine: MyFeedbackSummary
+): number | null => {
+  const at = orderedTeamIds.indexOf(currentId)
+  const others = [
+    ...orderedTeamIds.slice(at + 1),
+    ...orderedTeamIds.slice(0, at)
+  ]
+  return (
+    others.find((id) =>
+      ["NONE", "PARTIAL"].includes(getFeedbackStatus(id, mine))
+    ) ?? null
+  )
+}
+
 /** 피드백 곡 순서. 사람마다 섞을지는 운영진 질문(설계 7절) — 바꾸면 여기만 */
 export const orderFeedbackTeams = <
   T extends { id: number; createdAt: Date | string }

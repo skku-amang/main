@@ -25,7 +25,8 @@ const WaveformPlayer = ({
   height = 64,
   className,
   title,
-  artist
+  artist,
+  autoPlay = false
 }: {
   src: string
   height?: number
@@ -33,9 +34,14 @@ const WaveformPlayer = ({
   /** 있으면 잠금화면·알림센터 재생 컨트롤에 곡 정보를 띄운다 (Media Session) */
   title?: string
   artist?: string
+  /** 불러오자마자 재생. 브라우저가 막으면 재생 버튼을 누르면 된다 */
+  autoPlay?: boolean
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const wavesurferRef = useRef<WaveSurfer | null>(null)
+  // 값이 바뀌어도 음원을 다시 불러오지 않도록 ref로 읽는다
+  const autoPlayRef = useRef(autoPlay)
+  autoPlayRef.current = autoPlay
   const [status, setStatus] = useState<Status>("loading")
   const [playing, setPlaying] = useState(false)
   const [current, setCurrent] = useState(0)
@@ -67,6 +73,10 @@ const WaveformPlayer = ({
       instance.on("ready", (d) => {
         setDuration(d)
         setStatus("ready")
+        if (autoPlayRef.current) {
+          announceRecordingPlay(src)
+          void instance?.play().catch(() => undefined)
+        }
       })
       instance.on("play", () => {
         setPlaying(true)
