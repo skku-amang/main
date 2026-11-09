@@ -105,9 +105,9 @@ export const getPerformanceStage = (
   return "PREPARING"
 }
 
-/** 피드백·집계 단계 — 운영진이 아니면 그 공연 팀의 팀원을 가린다 (설계 5.2) */
+/** 팀이 확정된 뒤 결과 공개 전까지 — 운영진·본인 팀이 아니면 그 공연 팀의 팀원을 가린다 (설계 5.2) */
 export const isMemberMaskedStage = (stage: PerformanceStage) =>
-  stage === "EVALUATION" || stage === "DECISION"
+  stage === "SUBMISSION" || stage === "EVALUATION" || stage === "DECISION"
 
 export const isPerformanceRecruiting = (
   p: PerformanceSchedule,

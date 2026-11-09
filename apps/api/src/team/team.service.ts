@@ -449,7 +449,11 @@ export class TeamService {
   }
 
   /** 녹음본 올리기·바꾸기·지우기 (null). 팀 수정(PUT)과 따로 — 팀 폼이 모르는 필드라 실수로 지우지 않게 */
-  async updateRecording(id: number, recordingUrl: string | null) {
+  async updateRecording(
+    id: number,
+    recordingUrl: string | null,
+    viewerId: number
+  ) {
     const team = await this.prisma.team.findUnique({
       where: { id },
       select: { performanceId: true, recordingUrl: true }
@@ -488,7 +492,7 @@ export class TeamService {
     if (team.recordingUrl && team.recordingUrl !== recordingUrl)
       this.objectStorageService.deleteObjectSafely(team.recordingUrl)
 
-    return this.findOne(id, undefined)
+    return this.findOne(id, viewerId)
   }
 
   async remove(id: number, actorId: number) {

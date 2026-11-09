@@ -62,9 +62,11 @@ export class TeamController {
   @UseGuards(TeamOwnerGuard)
   updateRecording(
     @Param("id", ParseIntPipe) id: number,
-    @Body() dto: UpdateTeamRecordingDto
+    @Body() dto: UpdateTeamRecordingDto,
+    @Req() req: Request
   ) {
-    return this.teamService.updateRecording(id, dto.recordingUrl)
+    const user = req.user as JwtPayload
+    return this.teamService.updateRecording(id, dto.recordingUrl, user.sub)
   }
 
   @Delete(":id")

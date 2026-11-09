@@ -133,7 +133,7 @@ const TeamDetailClient = () => {
 
           {team.membersHidden && (
             <p className="rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-600">
-              피드백 기간에는 팀원이 비공개예요
+              결과 발표 전까지 팀원이 비공개예요
             </p>
           )}
 
