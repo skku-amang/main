@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: ko-KR
+reviews:
+  # main ruleset이 리뷰 스레드 resolve를 머지 조건으로 걸고 있어, 지적이 많으면 머지가 막힘
+  profile: chill
+  request_changes_workflow: false
+  poem: false
+  review_status: false
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - AGENTS.md
+      - CONTRIBUTING.md
+      - docs/reference/glossary.md
