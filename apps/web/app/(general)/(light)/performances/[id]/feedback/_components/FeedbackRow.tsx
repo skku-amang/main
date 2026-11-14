@@ -5,9 +5,10 @@ import {
   missingDimensions,
   MyFeedbackSummary
 } from "@repo/shared-types"
-import { ChevronDown, Music } from "lucide-react"
+import { ArrowRight, ChevronDown, Music } from "lucide-react"
 import Image from "next/image"
 
+import { Button } from "@/components/ui/button"
 import WaveformPlayer from "@/components/WaveformPlayer"
 import { cn } from "@/lib/utils"
 
@@ -48,9 +49,13 @@ const FeedbackRow = ({
   row,
   expanded,
   readOnly,
+  hasNext,
+  autoPlay,
+  onAutoPlay,
   onToggle,
   onScore,
-  onComment
+  onComment,
+  onNext
 }: {
   team: {
     id: number
@@ -67,11 +72,17 @@ const FeedbackRow = ({
   row: FeedbackRowData | undefined
   expanded: boolean
   readOnly: boolean
+  /** 이 곡 말고 안 끝낸 곡이 있는지. 없으면 버튼이 "완료"가 된다 */
+  hasNext: boolean
+  autoPlay: boolean
+  onAutoPlay: () => void
   onToggle: () => void
   onScore: (key: FeedbackDimensionKey, score: number) => void
   onComment: (comment: string) => Promise<boolean>
+  onNext: () => void
 }) => {
   const own = status === "OWN"
+  const finishBlocked = !hasNext && status !== "DONE"
 
   return (
     <li
@@ -159,13 +170,17 @@ const FeedbackRow = ({
             src={team.recordingUrl}
             title={team.songName}
             artist={team.name}
+            autoPlay={autoPlay}
+            onAutoPlay={onAutoPlay}
           />
           <div className="mt-3">
-            {FEEDBACK_DIMENSIONS.map(({ key, label }) => (
+            {FEEDBACK_DIMENSIONS.map(({ key, label, hint, max }) => (
               <ScoreButtons
                 key={key}
                 name={`feedback-${team.id}-${key}`}
                 label={label}
+                hint={hint}
+                max={max}
                 value={row?.[key] ?? null}
                 disabled={readOnly}
                 onChange={(score) => onScore(key, score)}
@@ -177,6 +192,25 @@ const FeedbackRow = ({
             disabled={readOnly}
             onSave={onComment}
           />
+          {!readOnly && (
+            <div className="mt-3 flex items-center justify-end gap-3">
+              {finishBlocked && (
+                <span className="text-xs text-slate-500">
+                  점수를 모두 매기면 완료할 수 있어요
+                </span>
+              )}
+              <Button type="button" disabled={finishBlocked} onClick={onNext}>
+                {hasNext ? (
+                  <>
+                    다음 곡
+                    <ArrowRight className="size-4" />
+                  </>
+                ) : (
+                  "완료"
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </li>

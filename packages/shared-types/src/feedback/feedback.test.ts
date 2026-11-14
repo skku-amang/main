@@ -7,6 +7,7 @@ import {
   isFeedbackComplete,
   missingDimensions,
   MyFeedbackSummary,
+  nextFeedbackTeamId,
   orderFeedbackTeams
 } from "./feedback"
 import { UpsertFeedbackSchema } from "./upsert-feedback.schema"
@@ -118,14 +119,64 @@ describe("orderFeedbackTeams", () => {
   })
 })
 
+describe("nextFeedbackTeamId", () => {
+  const ORDER = [1, 2, 3, 4, 5]
+  const summary = (
+    doneTeamIds: number[],
+    partialTeamIds: number[] = []
+  ): MyFeedbackSummary => ({
+    stage: "EVALUATION",
+    eligible: true,
+    ownTeamIds: [1],
+    targetTeamIds: ORDER,
+    feedbacks: [
+      ...doneTeamIds.map((teamId) => ({ teamId, score: 3 })),
+      ...partialTeamIds.map((teamId) => ({ teamId, score: null }))
+    ].map(({ teamId, score }) => ({
+      teamId,
+      teamScore: 3,
+      individualScore: score,
+      preferenceScore: score,
+      comment: null,
+      updatedAt: "2026-11-09T00:00:00.000Z"
+    }))
+  })
+
+  it("지금 곡 뒤에서 완료한 곡을 건너뛰고 안 끝낸 곡으로 간다", () => {
+    expect(nextFeedbackTeamId(ORDER, 2, summary([2, 3]))).toBe(4)
+  })
+
+  it("일부만 채운 곡도 안 끝낸 곡이다", () => {
+    expect(nextFeedbackTeamId(ORDER, 2, summary([3], [4]))).toBe(4)
+  })
+
+  it("뒤에 없으면 앞쪽의 빠뜨린 곡으로 돌아간다", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 4, 5]))).toBe(3)
+  })
+
+  it("본인 팀으로는 가지 않는다", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 3, 4, 5]))).toBeNull()
+  })
+
+  it("지금 곡이 안 끝났어도 다른 곡이 없으면 null", () => {
+    expect(nextFeedbackTeamId(ORDER, 5, summary([2, 3, 4], [5]))).toBeNull()
+  })
+})
+
 describe("UpsertFeedbackSchema", () => {
-  it("1~5 정수만 받는다", () => {
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 6 }).success).toBe(false)
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 0 }).success).toBe(false)
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 2.5 }).success).toBe(
-      false
-    )
-    expect(UpsertFeedbackSchema.safeParse({ teamScore: 5 }).success).toBe(true)
+  it.each([
+    ["teamScore", 10],
+    ["individualScore", 10],
+    ["preferenceScore", 5]
+  ])("%s는 1~%i 정수만 받는다 (구글 폼과 같은 배점)", (key, max) => {
+    const accepts = (value: number) =>
+      UpsertFeedbackSchema.safeParse({ [key]: value }).success
+
+    expect(accepts(1)).toBe(true)
+    expect(accepts(max)).toBe(true)
+    expect(accepts(0)).toBe(false)
+    expect(accepts(max + 1)).toBe(false)
+    expect(accepts(2.5)).toBe(false)
   })
 
   it("빈 객체는 거부한다", () => {

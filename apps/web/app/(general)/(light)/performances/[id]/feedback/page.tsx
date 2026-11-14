@@ -5,19 +5,24 @@ import {
   FeedbackStatus,
   getFeedbackStatus,
   MyFeedbackSummary,
+  nextFeedbackTeamId,
   orderFeedbackTeams,
   UpsertFeedback
 } from "@repo/shared-types"
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { toast } from "@/components/hooks/use-toast"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import ROUTES from "@/constants/routes"
 import {
   myFeedbackKey,
@@ -71,6 +76,12 @@ const FeedbackPage = () => {
     "remaining",
     parseAsBoolean.withDefault(false)
   )
+  const [autoPlayNext, setAutoPlayNext] = useQueryState(
+    "autoplay",
+    parseAsBoolean.withDefault(false)
+  )
+  // 다음 곡 버튼으로 넘어간 곡만 재생한다. 줄을 직접 눌러 펼칠 때는 재생하지 않는다
+  const [autoPlayTeamId, setAutoPlayTeamId] = useState<number | null>(null)
 
   const statusOf = (teamId: number) =>
     mine ? getFeedbackStatus(teamId, mine) : "NONE"
@@ -200,6 +211,20 @@ const FeedbackPage = () => {
       )
 
     const readOnly = mine.stage !== "EVALUATION"
+    const finished =
+      !readOnly && reviewable.length > 0 && doneCount === reviewable.length
+    const nextOf = (teamId: number) =>
+      nextFeedbackTeamId(
+        reviewable.map((t) => t.id),
+        teamId,
+        mine
+      )
+    const goNext = (teamId: number) => {
+      const next = nextOf(teamId)
+      setAutoPlayTeamId(autoPlayNext ? next : null)
+      void setTeamParam(next ?? COLLAPSED)
+      if (next === null) window.scrollTo({ top: 0, behavior: "smooth" })
+    }
     const visible = remainingOnly
       ? targets.filter(
           (t) => OPEN.includes(statusOf(t.id)) || t.id === expandedId
@@ -211,16 +236,44 @@ const FeedbackPage = () => {
         {readOnly && (
           <Notice>피드백이 끝났어요. 내가 남긴 피드백만 볼 수 있어요.</Notice>
         )}
-        <label className="flex items-center gap-2 text-sm text-slate-600">
-          <input
-            type="checkbox"
-            checked={remainingOnly}
-            onChange={(e) => void setRemainingOnly(e.target.checked || null)}
-          />
-          남은 것만 보기
-        </label>
+        {finished && (
+          <div className="rounded-lg bg-green-50 px-4 py-5 text-center text-sm text-green-800">
+            <p className="font-semibold">피드백을 완료했어요</p>
+            {performance?.feedbackEndAt && (
+              <p className="mt-1">
+                {dayjs(performance.feedbackEndAt).format("M월 D일 HH:mm")}까지
+                고칠 수 있어요
+              </p>
+            )}
+            <Button asChild className="mt-3">
+              <Link href={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}>
+                팀 목록으로
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        )}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={remainingOnly}
+              onChange={(e) => void setRemainingOnly(e.target.checked || null)}
+            />
+            남은 것만 보기
+          </label>
+          {!readOnly && (
+            <label className="flex items-center gap-2">
+              <Switch
+                checked={autoPlayNext}
+                onCheckedChange={(on) => void setAutoPlayNext(on || null)}
+              />
+              다음 곡 자동 재생
+            </label>
+          )}
+        </div>
         {visible.length === 0 ? (
-          <Notice>남은 곡이 없어요. 모두 끝냈어요!</Notice>
+          <Notice>남은 곡이 없어요.</Notice>
         ) : (
           <ul className="flex flex-col gap-2">
             {visible.map((team) => (
@@ -239,11 +292,16 @@ const FeedbackPage = () => {
                 row={mine.feedbacks.find((f) => f.teamId === team.id)}
                 expanded={team.id === expandedId}
                 readOnly={readOnly}
-                onToggle={() =>
+                hasNext={nextOf(team.id) !== null}
+                autoPlay={team.id === autoPlayTeamId}
+                onAutoPlay={() => setAutoPlayTeamId(null)}
+                onToggle={() => {
+                  setAutoPlayTeamId(null)
                   void setTeamParam(
                     team.id === expandedId ? COLLAPSED : team.id
                   )
-                }
+                }}
+                onNext={() => goNext(team.id)}
                 onScore={(key: FeedbackDimensionKey, score) =>
                   void save(team.id, { [key]: score })
                 }

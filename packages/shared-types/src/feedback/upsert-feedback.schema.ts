@@ -1,22 +1,21 @@
 import { z } from "zod"
 import {
   FEEDBACK_COMMENT_MAX,
-  FEEDBACK_SCORE_MAX,
+  FEEDBACK_DIMENSIONS,
   FEEDBACK_SCORE_MIN
 } from "./feedback"
 
-const score = z
-  .number()
-  .int("점수는 정수여야 합니다.")
-  .min(FEEDBACK_SCORE_MIN)
-  .max(FEEDBACK_SCORE_MAX)
+const score = (max: number) =>
+  z.number().int("점수는 정수여야 합니다.").min(FEEDBACK_SCORE_MIN).max(max)
+
+const [team, individual, preference] = FEEDBACK_DIMENSIONS
 
 /** 보낸 필드만 바꾼다. 빈 의견은 null(지우기) */
 export const UpsertFeedbackSchema = z
   .object({
-    teamScore: score.optional(),
-    individualScore: score.optional(),
-    preferenceScore: score.optional(),
+    [team.key]: score(team.max).optional(),
+    [individual.key]: score(individual.max).optional(),
+    [preference.key]: score(preference.max).optional(),
     comment: z
       .string()
       .trim()
