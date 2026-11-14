@@ -51,6 +51,7 @@ const FeedbackRow = ({
   readOnly,
   hasNext,
   autoPlay,
+  onAutoPlay,
   onToggle,
   onScore,
   onComment,
@@ -74,6 +75,7 @@ const FeedbackRow = ({
   /** 이 곡 말고 안 끝낸 곡이 있는지. 없으면 버튼이 "완료"가 된다 */
   hasNext: boolean
   autoPlay: boolean
+  onAutoPlay: () => void
   onToggle: () => void
   onScore: (key: FeedbackDimensionKey, score: number) => void
   onComment: (comment: string) => Promise<boolean>
@@ -169,6 +171,7 @@ const FeedbackRow = ({
             title={team.songName}
             artist={team.name}
             autoPlay={autoPlay}
+            onAutoPlay={onAutoPlay}
           />
           <div className="mt-3">
             {FEEDBACK_DIMENSIONS.map(({ key, label, hint, max }) => (

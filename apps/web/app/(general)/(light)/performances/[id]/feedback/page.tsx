@@ -294,6 +294,7 @@ const FeedbackPage = () => {
                 readOnly={readOnly}
                 hasNext={nextOf(team.id) !== null}
                 autoPlay={team.id === autoPlayTeamId}
+                onAutoPlay={() => setAutoPlayTeamId(null)}
                 onToggle={() => {
                   setAutoPlayTeamId(null)
                   void setTeamParam(
