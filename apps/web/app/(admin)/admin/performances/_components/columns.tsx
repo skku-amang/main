@@ -2,7 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-import { EllipsisVertical, ExternalLink, Pencil, Trash2 } from "lucide-react"
+import {
+  ClipboardCheck,
+  EllipsisVertical,
+  ExternalLink,
+  Pencil,
+  Trash2
+} from "lucide-react"
 import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
@@ -181,6 +187,12 @@ export function getColumns(
               <Link href={ROUTES.PERFORMANCE.DETAIL(row.original.id)}>
                 <ExternalLink className="mr-2 h-4 w-4" />
                 바로가기
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(row.original.id)}>
+                <ClipboardCheck className="mr-2 h-4 w-4" />
+                피드백 현황
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => actions.onEdit(row.original)}>

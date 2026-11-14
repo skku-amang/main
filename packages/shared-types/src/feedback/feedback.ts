@@ -72,6 +72,52 @@ export const isCountableFeedback = (
   isEligibleReviewer(row.reviewerId, ctx) &&
   !teamsOf(row.reviewerId, ctx).includes(row.teamId)
 
+type ReviewRow = FeedbackScores & { teamId: number; reviewerId: number }
+
+/** 작성자 한 명이 해야 할 피드백 수(대상 팀 − 본인 팀)와 셀 수 있는 피드백 수 (설계 5.3) */
+export const reviewerProgress = (
+  reviewerId: number,
+  ctx: FeedbackContext,
+  rows: ReviewRow[]
+) => {
+  const own = teamsOf(reviewerId, ctx)
+  return {
+    done: rows.filter(
+      (r) => r.reviewerId === reviewerId && isCountableFeedback(r, ctx)
+    ).length,
+    required: ctx.targetTeamIds.filter((id) => !own.includes(id)).length
+  }
+}
+
+/** 팀 소속자들이 빠뜨린 피드백 수의 합. 감점 = 이 값 × penaltyPerMissingReview (설계 5.4) */
+export const missingReviewsOfTeam = (
+  teamId: number,
+  ctx: FeedbackContext,
+  rows: ReviewRow[]
+) =>
+  [...new Set(ctx.membersByTeam[teamId] ?? [])].reduce((sum, userId) => {
+    const { done, required } = reviewerProgress(userId, ctx, rows)
+    return sum + required - done
+  }, 0)
+
+/** GET /performances/:id/feedback/progress 응답 (운영진) — 대상 팀별 소속자의 진행 */
+export type FeedbackProgress = {
+  stage: PerformanceStage
+  teams: {
+    id: number
+    name: string
+    songName: string
+    songArtist: string
+    members: {
+      id: number
+      name: string
+      nickname: string
+      done: number
+      required: number
+    }[]
+  }[]
+}
+
 /** GET /performances/:id/feedback/mine 응답 */
 export type MyFeedbackSummary = {
   stage: PerformanceStage

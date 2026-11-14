@@ -9,6 +9,11 @@ export const useMyFeedback = createQueryHook(
   (performanceId: number) => myFeedbackKey(performanceId)
 )
 
+export const useFeedbackProgress = createQueryHook(
+  ApiClient.prototype.getFeedbackProgress,
+  (performanceId: number) => ["feedback", "progress", performanceId] as const
+)
+
 export const useUpsertFeedback = createMutationHook(
   ApiClient.prototype.upsertFeedback
 )
