@@ -32,6 +32,7 @@ export function getPeopleColumns(
       ),
       meta: { label: "이름" },
       cell: ({ row }) => <UserCell user={row.original} />,
+      size: 140,
       enableHiding: false
     },
     {
@@ -39,6 +40,7 @@ export function getPeopleColumns(
       accessorFn: (p) => teamNames(p.teamIds).join(", "),
       header: "소속 팀",
       meta: { label: "소속 팀" },
+      size: 260,
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex max-w-72 flex-wrap gap-1">
@@ -62,13 +64,14 @@ export function getPeopleColumns(
         <DataTableColumnHeader column={column} title="진행" />
       ),
       meta: { label: "진행" },
+      size: 120,
       cell: ({ row }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex w-24 flex-col items-start gap-1.5">
           <ProgressBar
             done={row.original.done}
             total={row.original.required}
             label={`${row.original.name} 피드백 진행`}
-            className="w-24"
+            className="w-full"
           />
           <RemainingBadge count={remainingOf(row.original)} unit="곡" />
         </div>
@@ -79,6 +82,7 @@ export function getPeopleColumns(
       accessorFn: (p) => songNames(p.missingTeamIds).join(", "),
       header: "남은 곡",
       meta: { label: "남은 곡" },
+      size: 280,
       enableSorting: false,
       cell: ({ row }) => {
         const missing = songNames(row.original.missingTeamIds)
