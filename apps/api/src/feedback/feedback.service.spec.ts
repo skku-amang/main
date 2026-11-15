@@ -229,7 +229,7 @@ describe("FeedbackService", () => {
         updatedAt: new Date()
       })
 
-    it("대상 팀마다 소속자의 한 수 / 해야 할 수를 돌려준다", async () => {
+    it("사람마다 소속 팀, 한 수 / 해야 할 수, 안 한 팀을 한 번씩 돌려준다", async () => {
       fill(2, ME)
       fill(3, ME, false) // 일부만 → 안 한 것
       fill(1, 20)
@@ -239,31 +239,30 @@ describe("FeedbackService", () => {
 
       expect(progress.stage).toBe("EVALUATION")
       expect(
-        progress.teams.map((t) => [
-          t.id,
-          t.members.map((m) => [m.id, m.done, m.required])
+        progress.teams.map((t) => [t.id, t.name, t.songName, t.memberIds])
+      ).toEqual([
+        [1, "팀1", "곡1", [ME, 11]],
+        [2, "팀2", "곡2", [20, 21]],
+        [3, "팀3", "곡3", [22]]
+      ])
+      expect(
+        progress.people.map((p) => [
+          p.id,
+          p.teamIds,
+          p.done,
+          p.required,
+          p.missingTeamIds
         ])
       ).toEqual([
-        [
-          1,
-          [
-            [ME, 1, 2],
-            [11, 0, 2]
-          ]
-        ],
-        [
-          2,
-          [
-            [20, 2, 2],
-            [21, 0, 2]
-          ]
-        ],
-        [3, [[22, 0, 2]]]
+        [ME, [1], 1, 2, [3]],
+        [11, [1], 0, 2, [2, 3]],
+        [20, [2], 2, 2, []],
+        [21, [2], 0, 2, [1, 3]],
+        [22, [3], 0, 2, [1, 2]]
       ])
-      expect(progress.teams[0]).toMatchObject({
-        name: "팀1",
-        songName: "곡1",
-        members: [{ name: `이름${ME}`, nickname: `닉${ME}` }, {}]
+      expect(progress.people[0]).toMatchObject({
+        name: `이름${ME}`,
+        nickname: `닉${ME}`
       })
     })
 

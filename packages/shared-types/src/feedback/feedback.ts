@@ -74,18 +74,23 @@ export const isCountableFeedback = (
 
 type ReviewRow = FeedbackScores & { teamId: number; reviewerId: number }
 
-/** 작성자 한 명이 해야 할 피드백 수(대상 팀 − 본인 팀)와 셀 수 있는 피드백 수 (설계 5.3) */
+/** 작성자 한 명이 해야 할 피드백 수(대상 팀 − 본인 팀), 셀 수 있는 피드백 수, 아직 안 한 팀 (설계 5.3) */
 export const reviewerProgress = (
   reviewerId: number,
   ctx: FeedbackContext,
   rows: ReviewRow[]
 ) => {
   const own = teamsOf(reviewerId, ctx)
+  const required = ctx.targetTeamIds.filter((id) => !own.includes(id))
+  const doneTeamIds = new Set(
+    rows
+      .filter((r) => r.reviewerId === reviewerId && isCountableFeedback(r, ctx))
+      .map((r) => r.teamId)
+  )
   return {
-    done: rows.filter(
-      (r) => r.reviewerId === reviewerId && isCountableFeedback(r, ctx)
-    ).length,
-    required: ctx.targetTeamIds.filter((id) => !own.includes(id)).length
+    done: doneTeamIds.size,
+    required: required.length,
+    missingTeamIds: required.filter((id) => !doneTeamIds.has(id))
   }
 }
 
@@ -100,7 +105,7 @@ export const missingReviewsOfTeam = (
     return sum + required - done
   }, 0)
 
-/** GET /performances/:id/feedback/progress 응답 (운영진) — 대상 팀별 소속자의 진행 */
+/** GET /performances/:id/feedback/progress 응답 (운영진) — 대상 팀과 그 소속자(사람마다 한 번) */
 export type FeedbackProgress = {
   stage: PerformanceStage
   teams: {
@@ -108,13 +113,17 @@ export type FeedbackProgress = {
     name: string
     songName: string
     songArtist: string
-    members: {
-      id: number
-      name: string
-      nickname: string
-      done: number
-      required: number
-    }[]
+    memberIds: number[]
+  }[]
+  people: {
+    id: number
+    name: string
+    nickname: string
+    /** 소속된 대상 팀 */
+    teamIds: number[]
+    done: number
+    required: number
+    missingTeamIds: number[]
   }[]
 }
 

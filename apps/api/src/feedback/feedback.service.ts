@@ -127,10 +127,9 @@ export class FeedbackService {
     const membersOf = (teamId: number) => [
       ...new Set(ctx.membersByTeam[teamId] ?? [])
     ]
+    const peopleIds = [...new Set(targets.flatMap((t) => membersOf(t.id)))]
     const users = await this.prisma.user.findMany({
-      where: {
-        id: { in: [...new Set(targets.flatMap((t) => membersOf(t.id)))] }
-      },
+      where: { id: { in: peopleIds } },
       select: { id: true, name: true, nickname: true }
     })
     const userById = new Map(users.map((u) => [u.id, u]))
@@ -142,12 +141,16 @@ export class FeedbackService {
         name: t.name,
         songName: t.songName,
         songArtist: t.songArtist,
-        members: membersOf(t.id).map((id) => ({
-          id,
-          name: userById.get(id)?.name ?? "",
-          nickname: userById.get(id)?.nickname ?? "",
-          ...reviewerProgress(id, ctx, rows)
-        }))
+        memberIds: membersOf(t.id)
+      })),
+      people: peopleIds.map((id) => ({
+        id,
+        name: userById.get(id)?.name ?? "",
+        nickname: userById.get(id)?.nickname ?? "",
+        teamIds: targets
+          .filter((t) => membersOf(t.id).includes(id))
+          .map((t) => t.id),
+        ...reviewerProgress(id, ctx, rows)
       }))
     }
   }

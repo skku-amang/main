@@ -177,20 +177,25 @@ describe("reviewerProgress / missingReviewsOfTeam", () => {
     s: FeedbackScores = scores(3, 4, 5)
   ) => ({ ...s, teamId, reviewerId })
 
-  it("해야 할 수 = 대상 팀 − 본인 팀, 한 수 = 셀 수 있는 피드백만", () => {
+  it("해야 할 수 = 대상 팀 − 본인 팀, 한 수 = 셀 수 있는 피드백만, 나머지가 안 한 팀", () => {
     const rows = [
       row(2, 10),
       row(3, 10, scores(3, null, null)), // 일부만 → 안 한 것
       row(1, 10), // 본인 팀 → 안 셈
       row(4, 10) // 미제출 팀 → 안 셈
     ]
-    expect(reviewerProgress(10, multi, rows)).toEqual({ done: 1, required: 2 })
+    expect(reviewerProgress(10, multi, rows)).toEqual({
+      done: 1,
+      required: 2,
+      missingTeamIds: [3]
+    })
   })
 
   it("여러 팀 소속이면 그 팀들이 모두 빠진다", () => {
     expect(reviewerProgress(11, multi, [row(3, 11)])).toEqual({
       done: 1,
-      required: 1
+      required: 1,
+      missingTeamIds: []
     })
   })
 
