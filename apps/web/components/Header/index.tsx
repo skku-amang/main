@@ -104,7 +104,7 @@ const Header = ({
 
           {/* Personal */}
           <NotificationBell mode={mode} />
-          <Profile />
+          <Profile mode={mode} />
         </div>
       </nav>
     </header>

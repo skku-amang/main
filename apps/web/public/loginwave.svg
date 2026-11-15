@@ -18,7 +18,7 @@
    <feBlend in="SourceGraphic" in2="effect2_dropShadow_1113_6641"/>
   </filter>
   <linearGradient id="paint0_linear_1113_6641" x1="0.5" x2="0.5" y1="1" y2="0">
-   <stop stop-color="#3B82F6"/>
+   <stop stop-color="#1E3A8A"/>
    <stop offset="1" stop-color="#023664"/>
   </linearGradient>
  </defs>
