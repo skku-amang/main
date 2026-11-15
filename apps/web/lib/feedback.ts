@@ -18,17 +18,25 @@ export const feedbackDeadline = (
   endAt: Date | string | null | undefined
 ) => {
   if (!stage || !endAt) return null
+  const now = dayjs()
   const end = dayjs(endAt)
   const at = (d: dayjs.Dayjs) => d.format("M월 D일 HH:mm")
-  if (["PREPARING", "RECRUITING", "SUBMISSION"].includes(stage) && startAt) {
+  const beforeFeedback = ["PREPARING", "RECRUITING", "SUBMISSION"].includes(
+    stage
+  )
+  if (beforeFeedback) {
+    if (!startAt) return null
     const start = dayjs(startAt)
-    return {
-      text: `피드백 시작까지 ${untilText(start.diff(dayjs()))} (${at(start)})`,
-      urgent: false
+    if (start.isAfter(now)) {
+      return {
+        text: `피드백 시작까지 ${untilText(start.diff(now))} (${at(start)})`,
+        urgent: false
+      }
     }
   }
-  if (stage === "EVALUATION") {
-    const ms = end.diff(dayjs())
+  // stage는 조회 시점 값이라, 화면을 열어 둔 사이 시각이 지났을 수 있다
+  const ms = end.diff(now)
+  if ((beforeFeedback || stage === "EVALUATION") && ms > 0) {
     return {
       text: `마감까지 ${untilText(ms)} (${at(end)})`,
       urgent: ms < 24 * HOUR
