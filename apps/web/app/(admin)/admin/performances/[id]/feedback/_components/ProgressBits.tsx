@@ -40,7 +40,7 @@ export const RemainingBadge = ({
 }) => (
   <span
     className={cn(
-      "shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium",
+      "inline-block min-w-[4.5rem] shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-center text-xs font-medium",
       count > 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-green-700"
     )}
   >
