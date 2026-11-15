@@ -61,7 +61,7 @@ const TeamEditPage = () => {
       <TeamForm
         initialData={team}
         closeHref={ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId)}
-        className="bg-white px-4 py-10 md:p-20"
+        className="w-full bg-white px-4 py-10 md:p-20"
       />
     </div>
   )

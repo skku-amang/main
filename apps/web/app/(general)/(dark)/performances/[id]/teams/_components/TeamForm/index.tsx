@@ -370,8 +370,7 @@ const TeamForm = ({
   return (
     <div
       className={cn(
-        // 휴대폰은 바깥 카드 없이 화면 폭 그대로(컨테이너 여백 1rem을 상쇄), md부터 카드
-        "relative -mx-4 mb-10 w-[calc(100%+2rem)] md:mx-0 md:mb-20 md:w-full md:rounded-2xl md:shadow-2xl",
+        `relative mb-10 rounded-2xl shadow-2xl md:mb-20`,
         className
       )}
     >
