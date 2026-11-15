@@ -47,6 +47,7 @@ import {
   UpdateTeamRecording,
   UpsertFeedback,
   MyFeedbackSummary,
+  FeedbackProgress,
   GetNotificationsQuery,
   NotificationItem,
   NotificationList,
@@ -502,10 +503,24 @@ export default class ApiClient {
   }
 
   /**
+   * 대상 팀별 소속자의 피드백 진행 (운영진 전용)
+   * @throws {AuthError} 로그인 하지 않은 경우
+   * @throws {ForbiddenError} 관리자가 아닌 경우
+   * @throws {NotFoundError} 공연이 없는 경우
+   * @throws {InternalServerError} 서버 오류 발생 시
+   */
+  public getFeedbackProgress(performanceId: number) {
+    return this._request<
+      FeedbackProgress,
+      AuthError | ForbiddenError | NotFoundError | InternalServerError
+    >(`/performances/${performanceId}/feedback/progress`, "GET")
+  }
+
+  /**
    * 팀에 내 피드백 저장 (보낸 필드만 바꿈)
    * @throws {AuthError} 로그인 하지 않은 경우
    * @throws {ForbiddenError} 피드백 기간이 아니거나, 자격이 없거나, 본인 팀인 경우
-   * @throws {ValidationError} 점수가 1~5 정수가 아니거나 녹음본 없는 팀인 경우
+   * @throws {ValidationError} 점수가 문항별 범위의 정수가 아니거나 녹음본 없는 팀인 경우
    * @throws {NotFoundError} 팀이 없는 경우
    * @throws {InternalServerError} 서버 오류 발생 시
    */

@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { Guitar, Hash, Mic, Music, Users } from "lucide-react"
+import { ChevronRight, Guitar, Hash, Mic, Music, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useMemo } from "react"
@@ -17,12 +17,18 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { getSessionDisplayName } from "@/constants/session"
+import { useFeedbackProgress } from "@/hooks/api/useFeedback"
 import { useGenerations } from "@/hooks/api/useGeneration"
 import { usePerformances } from "@/hooks/api/usePerformance"
 import { useSessions } from "@/hooks/api/useSession"
 import { useAllTeams } from "@/hooks/api/useTeam"
 import { useUsers } from "@/hooks/api/useUser"
-import { formatGenerationOrder } from "@repo/shared-types"
+import { feedbackDeadline } from "@/lib/feedback"
+import {
+  formatGenerationOrder,
+  getPerformanceStage,
+  Performance
+} from "@repo/shared-types"
 
 // --- Summary Card ---
 
@@ -55,6 +61,64 @@ function SummaryCard({
           <p className="text-2xl font-bold">{count}</p>
         )}
       </div>
+    </Link>
+  )
+}
+
+// --- Feedback In Progress ---
+
+/** 피드백 기간인 공연의 진행률. 누르면 피드백 현황으로 */
+function FeedbackInProgressCard({ performance }: { performance: Performance }) {
+  const { data: progress } = useFeedbackProgress(performance.id)
+  const people = progress?.people ?? []
+  const done = people.reduce((sum, p) => sum + p.done, 0)
+  const required = people.reduce((sum, p) => sum + p.required, 0)
+  const doneCount = people.filter((p) => p.done >= p.required).length
+  const deadline = feedbackDeadline(
+    "EVALUATION",
+    performance.feedbackStartAt,
+    performance.feedbackEndAt
+  )
+
+  return (
+    <Link
+      href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(performance.id)}
+      className="group flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
+    >
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-semibold text-blue-950">
+          피드백 진행 중 · {performance.name}
+        </p>
+        {deadline && (
+          <p
+            className={
+              deadline.urgent
+                ? "text-sm font-medium text-amber-700"
+                : "text-sm text-blue-900/70"
+            }
+          >
+            {deadline.text}
+          </p>
+        )}
+      </div>
+      <div className="shrink-0 text-right">
+        {progress ? (
+          <>
+            <p className="text-2xl font-bold tabular-nums text-blue-950">
+              {required === 0 ? 0 : Math.round((done / required) * 100)}%
+            </p>
+            <p className="text-xs text-blue-900/70">
+              다 한 사람 {doneCount} / {people.length}명
+            </p>
+          </>
+        ) : (
+          <Skeleton className="h-8 w-16" />
+        )}
+      </div>
+      <span className="flex shrink-0 items-center gap-0.5 text-sm font-medium text-blue-900">
+        현황 보기
+        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </span>
     </Link>
   )
 }
@@ -238,6 +302,14 @@ export default function AdminDashboardPage() {
   const { data: sessions, isLoading: sessionsLoading } = useSessions()
 
   // Recent performances (latest 5 by createdAt)
+  const evaluating = useMemo(
+    () =>
+      (performances ?? []).filter(
+        (p) => getPerformanceStage(p) === "EVALUATION"
+      ),
+    [performances]
+  )
+
   const recentPerformances = useMemo(
     () =>
       [...(performances ?? [])]
@@ -287,6 +359,10 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">대시보드</h1>
+
+      {evaluating.map((p) => (
+        <FeedbackInProgressCard key={p.id} performance={p} />
+      ))}
 
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

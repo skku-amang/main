@@ -7,9 +7,12 @@ import {
 import { Prisma } from "@repo/database"
 import {
   FeedbackContext,
+  FeedbackProgress,
   getPerformanceStage,
   isEligibleReviewer,
   MyFeedbackSummary,
+  orderFeedbackTeams,
+  reviewerProgress,
   UpsertFeedback
 } from "@repo/shared-types"
 import { PrismaService } from "../prisma/prisma.service"
@@ -33,6 +36,10 @@ export class FeedbackService {
         teams: {
           select: {
             id: true,
+            name: true,
+            songName: true,
+            songArtist: true,
+            createdAt: true,
             leaderId: true,
             recordingUrl: true,
             teamSessions: { select: { members: { select: { userId: true } } } }
@@ -59,7 +66,11 @@ export class FeedbackService {
         ])
       )
     }
-    return { stage: getPerformanceStage(performance, new Date()), ctx }
+    return {
+      stage: getPerformanceStage(performance, new Date()),
+      ctx,
+      teams: performance.teams
+    }
   }
 
   private ownTeamIds(userId: number, ctx: FeedbackContext) {
@@ -93,6 +104,61 @@ export class FeedbackService {
       feedbacks: feedbacks.map((f) => ({
         ...f,
         updatedAt: f.updatedAt.toISOString()
+      }))
+    }
+  }
+
+  /** 운영진용. 대상 팀마다 소속자가 해야 할 피드백 중 몇 개 했는지 (설계 5.3) */
+  async getProgress(performanceId: number): Promise<FeedbackProgress> {
+    const { stage, ctx, teams } = await this.loadPerformance(performanceId)
+    const rows = await this.prisma.feedback.findMany({
+      where: { team: { performanceId } },
+      select: {
+        teamId: true,
+        reviewerId: true,
+        teamScore: true,
+        individualScore: true,
+        preferenceScore: true
+      }
+    })
+    const targets = orderFeedbackTeams(
+      teams.filter((t) => ctx.targetTeamIds.includes(t.id))
+    )
+    const membersOf = (teamId: number) => [
+      ...new Set(ctx.membersByTeam[teamId] ?? [])
+    ]
+    const peopleIds = [...new Set(targets.flatMap((t) => membersOf(t.id)))]
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: peopleIds } },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        image: true,
+        generation: { select: { id: true, order: true } }
+      }
+    })
+    const userById = new Map(users.map((u) => [u.id, u]))
+
+    return {
+      stage,
+      teams: targets.map((t) => ({
+        id: t.id,
+        name: t.name,
+        songName: t.songName,
+        songArtist: t.songArtist,
+        memberIds: membersOf(t.id)
+      })),
+      people: peopleIds.map((id) => ({
+        id,
+        name: userById.get(id)?.name ?? "",
+        nickname: userById.get(id)?.nickname ?? "",
+        image: userById.get(id)?.image ?? null,
+        generation: userById.get(id)?.generation ?? null,
+        teamIds: targets
+          .filter((t) => membersOf(t.id).includes(id))
+          .map((t) => t.id),
+        ...reviewerProgress(id, ctx, rows)
       }))
     }
   }

@@ -8,6 +8,8 @@ const ROUTES = {
     PENDING_USERS: "/admin/pending-users",
     GENERATIONS: "/admin/generations",
     PERFORMANCES: "/admin/performances",
+    PERFORMANCE_FEEDBACK: (performanceId: number) =>
+      `/admin/performances/${performanceId}/feedback`,
     TEAMS: "/admin/teams",
     TEAM_DETAIL: (teamId: number) => `/admin/teams/${teamId}`,
     SESSIONS: "/admin/sessions",

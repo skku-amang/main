@@ -74,6 +74,10 @@ describe("FeedbackService", () => {
                 ...schedule,
                 teams: teams.map((t) => ({
                   id: t.id,
+                  name: `팀${t.id}`,
+                  songName: `곡${t.id}`,
+                  songArtist: `가수${t.id}`,
+                  createdAt: new Date(t.id * 1000),
                   leaderId: t.leaderId,
                   recordingUrl: t.recordingUrl,
                   teamSessions: [
@@ -82,6 +86,18 @@ describe("FeedbackService", () => {
                 }))
               }
             : null
+        )
+      },
+      user: {
+        findMany: jest.fn(
+          async ({ where }: { where: { id: { in: number[] } } }) =>
+            where.id.in.map((id) => ({
+              id,
+              name: `이름${id}`,
+              nickname: `닉${id}`,
+              image: id === ME ? "me.png" : null,
+              generation: { id: 1, order: 36 }
+            }))
         )
       },
       team: {
@@ -93,8 +109,12 @@ describe("FeedbackService", () => {
       },
       feedback: {
         findMany: jest.fn(
-          async ({ where }: { where: { reviewerId: number } }) =>
-            rows.filter((r) => r.reviewerId === where.reviewerId)
+          async ({ where }: { where: { reviewerId?: number } }) =>
+            rows.filter(
+              (r) =>
+                where.reviewerId === undefined ||
+                r.reviewerId === where.reviewerId
+            )
         ),
         upsert: jest.fn(
           async ({
@@ -195,6 +215,63 @@ describe("FeedbackService", () => {
 
     it("공연이 없으면 찾을 수 없다고 알린다", async () => {
       await expect(service.getMine(99, ME)).rejects.toThrow(NotFoundError)
+    })
+  })
+
+  describe("getProgress", () => {
+    const fill = (teamId: number, reviewerId: number, complete = true) =>
+      rows.push({
+        id: rows.length + 1,
+        teamId,
+        reviewerId,
+        teamScore: 3,
+        individualScore: complete ? 3 : null,
+        preferenceScore: complete ? 3 : null,
+        comment: null,
+        updatedAt: new Date()
+      })
+
+    it("사람마다 소속 팀, 한 수 / 해야 할 수, 안 한 팀을 한 번씩 돌려준다", async () => {
+      fill(2, ME)
+      fill(3, ME, false) // 일부만 → 안 한 것
+      fill(1, 20)
+      fill(3, 20)
+
+      const progress = await service.getProgress(PERFORMANCE_ID)
+
+      expect(progress.stage).toBe("EVALUATION")
+      expect(
+        progress.teams.map((t) => [t.id, t.name, t.songName, t.memberIds])
+      ).toEqual([
+        [1, "팀1", "곡1", [ME, 11]],
+        [2, "팀2", "곡2", [20, 21]],
+        [3, "팀3", "곡3", [22]]
+      ])
+      expect(
+        progress.people.map((p) => [
+          p.id,
+          p.teamIds,
+          p.done,
+          p.required,
+          p.missingTeamIds
+        ])
+      ).toEqual([
+        [ME, [1], 1, 2, [3]],
+        [11, [1], 0, 2, [2, 3]],
+        [20, [2], 2, 2, []],
+        [21, [2], 0, 2, [1, 3]],
+        [22, [3], 0, 2, [1, 2]]
+      ])
+      expect(progress.people[0]).toMatchObject({
+        name: `이름${ME}`,
+        nickname: `닉${ME}`,
+        image: "me.png",
+        generation: { id: 1, order: 36 }
+      })
+    })
+
+    it("공연이 없으면 찾을 수 없다고 알린다", async () => {
+      await expect(service.getProgress(99)).rejects.toThrow(NotFoundError)
     })
   })
 

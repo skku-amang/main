@@ -11,6 +11,7 @@ import {
 import { JwtPayload } from "@repo/shared-types"
 import { Request } from "express"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
+import { AdminGuard } from "../auth/guards/admin.guard"
 import { UpsertFeedbackDto } from "./dto/upsert-feedback.dto"
 import { FeedbackService } from "./feedback.service"
 
@@ -23,6 +24,12 @@ export class FeedbackController {
   getMine(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     const user = req.user as JwtPayload
     return this.feedbackService.getMine(id, user.sub)
+  }
+
+  @Get("performances/:id/feedback/progress")
+  @UseGuards(AdminGuard)
+  getProgress(@Param("id", ParseIntPipe) id: number) {
+    return this.feedbackService.getProgress(id)
   }
 
   @Put("teams/:id/feedback")

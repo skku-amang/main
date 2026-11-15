@@ -6,9 +6,11 @@ import {
   isCountableFeedback,
   isFeedbackComplete,
   missingDimensions,
+  missingReviewsOfTeam,
   MyFeedbackSummary,
   nextFeedbackTeamId,
-  orderFeedbackTeams
+  orderFeedbackTeams,
+  reviewerProgress
 } from "./feedback"
 import { UpsertFeedbackSchema } from "./upsert-feedback.schema"
 
@@ -160,6 +162,50 @@ describe("nextFeedbackTeamId", () => {
 
   it("지금 곡이 안 끝났어도 다른 곡이 없으면 null", () => {
     expect(nextFeedbackTeamId(ORDER, 5, summary([2, 3, 4], [5]))).toBeNull()
+  })
+})
+
+describe("reviewerProgress / missingReviewsOfTeam", () => {
+  // 사용자 11은 팀 1과 팀 2 둘 다 소속 → 해야 할 곳은 팀 3뿐
+  const multi: FeedbackContext = {
+    targetTeamIds: [1, 2, 3],
+    membersByTeam: { 1: [10, 11], 2: [11, 12], 3: [13], 4: [20] }
+  }
+  const row = (
+    teamId: number,
+    reviewerId: number,
+    s: FeedbackScores = scores(3, 4, 5)
+  ) => ({ ...s, teamId, reviewerId })
+
+  it("해야 할 수 = 대상 팀 − 본인 팀, 한 수 = 셀 수 있는 피드백만, 나머지가 안 한 팀", () => {
+    const rows = [
+      row(2, 10),
+      row(3, 10, scores(3, null, null)), // 일부만 → 안 한 것
+      row(1, 10), // 본인 팀 → 안 셈
+      row(4, 10) // 미제출 팀 → 안 셈
+    ]
+    expect(reviewerProgress(10, multi, rows)).toEqual({
+      done: 1,
+      required: 2,
+      missingTeamIds: [3]
+    })
+  })
+
+  it("여러 팀 소속이면 그 팀들이 모두 빠진다", () => {
+    expect(reviewerProgress(11, multi, [row(3, 11)])).toEqual({
+      done: 1,
+      required: 1,
+      missingTeamIds: []
+    })
+  })
+
+  it("팀의 빠진 피드백 = 소속자마다 빠진 수의 합", () => {
+    // 팀 1: 10은 2개 중 1개 함(1 빠짐), 11은 1개 중 0개(1 빠짐)
+    expect(missingReviewsOfTeam(1, multi, [row(2, 10)])).toBe(2)
+    // 팀 2: 11(1 빠짐) + 12는 팀 1·3 중 둘 다 함(0)
+    expect(
+      missingReviewsOfTeam(2, multi, [row(1, 12), row(3, 12), row(2, 10)])
+    ).toBe(1)
   })
 })
 
