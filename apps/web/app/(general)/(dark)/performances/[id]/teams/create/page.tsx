@@ -46,7 +46,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
       />
 
       {isClosed ? (
-        <div className="mb-20 flex w-full flex-col items-center gap-4 rounded-2xl bg-white px-7 py-16 text-center shadow-2xl md:p-20">
+        <div className="-mx-4 mb-20 flex w-[calc(100%+2rem)] flex-col items-center gap-4 bg-white px-4 py-16 text-center md:mx-0 md:w-full md:rounded-2xl md:p-20 md:shadow-2xl">
           <p className="text-lg font-semibold">팀 모집 기간이 아닙니다.</p>
           <p className="text-sm text-muted-foreground">
             {josa(performance.name, "은/는")} 지금{" "}
@@ -64,7 +64,7 @@ const TeamCreatePage = async (props: TeamCreatePageProps) => {
         <TeamForm
           defaultPerformanceId={Number(performanceId)}
           closeHref={ROUTES.PERFORMANCE.TEAM.LIST(performanceId)}
-          className="w-full bg-white px-7 py-10 md:p-20"
+          className="bg-white px-4 py-10 md:p-20"
         />
       )}
     </div>

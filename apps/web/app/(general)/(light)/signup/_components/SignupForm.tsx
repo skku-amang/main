@@ -109,7 +109,7 @@ const SignupForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="h-full w-[38.875rem] space-y-6 p-5 lg:p-24 xl:w-full"
+        className="h-full w-full space-y-6 px-4 py-5 md:w-[38.875rem] md:p-5 lg:p-24 xl:w-full"
       >
         <SimpleStringField
           form={form}
