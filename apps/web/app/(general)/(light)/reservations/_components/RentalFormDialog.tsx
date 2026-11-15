@@ -32,9 +32,12 @@ import { useUsers } from "@/hooks/api/useUser"
 import {
   Equipment,
   RentalDetail,
-  formatGenerationOrder
+  formatDuration,
+  formatGenerationOrder,
+  nextFullHour
 } from "@repo/shared-types"
 import type { DateRange } from "react-day-picker"
+import TimeWheel from "./TimeWheel"
 
 const DEFAULT_TITLE = "개인 연습"
 
@@ -86,7 +89,7 @@ const toFields = (d: Dayjs) => ({
   time: d.format("HH:mm")
 })
 
-/** 폼 처음 값 — 빈 칸은 그 시각부터 1시간, 수정은 기존 예약 그대로 */
+/** 폼 처음 값 — 빈 칸은 그 시각부터 1시간, 예약하기 버튼은 다음 정시부터 1시간, 수정은 기존 예약 그대로 */
 function getInitialRange(target: RentalFormTarget) {
   if (target.mode === "edit") {
     return {
@@ -94,11 +97,16 @@ function getInitialRange(target: RentalFormTarget) {
       end: toFields(dayjs(target.rental.endAt))
     }
   }
-  if (!target.startAt) return null
+  const startAt = target.startAt ?? dayjs(nextFullHour(new Date()))
   return {
-    start: toFields(target.startAt),
-    end: toFields(target.startAt.add(1, "hour"))
+    start: toFields(startAt),
+    end: toFields(startAt.add(1, "hour"))
   }
+}
+
+const minutesOfDay = (time: string) => {
+  const [h = 0, m = 0] = time.split(":").map(Number)
+  return h * 60 + m
 }
 
 interface RentalFormDialogProps {
@@ -148,16 +156,19 @@ function RentalForm({
     }
   }, [equipments, equipmentId])
   const [title, setTitle] = useState(editing?.title ?? DEFAULT_TITLE)
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(
-    initialRange
-      ? { from: initialRange.start.date, to: initialRange.end.date }
-      : undefined
-  )
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: initialRange.start.date,
+    to: initialRange.end.date
+  })
   // 끝 날짜를 안 골랐으면 하루짜리
   const startDate = dateRange?.from
   const endDate = dateRange?.to ?? dateRange?.from
-  const [startTime, setStartTime] = useState(initialRange?.start.time ?? "")
-  const [endTime, setEndTime] = useState(initialRange?.end.time ?? "")
+  const [startTime, setStartTime] = useState(initialRange.start.time)
+  const [endTime, setEndTime] = useState(initialRange.end.time)
+  const duration =
+    startDate && endDate && dayjs(startDate).isSame(endDate, "day")
+      ? formatDuration(minutesOfDay(startTime), minutesOfDay(endTime))
+      : null
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
@@ -175,12 +186,10 @@ function RentalForm({
     const newErrors: Record<string, string> = {}
     if (!equipmentId) newErrors.equipmentId = "장비를 선택해주세요."
     if (!startDate) newErrors.startDate = "날짜를 선택해주세요."
-    if (!startTime) newErrors.startTime = "시작 시간을 선택해주세요."
-    if (!endTime) newErrors.endTime = "종료 시간을 선택해주세요."
     if (selectedUserIds.length === 0)
       newErrors.users = "참여자를 최소 1명 선택해주세요."
 
-    if (startDate && endDate && startTime && endTime) {
+    if (startDate && endDate) {
       const start = atTime(startDate, startTime)
       const end = atTime(endDate, endTime)
       if (!end.isAfter(start)) {
@@ -317,24 +326,20 @@ function RentalForm({
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <Input
-                type="time"
-                aria-label="시작 시각"
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+              <TimeWheel
+                label="시작"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={setStartTime}
               />
               <span className="text-muted-foreground text-sm">~</span>
-              <Input
-                type="time"
-                aria-label="종료 시각"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
+              <TimeWheel label="종료" value={endTime} onChange={setEndTime} />
             </div>
             <div>
-              {errors.startTime && (
-                <p className="text-sm text-destructive">{errors.startTime}</p>
+              {duration && (
+                <p className="text-center text-sm text-muted-foreground">
+                  {duration}
+                </p>
               )}
               {errors.endTime && (
                 <p className="text-sm text-destructive">{errors.endTime}</p>
