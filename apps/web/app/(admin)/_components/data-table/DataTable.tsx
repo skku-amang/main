@@ -442,22 +442,28 @@ function DataTableInner<TData, TValue>({
   const tableRef = useRef(table)
   tableRef.current = table
 
-  // Navigate to the page containing the highlighted row
+  // Navigate to the page containing the highlighted row.
+  // 데이터가 늦게 도착하므로 data가 바뀔 때도 다시 보되, rowId 하나당 한 번만 옮긴다
+  // (재조회로 data가 바뀌어도 사용자가 넘긴 페이지를 되돌리지 않게)
+  const navigatedRowId = useRef<number | null>(null)
   useEffect(() => {
-    if (highlightedRowId == null) return
+    if (highlightedRowId == null || navigatedRowId.current === highlightedRowId)
+      return
     const t = tableRef.current
-    const allRows = t.getFilteredRowModel().rows
+    // 정렬·필터가 적용된 순서 = 화면 순서
+    const allRows = t.getPrePaginationRowModel().rows
     const rowIndex = allRows.findIndex(
       (r) => (r.original as { id?: number }).id === highlightedRowId
     )
     if (rowIndex < 0) return
 
+    navigatedRowId.current = highlightedRowId
     const pageSize = t.getState().pagination.pageSize
     const targetPage = Math.floor(rowIndex / pageSize)
     if (t.getState().pagination.pageIndex !== targetPage) {
       setUrlPage(targetPage + 1, { history: "replace" })
     }
-  }, [highlightedRowId, setUrlPage])
+  }, [highlightedRowId, data, setUrlPage])
 
   const pageCount = table.getPageCount()
   useEffect(() => {
@@ -466,15 +472,21 @@ function DataTableInner<TData, TValue>({
     }
   }, [pageCount, urlPage, setUrlPage])
 
-  // Scroll highlighted row into view
+  // Scroll highlighted row into view — 페이지를 옮긴 뒤에야 행이 그려지므로 페이지·데이터가 바뀔 때도 보되 한 번만
+  const scrolledRowId = useRef<number | null>(null)
   useEffect(() => {
-    if (highlightRef.current) {
-      highlightRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      })
-    }
-  }, [highlightedRowId])
+    if (
+      highlightedRowId == null ||
+      scrolledRowId.current === highlightedRowId ||
+      !highlightRef.current
+    )
+      return
+    scrolledRowId.current = highlightedRowId
+    highlightRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    })
+  }, [highlightedRowId, pagination.pageIndex, data])
 
   // Search handler for toolbar — routes to column filter or global filter
   const handleSearchChange = useCallback(
