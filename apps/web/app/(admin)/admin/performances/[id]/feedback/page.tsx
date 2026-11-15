@@ -1,7 +1,7 @@
 "use client"
 
 import { FeedbackProgress } from "@repo/shared-types"
-import { ArrowLeft, ArrowUpRight } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs"
@@ -215,40 +215,37 @@ export default function PerformanceFeedbackAdminPage() {
                   value={String(team.id)}
                   className="rounded-lg border"
                 >
-                  <div className="flex items-center gap-1 pr-2">
-                    <div className="min-w-0 flex-1">
-                      <AccordionTrigger className="gap-3 px-4 py-3 text-left hover:no-underline">
-                        <div className="min-w-0 flex-1 space-y-2">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="truncate font-medium">
-                                {team.songName}{" "}
-                                <span className="text-sm font-normal text-muted-foreground">
-                                  {team.songArtist}
-                                </span>
-                              </p>
-                              <p className="truncate text-xs font-normal text-muted-foreground">
-                                {team.name}
-                              </p>
-                            </div>
-                            <RemainingBadge count={team.notDone} unit="명" />
-                          </div>
-                          <ProgressBar
-                            done={team.done}
-                            total={team.required}
-                            label={`${team.name} 피드백 진행`}
-                          />
+                  {/* 버튼 안에 링크를 둘 수 없어, 펼침 버튼을 머리 전체에 깔고 팀 이름 링크만 위로 올린다 */}
+                  <div className="relative px-4 py-3 pr-11">
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">
+                            {team.songName}{" "}
+                            <span className="text-sm font-normal text-muted-foreground">
+                              {team.songArtist}
+                            </span>
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            <Link
+                              href={teamLink(team.id)}
+                              className="relative z-10 hover:text-foreground hover:underline"
+                            >
+                              {team.name}
+                            </Link>
+                          </p>
                         </div>
-                      </AccordionTrigger>
+                        <RemainingBadge count={team.notDone} unit="명" />
+                      </div>
+                      <ProgressBar
+                        done={team.done}
+                        total={team.required}
+                        label={`${team.name} 피드백 진행`}
+                      />
                     </div>
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link
-                        href={teamLink(team.id)}
-                        aria-label={`${team.name} 팀 페이지`}
-                      >
-                        <ArrowUpRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <AccordionTrigger className="absolute inset-0 justify-end rounded-lg px-4 py-0 hover:no-underline">
+                      <span className="sr-only">{team.name} 팀원 보기</span>
+                    </AccordionTrigger>
                   </div>
                   <AccordionContent className="p-0">
                     <ul className="divide-y border-t">
