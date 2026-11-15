@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { Guitar, Hash, Mic, Music, Users } from "lucide-react"
+import { ChevronRight, Guitar, Hash, Mic, Music, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useMemo } from "react"
@@ -83,9 +83,9 @@ function FeedbackInProgressCard({ performance }: { performance: Performance }) {
   return (
     <Link
       href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(performance.id)}
-      className="flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate font-semibold text-blue-950">
           피드백 진행 중 · {performance.name}
         </p>
@@ -115,6 +115,10 @@ function FeedbackInProgressCard({ performance }: { performance: Performance }) {
           <Skeleton className="h-8 w-16" />
         )}
       </div>
+      <span className="flex shrink-0 items-center gap-0.5 text-sm font-medium text-blue-900">
+        현황 보기
+        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </span>
     </Link>
   )
 }
