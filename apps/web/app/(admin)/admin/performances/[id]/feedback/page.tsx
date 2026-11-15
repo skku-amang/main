@@ -1,7 +1,7 @@
 "use client"
 
 import { FeedbackProgress } from "@repo/shared-types"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs"
@@ -10,6 +10,12 @@ import { useMemo } from "react"
 import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
 import { UserCell } from "@/app/(admin)/_components/data-table/UserCell"
 import PerformanceStageBadge from "@/components/PerformanceStageBadge"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -199,55 +205,75 @@ export default function PerformanceFeedbackAdminPage() {
               모두 피드백을 다 했어요.
             </p>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
+            <Accordion
+              type="multiple"
+              className="grid items-start gap-4 lg:grid-cols-2"
+            >
               {teams.map((team) => (
-                <section key={team.id} className="rounded-lg border">
-                  <div className="space-y-2 border-b px-4 py-3">
-                    <div className="flex items-start justify-between gap-3">
+                <AccordionItem
+                  key={team.id}
+                  value={String(team.id)}
+                  className="rounded-lg border"
+                >
+                  <div className="flex items-center gap-1 pr-2">
+                    <div className="min-w-0 flex-1">
+                      <AccordionTrigger className="gap-3 px-4 py-3 text-left hover:no-underline">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">
+                                {team.songName}{" "}
+                                <span className="text-sm font-normal text-muted-foreground">
+                                  {team.songArtist}
+                                </span>
+                              </p>
+                              <p className="truncate text-xs font-normal text-muted-foreground">
+                                {team.name}
+                              </p>
+                            </div>
+                            <RemainingBadge count={team.notDone} unit="명" />
+                          </div>
+                          <ProgressBar
+                            done={team.done}
+                            total={team.required}
+                            label={`${team.name} 피드백 진행`}
+                          />
+                        </div>
+                      </AccordionTrigger>
+                    </div>
+                    <Button variant="ghost" size="icon" asChild>
                       <Link
                         href={teamLink(team.id)}
-                        className="min-w-0 hover:underline"
+                        aria-label={`${team.name} 팀 페이지`}
                       >
-                        <p className="truncate font-medium">
-                          {team.songName}{" "}
-                          <span className="text-sm font-normal text-muted-foreground">
-                            {team.songArtist}
-                          </span>
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {team.name}
-                        </p>
+                        <ArrowUpRight className="h-4 w-4" />
                       </Link>
-                      <RemainingBadge count={team.notDone} unit="명" />
-                    </div>
-                    <ProgressBar
-                      done={team.done}
-                      total={team.required}
-                      label={`${team.name} 피드백 진행`}
-                    />
+                    </Button>
                   </div>
-                  <ul className="divide-y">
-                    {team.members.map((p) => (
-                      <li
-                        key={p.id}
-                        className="flex items-center justify-between gap-3 px-4 py-2 text-sm"
-                      >
-                        <UserCell user={p} />
-                        <div className="flex shrink-0 items-center gap-3">
-                          <ProgressBar
-                            done={p.done}
-                            total={p.required}
-                            label={`${p.name} 피드백 진행`}
-                            className="w-20"
-                          />
-                          <RemainingBadge count={remainingOf(p)} unit="곡" />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
+                  <AccordionContent className="p-0">
+                    <ul className="divide-y border-t">
+                      {team.members.map((p) => (
+                        <li
+                          key={p.id}
+                          className="flex items-center justify-between gap-3 px-4 py-2 text-sm"
+                        >
+                          <UserCell user={p} />
+                          <div className="flex shrink-0 items-center gap-3">
+                            <ProgressBar
+                              done={p.done}
+                              total={p.required}
+                              label={`${p.name} 피드백 진행`}
+                              className="w-20"
+                            />
+                            <RemainingBadge count={remainingOf(p)} unit="곡" />
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           )}
         </>
       )}
