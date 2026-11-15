@@ -105,6 +105,22 @@ export function getColumns(
       )
     },
     {
+      id: "feedback",
+      header: "피드백",
+      meta: { label: "피드백" },
+      enableSorting: false,
+      cell: ({ row }) =>
+        FEEDBACK_STAGES.includes(getPerformanceStage(row.original)) ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(row.original.id)}>
+              현황
+            </Link>
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        )
+    },
+    {
       accessorKey: "description",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="설명" />
@@ -165,22 +181,6 @@ export function getColumns(
       ),
       meta: { label: "단계" },
       cell: ({ row }) => <PerformanceStageBadge performance={row.original} />
-    },
-    {
-      id: "feedback",
-      header: "피드백",
-      meta: { label: "피드백" },
-      enableSorting: false,
-      cell: ({ row }) =>
-        FEEDBACK_STAGES.includes(getPerformanceStage(row.original)) ? (
-          <Button variant="outline" size="sm" asChild>
-            <Link href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(row.original.id)}>
-              현황
-            </Link>
-          </Button>
-        ) : (
-          <span className="text-muted-foreground">-</span>
-        )
     },
     {
       id: "teamCount",
