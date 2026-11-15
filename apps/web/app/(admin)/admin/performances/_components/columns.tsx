@@ -23,12 +23,25 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import ROUTES from "@/constants/routes"
-import { Performance } from "@repo/shared-types"
+import {
+  getPerformanceStage,
+  Performance,
+  PerformanceStage
+} from "@repo/shared-types"
 
 interface ColumnActions {
   onEdit: (performance: Performance) => void
   onDelete: (performance: Performance) => void
 }
+
+// 녹음본이 모이기 시작한 뒤부터 피드백 현황을 볼 의미가 있다
+const FEEDBACK_STAGES: PerformanceStage[] = [
+  "SUBMISSION",
+  "EVALUATION",
+  "DECISION",
+  "LINEUP",
+  "DONE"
+]
 
 // 진행 순서대로 — 공연 편집 창의 타임라인과 같은 순서
 const SCHEDULE_COLUMNS = [
@@ -152,6 +165,22 @@ export function getColumns(
       ),
       meta: { label: "단계" },
       cell: ({ row }) => <PerformanceStageBadge performance={row.original} />
+    },
+    {
+      id: "feedback",
+      header: "피드백",
+      meta: { label: "피드백" },
+      enableSorting: false,
+      cell: ({ row }) =>
+        FEEDBACK_STAGES.includes(getPerformanceStage(row.original)) ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link href={ROUTES.ADMIN.PERFORMANCE_FEEDBACK(row.original.id)}>
+              현황
+            </Link>
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        )
     },
     {
       id: "teamCount",

@@ -1,7 +1,6 @@
 "use client"
 
 import { FeedbackProgress } from "@repo/shared-types"
-import dayjs from "dayjs"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -16,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ROUTES from "@/constants/routes"
 import { useFeedbackProgress } from "@/hooks/api/useFeedback"
+import { feedbackDeadline } from "@/lib/feedback"
 import { usePerformance } from "@/hooks/api/usePerformance"
 import { cn } from "@/lib/utils"
 
@@ -25,42 +25,6 @@ import { ProgressBar, RemainingBadge } from "./_components/ProgressBits"
 type Person = FeedbackProgress["people"][number]
 
 const VIEWS = ["people", "teams"] as const
-
-const HOUR = 60 * 60 * 1000
-
-const untilText = (ms: number) => {
-  const days = Math.floor(ms / (24 * HOUR))
-  const hours = Math.floor((ms % (24 * HOUR)) / HOUR)
-  if (days > 0) return `${days}일 ${hours}시간`
-  if (hours > 0) return `${hours}시간`
-  return `${Math.max(1, Math.ceil(ms / 60000))}분`
-}
-
-/** 단계에 맞춰 피드백 시작·마감까지 남은 시간. 마감 24시간 전부터 강조 */
-const feedbackDeadline = (
-  stage: FeedbackProgress["stage"] | undefined,
-  startAt: Date | string | null | undefined,
-  endAt: Date | string | null | undefined
-) => {
-  if (!stage || !endAt) return null
-  const end = dayjs(endAt)
-  const at = (d: dayjs.Dayjs) => d.format("M월 D일 HH:mm")
-  if (["PREPARING", "RECRUITING", "SUBMISSION"].includes(stage) && startAt) {
-    const start = dayjs(startAt)
-    return {
-      text: `피드백 시작까지 ${untilText(start.diff(dayjs()))} (${at(start)})`,
-      urgent: false
-    }
-  }
-  if (stage === "EVALUATION") {
-    const ms = end.diff(dayjs())
-    return {
-      text: `마감까지 ${untilText(ms)} (${at(end)})`,
-      urgent: ms < 24 * HOUR
-    }
-  }
-  return { text: `피드백 마감됨 (${at(end)})`, urgent: false }
-}
 
 /** 운영진이 누가 피드백을 안 했는지 확인하는 화면 (설계 5.3). 순위·확정은 #896에서 아래에 붙는다 */
 export default function PerformanceFeedbackAdminPage() {
