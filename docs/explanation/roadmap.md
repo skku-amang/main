@@ -5,11 +5,12 @@
 
 ## Now — 지금 하는 것
 
-### 녹음본 피드백을 한 곳에서 하기
+### 쌓인 백로그 정리
 
-- 근거 (운영진 회의): 지금은 구글 폼과 파이썬 스크립트로 손으로 집계한다. 운영진이 "하나의 플랫폼에서" 하기를 원한다. → [피드백 시스템 요구사항](design/feedback-system-requirements.md)
-- 근거 (운영진 인터뷰 2건, 2026-10): 인터뷰한 운영진 2명 모두 홈페이지에 가장 먼저 생겼으면 하는 기능으로 꼽았다.
-- 작업: [#898](https://github.com/skku-amang/main/issues/898) (하위 이슈 9개)
+- 근거: 녹음본 피드백은 2026년 2학기 정기공연이 끝나 다음에 쓸 때(2027년 1학기 정기공연)까지 약 5달이 남았다. 그동안 부원이 직접 알려 준 불편과 미뤄 둔 정리 작업부터 끝낸다.
+- 부원 의견에서 나온 불편: [#888](https://github.com/skku-amang/main/issues/888) 예약 시각 15분 단위 · [#528](https://github.com/skku-amang/main/issues/528) 비밀번호 찾기 · [#530](https://github.com/skku-amang/main/issues/530)·[#484](https://github.com/skku-amang/main/issues/484) 휴대폰에서 동방 예약 보기 · [#865](https://github.com/skku-amang/main/issues/865) 휴대폰 좌우 여백 · [#777](https://github.com/skku-amang/main/issues/777) 세션 아이콘
+- 기능: [#931](https://github.com/skku-amang/main/issues/931) 이름에 요약 카드 · [#914](https://github.com/skku-amang/main/issues/914) 팀 목록 표 통일 · [#535](https://github.com/skku-amang/main/issues/535) 비활동 부원 참여 제한
+- 코드·운영 정리: [#610](https://github.com/skku-amang/main/issues/610) 문법 검사 경고 (하위 #619~#622) · [#567](https://github.com/skku-amang/main/issues/567) 권한 규칙 한 곳으로 · [#771](https://github.com/skku-amang/main/issues/771) 팀 자리 규칙 한 곳으로 · [#862](https://github.com/skku-amang/main/issues/862) 선택 컴포넌트 정리 · [#659](https://github.com/skku-amang/main/issues/659)·[#616](https://github.com/skku-amang/main/issues/616) API가 멈췄을 때 대응 · [#499](https://github.com/skku-amang/main/issues/499) Sentry source map · [#448](https://github.com/skku-amang/main/issues/448) MinIO CORS · [#446](https://github.com/skku-amang/main/issues/446) 에러 메시지 · [#467](https://github.com/skku-amang/main/issues/467) DESIGN.md
 
 ### 유저 인터뷰
 
@@ -17,6 +18,13 @@
 - 인터뷰를 계속 늘리고, 쌓인 근거로 이 로드맵을 고친다.
 
 ## Next — 다음 차례
+
+### 녹음본 피드백을 한 곳에서 하기 (마무리)
+
+- 근거 (운영진 회의): 지금은 구글 폼과 파이썬 스크립트로 손으로 집계한다. 운영진이 "하나의 플랫폼에서" 하기를 원한다. → [피드백 시스템 요구사항](design/feedback-system-requirements.md)
+- 근거 (운영진 인터뷰 2건, 2026-10): 인터뷰한 운영진 2명 모두 홈페이지에 가장 먼저 생겼으면 하는 기능으로 꼽았다.
+- 기한: 2027년 1학기 정기공연 피드백 전
+- 작업: [#898](https://github.com/skku-amang/main/issues/898). 단계·녹음본 올리기·피드백 입력·미참여 확인은 끝났고, 남은 일은 [#896](https://github.com/skku-amang/main/issues/896) 순위·합격 곡 · [#912](https://github.com/skku-amang/main/issues/912) 운영진 공연 상세 · [#897](https://github.com/skku-amang/main/issues/897) 알림·코멘트 전달 · [#927](https://github.com/skku-amang/main/issues/927) 동영상에서 소리 뽑기
 
 ### 공지·정기모임 자료를 한 곳에 모으기
 
