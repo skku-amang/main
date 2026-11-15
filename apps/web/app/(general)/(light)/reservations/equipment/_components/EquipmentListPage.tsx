@@ -34,6 +34,7 @@ import ROUTES from "@/constants/routes"
 import { useEquipments, useDeleteEquipment } from "@/hooks/api/useEquipment"
 import { useToast } from "@/components/hooks/use-toast"
 import { useAuth } from "@/lib/providers/auth-provider"
+import { matchesKorean } from "@/lib/hangul-search"
 
 import EquipmentCard from "./EquipmentCard"
 import FilterContent, { FILTER_CATEGORIES } from "./FilterModal"
@@ -81,11 +82,10 @@ export default function EquipmentListPage() {
         const matchesCategory = selectedCategories.includes(
           eq.category as EquipCategory
         )
-        const matchesSearch =
-          search === "" ||
-          `${eq.brand} ${eq.model} ${eq.description ?? ""}`
-            .toLowerCase()
-            .includes(search.toLowerCase())
+        const matchesSearch = matchesKorean(
+          `${eq.brand} ${eq.model} ${eq.description ?? ""}`,
+          search
+        )
         return matchesCategory && matchesSearch
       })
       .sort(

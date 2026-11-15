@@ -11,11 +11,11 @@ import {
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
-import Search from "@/components/Search"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import ROUTES from "@/constants/routes"
 import { usePerformances } from "@/hooks/api/usePerformance"
+import { useAuth } from "@/lib/providers/auth-provider"
 import { splitPerformances } from "@/lib/performance"
 
 const Section = ({
@@ -44,6 +44,7 @@ const PerformanceListSkeleton = () => (
 
 const PerformanceListClient = () => {
   const { data: performances } = usePerformances()
+  const { user } = useAuth()
 
   return (
     <div>
@@ -55,19 +56,19 @@ const PerformanceListClient = () => {
         ]}
       />
 
-      {/* 도구 모음 */}
-      <div className="mb-6 flex justify-between gap-x-2">
-        <Search className="h-9 min-w-0 flex-1 md:h-10 md:w-80 md:flex-none" />
-        <Button
-          asChild
-          className="h-9 rounded-lg px-4 text-sm font-medium md:h-10 md:w-[136px] md:rounded-full md:text-[20px] md:font-semibold"
-        >
-          <Link href={ROUTES.ADMIN.PERFORMANCES}>
-            <CirclePlus className="me-1 size-4 md:me-[9px] md:size-6" />
-            Create
-          </Link>
-        </Button>
-      </div>
+      {user?.isAdmin && (
+        <div className="mb-6 flex justify-end">
+          <Button
+            asChild
+            className="h-9 rounded-lg px-4 text-sm font-medium md:h-10 md:w-[136px] md:rounded-full md:text-[20px] md:font-semibold"
+          >
+            <Link href={ROUTES.ADMIN.PERFORMANCES}>
+              <CirclePlus className="me-1 size-4 md:me-[9px] md:size-6" />
+              Create
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {performances === undefined ? (
         <PerformanceListSkeleton />

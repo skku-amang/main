@@ -21,6 +21,7 @@ import {
   ColumnFiltersState,
   ColumnOrderState,
   ColumnPinningState,
+  FilterFn,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -42,6 +43,7 @@ import {
 } from "nuqs"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
+import { matchesKorean } from "@/lib/hangul-search"
 import { cn } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -58,6 +60,10 @@ import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar, type FilterConfig } from "./DataTableToolbar"
 import { DraggableHeader } from "./DraggableHeader"
 import "./types"
+
+// 검색창(열 검색·전체 검색)은 초성·조합 중인 글자도 찾는다. 드롭다운 필터는 열마다 filterFn을 직접 둔다
+const koreanSearch: FilterFn<unknown> = (row, columnId, value) =>
+  matchesKorean(String(row.getValue(columnId) ?? ""), String(value ?? ""))
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -407,6 +413,8 @@ function DataTableInner<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    defaultColumn: { filterFn: koreanSearch as FilterFn<TData> },
+    globalFilterFn: koreanSearch as FilterFn<TData>,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
