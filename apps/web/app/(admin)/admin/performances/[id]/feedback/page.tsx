@@ -215,25 +215,27 @@ export default function PerformanceFeedbackAdminPage() {
                   value={String(team.id)}
                   className="rounded-lg border"
                 >
-                  {/* 버튼 안에 링크를 둘 수 없어, 펼침 버튼을 머리 전체에 깔고 팀 이름 링크만 위로 올린다 */}
+                  {/* 버튼 안에 링크를 둘 수 없어, 펼침 버튼을 머리 전체에 깔고 곡 제목 링크만 위로 올린다 */}
                   <div className="relative px-4 py-3 pr-11">
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate font-medium">
-                            {team.songName}{" "}
+                            <Link
+                              href={teamLink(team.id)}
+                              className="relative z-10 hover:underline"
+                            >
+                              {team.songName}
+                            </Link>{" "}
                             <span className="text-sm font-normal text-muted-foreground">
                               {team.songArtist}
                             </span>
                           </p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            <Link
-                              href={teamLink(team.id)}
-                              className="relative z-10 hover:text-foreground hover:underline"
-                            >
+                          {team.name !== team.songName && (
+                            <p className="truncate text-xs text-muted-foreground">
                               {team.name}
-                            </Link>
-                          </p>
+                            </p>
+                          )}
                         </div>
                         <RemainingBadge count={team.notDone} unit="명" />
                       </div>
