@@ -192,6 +192,7 @@ export default function PerformanceFeedbackAdminPage() {
               searchPlaceholder="이름 검색"
               initialSorting={[{ id: "progress", desc: true }]}
               emptyMessage="모두 피드백을 다 했어요."
+              exportName={`${performance?.name ?? "공연"}_피드백 현황`}
             />
           ) : teams.length === 0 ? (
             <p className="text-sm text-muted-foreground">
