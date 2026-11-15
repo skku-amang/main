@@ -130,7 +130,7 @@ export class FeedbackService {
     const peopleIds = [...new Set(targets.flatMap((t) => membersOf(t.id)))]
     const users = await this.prisma.user.findMany({
       where: { id: { in: peopleIds } },
-      select: { id: true, name: true, nickname: true }
+      select: { id: true, name: true, nickname: true, image: true }
     })
     const userById = new Map(users.map((u) => [u.id, u]))
 
@@ -147,6 +147,7 @@ export class FeedbackService {
         id,
         name: userById.get(id)?.name ?? "",
         nickname: userById.get(id)?.nickname ?? "",
+        image: userById.get(id)?.image ?? null,
         teamIds: targets
           .filter((t) => membersOf(t.id).includes(id))
           .map((t) => t.id),

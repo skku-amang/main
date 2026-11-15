@@ -94,7 +94,8 @@ describe("FeedbackService", () => {
             where.id.in.map((id) => ({
               id,
               name: `이름${id}`,
-              nickname: `닉${id}`
+              nickname: `닉${id}`,
+              image: id === ME ? "me.png" : null
             }))
         )
       },
@@ -262,7 +263,8 @@ describe("FeedbackService", () => {
       ])
       expect(progress.people[0]).toMatchObject({
         name: `이름${ME}`,
-        nickname: `닉${ME}`
+        nickname: `닉${ME}`,
+        image: "me.png"
       })
     })
 
