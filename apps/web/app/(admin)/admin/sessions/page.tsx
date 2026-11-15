@@ -121,6 +121,7 @@ export default function SessionsAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">세션 관리</h1>
 
       <DataTable
+        exportName="세션"
         columns={columns}
         data={sessions ?? []}
         isLoading={isLoading}

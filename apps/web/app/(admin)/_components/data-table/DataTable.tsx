@@ -68,6 +68,8 @@ const koreanSearch: FilterFn<unknown> = (row, columnId, value) =>
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  /** CSV 파일 이름에 들어갈 표 이름 (예: "부원") → 아망_부원_2026-11-15_1430.csv */
+  exportName: string
   isLoading?: boolean
   searchColumn?: string
   searchPlaceholder?: string
@@ -126,6 +128,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 function DataTableInner<TData, TValue>({
   columns: userColumns,
   data,
+  exportName,
   isLoading = false,
   searchColumn,
   searchPlaceholder,
@@ -519,6 +522,7 @@ function DataTableInner<TData, TValue>({
     <div>
       <DataTableToolbar
         table={table}
+        exportName={exportName}
         searchValue={searchDisplayValue}
         onSearchChange={
           searchColumn || enableGlobalSearch ? handleSearchChange : undefined

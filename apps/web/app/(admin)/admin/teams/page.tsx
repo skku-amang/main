@@ -201,6 +201,7 @@ export default function TeamsAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">팀 관리</h1>
 
       <DataTable
+        exportName="팀"
         columns={columns}
         data={teams ?? []}
         isLoading={isLoading}

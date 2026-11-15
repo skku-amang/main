@@ -126,6 +126,7 @@ export default function GenerationsAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">기수 관리</h1>
 
       <DataTable
+        exportName="기수"
         columns={columns}
         data={generations ?? []}
         initialSorting={[{ id: "order", desc: true }]}

@@ -143,6 +143,7 @@ export default function PendingUsersAdminPage() {
       </div>
 
       <DataTable
+        exportName="가입 대기 부원"
         columns={columns}
         data={pendingUsers ?? []}
         isLoading={isLoading}
