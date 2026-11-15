@@ -93,11 +93,11 @@ export default function PerformanceFeedbackAdminPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <Link href={ROUTES.ADMIN.PERFORMANCES}>
-          <Button variant="ghost" size="icon" aria-label="공연 목록으로">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={ROUTES.ADMIN.PERFORMANCES} aria-label="공연 목록으로">
             <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <h1 className="text-2xl font-bold">피드백 현황</h1>
         {performance && (
           <>
