@@ -44,6 +44,6 @@ export const RemainingBadge = ({
       count > 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-green-700"
     )}
   >
-    {count > 0 ? `${count}${unit} 남음` : "✔ 다 함"}
+    {count > 0 ? `${count}${unit} 남음` : "✔ 완료"}
   </span>
 )
