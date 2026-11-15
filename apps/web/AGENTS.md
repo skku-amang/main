@@ -22,3 +22,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - 만들기 전에 1~4에서 비슷한 이름(`*Table`, `*Cell`, `*Avatar`, `*Badge` 등)을 먼저 검색한다. 몰라서 못 쓰는 경우가 가장 흔하다.
 - 같은 모양이 두 곳 이상에서 반복되면 공통으로 올릴지 사용자에게 묻는다.
+
+## 검색
+
+- 사용자가 입력하는 검색은 [lib/hangul-search.ts](lib/hangul-search.ts)의 `matchesKorean`으로 맞춘다. 초성("ㅂㄷ" → "밴드")과 조합 중인 글자("밴" → "밴드")를 찾는다. `toLowerCase().includes()`를 직접 쓰지 않는다.
+- 운영진 표([app/(admin)/\_components/data-table/DataTable.tsx](<app/(admin)/_components/data-table/DataTable.tsx>))의 검색창은 기본으로 `matchesKorean`을 쓴다. 드롭다운 필터처럼 값이 정확히 같아야 하는 열은 그 열에 `filterFn`을 따로 둔다.
