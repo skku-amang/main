@@ -9,11 +9,12 @@ const pad = (n: number) => String(n).padStart(2, "0")
 const toOption = (n: number) => ({ value: n, label: pad(n) })
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, h) => toOption(h))
 
-// 생성된 wheel-picker.tsx는 Tailwind v4 문법(inset-ring 등)이라 v3에서 빠지는 포커스 표시를 여기서 채운다
+// 생성된 wheel-picker.tsx는 Tailwind v4 문법(inset-ring 등)이라 v3에서 빠지는 포커스 표시를 여기서 채운다.
+// 글자 크기는 라이브러리 CSS와 우선순위가 같아 로드 순서에 따라 갈리므로, 라이브러리 규칙이 없는 highlightItem에만 준다
 const WHEEL_CLASS_NAMES = {
-  optionItem: "text-base",
   highlightWrapper:
-    "text-lg font-semibold data-[rwp-focused]:ring-2 data-[rwp-focused]:ring-inset data-[rwp-focused]:ring-zinc-300"
+    "data-[rwp-focused]:ring-2 data-[rwp-focused]:ring-inset data-[rwp-focused]:ring-zinc-300",
+  highlightItem: "text-lg font-semibold"
 }
 
 interface TimeWheelProps {
@@ -29,7 +30,7 @@ export default function TimeWheel({ value, onChange, label }: TimeWheelProps) {
   const [minutes] = useState(() => minuteOptions(minute).map(toOption))
 
   return (
-    <WheelPickerWrapper className="w-40 shadow-sm">
+    <WheelPickerWrapper className="w-full min-w-0 shadow-sm">
       <div role="group" aria-label={`${label} 시`} className="flex flex-1">
         <WheelPicker
           options={HOUR_OPTIONS}

@@ -326,7 +326,7 @@ function RentalForm({
               )}
             </div>
 
-            <div className="flex items-center justify-center gap-2">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
               <TimeWheel
                 label="시작"
                 value={startTime}
