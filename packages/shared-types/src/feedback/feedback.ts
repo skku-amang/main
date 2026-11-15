@@ -120,6 +120,7 @@ export type FeedbackProgress = {
     name: string
     nickname: string
     image: string | null
+    generation: { id: number; order: number } | null
     /** 소속된 대상 팀 */
     teamIds: number[]
     done: number

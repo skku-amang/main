@@ -3,6 +3,7 @@
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -17,7 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import UserAvatar from "@/components/UserAvatar"
 import { koreanCommandFilter } from "@/lib/hangul-search"
 import { cn } from "@/lib/utils"
 import { formatGenerationOrder } from "@repo/shared-types"
@@ -65,6 +65,21 @@ type MemberPickerProps<T extends PickableMember> =
 
 const generationLabel = (user: PickableMember) =>
   `${formatGenerationOrder(user.generation.order)}기`
+
+function MemberAvatar({
+  user,
+  className
+}: {
+  user: PickableMember
+  className?: string
+}) {
+  return (
+    <Avatar className={cn("size-6", className)}>
+      <AvatarImage src={user.image ?? undefined} alt="" />
+      <AvatarFallback className="text-[10px]">{user.name[0]}</AvatarFallback>
+    </Avatar>
+  )
+}
 
 /**
  * 한글 친화 검색 + 기수 표기를 지원하는 멤버 선택 컴포넌트.
@@ -120,7 +135,7 @@ export default function MemberPicker<T extends PickableMember>(
         >
           {selected ? (
             <span className="flex min-w-0 items-center gap-x-2">
-              <UserAvatar user={selected} />
+              <MemberAvatar user={selected} />
               <span className="truncate">
                 {generationLabel(selected)} {selected.name}
               </span>
@@ -174,7 +189,7 @@ export default function MemberPicker<T extends PickableMember>(
                         )}
                       />
                     )}
-                    <UserAvatar user={user} className="mr-2" />
+                    <MemberAvatar user={user} className="mr-2" />
                     <span className="flex-1 truncate">{user.name}</span>
                     <span className="ml-2 text-xs text-muted-foreground">
                       {generationLabel(user)}

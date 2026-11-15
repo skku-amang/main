@@ -95,7 +95,8 @@ describe("FeedbackService", () => {
               id,
               name: `이름${id}`,
               nickname: `닉${id}`,
-              image: id === ME ? "me.png" : null
+              image: id === ME ? "me.png" : null,
+              generation: { id: 1, order: 36 }
             }))
         )
       },
@@ -264,7 +265,8 @@ describe("FeedbackService", () => {
       expect(progress.people[0]).toMatchObject({
         name: `이름${ME}`,
         nickname: `닉${ME}`,
-        image: "me.png"
+        image: "me.png",
+        generation: { id: 1, order: 36 }
       })
     })
 

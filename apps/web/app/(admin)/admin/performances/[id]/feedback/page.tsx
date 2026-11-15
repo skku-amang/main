@@ -6,24 +6,25 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs"
+import { useMemo } from "react"
 
+import { DataTable } from "@/app/(admin)/_components/data-table/DataTable"
+import { UserCell } from "@/app/(admin)/_components/data-table/UserCell"
 import PerformanceStageBadge from "@/components/PerformanceStageBadge"
-import ProfileLink from "@/components/ProfileLink"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import UserAvatar from "@/components/UserAvatar"
 import ROUTES from "@/constants/routes"
 import { useFeedbackProgress } from "@/hooks/api/useFeedback"
 import { usePerformance } from "@/hooks/api/usePerformance"
 import { cn } from "@/lib/utils"
 
+import { getPeopleColumns, remainingOf } from "./_components/peopleColumns"
+import { ProgressBar, RemainingBadge } from "./_components/ProgressBits"
+
 type Person = FeedbackProgress["people"][number]
 
 const VIEWS = ["people", "teams"] as const
-const MISSING_PREVIEW = 3
-
-const left = (p: Person) => p.required - p.done
 
 const HOUR = 60 * 60 * 1000
 
@@ -61,60 +62,6 @@ const feedbackDeadline = (
   return { text: `피드백 마감됨 (${at(end)})`, urgent: false }
 }
 
-const Bar = ({
-  done,
-  total,
-  label,
-  className
-}: {
-  done: number
-  total: number
-  label: string
-  className?: string
-}) => (
-  <div
-    role="progressbar"
-    aria-label={label}
-    aria-valuemin={0}
-    aria-valuemax={total}
-    aria-valuenow={done}
-    title={`${done} / ${total}`}
-    className={cn("h-1.5 overflow-hidden rounded-full bg-slate-200", className)}
-  >
-    <div
-      className={cn(
-        "h-full rounded-full transition-all",
-        done >= total ? "bg-green-600" : "bg-blue-900"
-      )}
-      style={{ width: `${total === 0 ? 100 : (done / total) * 100}%` }}
-    />
-  </div>
-)
-
-const Remaining = ({ count, unit }: { count: number; unit: string }) => (
-  <span
-    className={cn(
-      "shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium",
-      count > 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-green-700"
-    )}
-  >
-    {count > 0 ? `${count}${unit} 남음` : "✔ 다 함"}
-  </span>
-)
-
-const PersonName = ({ person }: { person: Person }) => (
-  <ProfileLink
-    userId={person.id}
-    className="flex min-w-0 items-center gap-2 hover:underline"
-  >
-    <UserAvatar user={person} />
-    <span className="truncate">
-      {person.name}{" "}
-      <span className="text-muted-foreground">({person.nickname})</span>
-    </span>
-  </ProfileLink>
-)
-
 /** 운영진이 누가 피드백을 안 했는지 확인하는 화면 (설계 5.3). 순위·확정은 #896에서 아래에 붙는다 */
 export default function PerformanceFeedbackAdminPage() {
   const performanceId = Number(useParams<{ id: string }>().id)
@@ -135,9 +82,8 @@ export default function PerformanceFeedbackAdminPage() {
 
   const people = progress?.people ?? []
   const personById = new Map(people.map((p) => [p.id, p]))
-  const teamById = new Map((progress?.teams ?? []).map((t) => [t.id, t]))
-  const shown = (p: Person) => !incompleteOnly || left(p) > 0
-  const doneCount = people.filter((p) => left(p) === 0).length
+  const shown = (p: Person) => !incompleteOnly || remainingOf(p) > 0
+  const doneCount = people.filter((p) => remainingOf(p) === 0).length
   const totalDone = people.reduce((sum, p) => sum + p.done, 0)
   const totalRequired = people.reduce((sum, p) => sum + p.required, 0)
   const deadline = feedbackDeadline(
@@ -148,12 +94,14 @@ export default function PerformanceFeedbackAdminPage() {
   const teamLink = (teamId: number) =>
     ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId)
 
-  // 남은 곡이 많은 사람부터. 같으면 원래 순서(팀 순서 → 팀장 → 세션)
-  const sortedPeople = people
-    .map((p, i) => ({ p, i }))
-    .sort((a, b) => left(b.p) - left(a.p) || a.i - b.i)
-    .map(({ p }) => p)
-    .filter(shown)
+  const peopleColumns = useMemo(
+    () =>
+      getPeopleColumns(
+        new Map((progress?.teams ?? []).map((t) => [t.id, t])),
+        (teamId) => ROUTES.PERFORMANCE.TEAM.DETAIL(performanceId, teamId)
+      ),
+    [progress?.teams, performanceId]
+  )
 
   const teams = (progress?.teams ?? [])
     .map((team) => {
@@ -164,15 +112,11 @@ export default function PerformanceFeedbackAdminPage() {
         ...team,
         done: all.reduce((sum, p) => sum + p.done, 0),
         required: all.reduce((sum, p) => sum + p.required, 0),
-        notDone: all.filter((p) => left(p) > 0).length,
+        notDone: all.filter((p) => remainingOf(p) > 0).length,
         members: all.filter(shown)
       }
     })
     .filter((team) => team.members.length > 0)
-
-  const empty = (
-    <p className="text-sm text-muted-foreground">모두 피드백을 다 했어요.</p>
-  )
 
   return (
     <div className="space-y-6">
@@ -236,7 +180,7 @@ export default function PerformanceFeedbackAdminPage() {
               피드백 {totalDone} / {totalRequired}건 · 다 한 사람 {doneCount} /{" "}
               {people.length}명
             </p>
-            <Bar
+            <ProgressBar
               done={totalDone}
               total={totalRequired}
               label="전체 피드백 진행"
@@ -277,73 +221,18 @@ export default function PerformanceFeedbackAdminPage() {
               녹음본을 낸 팀이 없어요.
             </p>
           ) : view === "people" ? (
-            sortedPeople.length === 0 ? (
-              empty
-            ) : (
-              <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">이름</th>
-                      <th className="px-4 py-2 font-medium">소속 팀</th>
-                      <th className="px-4 py-2 font-medium">진행</th>
-                      <th className="px-4 py-2 font-medium">남은 곡</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {sortedPeople.map((p) => {
-                      const missing = p.missingTeamIds.map(
-                        (id) => teamById.get(id)?.songName ?? ""
-                      )
-                      return (
-                        <tr key={p.id} className="align-top">
-                          <td className="max-w-56 px-4 py-2">
-                            <PersonName person={p} />
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex max-w-72 flex-wrap gap-1">
-                              {p.teamIds.map((id) => (
-                                <Link
-                                  key={id}
-                                  href={teamLink(id)}
-                                  className="max-w-full truncate rounded bg-muted px-1.5 py-0.5 text-xs hover:underline"
-                                >
-                                  {teamById.get(id)?.name}
-                                </Link>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex items-center gap-3">
-                              <Bar
-                                done={p.done}
-                                total={p.required}
-                                label={`${p.name} 피드백 진행`}
-                                className="w-24"
-                              />
-                              <Remaining count={left(p)} unit="곡" />
-                            </div>
-                          </td>
-                          <td
-                            className="px-4 py-2 text-muted-foreground"
-                            title={missing.join(", ")}
-                          >
-                            {missing.length === 0
-                              ? "-"
-                              : missing.slice(0, MISSING_PREVIEW).join(", ") +
-                                (missing.length > MISSING_PREVIEW
-                                  ? ` 외 ${missing.length - MISSING_PREVIEW}곡`
-                                  : "")}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )
+            <DataTable
+              columns={peopleColumns}
+              data={people.filter(shown)}
+              searchColumn="name"
+              searchPlaceholder="이름 검색"
+              initialSorting={[{ id: "progress", desc: true }]}
+              emptyMessage="모두 피드백을 다 했어요."
+            />
           ) : teams.length === 0 ? (
-            empty
+            <p className="text-sm text-muted-foreground">
+              모두 피드백을 다 했어요.
+            </p>
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
               {teams.map((team) => (
@@ -364,9 +253,9 @@ export default function PerformanceFeedbackAdminPage() {
                           {team.name}
                         </p>
                       </Link>
-                      <Remaining count={team.notDone} unit="명" />
+                      <RemainingBadge count={team.notDone} unit="명" />
                     </div>
-                    <Bar
+                    <ProgressBar
                       done={team.done}
                       total={team.required}
                       label={`${team.name} 피드백 진행`}
@@ -378,15 +267,15 @@ export default function PerformanceFeedbackAdminPage() {
                         key={p.id}
                         className="flex items-center justify-between gap-3 px-4 py-2 text-sm"
                       >
-                        <PersonName person={p} />
+                        <UserCell user={p} />
                         <div className="flex shrink-0 items-center gap-3">
-                          <Bar
+                          <ProgressBar
                             done={p.done}
                             total={p.required}
                             label={`${p.name} 피드백 진행`}
                             className="w-20"
                           />
-                          <Remaining count={left(p)} unit="곡" />
+                          <RemainingBadge count={remainingOf(p)} unit="곡" />
                         </div>
                       </li>
                     ))}
