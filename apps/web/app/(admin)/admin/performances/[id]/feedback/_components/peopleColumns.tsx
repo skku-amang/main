@@ -38,7 +38,7 @@ export function getPeopleColumns(
     {
       id: "teams",
       accessorFn: (p) => teamNames(p.teamIds).join(", "),
-      header: "소속 팀",
+      header: () => <span className="whitespace-nowrap">소속 팀</span>,
       meta: { label: "소속 팀" },
       size: 260,
       enableSorting: false,
@@ -80,7 +80,7 @@ export function getPeopleColumns(
     {
       id: "missing",
       accessorFn: (p) => songNames(p.missingTeamIds).join(", "),
-      header: "남은 곡",
+      header: () => <span className="whitespace-nowrap">남은 곡</span>,
       meta: { label: "남은 곡" },
       size: 280,
       enableSorting: false,

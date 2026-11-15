@@ -106,7 +106,7 @@ export function getColumns(
     },
     {
       id: "feedback",
-      header: "피드백",
+      header: () => <span className="whitespace-nowrap">피드백</span>,
       meta: { label: "피드백" },
       enableSorting: false,
       cell: ({ row }) =>
