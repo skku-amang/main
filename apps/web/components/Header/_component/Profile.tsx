@@ -24,6 +24,8 @@ import ROUTES from "@/constants/routes"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
+import { HeaderMode } from ".."
+
 interface MenuItemProps {
   icon: React.ReactNode
   href?: string
@@ -46,7 +48,7 @@ const MenuItem = ({ icon, href, children }: MenuItemProps) => {
   )
 }
 
-const Profile = () => {
+const Profile = ({ mode }: { mode: HeaderMode }) => {
   const router = useRouter()
   const { user, isLoading, logout } = useAuth()
 
@@ -54,11 +56,22 @@ const Profile = () => {
     return (
       <>
         {isLoading ? (
-          <LoaderCircle className="animate-spin text-white" size={30} />
-        ) : (
-          <Button
+          <LoaderCircle
             className={cn(
-              "text-white text-lg font-semibold rounded-full bg-blue-500 px-[37px] py-[10.5px]"
+              "animate-spin",
+              mode === "light" ? "text-primary" : "text-white"
+            )}
+            size={30}
+          />
+        ) : (
+          // 남색 헤더 위에선 남색 버튼이 묻히므로 흰 버튼으로 뒤집는다
+          <Button
+            asChild
+            size="lg"
+            shape="round"
+            className={cn(
+              "px-[37px] text-lg font-semibold",
+              mode !== "light" && "bg-white text-primary hover:bg-white/90"
             )}
           >
             <Link href={ROUTES.LOGIN}>Login</Link>

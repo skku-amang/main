@@ -306,7 +306,7 @@ const SignupForm = () => {
           </Button>
           <Button
             type="submit"
-            className="h-11 w-36 rounded-full bg-[#023664] font-semibold text-white hover:bg-[#012a50]"
+            className="h-11 w-36 rounded-full font-semibold"
           >
             회원가입
           </Button>

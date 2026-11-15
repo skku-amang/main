@@ -135,7 +135,7 @@ const Login = () => {
         </div>
         <div className="flex w-full flex-col items-center justify-center py-8 lg:absolute lg:right-20 lg:top-[8.5rem] lg:w-auto lg:py-0 xl:right-32">
           <h3 className="mb-2 text-2xl font-medium text-slate-900">로그인</h3>
-          <h5 className="mb-8 text-sm font-normal text-slate-400">
+          <h5 className="mb-8 text-sm font-normal text-muted-foreground">
             계속하려면 로그인해주세요
           </h5>
           {(signupSuccess || isPendingApproval) && (
@@ -155,12 +155,13 @@ const Login = () => {
           >
             <div className="grid w-full items-center gap-1.5 lg:max-w-sm">
               <Label htmlFor="email" className="font-semibold">
-                아이디
+                이메일
               </Label>
               <Input
                 {...register("email")}
+                id="email"
                 name="email"
-                placeholder="Input text"
+                placeholder="example@g.skku.edu"
                 className="h-12 rounded-lg border-slate-300 bg-white px-5 text-base shadow-sm lg:w-80"
               />
             </div>
@@ -171,8 +172,9 @@ const Login = () => {
               </Label>
               <Input
                 {...register("password")}
+                id="password"
                 name="password"
-                placeholder="Input text"
+                placeholder="비밀번호"
                 type="password"
                 className="h-12 rounded-lg border-slate-300 bg-white px-5 text-base shadow-sm lg:w-80"
               />
@@ -180,7 +182,9 @@ const Login = () => {
             <div className="text-destructive">{errors.password?.message}</div>
             <Button
               type="submit"
-              className="mt-8 h-[52px] w-full rounded-lg bg-[#4A8AF4] text-base font-semibold text-white hover:bg-[#3b7ae5] lg:w-[300px]"
+              size="xl"
+              shape="round"
+              className="mt-8 w-full font-semibold lg:w-[300px]"
               disabled={isSubmitting}
             >
               {isSubmitting ? "로그인 중..." : "로그인"}
@@ -189,7 +193,10 @@ const Login = () => {
               <div className="pr-2 text-sm font-medium text-slate-900">
                 아직 계정이 없으신가요?
               </div>
-              <Link href={ROUTES.SIGNUP} className="text-sm text-blue-400">
+              <Link
+                href={ROUTES.SIGNUP}
+                className="text-sm font-semibold text-primary underline underline-offset-4"
+              >
                 회원가입
               </Link>
             </div>
