@@ -1,6 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
+import { format } from "date-fns"
 import { Download, Plus, Search, Trash2, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -28,6 +29,8 @@ export interface FilterConfig {
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
+  /** CSV 파일 이름에 들어갈 표 이름 (예: "부원") */
+  exportName: string
   searchValue?: string
   onSearchChange?: (value: string) => void
   searchPlaceholder?: string
@@ -38,7 +41,13 @@ interface DataTableToolbarProps<TData> {
   selectedCount?: number
 }
 
-function exportToCsv<TData>(table: Table<TData>) {
+/** 아망_{표 이름}_{날짜}_{시각}.csv — 브라우저 시간(한국) 기준. 파일 이름에 못 쓰는 문자는 _ */
+function csvFileName(exportName: string, now = new Date()) {
+  const name = exportName.replace(/[\\/:*?"<>|]/g, "_").trim()
+  return `아망_${name}_${format(now, "yyyy-MM-dd_HHmm")}.csv`
+}
+
+function exportToCsv<TData>(table: Table<TData>, exportName: string) {
   const exportColumns = table
     .getAllColumns()
     .filter(
@@ -70,13 +79,14 @@ function exportToCsv<TData>(table: Table<TData>) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
-  link.download = `export-${new Date().toISOString().slice(0, 10)}.csv`
+  link.download = csvFileName(exportName)
   link.click()
   URL.revokeObjectURL(url)
 }
 
 export function DataTableToolbar<TData>({
   table,
+  exportName,
   searchValue,
   onSearchChange,
   searchPlaceholder = "검색...",
@@ -161,7 +171,11 @@ export function DataTableToolbar<TData>({
       )}
 
       <div className="ml-auto flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={() => exportToCsv(table)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => exportToCsv(table, exportName)}
+        >
           <Download className="mr-1 h-4 w-4" />
           CSV
         </Button>

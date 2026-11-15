@@ -160,6 +160,7 @@ export default function UsersAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">회원 관리</h1>
 
       <DataTable
+        exportName="부원"
         columns={columns}
         data={users ?? []}
         isLoading={isLoading}

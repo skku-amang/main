@@ -116,6 +116,7 @@ export default function EquipmentsAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">장비 관리</h1>
 
       <DataTable
+        exportName="장비"
         columns={columns}
         data={equipments ?? []}
         isLoading={isLoading}

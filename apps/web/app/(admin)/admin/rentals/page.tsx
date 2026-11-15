@@ -116,6 +116,7 @@ export default function RentalsAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">예약 관리</h1>
 
       <DataTable
+        exportName="대여"
         columns={columns}
         data={rentals ?? []}
         isLoading={isLoading}

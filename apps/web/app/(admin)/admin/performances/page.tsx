@@ -148,6 +148,7 @@ export default function PerformancesAdminPage() {
       <h1 className="mb-6 text-2xl font-bold">공연 관리</h1>
 
       <DataTable
+        exportName="공연"
         columns={columns}
         data={performances ?? []}
         isLoading={isLoading}
