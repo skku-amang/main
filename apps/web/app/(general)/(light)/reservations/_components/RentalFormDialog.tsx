@@ -104,11 +104,6 @@ function getInitialRange(target: RentalFormTarget) {
   }
 }
 
-const minutesOfDay = (time: string) => {
-  const [h = 0, m = 0] = time.split(":").map(Number)
-  return h * 60 + m
-}
-
 interface RentalFormDialogProps {
   target: RentalFormTarget | null
   onClose: () => void
@@ -165,10 +160,12 @@ function RentalForm({
   const endDate = dateRange?.to ?? dateRange?.from
   const [startTime, setStartTime] = useState(initialRange.start.time)
   const [endTime, setEndTime] = useState(initialRange.end.time)
-  const duration =
-    startDate && endDate && dayjs(startDate).isSame(endDate, "day")
-      ? formatDuration(minutesOfDay(startTime), minutesOfDay(endTime))
-      : null
+  const spanMinutes =
+    startDate && endDate
+      ? atTime(endDate, endTime).diff(atTime(startDate, startTime), "minute")
+      : 0
+  // 24시간 안이면 날짜를 넘겨도(23:00~다음 날 00:00) 걸리는 시간을 보여 준다
+  const duration = spanMinutes < 24 * 60 ? formatDuration(0, spanMinutes) : null
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
@@ -181,6 +178,26 @@ function RentalForm({
   }, [editing, currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  // 날짜·시각을 고치면 지난 저장 때의 순서 오류는 지운다 — 고친 뒤에도 남아 걸리는 시간과 같이 보이지 않게
+  const clearOrderError = () =>
+    setErrors((prev) => {
+      if (!prev.endTime) return prev
+      const next = { ...prev }
+      delete next.endTime
+      return next
+    })
+  const changeStartTime = (v: string) => {
+    setStartTime(v)
+    clearOrderError()
+  }
+  const changeEndTime = (v: string) => {
+    setEndTime(v)
+    clearOrderError()
+  }
+  const changeDateRange = (range: DateRange | undefined) => {
+    setDateRange(range)
+    clearOrderError()
+  }
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -317,7 +334,7 @@ function RentalForm({
                 // 범위를 다 고른 뒤 다시 누르면 새로 시작 — 하루짜리 예약 날짜를 옮길 때 범위가 늘어나지 않게
                 resetOnSelect
                 selected={dateRange}
-                onSelect={setDateRange}
+                onSelect={changeDateRange}
                 disabled={disablePastDates}
                 className="mx-auto rounded-md border [--cell-size:2.5rem]"
               />
@@ -330,10 +347,14 @@ function RentalForm({
               <TimeWheel
                 label="시작"
                 value={startTime}
-                onChange={setStartTime}
+                onChange={changeStartTime}
               />
               <span className="text-muted-foreground text-sm">~</span>
-              <TimeWheel label="종료" value={endTime} onChange={setEndTime} />
+              <TimeWheel
+                label="종료"
+                value={endTime}
+                onChange={changeEndTime}
+              />
             </div>
             <div>
               {duration && (
