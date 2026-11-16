@@ -16,6 +16,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 기본 부품: [components/ui/](components/ui/) (shadcn)
 - 토큰은 shadcn 원래 뜻대로 쓴다. 예: `secondary`는 옅은 보조 배경이고 강조색이 아니다. 강조·주요 버튼은 `primary`(남색)
 
+값(색 코드·간격 수치)은 위 파일에만 둔다. 여기에는 코드만 봐서는 알 수 없는 **규칙**만 적는다.
+
+- **글자 대비**: 글자와 배경의 대비는 4.5:1 이상. 토큰 조합을 새로 만들면 대비부터 잰다 (밝은 파랑 위 남색 글자가 2.35:1이었던 사례: [#940](https://github.com/skku-amang/main/issues/940))
+- **화면 테마**: `app/(general)/(dark)`는 남색 머리 띠 위에 흰 카드가 뜨는 화면, `(light)`는 밝은 바탕 화면
+- **휴대폰 좌우 여백**: 내용은 화면 가장자리에서 16px. 밝은 화면에서 화면 전체를 감싸는 바깥 카드는 md부터만 쓰고, 어두운 화면은 카드를 유지하되 카드 안쪽 여백을 16px로 줄인다 ([#937](https://github.com/skku-amang/main/pull/937)). 화면 안에서 내용을 묶는 섹션 카드는 해당 없음
+- **공연 단계 표시**: [PerformanceStageBadge](components/PerformanceStageBadge.tsx) 하나만 쓴다. 단계를 따로 "모집 중/마감"처럼 다시 만들지 않는다. 색은 부원이 할 일 있음(팀 모집·피드백)=진한 남색, 진행 중=옅은 파랑, 시작 전·끝=회색 ([#941](https://github.com/skku-amang/main/pull/941))
+
 ## 컴포넌트 고르는 순서
 
 새 화면이나 컴포넌트를 만들 때 위에서부터 찾아 쓴다. 위에 맞는 게 있으면 아래로 내려가지 않는다.
