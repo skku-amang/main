@@ -7,7 +7,7 @@ import dayjs, { Dayjs } from "dayjs"
 import { Clock, Package, Pencil, Trash2, UserRound, Users } from "lucide-react"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
-import { RentalDetail } from "@repo/shared-types"
+import { formatDuration, RentalDetail } from "@repo/shared-types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -53,19 +53,8 @@ const ParticipantChip = ({ user }: { user: ChipUser }) => (
 const formatDate = (d: Dayjs) => d.locale("ko").format("M월 D일 (ddd)")
 
 /** 4시간 45분, 2일 3시간 */
-function formatDuration(start: Dayjs, end: Dayjs) {
-  const total = end.diff(start, "minute")
-  const days = Math.floor(total / 1440)
-  const hours = Math.floor((total % 1440) / 60)
-  const minutes = total % 60
-  return [
-    days && `${days}일`,
-    hours && `${hours}시간`,
-    minutes && `${minutes}분`
-  ]
-    .filter(Boolean)
-    .join(" ")
-}
+const formatSpan = (start: Dayjs, end: Dayjs) =>
+  formatDuration(0, end.diff(start, "minute")) ?? ""
 
 /** 아이콘(18px) 위치 — 첫 글자 줄(20px)·첫 칩 줄(34px) 가운데, 또는 내용 전체 가운데 */
 const ICON_ALIGN = {
@@ -203,7 +192,7 @@ export default function RentalDetailModal({
                 <p className="text-sm font-medium">{formatDate(start)}</p>
                 <p className="text-sm text-muted-foreground">
                   {start.format("HH:mm")} – {end.format("HH:mm")} (
-                  {formatDuration(start, end)})
+                  {formatSpan(start, end)})
                 </p>
               </>
             ) : (
@@ -220,7 +209,7 @@ export default function RentalDetailModal({
                   </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {formatDuration(start, end)}
+                  {formatSpan(start, end)}
                 </p>
               </>
             )}

@@ -50,4 +50,13 @@ describe("formatDuration", () => {
   it("종료가 앞이면 null", () => {
     expect(formatDuration(21 * 60, 19 * 60)).toBeNull()
   })
+  it("하루 이상이면 일 단위", () => {
+    expect(formatDuration(0, 24 * 60)).toBe("1일")
+  })
+  it("일과 시간", () => {
+    expect(formatDuration(0, 27 * 60)).toBe("1일 3시간")
+  })
+  it("일·시간·분", () => {
+    expect(formatDuration(0, 2 * 24 * 60 + 90)).toBe("2일 1시간 30분")
+  })
 })

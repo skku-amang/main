@@ -17,16 +17,21 @@ export const nextFullHour = (now: Date): Date => {
   return next
 }
 
-/** 하루 안의 분(0~1439) 두 개 사이를 "1시간 30분"처럼. 종료가 시작보다 늦지 않으면 null */
+/** 두 시점(분) 사이를 "1일 3시간 30분"처럼. 종료가 시작보다 늦지 않으면 null */
 export const formatDuration = (
   startMinutes: number,
   endMinutes: number
 ): string | null => {
   const diff = endMinutes - startMinutes
   if (diff <= 0) return null
-  const hours = Math.floor(diff / 60)
+  const days = Math.floor(diff / (24 * 60))
+  const hours = Math.floor((diff % (24 * 60)) / 60)
   const minutes = diff % 60
-  return [hours && `${hours}시간`, minutes && `${minutes}분`]
+  return [
+    days && `${days}일`,
+    hours && `${hours}시간`,
+    minutes && `${minutes}분`
+  ]
     .filter(Boolean)
     .join(" ")
 }
