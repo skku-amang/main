@@ -15,11 +15,16 @@ import {
   AuthSessionsResponse,
   JwtPayload,
   LoginResponse,
-  MeResponse
+  MeResponse,
+  PasswordResetLinkResponse
 } from "@repo/shared-types"
 import { Request, Response } from "express"
 import {
   EmailCodeRequestDto,
+  PasswordResetConfirmDto,
+  PasswordResetLinkRequestDto,
+  PasswordResetRequestDto,
+  PasswordResetTokenDto,
   SignupDto
 } from "../email-verification/email-verification.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
@@ -30,6 +35,7 @@ import {
 } from "./auth-cookie.util"
 import { AuthService } from "./auth.service"
 import { AccessTokenGuard } from "./guards/access-token.guard"
+import { AdminGuard } from "./guards/admin.guard"
 import { RefreshTokenGuard } from "./guards/refresh-token.guard"
 
 @Controller("auth")
@@ -50,6 +56,34 @@ export class AuthController {
     return {
       message: "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."
     }
+  }
+
+  @Post("password-reset/request")
+  @HttpCode(HttpStatus.OK)
+  async requestPasswordReset(@Body() { email }: PasswordResetRequestDto) {
+    await this.authService.requestPasswordReset(email)
+  }
+
+  @Post("password-reset/confirm")
+  @HttpCode(HttpStatus.OK)
+  async resetPasswordWithCode(@Body() dto: PasswordResetConfirmDto) {
+    await this.authService.resetPasswordWithCode(dto)
+  }
+
+  @Post("password-reset/token")
+  @HttpCode(HttpStatus.OK)
+  async resetPasswordWithToken(@Body() dto: PasswordResetTokenDto) {
+    await this.authService.resetPasswordWithToken(dto)
+  }
+
+  /** 이메일을 인증하지 않은 회원용. 운영진이 링크를 만들어 직접 전달한다 */
+  @Post("password-reset/link")
+  @UseGuards(AccessTokenGuard, AdminGuard)
+  @HttpCode(HttpStatus.OK)
+  async createPasswordResetLink(
+    @Body() { userId }: PasswordResetLinkRequestDto
+  ): Promise<PasswordResetLinkResponse> {
+    return this.authService.createPasswordResetLink(userId)
   }
 
   @Post("login")

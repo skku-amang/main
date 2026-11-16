@@ -42,16 +42,16 @@
 
 ## 3. API
 
-| 메서드·경로                                 | 로그인 | 하는 일                                                            |
-| ------------------------------------------- | ------ | ------------------------------------------------------------------ |
-| `POST /auth/email-code`                     | 불필요 | 가입용 인증번호 발송. 이미 쓰는 이메일이면 거절 (가입과 같은 오류) |
-| `POST /auth/signup`                         | 불필요 | 본문에 `emailCode` 추가. 맞으면 `emailVerifiedAt = now()`로 가입   |
-| `POST /users/me/email-verification`         | 필요   | 내 이메일로 인증번호 발송                                          |
-| `POST /users/me/email-verification/confirm` | 필요   | 인증번호 확인 → `emailVerifiedAt = now()`                          |
-| `POST /auth/password-reset/request`         | 불필요 | 인증된 회원이면 인증번호 발송. 응답은 항상 같다                    |
-| `POST /auth/password-reset/confirm`         | 불필요 | 이메일·인증번호·새 비밀번호 → 비밀번호 변경, 모든 기기 로그아웃    |
-| `POST /users/:id/password-reset-link`       | 운영진 | 재설정 링크 생성 → `{ url, expiresAt }`                            |
-| `POST /auth/password-reset/token`           | 불필요 | 링크 토큰·새 비밀번호 → 비밀번호 변경, 모든 기기 로그아웃          |
+| 메서드·경로                                 | 로그인 | 하는 일                                                                                                |
+| ------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| `POST /auth/email-code`                     | 불필요 | 가입용 인증번호 발송. 이미 쓰는 이메일이면 거절 (가입과 같은 오류)                                     |
+| `POST /auth/signup`                         | 불필요 | 본문에 `emailCode` 추가. 맞으면 `emailVerifiedAt = now()`로 가입                                       |
+| `POST /users/me/email-verification`         | 필요   | 내 이메일로 인증번호 발송                                                                              |
+| `POST /users/me/email-verification/confirm` | 필요   | 인증번호 확인 → `emailVerifiedAt = now()`                                                              |
+| `POST /auth/password-reset/request`         | 불필요 | 인증된 회원이면 인증번호 발송. 응답은 항상 같다                                                        |
+| `POST /auth/password-reset/confirm`         | 불필요 | 이메일·인증번호·새 비밀번호 → 비밀번호 변경, 모든 기기 로그아웃                                        |
+| `POST /auth/password-reset/link`            | 운영진 | 본문 `{ userId }` → 재설정 토큰 `{ token, expiresAt }`. 화면이 `/password-reset?token=…` 주소를 만든다 |
+| `POST /auth/password-reset/token`           | 불필요 | 링크 토큰·새 비밀번호 → 비밀번호 변경, 모든 기기 로그아웃                                              |
 
 비밀번호를 바꾸면 그 회원의 로그인 세션을 모두 지운다. 누군가 이미 로그인해 있었다면 쫓겨난다.
 

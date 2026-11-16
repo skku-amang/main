@@ -244,6 +244,13 @@ export class UsersService {
     })
   }
 
+  async setPassword(userId: number, newPassword: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: await bcrypt.hash(newPassword, 10) }
+    })
+  }
+
   /** 인증번호를 확인한 주소가 지금도 그 회원의 주소일 때만 인증한다 */
   async markEmailVerified(userId: number, email: string) {
     try {

@@ -3,7 +3,9 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import { Test, TestingModule } from "@nestjs/testing"
 import {
+  AuthError,
   ConflictError,
+  NotFoundError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError,
   ValidationError
@@ -18,6 +20,7 @@ import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
 import { AuthSessionStore } from "./auth-session.store"
 import { AuthService } from "./auth.service"
+import { PasswordResetTokenStore } from "./password-reset-token.store"
 
 const PASSWORD = "password"
 const env: Record<string, string> = {
@@ -45,13 +48,21 @@ describe("AuthService", () => {
     outbox = []
     const password = await bcrypt.hash(PASSWORD, 4)
     const users = [
-      { id: 1, email: loginDto.email, password, isApproved: true },
+      {
+        id: 1,
+        email: loginDto.email,
+        nickname: "member1",
+        password,
+        isApproved: true,
+        emailVerifiedAt: new Date() as Date | null
+      },
       {
         id: 2,
         email: otherLoginDto.email,
         nickname: "taken",
         password,
-        isApproved: true
+        isApproved: true,
+        emailVerifiedAt: null as Date | null
       }
     ]
 
@@ -59,6 +70,7 @@ describe("AuthService", () => {
       providers: [
         AuthService,
         AuthSessionStore,
+        PasswordResetTokenStore,
         JwtService,
         EmailCodeService,
         {
@@ -77,6 +89,12 @@ describe("AuthService", () => {
               if (users.some((u) => u.nickname === nickname))
                 throw new ConflictError("이미 사용중인 닉네임입니다.")
               return { id: 3 }
+            },
+            setPassword: async (id: number, newPassword: string) => {
+              users.find((u) => u.id === id)!.password = await bcrypt.hash(
+                newPassword,
+                4
+              )
             }
           }
         },
@@ -438,6 +456,63 @@ describe("AuthService", () => {
 
     it("이미 없는 기기를 로그아웃해도 에러가 나지 않는다", async () => {
       await expect(service.logout(1, "missing-sid")).resolves.not.toThrow()
+    })
+  })
+
+  describe("비밀번호 찾기 (#528)", () => {
+    const NEW_PASSWORD = "NewPass123!"
+
+    it("인증된 회원은 메일 인증번호로 비밀번호를 바꾸고, 다른 기기는 로그아웃된다", async () => {
+      const before = await service.login(loginDto, {})
+
+      await service.requestPasswordReset(loginDto.email)
+      await service.resetPasswordWithCode({
+        email: loginDto.email,
+        code: sentCode(),
+        newPassword: NEW_PASSWORD
+      })
+
+      await expect(service.login(loginDto, {})).rejects.toBeInstanceOf(
+        AuthError
+      )
+      await expect(
+        service.login({ ...loginDto, password: NEW_PASSWORD }, {})
+      ).resolves.toHaveProperty("accessToken")
+      await expect(
+        service.refreshTokens(
+          1,
+          sidOf(before.refreshToken),
+          before.refreshToken
+        )
+      ).rejects.toBeInstanceOf(RefreshTokenNotFoundError)
+    })
+
+    it("인증 안 된 회원과 없는 이메일에는 메일을 보내지 않는다", async () => {
+      await service.requestPasswordReset(otherLoginDto.email)
+      await service.requestPasswordReset("nobody@g.skku.edu")
+
+      expect(outbox).toHaveLength(0)
+    })
+
+    it("운영진 링크는 한 번만 쓸 수 있다", async () => {
+      const { token } = await service.createPasswordResetLink(2)
+
+      await service.resetPasswordWithToken({
+        token,
+        newPassword: NEW_PASSWORD
+      })
+      await expect(
+        service.login({ ...otherLoginDto, password: NEW_PASSWORD }, {})
+      ).resolves.toHaveProperty("accessToken")
+      await expect(
+        service.resetPasswordWithToken({ token, newPassword: "Other123!" })
+      ).rejects.toBeInstanceOf(ValidationError)
+    })
+
+    it("없는 회원에게는 링크를 만들지 않는다", async () => {
+      await expect(service.createPasswordResetLink(999)).rejects.toBeInstanceOf(
+        NotFoundError
+      )
     })
   })
 })

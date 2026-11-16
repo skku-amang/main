@@ -5,6 +5,8 @@ import { JwtService } from "@nestjs/jwt"
 import {
   AuthError,
   ConflictError,
+  NotFoundError,
+  ValidationError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError,
   UserNotApprovedError
@@ -18,6 +20,7 @@ import { LoginUserDto } from "../users/dto/login-user.dto"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
 import { AuthSessionStore } from "./auth-session.store"
+import { PasswordResetTokenStore } from "./password-reset-token.store"
 
 @Injectable()
 export class AuthService {
@@ -29,7 +32,8 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly authSessionStore: AuthSessionStore,
     private readonly eventEmitter: EventEmitter2,
-    private readonly emailCodeService: EmailCodeService
+    private readonly emailCodeService: EmailCodeService,
+    private readonly passwordResetTokenStore: PasswordResetTokenStore
   ) {}
 
   async requestSignupEmailCode(email: string) {
@@ -58,6 +62,58 @@ export class AuthService {
     Sentry.metrics.count("signup.completed", 1, {
       attributes: { provider: "credentials" }
     })
+  }
+
+  /** 인증된 회원에게만 보낸다. 없거나 미인증이어도 같은 응답 (#528) */
+  async requestPasswordReset(email: string) {
+    const user = await this.usersService.findOneByEmail(email)
+    if (!user?.emailVerifiedAt) return
+    await this.emailCodeService.issue("reset", email)
+  }
+
+  async resetPasswordWithCode({
+    email,
+    code,
+    newPassword
+  }: {
+    email: string
+    code: string
+    newPassword: string
+  }) {
+    const user = await this.usersService.findOneByEmail(email)
+    if (!user?.emailVerifiedAt)
+      throw new ValidationError("인증번호가 맞지 않거나 만료되었습니다.")
+    await this.emailCodeService.verify("reset", email, code)
+    await this.replacePassword(user.id, newPassword)
+  }
+
+  async createPasswordResetLink(userId: number) {
+    if (!(await this.usersService.findOneById(userId)))
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+    const { token, expiresAt } =
+      await this.passwordResetTokenStore.create(userId)
+    return { token, expiresAt: expiresAt.toISOString() }
+  }
+
+  async resetPasswordWithToken({
+    token,
+    newPassword
+  }: {
+    token: string
+    newPassword: string
+  }) {
+    const userId = await this.passwordResetTokenStore.consume(token)
+    if (userId === null)
+      throw new ValidationError(
+        "링크가 만료되었거나 이미 사용되었습니다. 운영진에게 새 링크를 받아주세요."
+      )
+    await this.replacePassword(userId, newPassword)
+  }
+
+  /** 비밀번호가 새어 나갔을 수 있으니 모든 기기를 로그아웃시킨다 */
+  private async replacePassword(userId: number, newPassword: string) {
+    await this.usersService.setPassword(userId, newPassword)
+    await this.authSessionStore.deleteAllExcept(userId, "")
   }
 
   async login(

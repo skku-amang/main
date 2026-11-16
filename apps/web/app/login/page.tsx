@@ -32,6 +32,7 @@ export default function LoginPage() {
 const Login = () => {
   const searchParams = useSearchParams()
   const signupSuccess = searchParams.get("signup") === "success"
+  const resetSuccess = searchParams.get("reset") === "success"
   const [isPendingApproval, setIsPendingApproval] = useState(false)
   const { toast } = useToast()
   const { login } = useAuth()
@@ -115,14 +116,16 @@ const Login = () => {
           <h5 className="mb-8 text-sm font-normal text-muted-foreground">
             계속하려면 로그인해주세요
           </h5>
-          {(signupSuccess || isPendingApproval) && (
+          {(signupSuccess || resetSuccess || isPendingApproval) && (
             <div
               role="status"
               className="mb-6 w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 lg:max-w-sm"
             >
               {isPendingApproval
                 ? "운영진의 계정 승인을 기다리는 중입니다."
-                : "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."}
+                : resetSuccess
+                  ? "비밀번호를 바꿨어요. 새 비밀번호로 로그인해주세요."
+                  : "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."}
             </div>
           )}
           {/* 일반 로그인 */}
@@ -157,6 +160,14 @@ const Login = () => {
               />
             </div>
             <div className="text-destructive">{errors.password?.message}</div>
+            <div className="mt-2 flex w-full justify-end lg:max-w-sm">
+              <Link
+                href={ROUTES.PASSWORD_RESET}
+                className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
+              >
+                비밀번호를 잊으셨나요?
+              </Link>
+            </div>
             <Button
               type="submit"
               size="xl"
