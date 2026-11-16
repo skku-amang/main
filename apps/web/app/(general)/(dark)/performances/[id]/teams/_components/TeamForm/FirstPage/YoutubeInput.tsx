@@ -71,7 +71,7 @@ const YoutubeInput = ({
             <Button
               type="button"
               variant="outline"
-              className="border border-secondary text-sm text-secondary"
+              className="border border-primary text-sm text-primary"
               onClick={() => onConfirm(debouncedUrl)}
             >
               확인

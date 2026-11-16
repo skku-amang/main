@@ -21,8 +21,8 @@ const PaginatorButton = ({
   return (
     <Button
       className={cn(
-        `h-8 md:h-10 rounded-none text-xs md:text-md p-4 text-secondary disabled:text-gray-500 font-semibold`,
-        mode === "next" ? "border-2 border-secondary" : "border-none",
+        `h-8 md:h-10 rounded-none text-xs md:text-md p-4 text-primary disabled:text-gray-500 font-semibold`,
+        mode === "next" ? "border-2 border-primary" : "border-none",
         className
       )}
       variant="outline"
@@ -35,7 +35,7 @@ const PaginatorButton = ({
       )}
       {mode === "prev" ? "Back" : !isLast ? "Next" : "Complete"}
       {mode === "next" && !isLast && (
-        <ArrowRight className="ms-2 w-4 h-4 md:w-6 md:h-6 text-secondary" />
+        <ArrowRight className="ms-2 w-4 h-4 md:w-6 md:h-6 text-primary" />
       )}
     </Button>
   )

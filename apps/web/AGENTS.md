@@ -8,6 +8,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## 디자인 기준
+
+디자인의 기준은 **코드**다. Figma는 2026-11부터 쓰지 않는다 (예전 시안은 기록용으로만 남음).
+
+- 색·간격 등 토큰: [app/globals.css](app/globals.css)의 CSS 변수와 [tailwind.config.ts](tailwind.config.ts)
+- 기본 부품: [components/ui/](components/ui/) (shadcn)
+- 토큰은 shadcn 원래 뜻대로 쓴다. 예: `secondary`는 옅은 보조 배경이고 강조색이 아니다. 강조·주요 버튼은 `primary`(남색)
+
 ## 컴포넌트 고르는 순서
 
 새 화면이나 컴포넌트를 만들 때 위에서부터 찾아 쓴다. 위에 맞는 게 있으면 아래로 내려가지 않는다.
