@@ -164,8 +164,7 @@ function RentalForm({
     startDate && endDate
       ? atTime(endDate, endTime).diff(atTime(startDate, startTime), "minute")
       : 0
-  // 24시간 안이면 날짜를 넘겨도(23:00~다음 날 00:00) 걸리는 시간을 보여 준다
-  const duration = spanMinutes < 24 * 60 ? formatDuration(0, spanMinutes) : null
+  const duration = formatDuration(0, spanMinutes)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
