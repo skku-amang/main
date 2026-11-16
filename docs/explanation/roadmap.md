@@ -8,9 +8,9 @@
 ### 쌓인 백로그 정리
 
 - 근거: 녹음본 피드백은 2026년 2학기 정기공연이 끝나 다음에 쓸 때(2027년 1학기 정기공연)까지 약 5달이 남았다. 그동안 부원이 직접 알려 준 불편과 미뤄 둔 정리 작업부터 끝낸다.
-- 부원 의견에서 나온 불편: [#888](https://github.com/skku-amang/main/issues/888) 예약 시각 15분 단위 · [#528](https://github.com/skku-amang/main/issues/528) 비밀번호 찾기 · [#530](https://github.com/skku-amang/main/issues/530)·[#484](https://github.com/skku-amang/main/issues/484) 휴대폰에서 동방 예약 보기 · [#865](https://github.com/skku-amang/main/issues/865) 휴대폰 좌우 여백 · [#777](https://github.com/skku-amang/main/issues/777) 세션 아이콘
-- 기능: [#931](https://github.com/skku-amang/main/issues/931) 이름에 요약 카드 · [#914](https://github.com/skku-amang/main/issues/914) 팀 목록 표 통일 · [#535](https://github.com/skku-amang/main/issues/535) 비활동 부원 참여 제한
-- 코드·운영 정리: [#610](https://github.com/skku-amang/main/issues/610) 문법 검사 경고 (하위 #619~#622) · [#567](https://github.com/skku-amang/main/issues/567) 권한 규칙 한 곳으로 · [#771](https://github.com/skku-amang/main/issues/771) 팀 자리 규칙 한 곳으로 · [#862](https://github.com/skku-amang/main/issues/862) 선택 컴포넌트 정리 · [#659](https://github.com/skku-amang/main/issues/659)·[#616](https://github.com/skku-amang/main/issues/616) API가 멈췄을 때 대응 · [#499](https://github.com/skku-amang/main/issues/499) Sentry source map · [#448](https://github.com/skku-amang/main/issues/448) MinIO CORS · [#446](https://github.com/skku-amang/main/issues/446) 에러 메시지 · [#467](https://github.com/skku-amang/main/issues/467) DESIGN.md
+- 부원 의견에서 나온 불편: [#528](https://github.com/skku-amang/main/issues/528) 비밀번호 찾기 · [#530](https://github.com/skku-amang/main/issues/530)·[#484](https://github.com/skku-amang/main/issues/484) 휴대폰에서 동방 예약 보기 · [#777](https://github.com/skku-amang/main/issues/777) 세션 아이콘
+- 기능: [#931](https://github.com/skku-amang/main/issues/931) 이름에 요약 카드 · [#914](https://github.com/skku-amang/main/issues/914) 팀 목록 표 통일(보류) · [#535](https://github.com/skku-amang/main/issues/535) 비활동 부원 참여 제한
+- 코드·운영 정리: [#610](https://github.com/skku-amang/main/issues/610) 문법 검사 경고 (하위 #619~#622) · [#567](https://github.com/skku-amang/main/issues/567) 권한 규칙 한 곳으로 · [#771](https://github.com/skku-amang/main/issues/771) 팀 자리 규칙 한 곳으로 · [#862](https://github.com/skku-amang/main/issues/862) 선택 컴포넌트 정리 · [#659](https://github.com/skku-amang/main/issues/659)·[#616](https://github.com/skku-amang/main/issues/616) API가 멈췄을 때 대응 · [#499](https://github.com/skku-amang/main/issues/499) Sentry source map · [#448](https://github.com/skku-amang/main/issues/448) MinIO CORS · [#446](https://github.com/skku-amang/main/issues/446) 에러 메시지
 
 ### 유저 인터뷰
 
