@@ -348,7 +348,7 @@ const FirstPage = ({
             <Button
               type="button"
               variant="outline"
-              className="border border-secondary text-sm text-secondary"
+              className="border border-primary text-sm text-primary"
               onClick={() => {
                 if (poster.inputRef.current) poster.inputRef.current.value = ""
                 poster.inputRef.current?.click()

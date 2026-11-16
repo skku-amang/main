@@ -59,4 +59,3 @@ pnpm dev
 | [GitHub Issues](https://github.com/skku-amang/main/issues) | 버그 리포트, 기능 제안 |
 | Slack (Amang-Homepage)                                     | 실시간 소통            |
 | Notion (아망 워크스페이스)                                 | 기획, 회의록, 문서     |
-| Figma                                                      | UI/UX 디자인           |

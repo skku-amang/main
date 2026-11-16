@@ -87,7 +87,7 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
           asChild
           variant="outline"
           type="button"
-          className="border border-secondary text-secondary hover:bg-secondary hover:text-white"
+          className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
           onClick={() => setOpen(true)}
         >
           <div className="flex items-center justify-center gap-x-2.5">
@@ -147,7 +147,7 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
                 </Button>
                 <Button
                   type="button"
-                  className="flex-1 bg-secondary"
+                  className="flex-1"
                   disabled={!file || isUploading}
                   onClick={upload}
                 >
@@ -168,14 +168,14 @@ function PosterImageDialog({ form }: PosterImageDialogProps) {
               className={cn(
                 "flex cursor-pointer flex-col items-center justify-center gap-y-2 rounded-lg border-2 border-dashed px-6 py-10 transition-colors",
                 isDragging
-                  ? "border-secondary bg-secondary/5"
+                  ? "border-primary bg-primary/5"
                   : "border-blue-300 bg-slate-50"
               )}
             >
               <ImagePlus size={40} className="text-blue-300" />
               <p className="text-sm text-zinc-500">
                 파일을 드래그하거나{" "}
-                <span className="font-medium text-secondary">찾아보기</span>
+                <span className="font-medium text-primary">찾아보기</span>
               </p>
               <input
                 id="poster-file-input"

@@ -42,7 +42,7 @@ const YoutubeDialog = ({ form, fieldName }: YoutubeDialogProps) => {
           }
           type="button"
           className={cn(
-            "border border-secondary text-secondary hover:bg-secondary hover:text-white",
+            "border border-primary text-primary hover:bg-primary hover:text-primary-foreground",
             form.formState.errors.songYoutubeVideoUrl?.message &&
               "border-destructive bg-destructive"
           )}

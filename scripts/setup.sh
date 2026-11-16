@@ -145,14 +145,13 @@ echo ""
 
 # ─── 8. Claude Code 도구 설정 (선택) ───
 if [ "$HAS_CLAUDE" = true ] && [ "$HAS_DIRENV" = true ]; then
-  echo -en "${CYAN}[INFO]${NC} Claude Code MCP 도구를 설정하시겠습니까? (Notion, Slack, Figma 등 연동) [Y/n] "
+  echo -en "${CYAN}[INFO]${NC} Claude Code MCP 도구를 설정하시겠습니까? (Notion, Slack 등 연동) [Y/n] "
   read -r REPLY
   if [[ -z "$REPLY" || "$REPLY" =~ ^[Yy]$ ]]; then
     info "MCP 서버 패키지 글로벌 설치 중..."
     pnpm add -g @notionhq/notion-mcp-server @modelcontextprotocol/server-slack 2>/dev/null \
       && ok "MCP 서버 패키지 설치 완료" \
       || warn "MCP 서버 패키지 설치 실패 — 수동 설치가 필요합니다"
-    info "Figma MCP는 공식 리모트 서버(mcp.figma.com)를 사용합니다. 첫 연결 시 브라우저에서 OAuth 로그인이 필요합니다."
     echo ""
   else
     info "Claude Code 도구 설정을 건너뜁니다."
