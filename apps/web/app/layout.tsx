@@ -4,6 +4,7 @@ import { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import React from "react"
 
+import EmailVerifyAsk from "@/components/EmailVerifyAsk"
 import PushSoftAsk from "@/components/PushSoftAsk"
 import { Toaster } from "@/components/ui/toaster"
 import UmamiAnalytics from "@/components/UmamiAnalytics"
@@ -91,6 +92,7 @@ export default function RootLayout({
       <body className={cn(pretendard.className, "bg-neutral-50")}>
         <Providers>
           {children}
+          <EmailVerifyAsk />
           <PushSoftAsk />
           <Toaster />
           <UmamiAnalytics />

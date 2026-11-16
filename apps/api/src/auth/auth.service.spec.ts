@@ -3,12 +3,16 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import { Test, TestingModule } from "@nestjs/testing"
 import {
+  ConflictError,
   RefreshTokenExpiredError,
-  RefreshTokenNotFoundError
+  RefreshTokenNotFoundError,
+  ValidationError
 } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import RedisMock from "ioredis-mock"
+import { EmailCodeService } from "../email-verification/email-code.service"
+import { Mail, MailService } from "../email-verification/mail.service"
 import { REDIS_CLIENT } from "../redis/redis.module"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
@@ -28,6 +32,7 @@ describe("AuthService", () => {
   let jwtService: JwtService
   let redis: InstanceType<typeof RedisMock>
   let emit: jest.Mock
+  let outbox: Mail[]
 
   const loginDto = { email: "member@g.skku.edu", password: PASSWORD }
   const otherLoginDto = { email: "other@g.skku.edu", password: PASSWORD }
@@ -37,6 +42,7 @@ describe("AuthService", () => {
     redis = new RedisMock()
     await redis.flushall()
     emit = jest.fn()
+    outbox = []
     const password = await bcrypt.hash(PASSWORD, 4)
     const users = [
       { id: 1, email: loginDto.email, password, isApproved: true },
@@ -48,6 +54,11 @@ describe("AuthService", () => {
         AuthService,
         AuthSessionStore,
         JwtService,
+        EmailCodeService,
+        {
+          provide: MailService,
+          useValue: { send: async (mail: Mail) => void outbox.push(mail) }
+        },
         { provide: REDIS_CLIENT, useValue: redis },
         {
           provide: UsersService,
@@ -73,20 +84,41 @@ describe("AuthService", () => {
 
   afterEach(() => redis.disconnect())
 
+  const signupDto = {
+    email: "new@g.skku.edu",
+    password: PASSWORD,
+    name: "홍길동",
+    nickname: "gil",
+    generationId: 1,
+    sessions: []
+  }
+  const sentCode = () => outbox.at(-1)!.subject.match(/\d{6}/)![0]
+
   it("가입 신청이 저장되면 user.signed_up을 발행한다 (#790)", async () => {
-    await service.signUp({
-      email: "new@g.skku.edu",
-      password: PASSWORD,
-      name: "홍길동",
-      nickname: "gil",
-      generationId: 1,
-      sessions: []
-    })
+    await service.requestSignupEmailCode(signupDto.email)
+    await service.signUp({ ...signupDto, emailCode: sentCode() })
 
     expect(emit).toHaveBeenCalledWith(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(3)
     )
+  })
+
+  it("메일 인증번호가 틀리면 가입되지 않는다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const wrong = sentCode() === "000000" ? "111111" : "000000"
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: wrong })
+    ).rejects.toBeInstanceOf(ValidationError)
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it("이미 가입된 이메일로는 가입 인증번호를 보내지 않는다 (#528)", async () => {
+    await expect(
+      service.requestSignupEmailCode(loginDto.email)
+    ).rejects.toBeInstanceOf(ConflictError)
+    expect(outbox).toHaveLength(0)
   })
 
   it("다른 기기에서 로그인해도 기존 기기의 refresh가 유지된다 (#541)", async () => {

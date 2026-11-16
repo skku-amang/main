@@ -7,9 +7,15 @@ import { AccessTokenStrategy } from "./strategies/access-token.strategy"
 import { RefreshTokenStrategy } from "./strategies/refresh-token.strategy"
 import { RedisModule } from "../redis/redis.module"
 import { AuthSessionStore } from "./auth-session.store"
+import { EmailVerificationModule } from "../email-verification/email-verification.module"
 
 @Module({
-  imports: [UsersModule, JwtModule.register({}), RedisModule],
+  imports: [
+    UsersModule,
+    JwtModule.register({}),
+    RedisModule,
+    EmailVerificationModule
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,

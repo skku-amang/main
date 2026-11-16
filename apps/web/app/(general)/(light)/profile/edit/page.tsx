@@ -2,13 +2,22 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Camera, KeyRound, Loader2, Save } from "lucide-react"
+import {
+  ArrowLeft,
+  Camera,
+  CircleCheck,
+  KeyRound,
+  Loader2,
+  Mail,
+  Save
+} from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { UpdatePasswordSchema, UpdateProfileSchema } from "@repo/shared-types"
 
+import EmailVerificationDialog from "@/components/EmailVerificationDialog"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
@@ -77,6 +86,7 @@ const ProfileEditPage = () => {
   const updatePasswordMutation = useUpdatePassword()
   const { data: sessions } = useSessions()
   const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const imageUpload = useImageUpload({
     onSuccess: (publicUrl) => {
       profileForm.setValue("image", publicUrl, { shouldDirty: true })
@@ -381,6 +391,44 @@ const ProfileEditPage = () => {
               </div>
             </form>
           </Form>
+        </div>
+
+        {/* 이메일 인증 (#528) */}
+        <div className="rounded-xl bg-white p-6 shadow-sm md:p-8">
+          <h3 className="mb-4 text-lg font-semibold">
+            <Mail className="mr-2 inline size-5" />
+            이메일
+          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="break-all font-medium">{user.email}</p>
+              {user.emailVerifiedAt ? (
+                <p className="mt-1 flex items-center gap-1 text-sm text-slate-600">
+                  <CircleCheck className="size-4 text-primary" />
+                  인증됨 — 비밀번호를 잊으면 이 메일로 찾을 수 있어요
+                </p>
+              ) : (
+                <p className="mt-1 text-sm text-slate-600">
+                  아직 인증하지 않았어요. 인증해 두면 비밀번호를 잊었을 때 직접
+                  찾을 수 있어요.
+                </p>
+              )}
+            </div>
+            {!user.emailVerifiedAt && (
+              <Button
+                type="button"
+                className="rounded-full"
+                onClick={() => setEmailDialogOpen(true)}
+              >
+                인증하기
+              </Button>
+            )}
+          </div>
+          <EmailVerificationDialog
+            email={user.email}
+            open={emailDialogOpen}
+            onOpenChange={setEmailDialogOpen}
+          />
         </div>
 
         {/* 비밀번호 변경 */}

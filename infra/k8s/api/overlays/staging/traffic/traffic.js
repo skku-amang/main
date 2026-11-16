@@ -233,6 +233,7 @@ function signup(bot1, sessionIds) {
     ok(
       guest.post("/auth/signup", {
         email: `${nickname}@${MEMBER_DOMAIN}`,
+        emailCode: __ENV.MAIL_TEST_CODE,
         password: __ENV.BOT_PASSWORD,
         name: `점검 부원 ${stamp.slice(-3)}`,
         nickname,

@@ -19,7 +19,10 @@ export class UsersService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+    { emailVerified = false }: { emailVerified?: boolean } = {}
+  ) {
     const { sessions: sessionIds, ...userData } = createUserDto
     const hashedPassword = await bcrypt.hash(userData.password, 10)
 
@@ -33,6 +36,7 @@ export class UsersService {
           ...userData,
           password: hashedPassword,
           image,
+          emailVerifiedAt: emailVerified ? new Date() : null,
           sessions: {
             connect: sessionIds.map((id) => ({ id }))
           }
@@ -108,11 +112,12 @@ export class UsersService {
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
-    const userExists = await this.prisma.user.count({
-      where: { id: userId }
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
     })
 
-    if (!userExists)
+    if (!current)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
     const {
@@ -127,6 +132,10 @@ export class UsersService {
     }
 
     if (password) updateData.password = await bcrypt.hash(password, 10)
+
+    // 바뀐 주소는 아직 본인 것인지 모른다 (#528)
+    if (restOfDto.email && restOfDto.email !== current.email)
+      updateData.emailVerifiedAt = null
 
     if (generationId) updateData.generation = { connect: { id: generationId } }
 
@@ -230,6 +239,14 @@ export class UsersService {
       data: {
         password: hashedPassword
       },
+      select: detailedUserSelector
+    })
+  }
+
+  async markEmailVerified(userId: number) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerifiedAt: new Date() },
       select: detailedUserSelector
     })
   }

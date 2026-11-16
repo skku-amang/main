@@ -4,6 +4,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import {
   AuthError,
+  ConflictError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError,
   UserNotApprovedError
@@ -11,7 +12,8 @@ import {
 import { AuthSessionInfo, JwtPayload } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import * as bcrypt from "bcrypt"
-import { CreateUserDto } from "../users/dto/create-user.dto"
+import { EmailCodeService } from "../email-verification/email-code.service"
+import { SignupDto } from "../email-verification/email-verification.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
@@ -24,11 +26,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly authSessionStore: AuthSessionStore,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
+    private readonly emailCodeService: EmailCodeService
   ) {}
 
-  async signUp(createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto)
+  async requestSignupEmailCode(email: string) {
+    if (await this.usersService.findOneByEmail(email))
+      throw new ConflictError("이미 사용중인 이메일입니다.")
+    await this.emailCodeService.issue("signup", email)
+  }
+
+  async signUp({ emailCode, ...createUserDto }: SignupDto) {
+    await this.emailCodeService.verify("signup", createUserDto.email, emailCode)
+    const user = await this.usersService.create(createUserDto, {
+      emailVerified: true
+    })
     this.eventEmitter.emit(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(user.id)

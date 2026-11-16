@@ -24,7 +24,8 @@ export const detailedUserSelector = {
   isProfilePublic: true,
   isAdmin: true,
   email: true,
-  isApproved: true
+  isApproved: true,
+  emailVerifiedAt: true
 } satisfies Prisma.UserSelect
 
 export type publicUser = Prisma.UserGetPayload<{

@@ -4,11 +4,13 @@ import { BellRing, X } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
+import { readEmailAskSnoozed } from "@/components/EmailVerifyAsk"
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
 import { usePushSubscription } from "@/hooks/usePushSubscription"
 import { isPushOptedOut } from "@/lib/push"
+import { useAuth } from "@/lib/providers/auth-provider"
 
 const SNOOZE_KEY = "push-soft-ask-snoozed-until"
 const SNOOZE_DAYS = 7
@@ -42,13 +44,18 @@ const PushSoftAsk = () => {
   const pathname = usePathname()
   const { support, subscribed, enable, isPending } = usePushSubscription()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [dismissed, setDismissed] = useState(true)
+  const [emailAskSnoozed, setEmailAskSnoozed] = useState(false)
 
   useEffect(() => {
     setDismissed(readSnoozed() || isPushOptedOut())
+    setEmailAskSnoozed(readEmailAskSnoozed())
   }, [])
 
   if (pathname === ROUTES.PROFILE.DEVICES) return null
+  // 같은 자리에 뜨는 이메일 인증 배너(EmailVerifyAsk)가 먼저
+  if (user && !user.emailVerifiedAt && !emailAskSnoozed) return null
   if (dismissed || support === null) return null
   if (support === "unsupported" || support === "denied") return null
   if (support === "granted" && subscribed !== false) return null
