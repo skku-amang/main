@@ -14,11 +14,14 @@ import {
   Users
 } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
 
+import EmailVerificationDialog from "@/components/EmailVerificationDialog"
 import DefaultPageHeader, {
   DefaultHomeIcon
 } from "@/components/PageHeaders/Default"
 import SessionBadge from "@/components/TeamBadges/SessionBadge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -88,6 +91,7 @@ const InfoRow = ({
 const ProfilePage = () => {
   const { user, isLoading, isAuthenticated } = useCurrentUser()
   const { logout } = useAuth()
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
 
   if (isLoading) return <ProfileSkeleton />
 
@@ -117,6 +121,32 @@ const ProfilePage = () => {
       />
 
       <div className="mx-auto max-w-2xl space-y-4">
+        {/* 하단 안내 카드는 닫으면 7일 숨으므로 여기서도 인증할 수 있게 (#528) */}
+        {!user.emailVerifiedAt && (
+          <Alert className="bg-white shadow-sm">
+            <Mail className="size-4" />
+            <AlertTitle>이메일을 인증해 주세요</AlertTitle>
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-slate-600">
+                인증해 두면 비밀번호를 잊었을 때 직접 찾을 수 있어요.
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                className="rounded-full"
+                onClick={() => setEmailDialogOpen(true)}
+              >
+                인증하기
+              </Button>
+            </AlertDescription>
+            <EmailVerificationDialog
+              email={user.email}
+              open={emailDialogOpen}
+              onOpenChange={setEmailDialogOpen}
+            />
+          </Alert>
+        )}
+
         {/* 프로필 카드 */}
         <div className="relative rounded-xl bg-white p-6 shadow-sm md:p-8">
           <Button

@@ -33,7 +33,7 @@ const snooze = () => {
 
 /**
  * 이메일을 인증하지 않은 기존 회원에게 인증을 권하는 배너 (#528).
- * 인증된 메일로만 비밀번호를 찾을 수 있어서다. 내 정보 수정에는 같은 버튼이 있어 띄우지 않는다.
+ * 인증된 메일로만 비밀번호를 찾을 수 있어서다. 내 프로필·내 정보 수정에는 같은 버튼이 있어 띄우지 않는다.
  */
 const EmailVerifyAsk = () => {
   const pathname = usePathname()
@@ -46,7 +46,9 @@ const EmailVerifyAsk = () => {
   }, [])
 
   if (!user || user.emailVerifiedAt) return null
-  if (pathname === ROUTES.PROFILE.EDIT) return null
+  if (pathname === ROUTES.PROFILE.INDEX || pathname === ROUTES.PROFILE.EDIT) {
+    return null
+  }
 
   const close = () => {
     snooze()
