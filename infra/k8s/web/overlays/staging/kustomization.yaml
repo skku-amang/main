@@ -10,4 +10,4 @@ resources:
 images:
 - name: ghcr.io/skku-amang/amang-web
   newName: ghcr.io/skku-amang/amang-web-staging
-  newTag: 20261116101014-620f555
+  newTag: 20261117013333-e07af5f
