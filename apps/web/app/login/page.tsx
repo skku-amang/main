@@ -5,7 +5,7 @@ import { Oleo_Script } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { Suspense, useCallback, useEffect, useState } from "react"
+import { Suspense, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -21,18 +21,6 @@ import { LoginUserSchema } from "@repo/shared-types"
 
 const OleoScript = Oleo_Script({ subsets: ["latin"], weight: "400" })
 
-/**
- * 로그인 후 돌아갈 경로. 앱 내부 경로가 아니거나 로그인 페이지 자신이면 홈으로 보낸다.
- * `/login`을 그대로 받으면 로그인 직후 다시 로그인 페이지로 돌아간다.
- */
-const resolveCallbackUrl = (raw: string | null) => {
-  if (!raw?.startsWith("/") || raw.startsWith("//")) return ROUTES.HOME
-  if (raw === ROUTES.LOGIN || raw.startsWith(`${ROUTES.LOGIN}?`)) {
-    return ROUTES.HOME
-  }
-  return raw
-}
-
 export default function LoginPage() {
   return (
     <Suspense>
@@ -46,7 +34,7 @@ const Login = () => {
   const signupSuccess = searchParams.get("signup") === "success"
   const [isPendingApproval, setIsPendingApproval] = useState(false)
   const { toast } = useToast()
-  const { login, isAuthenticated } = useAuth()
+  const { login } = useAuth()
 
   const {
     register,
@@ -57,21 +45,10 @@ const Login = () => {
     resolver: zodResolver(LoginUserSchema)
   })
 
-  // 클라이언트 이동(router.push)은 금지. 로그아웃 상태에서 prefetch된 보호 경로는
-  // proxy의 /login redirect가 Router Cache에 남아 있어, 로그인 직후 그 캐시를 타고
-  // 다시 로그인 페이지로 돌아온다. 전체 이동으로 캐시를 버리고 새 cookie로 판정받는다.
-  const goToCallback = useCallback(() => {
-    window.location.replace(resolveCallbackUrl(searchParams.get("callbackUrl")))
-  }, [searchParams])
-
-  useEffect(() => {
-    if (isAuthenticated) goToCallback()
-  }, [isAuthenticated, goToCallback])
-
   async function onValid(formData: z.infer<typeof LoginUserSchema>) {
     try {
+      // 로그인되면 layout의 GuestOnly가 callbackUrl로 보낸다
       await login(formData)
-      goToCallback()
     } catch (error) {
       if (error instanceof UserNotApprovedError) {
         setIsPendingApproval(true)
