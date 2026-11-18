@@ -6,6 +6,8 @@ import { REDIS_CLIENT } from "../redis/redis.module"
 // 운영진이 카톡으로 전달할 시간을 넉넉히 준다
 const TOKEN_TTL_SECONDS = 24 * 60 * 60
 
+// 토큰은 32바이트 무작위 값이라 추측으로 맞힐 수 없다. 사람이 정한 비밀번호가 아니므로
+// bcrypt 같은 느린 해시 대신 sha256으로 충분하고, 해시가 곧 조회 키라 솔트도 쓸 수 없다
 const tokenKey = (token: string) =>
   `password-reset-token:${createHash("sha256").update(token).digest("hex")}`
 
