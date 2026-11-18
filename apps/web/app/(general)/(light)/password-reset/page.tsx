@@ -13,7 +13,7 @@ const PasswordReset = () => {
 
   return (
     <div className="mx-auto w-full max-w-md py-8 md:py-16">
-      <div className="rounded-xl bg-white p-6 shadow-sm md:p-8">
+      <div className="md:rounded-xl md:bg-white md:p-8 md:shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-900">
           {token ? "새 비밀번호 정하기" : "비밀번호 찾기"}
         </h1>

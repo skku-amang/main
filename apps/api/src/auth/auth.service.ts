@@ -64,11 +64,18 @@ export class AuthService {
     })
   }
 
-  /** 인증된 회원에게만 보낸다. 없거나 미인증이어도 같은 응답 (#528) */
+  /**
+   * 인증된 회원에게만 보낸다 (#528). 없는 주소·미인증·재발송 제한·발송 실패 모두 같은 응답이다 —
+   * 응답이 다르면 그 차이로 가입·인증 여부를 알아낼 수 있다
+   */
   async requestPasswordReset(email: string) {
     const user = await this.usersService.findOneByEmail(email)
     if (!user?.emailVerifiedAt) return
-    await this.emailCodeService.issue("reset", email)
+    await this.emailCodeService
+      .issue("reset", email)
+      .catch((error: Error) =>
+        this.logger.warn(`비밀번호 찾기 인증번호 발송 안 됨: ${error.message}`)
+      )
   }
 
   async resetPasswordWithCode({
@@ -84,7 +91,9 @@ export class AuthService {
     if (!user?.emailVerifiedAt)
       throw new ValidationError("인증번호가 맞지 않거나 만료되었습니다.")
     await this.emailCodeService.verify("reset", email, code)
-    await this.replacePassword(user.id, newPassword)
+    // 인증번호를 확인한 주소가 그 사이 바뀌었으면 바꾸지 않는다
+    if (!(await this.replacePassword(user.id, newPassword, email)))
+      throw new ValidationError("인증번호가 맞지 않거나 만료되었습니다.")
   }
 
   async createPasswordResetLink(userId: number) {
@@ -103,17 +112,25 @@ export class AuthService {
     newPassword: string
   }) {
     const userId = await this.passwordResetTokenStore.consume(token)
-    if (userId === null)
+    if (userId === null || !(await this.replacePassword(userId, newPassword)))
       throw new ValidationError(
         "링크가 만료되었거나 이미 사용되었습니다. 운영진에게 새 링크를 받아주세요."
       )
-    await this.replacePassword(userId, newPassword)
   }
 
-  /** 비밀번호가 새어 나갔을 수 있으니 모든 기기를 로그아웃시킨다 */
-  private async replacePassword(userId: number, newPassword: string) {
-    await this.usersService.setPassword(userId, newPassword)
-    await this.authSessionStore.deleteAllExcept(userId, "")
+  /** 비밀번호가 새어 나갔을 수 있으니 모든 기기를 로그아웃시킨다. 바꾸지 못했으면 false */
+  private async replacePassword(
+    userId: number,
+    newPassword: string,
+    verifiedEmail?: string
+  ) {
+    const changed = await this.usersService.setPassword(
+      userId,
+      newPassword,
+      verifiedEmail
+    )
+    if (changed) await this.authSessionStore.deleteAllExcept(userId, "")
+    return changed
   }
 
   async login(
@@ -258,12 +275,15 @@ export class AuthService {
     }
 
     const tokens = await this.getTokens(user.id, sid)
-    await this.authSessionStore.rotate(
+    const rotated = await this.authSessionStore.rotate(
       user.id,
       sid,
       tokens.refreshToken,
       this.tokenTtls().refreshToken
     )
+    if (!rotated) {
+      throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
+    }
     return tokens
   }
 }

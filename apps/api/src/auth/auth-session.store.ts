@@ -92,26 +92,31 @@ export class AuthSessionStore {
     return inGrace && hashEquals(prevTokenHash, received)
   }
 
-  /** 현재 RT를 직전 RT 자리로 옮기고 새 RT로 바꾼다. 직전 RT는 한 번 쓰면 다음 교체로 밀려난다. */
+  /**
+   * 현재 RT를 직전 RT 자리로 옮기고 새 RT로 바꾼다. 직전 RT는 한 번 쓰면 다음 교체로 밀려난다.
+   * 세션이 그 사이 지워졌으면(로그아웃·비밀번호 변경) 되살리지 않고 false를 돌려준다.
+   */
   async rotate(
     userId: number,
     sid: string,
     refreshToken: string,
     ttlSeconds: number
-  ): Promise<void> {
+  ): Promise<boolean> {
     const key = authSessionKey(userId, sid)
     const currentHash = await this.redis.hget(key, "tokenHash")
+    if (!currentHash) return false
     const now = new Date().toISOString()
     await this.redis
       .multi()
       .hset(key, {
         tokenHash: hashToken(refreshToken),
-        ...(currentHash && { prevTokenHash: currentHash }),
+        prevTokenHash: currentHash,
         rotatedAt: now,
         lastUsedAt: now
       })
       .expire(key, ttlSeconds)
       .exec()
+    return true
   }
 
   async delete(userId: number, sid: string): Promise<void> {

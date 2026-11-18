@@ -31,6 +31,7 @@ const env: Record<string, string> = {
 }
 
 describe("AuthService", () => {
+  let module: TestingModule
   let service: AuthService
   let jwtService: JwtService
   let redis: InstanceType<typeof RedisMock>
@@ -66,7 +67,7 @@ describe("AuthService", () => {
       }
     ]
 
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         AuthService,
         AuthSessionStore,
@@ -95,6 +96,7 @@ describe("AuthService", () => {
                 newPassword,
                 4
               )
+              return true
             }
           }
         },
@@ -485,6 +487,41 @@ describe("AuthService", () => {
           before.refreshToken
         )
       ).rejects.toBeInstanceOf(RefreshTokenNotFoundError)
+    })
+
+    it("60초 안에 다시 요청해도 오류 없이 같은 응답이고, 메일은 한 통만 간다", async () => {
+      await service.requestPasswordReset(loginDto.email)
+
+      await expect(
+        service.requestPasswordReset(loginDto.email)
+      ).resolves.toBeUndefined()
+      expect(outbox).toHaveLength(1)
+    })
+
+    it("토큰 갱신 도중 비밀번호가 바뀌면 지워진 세션을 되살리지 않는다", async () => {
+      const before = await service.login(loginDto, {})
+      await service.requestPasswordReset(loginDto.email)
+      const code = sentCode()
+      const store = module.get(AuthSessionStore)
+      const matches = store.matches.bind(store)
+      jest.spyOn(store, "matches").mockImplementationOnce(async (...args) => {
+        const matched = await matches(...args)
+        await service.resetPasswordWithCode({
+          email: loginDto.email,
+          code,
+          newPassword: NEW_PASSWORD
+        })
+        return matched
+      })
+
+      await expect(
+        service.refreshTokens(
+          1,
+          sidOf(before.refreshToken),
+          before.refreshToken
+        )
+      ).rejects.toBeInstanceOf(RefreshTokenNotFoundError)
+      expect(await store.list(1)).toHaveLength(0)
     })
 
     it("인증 안 된 회원과 없는 이메일에는 메일을 보내지 않는다", async () => {

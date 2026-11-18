@@ -2,8 +2,9 @@
 
 import dayjs from "dayjs"
 import { Check, Copy } from "lucide-react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
+import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -27,22 +28,29 @@ interface Props {
 
 /** 이메일을 인증하지 않은 회원에게 전달할 재설정 링크 (#528) */
 export const PasswordResetLinkDialog = ({ link, onOpenChange }: Props) => {
-  const [copied, setCopied] = useState(false)
+  const { toast } = useToast()
+  const inputRef = useRef<HTMLInputElement>(null)
+  // 링크가 다른 회원 것으로 바뀌면 "복사됨"이 따라오지 않게, 복사한 주소를 기억한다
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
+  const copied = !!link && copiedUrl === link.url
 
   const copy = async () => {
     if (!link) return
-    await navigator.clipboard.writeText(link.url)
-    setCopied(true)
+    try {
+      await navigator.clipboard.writeText(link.url)
+      setCopiedUrl(link.url)
+    } catch {
+      inputRef.current?.select()
+      toast({
+        title: "복사하지 못했어요",
+        description: "링크를 선택해 두었어요. 직접 복사해주세요.",
+        variant: "destructive"
+      })
+    }
   }
 
   return (
-    <Dialog
-      open={!!link}
-      onOpenChange={(open) => {
-        if (!open) setCopied(false)
-        onOpenChange(open)
-      }}
-    >
+    <Dialog open={!!link} onOpenChange={onOpenChange}>
       <DialogContent className="w-[calc(100%-2rem)] max-w-[480px]">
         <DialogHeader>
           <DialogTitle>{link?.name}님 비밀번호 재설정 링크</DialogTitle>
@@ -55,6 +63,7 @@ export const PasswordResetLinkDialog = ({ link, onOpenChange }: Props) => {
         </DialogHeader>
         <div className="flex gap-2">
           <Input
+            ref={inputRef}
             readOnly
             aria-label="재설정 링크"
             value={link?.url ?? ""}
