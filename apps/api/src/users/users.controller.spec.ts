@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing"
 import { AdminGuard } from "../auth/guards/admin.guard"
 import { UsersController } from "./users.controller"
 import { UsersService } from "./users.service"
+import { EmailCodeService } from "../email-verification/email-code.service"
 
 describe("UsersController", () => {
   let controller: UsersController
@@ -15,7 +16,8 @@ describe("UsersController", () => {
           useValue: {
             findAll: jest.fn()
           }
-        }
+        },
+        { provide: EmailCodeService, useValue: {} }
       ]
     })
       .overrideGuard(AdminGuard)

@@ -1,9 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ConflictError, ValidationError } from "@repo/api-client"
+import { ApiError, ConflictError, ValidationError } from "@repo/api-client"
 import {
-  CreateUserSchema,
+  EMAIL_CODE_LENGTH,
+  SignupSchema,
   passwordField,
   formatGenerationOrder
 } from "@repo/shared-types"
@@ -11,11 +12,14 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import EmailCodeButton from "@/components/EmailCodeButton"
+import SimpleDescription from "@/components/Form/SimpleDescription"
 import SimpleLabel from "@/components/Form/SimpleLabel"
 import SimpleStringField from "@/components/Form/SimpleStringField"
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
@@ -38,7 +42,7 @@ import { useGenerations } from "@/hooks/api/useGeneration"
 import { useSessions } from "@/hooks/api/useSession"
 import { apiClient } from "@/lib/apiClient"
 
-const confirmPasswordMergedCreateUserSchema = CreateUserSchema.merge(
+const confirmPasswordMergedCreateUserSchema = SignupSchema.merge(
   z.object({ confirmPassword: passwordField })
 ).refine((data) => data.password === data.confirmPassword, {
   message: "패스워드가 일치하지 않습니다.",
@@ -58,6 +62,34 @@ const SignupForm = () => {
     }
   })
 
+  async function sendEmailCode() {
+    if (!(await form.trigger("email"))) throw new Error("이메일 형식 오류")
+    try {
+      await apiClient.requestSignupEmailCode(form.getValues("email"))
+      toast({
+        title: "인증번호를 보냈어요",
+        description: "메일함(스팸함 포함)을 확인해주세요."
+      })
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        form.setError("email", {
+          type: "manual",
+          message: "이미 가입된 이메일입니다."
+        })
+      } else {
+        toast({
+          title: "인증번호를 보내지 못했어요",
+          description:
+            error instanceof ApiError
+              ? (error.detail ?? error.message)
+              : "잠시 후 다시 시도해주세요.",
+          variant: "destructive"
+        })
+      }
+      throw error
+    }
+  }
+
   async function onSubmit(
     formData: z.infer<typeof confirmPasswordMergedCreateUserSchema>
   ) {
@@ -66,6 +98,7 @@ const SignupForm = () => {
         name: formData.name,
         nickname: formData.nickname,
         email: formData.email,
+        emailCode: formData.emailCode,
         password: formData.password,
         sessions: formData.sessions,
         generationId: formData.generationId
@@ -89,6 +122,11 @@ const SignupForm = () => {
             "이미 가입하셨다면 로그인해주세요. 운영진 승인 전이라면 승인 후 로그인할 수 있습니다.",
           variant: "destructive"
         })
+      } else if (
+        error instanceof ValidationError &&
+        error.detail?.includes("인증번호")
+      ) {
+        form.setError("emailCode", { type: "manual", message: error.detail })
       } else if (error instanceof ValidationError) {
         toast({
           title: "회원가입 실패",
@@ -155,6 +193,34 @@ const SignupForm = () => {
               z.ZodOptional
             )
           }
+        />
+        <FormField
+          control={form.control}
+          name="emailCode"
+          render={({ field }) => (
+            <FormItem>
+              <SimpleLabel required>이메일 인증번호</SimpleLabel>
+              <div className="mt-[0.2rem] flex gap-2">
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={EMAIL_CODE_LENGTH}
+                    placeholder={`${EMAIL_CODE_LENGTH}자리 숫자`}
+                    className="border-slate-300 shadow-sm"
+                  />
+                </FormControl>
+                <EmailCodeButton onSend={sendEmailCode} className="shrink-0" />
+              </div>
+              <SimpleDescription>
+                위 이메일로 받은 인증번호를 입력해주세요. 비밀번호를 잊었을 때
+                이 메일로 찾을 수 있어요.
+              </SimpleDescription>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         <SimpleStringField
           form={form}

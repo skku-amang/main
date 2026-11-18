@@ -39,3 +39,9 @@ export KARGO_API_TOKEN=
 #   curl -s -X POST $UMAMI_URL/api/me/api-keys -H "Authorization: Bearer $T" -H 'Content-Type: application/json' -d '{"name":"local"}' | jq -r .key
 export UMAMI_URL=https://analytics.amang.json-server.win
 export UMAMI_API_TOKEN=
+
+# Resend 메일 발송 키 (ADR-0004). SealedSecret 봉인 원본 + 로컬 실제 발송용
+#  - 발급: resend.com → API Keys → Sending access, 도메인 amang.json-server.win 제한
+#  - 로컬에서 실제로 보내려면 apps/api/.env의 RESEND_API_KEY에 staging 키를 넣는다
+export RESEND_API_KEY_STAGING=
+export RESEND_API_KEY_PRODUCTION=

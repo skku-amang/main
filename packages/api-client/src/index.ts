@@ -6,6 +6,7 @@ import {
   CreateSession,
   CreateTeam,
   CreateUser,
+  Signup,
   DetailedUser,
   DetailedUserList,
   Equipment,
@@ -1068,7 +1069,7 @@ export default class ApiClient {
    * @throws {UnprocessableEntityError} 존재하지 않는 기수인 경우
    * @throws {InternalServerError}
    */
-  public signup(userData: CreateUser) {
+  public signup(userData: Signup) {
     return this._request<
       SignUpResponse,
       | ValidationError
@@ -1076,6 +1077,45 @@ export default class ApiClient {
       | UnprocessableEntityError
       | InternalServerError
     >("/auth/signup", "POST", userData)
+  }
+
+  /**
+   * 가입용 이메일 인증번호 발송 (#528)
+   * @throws {ConflictError} 이미 사용중인 이메일
+   * @throws {UnprocessableEntityError} 60초 안에 다시 요청했거나 한 시간 한도를 넘음
+   */
+  public requestSignupEmailCode(email: string) {
+    return this._request<
+      void,
+      | ValidationError
+      | ConflictError
+      | UnprocessableEntityError
+      | InternalServerError
+    >("/auth/email-code", "POST", { email })
+  }
+
+  /**
+   * 내 이메일로 인증번호 발송 (#528)
+   * @throws {ConflictError} 이미 인증된 이메일
+   * @throws {UnprocessableEntityError} 60초 안에 다시 요청했거나 한 시간 한도를 넘음
+   */
+  public requestEmailVerification() {
+    return this._request<
+      void,
+      ConflictError | UnprocessableEntityError | InternalServerError
+    >("/users/me/email-verification", "POST")
+  }
+
+  /**
+   * 내 이메일 인증번호 확인 (#528)
+   * @throws {ValidationError} 인증번호가 틀리거나 만료됨
+   */
+  public confirmEmailVerification(code: string) {
+    return this._request<DetailedUser, ValidationError | InternalServerError>(
+      "/users/me/email-verification/confirm",
+      "POST",
+      { code }
+    )
   }
 
   /**

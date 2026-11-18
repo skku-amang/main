@@ -19,7 +19,10 @@ export class UsersService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+    { emailVerified = false }: { emailVerified?: boolean } = {}
+  ) {
     const { sessions: sessionIds, ...userData } = createUserDto
     const hashedPassword = await bcrypt.hash(userData.password, 10)
 
@@ -33,6 +36,7 @@ export class UsersService {
           ...userData,
           password: hashedPassword,
           image,
+          emailVerifiedAt: emailVerified ? new Date() : null,
           sessions: {
             connect: sessionIds.map((id) => ({ id }))
           }
@@ -108,11 +112,12 @@ export class UsersService {
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
-    const userExists = await this.prisma.user.count({
-      where: { id: userId }
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
     })
 
-    if (!userExists)
+    if (!current)
       throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
 
     const {
@@ -127,6 +132,11 @@ export class UsersService {
     }
 
     if (password) updateData.password = await bcrypt.hash(password, 10)
+
+    // 바뀐 주소는 아직 본인 것인지 모른다 (#528).
+    // 그대로인 주소는 다시 쓰지 않는다 — 그 사이 다른 요청이 바꾸고 인증한 주소를 덮어쓰면 인증만 남는다
+    if (restOfDto.email === current.email) delete updateData.email
+    else if (restOfDto.email) updateData.emailVerifiedAt = null
 
     if (generationId) updateData.generation = { connect: { id: generationId } }
 
@@ -232,6 +242,26 @@ export class UsersService {
       },
       select: detailedUserSelector
     })
+  }
+
+  /** 인증번호를 확인한 주소가 지금도 그 회원의 주소일 때만 인증한다 */
+  async markEmailVerified(userId: number, email: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId, email },
+        data: { emailVerifiedAt: new Date() },
+        select: detailedUserSelector
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        throw new ConflictError(
+          "이메일 주소가 바뀌었습니다. 새 주소로 다시 인증해주세요."
+        )
+      throw error
+    }
   }
 
   async approveUser(userId: number) {

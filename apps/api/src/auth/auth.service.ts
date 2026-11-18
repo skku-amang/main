@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import {
   AuthError,
+  ConflictError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError,
   UserNotApprovedError
@@ -11,7 +12,8 @@ import {
 import { AuthSessionInfo, JwtPayload } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import * as bcrypt from "bcrypt"
-import { CreateUserDto } from "../users/dto/create-user.dto"
+import { EmailCodeService } from "../email-verification/email-code.service"
+import { SignupDto } from "../email-verification/email-verification.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
@@ -19,20 +21,40 @@ import { AuthSessionStore } from "./auth-session.store"
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly authSessionStore: AuthSessionStore,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
+    private readonly emailCodeService: EmailCodeService
   ) {}
 
-  async signUp(createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto)
+  async requestSignupEmailCode(email: string) {
+    if (await this.usersService.findOneByEmail(email))
+      throw new ConflictError("이미 사용중인 이메일입니다.")
+    await this.emailCodeService.issue("signup", email)
+  }
+
+  async signUp({ emailCode, ...createUserDto }: SignupDto) {
+    // 번호는 가입이 저장된 뒤에 지운다 — 닉네임 중복 등으로 저장이 실패해도 같은 번호로 다시 가입할 수 있다.
+    // 같은 번호로 동시에 가입해도 이메일이 unique라 한 건만 저장된다
+    await this.emailCodeService.check("signup", createUserDto.email, emailCode)
+    const user = await this.usersService.create(createUserDto, {
+      emailVerified: true
+    })
     this.eventEmitter.emit(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(user.id)
     )
+    // 가입은 이미 끝났다. 번호를 못 지워도 10분 뒤 사라지고, 그 이메일로는 다시 가입할 수 없다
+    await this.emailCodeService
+      .consume("signup", createUserDto.email)
+      .catch((error: Error) =>
+        this.logger.warn(`가입 인증번호 삭제 실패: ${error.message}`)
+      )
     Sentry.metrics.count("signup.completed", 1, {
       attributes: { provider: "credentials" }
     })

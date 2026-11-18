@@ -8,8 +8,11 @@ import {
   Param,
   ParseIntPipe,
   Delete,
+  HttpCode,
+  HttpStatus,
   Req
 } from "@nestjs/common"
+import { ConflictError, NotFoundError } from "@repo/api-client"
 import { AccessTokenGuard } from "../auth/guards/access-token.guard"
 import { UsersService } from "./users.service"
 import { AdminGuard } from "../auth/guards/admin.guard"
@@ -19,11 +22,16 @@ import { Request } from "express"
 import { JwtPayload } from "@repo/shared-types"
 import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { UpdateProfileDto } from "./dto/update-profile.dto"
+import { EmailCodeService } from "../email-verification/email-code.service"
+import { EmailCodeConfirmDto } from "../email-verification/email-verification.dto"
 
 @Controller("users")
 @UseGuards(AccessTokenGuard)
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly emailCodeService: EmailCodeService
+  ) {}
 
   @Get()
   findAll() {
@@ -81,6 +89,24 @@ export class UsersController {
     return this.userService.updatePassword(userId, updatePasswordDto)
   }
 
+  @Post("me/email-verification")
+  @HttpCode(HttpStatus.OK)
+  async requestEmailVerification(@Req() req: Request) {
+    const { email, emailVerifiedAt } = await this.myEmail(req)
+    if (emailVerifiedAt) throw new ConflictError("이미 인증된 이메일입니다.")
+    await this.emailCodeService.issue("verify", email)
+  }
+
+  @Post("me/email-verification/confirm")
+  async confirmEmailVerification(
+    @Req() req: Request,
+    @Body() { code }: EmailCodeConfirmDto
+  ) {
+    const { id, email } = await this.myEmail(req)
+    await this.emailCodeService.verify("verify", email, code)
+    return this.userService.markEmailVerified(id, email)
+  }
+
   @Patch(":id")
   @UseGuards(AdminGuard)
   async update(
@@ -100,5 +126,12 @@ export class UsersController {
   @UseGuards(AdminGuard)
   async deleteUser(@Param("id", ParseIntPipe) id: number) {
     return this.userService.deleteUser(id)
+  }
+
+  private async myEmail(req: Request) {
+    const { sub } = req.user as JwtPayload
+    const user = await this.userService.findDetailedById(sub)
+    if (!user) throw new NotFoundError("존재하지 않는 사용자입니다.")
+    return user
   }
 }

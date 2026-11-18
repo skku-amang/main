@@ -18,7 +18,10 @@ import {
   MeResponse
 } from "@repo/shared-types"
 import { Request, Response } from "express"
-import { CreateUserDto } from "../users/dto/create-user.dto"
+import {
+  EmailCodeRequestDto,
+  SignupDto
+} from "../email-verification/email-verification.dto"
 import { LoginUserDto } from "../users/dto/login-user.dto"
 import {
   clearAuthCookies,
@@ -33,10 +36,16 @@ import { RefreshTokenGuard } from "./guards/refresh-token.guard"
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post("email-code")
+  @HttpCode(HttpStatus.OK)
+  async requestSignupEmailCode(@Body() { email }: EmailCodeRequestDto) {
+    await this.authService.requestSignupEmailCode(email)
+  }
+
   @Post("signup")
   @HttpCode(HttpStatus.CREATED)
-  async signup(@Body() createUserDto: CreateUserDto) {
-    await this.authService.signUp(createUserDto)
+  async signup(@Body() signupDto: SignupDto) {
+    await this.authService.signUp(signupDto)
 
     return {
       message: "회원가입이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다."

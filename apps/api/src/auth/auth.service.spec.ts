@@ -3,12 +3,16 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
 import { Test, TestingModule } from "@nestjs/testing"
 import {
+  ConflictError,
   RefreshTokenExpiredError,
-  RefreshTokenNotFoundError
+  RefreshTokenNotFoundError,
+  ValidationError
 } from "@repo/api-client"
 import { JwtPayload } from "@repo/shared-types"
 import * as bcrypt from "bcrypt"
 import RedisMock from "ioredis-mock"
+import { EmailCodeService } from "../email-verification/email-code.service"
+import { Mail, MailService } from "../email-verification/mail.service"
 import { REDIS_CLIENT } from "../redis/redis.module"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
@@ -28,6 +32,7 @@ describe("AuthService", () => {
   let jwtService: JwtService
   let redis: InstanceType<typeof RedisMock>
   let emit: jest.Mock
+  let outbox: Mail[]
 
   const loginDto = { email: "member@g.skku.edu", password: PASSWORD }
   const otherLoginDto = { email: "other@g.skku.edu", password: PASSWORD }
@@ -37,10 +42,17 @@ describe("AuthService", () => {
     redis = new RedisMock()
     await redis.flushall()
     emit = jest.fn()
+    outbox = []
     const password = await bcrypt.hash(PASSWORD, 4)
     const users = [
       { id: 1, email: loginDto.email, password, isApproved: true },
-      { id: 2, email: otherLoginDto.email, password, isApproved: true }
+      {
+        id: 2,
+        email: otherLoginDto.email,
+        nickname: "taken",
+        password,
+        isApproved: true
+      }
     ]
 
     const module: TestingModule = await Test.createTestingModule({
@@ -48,6 +60,11 @@ describe("AuthService", () => {
         AuthService,
         AuthSessionStore,
         JwtService,
+        EmailCodeService,
+        {
+          provide: MailService,
+          useValue: { send: async (mail: Mail) => void outbox.push(mail) }
+        },
         { provide: REDIS_CLIENT, useValue: redis },
         {
           provide: UsersService,
@@ -56,7 +73,11 @@ describe("AuthService", () => {
               Promise.resolve(users.find((u) => u.email === email) ?? null),
             findOneById: (id: number) =>
               Promise.resolve(users.find((u) => u.id === id) ?? null),
-            create: () => Promise.resolve({ id: 3 })
+            create: async ({ nickname }: { nickname: string }) => {
+              if (users.some((u) => u.nickname === nickname))
+                throw new ConflictError("이미 사용중인 닉네임입니다.")
+              return { id: 3 }
+            }
           }
         },
         {
@@ -73,20 +94,77 @@ describe("AuthService", () => {
 
   afterEach(() => redis.disconnect())
 
+  const signupDto = {
+    email: "new@g.skku.edu",
+    password: PASSWORD,
+    name: "홍길동",
+    nickname: "gil",
+    generationId: 1,
+    sessions: []
+  }
+  const sentCode = () => outbox.at(-1)!.subject.match(/\d{6}/)![0]
+
   it("가입 신청이 저장되면 user.signed_up을 발행한다 (#790)", async () => {
-    await service.signUp({
-      email: "new@g.skku.edu",
-      password: PASSWORD,
-      name: "홍길동",
-      nickname: "gil",
-      generationId: 1,
-      sessions: []
-    })
+    await service.requestSignupEmailCode(signupDto.email)
+    await service.signUp({ ...signupDto, emailCode: sentCode() })
 
     expect(emit).toHaveBeenCalledWith(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(3)
     )
+  })
+
+  it("메일 인증번호가 틀리면 가입되지 않는다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const wrong = sentCode() === "000000" ? "111111" : "000000"
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: wrong })
+    ).rejects.toBeInstanceOf(ValidationError)
+    expect(emit).not.toHaveBeenCalled()
+  })
+
+  it("가입이 저장된 뒤 인증번호 삭제가 실패해도 가입은 끝난다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+    jest.spyOn(redis, "del").mockRejectedValueOnce(new Error("redis down"))
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).resolves.toBeUndefined()
+    expect(emit).toHaveBeenCalledWith(
+      USER_EVENTS.SIGNED_UP,
+      new UserSignedUpEvent(3)
+    )
+  })
+
+  it("가입한 뒤에는 같은 인증번호를 다시 쓸 수 없다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+    await service.signUp({ ...signupDto, emailCode: code })
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).rejects.toBeInstanceOf(ValidationError)
+  })
+
+  it("저장이 실패하면(닉네임 중복) 같은 인증번호로 다시 가입할 수 있다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+
+    await expect(
+      service.signUp({ ...signupDto, nickname: "taken", emailCode: code })
+    ).rejects.toBeInstanceOf(ConflictError)
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).resolves.toBeUndefined()
+  })
+
+  it("이미 가입된 이메일로는 가입 인증번호를 보내지 않는다 (#528)", async () => {
+    await expect(
+      service.requestSignupEmailCode(loginDto.email)
+    ).rejects.toBeInstanceOf(ConflictError)
+    expect(outbox).toHaveLength(0)
   })
 
   it("다른 기기에서 로그인해도 기존 기기의 refresh가 유지된다 (#541)", async () => {
