@@ -74,3 +74,5 @@ jobs:
       # PR에서는 빌드 검증만 하고 레지스트리에는 올리지 않는다
       push: ${{ github.event_name == 'push' }}
       skip: ${{ needs.changes.outputs.code != 'true' }}
+    secrets:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

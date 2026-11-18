@@ -67,5 +67,5 @@ export default withSentryConfig(nextConfig, {
   org: "amang-23",
   project: "web",
   tunnelRoute: true,
-  silent: !process.env.CI
+  silent: !process.env.SENTRY_AUTH_TOKEN
 })

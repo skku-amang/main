@@ -21,6 +21,16 @@ COPY --from=builder /app/out/full/ .
 RUN pnpm turbo run db:generate --filter=@repo/database
 RUN pnpm turbo run build --filter=api
 
+# 이미지에 들어갈 바로 이 dist에 Debug ID를 새기고 map을 Sentry에 올린다 (#499).
+# 토큰이 없으면(PR 빌드·로컬) 건너뛰고, 업로드가 실패해도 배포는 막지 않는다
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+    if [ -n "$SENTRY_AUTH_TOKEN" ]; then \
+      cd apps/api && \
+      pnpm exec sentry-cli sourcemaps inject dist && \
+      (pnpm exec sentry-cli sourcemaps upload --org amang-23 --project api dist \
+        || echo "Sentry source map 업로드 실패 — 이미지는 그대로 만든다"); \
+    fi
+
 FROM base AS runner
 WORKDIR /app
 

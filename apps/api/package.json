@@ -66,6 +66,7 @@
     "@nestjs/testing": "^11.2.10",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@sentry/cli": "^2.58.6",
     "@swc/cli": "^0.8.2",
     "@swc/core": "^1.16.22",
     "@types/bcrypt": "catalog:",
