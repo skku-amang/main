@@ -46,7 +46,13 @@ describe("AuthService", () => {
     const password = await bcrypt.hash(PASSWORD, 4)
     const users = [
       { id: 1, email: loginDto.email, password, isApproved: true },
-      { id: 2, email: otherLoginDto.email, password, isApproved: true }
+      {
+        id: 2,
+        email: otherLoginDto.email,
+        nickname: "taken",
+        password,
+        isApproved: true
+      }
     ]
 
     const module: TestingModule = await Test.createTestingModule({
@@ -67,7 +73,11 @@ describe("AuthService", () => {
               Promise.resolve(users.find((u) => u.email === email) ?? null),
             findOneById: (id: number) =>
               Promise.resolve(users.find((u) => u.id === id) ?? null),
-            create: () => Promise.resolve({ id: 3 })
+            create: () => Promise.resolve({ id: 3 }),
+            assertAvailable: async ({ nickname }: { nickname: string }) => {
+              if (users.some((u) => u.nickname === nickname))
+                throw new ConflictError("이미 사용중인 닉네임입니다.")
+            }
           }
         },
         {
@@ -112,6 +122,18 @@ describe("AuthService", () => {
       service.signUp({ ...signupDto, emailCode: wrong })
     ).rejects.toBeInstanceOf(ValidationError)
     expect(emit).not.toHaveBeenCalled()
+  })
+
+  it("닉네임이 겹쳐 가입이 막혀도 같은 인증번호로 다시 가입할 수 있다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+
+    await expect(
+      service.signUp({ ...signupDto, nickname: "taken", emailCode: code })
+    ).rejects.toBeInstanceOf(ConflictError)
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).resolves.toBeUndefined()
   })
 
   it("이미 가입된 이메일로는 가입 인증번호를 보내지 않는다 (#528)", async () => {

@@ -4,7 +4,10 @@ import { BellRing, X } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { readEmailAskSnoozed } from "@/components/EmailVerifyAsk"
+import {
+  EMAIL_ASK_SNOOZED_EVENT,
+  readEmailAskSnoozed
+} from "@/components/EmailVerifyAsk"
 import { useToast } from "@/components/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes"
@@ -51,6 +54,9 @@ const PushSoftAsk = () => {
   useEffect(() => {
     setDismissed(readSnoozed() || isPushOptedOut())
     setEmailAskSnoozed(readEmailAskSnoozed())
+    const onSnoozed = () => setEmailAskSnoozed(true)
+    window.addEventListener(EMAIL_ASK_SNOOZED_EVENT, onSnoozed)
+    return () => window.removeEventListener(EMAIL_ASK_SNOOZED_EVENT, onSnoozed)
   }, [])
 
   if (pathname === ROUTES.PROFILE.DEVICES) return null

@@ -11,6 +11,8 @@ import { useAuth } from "@/lib/providers/auth-provider"
 
 const SNOOZE_KEY = "email-verify-ask-snoozed-until"
 const SNOOZE_DAYS = 7
+/** 같은 화면의 PushSoftAsk가 이 카드가 물러난 걸 바로 알도록 보내는 이벤트 */
+export const EMAIL_ASK_SNOOZED_EVENT = "email-verify-ask-snoozed"
 
 export const readEmailAskSnoozed = () => {
   try {
@@ -29,6 +31,7 @@ const snooze = () => {
   } catch {
     // 저장 불가 환경(시크릿 등)이면 이번 세션만 닫힘
   }
+  window.dispatchEvent(new Event(EMAIL_ASK_SNOOZED_EVENT))
 }
 
 /**

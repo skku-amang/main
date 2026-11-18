@@ -104,7 +104,7 @@ export class UsersController {
   ) {
     const { id, email } = await this.myEmail(req)
     await this.emailCodeService.verify("verify", email, code)
-    return this.userService.markEmailVerified(id)
+    return this.userService.markEmailVerified(id, email)
   }
 
   @Patch(":id")

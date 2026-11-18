@@ -37,6 +37,8 @@ export class AuthService {
   }
 
   async signUp({ emailCode, ...createUserDto }: SignupDto) {
+    // 인증번호는 맞으면 사라지므로, 닉네임 중복처럼 미리 알 수 있는 실패는 먼저 거른다
+    await this.usersService.assertAvailable(createUserDto)
     await this.emailCodeService.verify("signup", createUserDto.email, emailCode)
     const user = await this.usersService.create(createUserDto, {
       emailVerified: true

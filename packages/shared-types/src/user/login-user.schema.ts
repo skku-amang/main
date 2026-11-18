@@ -9,6 +9,7 @@ export const LoginUserSchema = z
     email: z
       .string()
       .min(1, { message: "이메일은 비워둘 수 없습니다." })
+      .toLowerCase()
       .email({
         message: "유효한 이메일 주소를 입력해주세요."
       }),

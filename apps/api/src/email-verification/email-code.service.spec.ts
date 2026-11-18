@@ -47,6 +47,18 @@ describe("EmailCodeService", () => {
     )
   })
 
+  it("같은 번호로 동시에 확인하면 한 요청만 통과한다", async () => {
+    await service.issue("verify", EMAIL)
+    const code = lastCode()
+
+    const results = await Promise.allSettled([
+      service.verify("verify", EMAIL, code),
+      service.verify("verify", EMAIL, code)
+    ])
+
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1)
+  })
+
   it("용도가 다르면 같은 번호라도 통과하지 않는다", async () => {
     await service.issue("signup", EMAIL)
 
@@ -87,6 +99,12 @@ describe("EmailCodeService", () => {
     await expect(service.issue("verify", EMAIL)).rejects.toBeInstanceOf(
       UnprocessableEntityError
     )
+  })
+
+  it("한 시간 횟수 기록에는 항상 만료가 걸린다", async () => {
+    await service.issue("verify", EMAIL)
+
+    expect(await redis.ttl(`email-code-hourly:${EMAIL}`)).toBeGreaterThan(0)
   })
 
   it("이메일 대소문자가 달라도 같은 주소로 본다", async () => {

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { CreateUserSchema } from "./create-user.schema"
+import { CreateUserSchema, emailField } from "./create-user.schema"
 
 export const EMAIL_CODE_LENGTH = 6
 
@@ -15,7 +15,7 @@ export const SignupSchema = CreateUserSchema.extend({
 export type Signup = z.infer<typeof SignupSchema>
 
 export const EmailCodeRequestSchema = z.object({
-  email: z.string().email({ message: "유효한 이메일 주소를 입력해주세요." })
+  email: emailField
 })
 export type EmailCodeRequest = z.infer<typeof EmailCodeRequestSchema>
 

@@ -133,9 +133,10 @@ export class UsersService {
 
     if (password) updateData.password = await bcrypt.hash(password, 10)
 
-    // 바뀐 주소는 아직 본인 것인지 모른다 (#528)
-    if (restOfDto.email && restOfDto.email !== current.email)
-      updateData.emailVerifiedAt = null
+    // 바뀐 주소는 아직 본인 것인지 모른다 (#528).
+    // 그대로인 주소는 다시 쓰지 않는다 — 그 사이 다른 요청이 바꾸고 인증한 주소를 덮어쓰면 인증만 남는다
+    if (restOfDto.email === current.email) delete updateData.email
+    else if (restOfDto.email) updateData.emailVerifiedAt = null
 
     if (generationId) updateData.generation = { connect: { id: generationId } }
 
@@ -243,12 +244,43 @@ export class UsersService {
     })
   }
 
-  async markEmailVerified(userId: number) {
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { emailVerifiedAt: new Date() },
-      select: detailedUserSelector
+  async assertAvailable({
+    email,
+    nickname
+  }: {
+    email: string
+    nickname: string
+  }) {
+    const taken = await this.prisma.user.findFirst({
+      where: { OR: [{ email }, { nickname }] },
+      select: { email: true }
     })
+    if (!taken) return
+    throw new ConflictError(
+      taken.email === email
+        ? "이미 사용중인 이메일입니다."
+        : "이미 사용중인 닉네임입니다."
+    )
+  }
+
+  /** 인증번호를 확인한 주소가 지금도 그 회원의 주소일 때만 인증한다 */
+  async markEmailVerified(userId: number, email: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId, email },
+        data: { emailVerifiedAt: new Date() },
+        select: detailedUserSelector
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        throw new ConflictError(
+          "이메일 주소가 바뀌었습니다. 새 주소로 다시 인증해주세요."
+        )
+      throw error
+    }
   }
 
   async approveUser(userId: number) {

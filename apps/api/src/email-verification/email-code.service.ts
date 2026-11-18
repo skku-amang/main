@@ -56,8 +56,13 @@ export class EmailCodeService {
         `인증번호는 ${COOLDOWN_SECONDS}초에 한 번 받을 수 있습니다.`
       )
 
-    const sent = await this.redis.incr(hourlyKey(email))
-    if (sent === 1) await this.redis.expire(hourlyKey(email), 60 * 60)
+    // 한 번에 보내야 INCR 직후 프로세스가 죽어도 만료 없는 카운터가 남지 않는다
+    const counted = await this.redis
+      .multi()
+      .incr(hourlyKey(email))
+      .expire(hourlyKey(email), 60 * 60, "NX")
+      .exec()
+    const sent = Number(counted?.[0]?.[1])
     if (sent > HOURLY_LIMIT)
       throw new UnprocessableEntityError(
         "인증번호를 너무 많이 요청했습니다. 한 시간 뒤에 다시 시도해주세요."
@@ -104,8 +109,9 @@ export class EmailCodeService {
     if (!stored) throw invalidCode()
 
     if (timingSafeEqual(Buffer.from(stored), Buffer.from(hash(code)))) {
-      await this.redis.del(key)
-      return
+      // 같은 번호로 동시에 들어오면 지운 쪽 한 요청만 통과한다
+      if ((await this.redis.del(key)) === 1) return
+      throw invalidCode()
     }
 
     const attempts = await this.redis.hincrby(key, "attempts", 1)
