@@ -23,9 +23,12 @@ configMapGenerator:
   - VAPID_SUBJECT=mailto:amang.skku@gmail.com
   - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy-gateway.observability.svc.cluster.local:4318
   - OTEL_SERVICE_NAME=amang-api
+  # 봇 가입 주소(받는 메일함 없음)는 메일을 보내지 않고 이 번호를 받아 준다 (#528). 봇도 이 값을 읽는다
+  - MAIL_TEST_DOMAIN=amang.staging.json-server.win
+  - MAIL_TEST_CODE=424242
 - name: traffic-script
   files:
   - traffic/traffic.js
 images:
 - name: ghcr.io/skku-amang/amang-api
-  newTag: 20261117013333-e07af5f
+  newTag: 20261118061550-23f8672
