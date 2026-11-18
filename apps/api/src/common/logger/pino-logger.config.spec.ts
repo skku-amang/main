@@ -1,8 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
   INestApplication,
   Module,
+  Post,
+  Res,
   ServiceUnavailableException
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
@@ -10,6 +13,7 @@ import { Test } from "@nestjs/testing"
 import { ACCESS_TOKEN_COOKIE } from "@repo/shared-types"
 import * as Sentry from "@sentry/nestjs"
 import cookieParser from "cookie-parser"
+import type { Response } from "express"
 import { LoggerModule } from "nestjs-pino"
 import { Writable } from "stream"
 import request from "supertest"
@@ -35,6 +39,20 @@ class PingController {
   @Get("health")
   ready() {
     throw new ServiceUnavailableException()
+  }
+
+  @Post("issue-cookie")
+  issueCookie(
+    @Body() { token }: { token: string },
+    @Res({ passthrough: true }) res: Response
+  ) {
+    res.cookie(ACCESS_TOKEN_COOKIE, token)
+    return { ok: true }
+  }
+
+  @Post("echo")
+  echo() {
+    return { ok: true }
   }
 }
 
@@ -135,5 +153,32 @@ describe("pinoLoggerModuleOption", () => {
     expect(
       lines.some((line) => line.req?.headers?.cookie === "[Redacted]")
     ).toBe(true)
+  })
+
+  it("응답의 set-cookie 헤더는 발급한 토큰이 담기므로 로그에서 가린다", async () => {
+    await request(app.getHttpServer())
+      .post("/issue-cookie")
+      .send({ token: "issued-token-value" })
+      .expect(201)
+
+    expect(
+      lines.some((line) => line.res?.headers?.["set-cookie"] === "[Redacted]")
+    ).toBe(true)
+    expect(
+      lines.some((line) =>
+        JSON.stringify(line.res ?? {}).includes("issued-token-value")
+      )
+    ).toBe(false)
+  })
+
+  it("비밀번호 변경 요청의 현재·새 비밀번호는 로그에서 가린다", async () => {
+    await request(app.getHttpServer())
+      .post("/echo")
+      .send({ currentPassword: "old-pw-value", newPassword: "new-pw-value" })
+      .expect(201)
+
+    const serialized = JSON.stringify(lines)
+    expect(serialized).not.toContain("old-pw-value")
+    expect(serialized).not.toContain("new-pw-value")
   })
 })
