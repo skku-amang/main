@@ -124,6 +124,20 @@ describe("AuthService", () => {
     expect(emit).not.toHaveBeenCalled()
   })
 
+  it("가입이 저장된 뒤 인증번호 삭제가 실패해도 가입은 끝난다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+    jest.spyOn(redis, "del").mockRejectedValueOnce(new Error("redis down"))
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).resolves.toBeUndefined()
+    expect(emit).toHaveBeenCalledWith(
+      USER_EVENTS.SIGNED_UP,
+      new UserSignedUpEvent(3)
+    )
+  })
+
   it("가입한 뒤에는 같은 인증번호를 다시 쓸 수 없다 (#528)", async () => {
     await service.requestSignupEmailCode(signupDto.email)
     const code = sentCode()

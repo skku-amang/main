@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { JwtService } from "@nestjs/jwt"
@@ -21,6 +21,8 @@ import { AuthSessionStore } from "./auth-session.store"
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -43,11 +45,16 @@ export class AuthService {
     const user = await this.usersService.create(createUserDto, {
       emailVerified: true
     })
-    await this.emailCodeService.consume("signup", createUserDto.email)
     this.eventEmitter.emit(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(user.id)
     )
+    // 가입은 이미 끝났다. 번호를 못 지워도 10분 뒤 사라지고, 그 이메일로는 다시 가입할 수 없다
+    await this.emailCodeService
+      .consume("signup", createUserDto.email)
+      .catch((error: Error) =>
+        this.logger.warn(`가입 인증번호 삭제 실패: ${error.message}`)
+      )
     Sentry.metrics.count("signup.completed", 1, {
       attributes: { provider: "credentials" }
     })
