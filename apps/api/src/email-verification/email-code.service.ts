@@ -95,6 +95,17 @@ export class EmailCodeService {
   /** 맞으면 인증번호를 지운다 (한 번만 쓸 수 있음). 틀리거나 없으면 ValidationError */
   async verify(
     purpose: EmailCodePurpose,
+    email: string,
+    code: string
+  ): Promise<void> {
+    await this.check(purpose, email, code)
+    // 같은 번호로 동시에 들어오면 지운 쪽 한 요청만 통과한다
+    if (!(await this.consume(purpose, email))) throw invalidCode()
+  }
+
+  /** 맞는지만 본다 — 번호는 남는다. 뒤따르는 작업이 성공한 뒤 consume으로 지운다 */
+  async check(
+    purpose: EmailCodePurpose,
     rawEmail: string,
     code: string
   ): Promise<void> {
@@ -108,15 +119,18 @@ export class EmailCodeService {
     const stored = await this.redis.hget(key, "hash")
     if (!stored) throw invalidCode()
 
-    if (timingSafeEqual(Buffer.from(stored), Buffer.from(hash(code)))) {
-      // 같은 번호로 동시에 들어오면 지운 쪽 한 요청만 통과한다
-      if ((await this.redis.del(key)) === 1) return
-      throw invalidCode()
-    }
+    if (timingSafeEqual(Buffer.from(stored), Buffer.from(hash(code)))) return
 
     const attempts = await this.redis.hincrby(key, "attempts", 1)
     if (attempts >= MAX_ATTEMPTS) await this.redis.del(key)
     throw invalidCode()
+  }
+
+  /** 인증번호를 지운다. 이미 없었으면 false */
+  async consume(purpose: EmailCodePurpose, rawEmail: string): Promise<boolean> {
+    const email = rawEmail.toLowerCase()
+    if (this.isTestAddress(email)) return true
+    return (await this.redis.del(codeKey(purpose, email))) === 1
   }
 
   private isTestAddress(email: string) {

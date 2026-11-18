@@ -244,25 +244,6 @@ export class UsersService {
     })
   }
 
-  async assertAvailable({
-    email,
-    nickname
-  }: {
-    email: string
-    nickname: string
-  }) {
-    const taken = await this.prisma.user.findFirst({
-      where: { OR: [{ email }, { nickname }] },
-      select: { email: true }
-    })
-    if (!taken) return
-    throw new ConflictError(
-      taken.email === email
-        ? "이미 사용중인 이메일입니다."
-        : "이미 사용중인 닉네임입니다."
-    )
-  }
-
   /** 인증번호를 확인한 주소가 지금도 그 회원의 주소일 때만 인증한다 */
   async markEmailVerified(userId: number, email: string) {
     try {

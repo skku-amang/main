@@ -37,12 +37,13 @@ export class AuthService {
   }
 
   async signUp({ emailCode, ...createUserDto }: SignupDto) {
-    // 인증번호는 맞으면 사라지므로, 닉네임 중복처럼 미리 알 수 있는 실패는 먼저 거른다
-    await this.usersService.assertAvailable(createUserDto)
-    await this.emailCodeService.verify("signup", createUserDto.email, emailCode)
+    // 번호는 가입이 저장된 뒤에 지운다 — 닉네임 중복 등으로 저장이 실패해도 같은 번호로 다시 가입할 수 있다.
+    // 같은 번호로 동시에 가입해도 이메일이 unique라 한 건만 저장된다
+    await this.emailCodeService.check("signup", createUserDto.email, emailCode)
     const user = await this.usersService.create(createUserDto, {
       emailVerified: true
     })
+    await this.emailCodeService.consume("signup", createUserDto.email)
     this.eventEmitter.emit(
       USER_EVENTS.SIGNED_UP,
       new UserSignedUpEvent(user.id)

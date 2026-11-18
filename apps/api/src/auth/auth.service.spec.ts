@@ -73,10 +73,10 @@ describe("AuthService", () => {
               Promise.resolve(users.find((u) => u.email === email) ?? null),
             findOneById: (id: number) =>
               Promise.resolve(users.find((u) => u.id === id) ?? null),
-            create: () => Promise.resolve({ id: 3 }),
-            assertAvailable: async ({ nickname }: { nickname: string }) => {
+            create: async ({ nickname }: { nickname: string }) => {
               if (users.some((u) => u.nickname === nickname))
                 throw new ConflictError("이미 사용중인 닉네임입니다.")
+              return { id: 3 }
             }
           }
         },
@@ -124,7 +124,17 @@ describe("AuthService", () => {
     expect(emit).not.toHaveBeenCalled()
   })
 
-  it("닉네임이 겹쳐 가입이 막혀도 같은 인증번호로 다시 가입할 수 있다 (#528)", async () => {
+  it("가입한 뒤에는 같은 인증번호를 다시 쓸 수 없다 (#528)", async () => {
+    await service.requestSignupEmailCode(signupDto.email)
+    const code = sentCode()
+    await service.signUp({ ...signupDto, emailCode: code })
+
+    await expect(
+      service.signUp({ ...signupDto, emailCode: code })
+    ).rejects.toBeInstanceOf(ValidationError)
+  })
+
+  it("저장이 실패하면(닉네임 중복) 같은 인증번호로 다시 가입할 수 있다 (#528)", async () => {
     await service.requestSignupEmailCode(signupDto.email)
     const code = sentCode()
 
