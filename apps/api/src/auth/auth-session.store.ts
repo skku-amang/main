@@ -36,6 +36,15 @@ export type AuthSessionRecord = {
   lastUsedAt: string
 }
 
+// 세션 확인과 교체를 한 번에 한다. 나눠 보내면 확인 직후 세션이 지워졌을 때 HSET이 세션을 되살린다
+const ROTATE_SCRIPT = `
+local current = redis.call('HGET', KEYS[1], 'tokenHash')
+if not current then return 0 end
+redis.call('HSET', KEYS[1], 'tokenHash', ARGV[1], 'prevTokenHash', current, 'rotatedAt', ARGV[2], 'lastUsedAt', ARGV[2])
+redis.call('EXPIRE', KEYS[1], ARGV[3])
+return 1
+`
+
 @Injectable()
 export class AuthSessionStore {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
@@ -102,21 +111,15 @@ export class AuthSessionStore {
     refreshToken: string,
     ttlSeconds: number
   ): Promise<boolean> {
-    const key = authSessionKey(userId, sid)
-    const currentHash = await this.redis.hget(key, "tokenHash")
-    if (!currentHash) return false
-    const now = new Date().toISOString()
-    await this.redis
-      .multi()
-      .hset(key, {
-        tokenHash: hashToken(refreshToken),
-        prevTokenHash: currentHash,
-        rotatedAt: now,
-        lastUsedAt: now
-      })
-      .expire(key, ttlSeconds)
-      .exec()
-    return true
+    const rotated = await this.redis.eval(
+      ROTATE_SCRIPT,
+      1,
+      authSessionKey(userId, sid),
+      hashToken(refreshToken),
+      new Date().toISOString(),
+      ttlSeconds
+    )
+    return rotated === 1
   }
 
   async delete(userId: number, sid: string): Promise<void> {
