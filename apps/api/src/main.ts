@@ -13,6 +13,7 @@ import { AllErrorFilter } from "./common/filters/all-error.filter"
 import { ApiErrorFilter } from "./common/filters/api-error.filter"
 import { ZodValidationErrorFilter } from "./common/filters/zod-validation-error"
 import { ApiResultInterceptor } from "./common/interceptors/api-result.interceptor"
+import { keepConnectionsLongerThanProxy } from "./common/keep-alive"
 import { originCheck } from "./common/middleware/origin-check.middleware"
 import { PrismaService } from "./prisma/prisma.service"
 
@@ -45,6 +46,7 @@ async function bootstrap() {
   )
   // SIGTERM 시 처리 중인 요청을 마무리하고 onModuleDestroy 등 종료 훅 실행 (기본값 off)
   app.enableShutdownHooks(["SIGTERM", "SIGINT"], { useProcessExit: true })
+  keepConnectionsLongerThanProxy(app.getHttpServer())
   const configService = app.get(ConfigService)
   await app.listen(configService.get<number>("PORT") ?? 8000)
 }
