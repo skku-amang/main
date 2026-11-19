@@ -55,7 +55,5 @@ tmp/
 *:Zone.Identifier
 
 .env*.local
-*.code-workspace
-!*.code-workspace.example
 .envrc.local
 .gstack/
