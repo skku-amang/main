@@ -39,5 +39,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/we
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
 ENV NODE_ENV=production
+# Traefik이 유휴 연결을 90초까지 다시 쓰므로 그보다 오래 유지한다 (먼저 끊으면 POST가 502)
+ENV KEEP_ALIVE_TIMEOUT=95000
 EXPOSE 3000
 CMD ["node", "apps/web/server.js"]
