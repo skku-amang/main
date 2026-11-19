@@ -198,6 +198,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@sentry/cli':
+        specifier: ^2.58.6
+        version: 2.58.6
       '@swc/cli':
         specifier: ^0.8.2
         version: 0.8.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(chokidar@4.0.3)

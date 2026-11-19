@@ -12,6 +12,10 @@ on:
       skip:
         type: boolean
         default: false
+    secrets:
+      # 없으면 source map 업로드만 건너뛴다
+      SENTRY_AUTH_TOKEN:
+        required: false
   # 레지스트리 일시 장애 등으로 push만 실패했을 때 검사 재실행 없이 재시도
   workflow_dispatch:
     inputs:
@@ -74,6 +78,8 @@ jobs:
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ steps.sortable.outputs.tag }}
           build-args: ${{ matrix.app.build-args }}
+          # source map은 레지스트리에 올리는 빌드에서만 Sentry로 보낸다. ARG가 아닌 secret이라 이미지에 안 남는다
+          secrets: ${{ inputs.push && secrets.SENTRY_AUTH_TOKEN && format('SENTRY_AUTH_TOKEN={0}', secrets.SENTRY_AUTH_TOKEN) || '' }}
           # scope 없으면 matrix 항목끼리 같은 캐시를 덮어쓴다
           cache-from: type=gha,scope=${{ matrix.app.name }}
           cache-to: ${{ inputs.push && format('type=gha,mode=max,scope={0}', matrix.app.name) || '' }}

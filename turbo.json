@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build", "^db:generate", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
     "format": {
       "dependsOn": ["^format"]

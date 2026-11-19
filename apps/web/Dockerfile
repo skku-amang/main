@@ -22,7 +22,9 @@ COPY --from=builder /app/out/full/ .
 # NEXT_PUBLIC_*는 빌드 때 번들에 박히므로 환경마다 이미지를 따로 만든다 (#749)
 ARG APP_ENV
 RUN test -n "$APP_ENV" && cp apps/web/env/${APP_ENV}.env apps/web/.env.production.local
-RUN pnpm turbo run build --filter=web
+# 토큰이 있으면 withSentryConfig가 빌드 중 source map을 Sentry에 올린다 (#499)
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+    pnpm turbo run build --filter=web
 
 # 실행에는 pnpm·turbo가 필요 없다 (standalone server.js)
 FROM node:22-alpine AS runner
