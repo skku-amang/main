@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common"
-import { createHash, randomUUID, timingSafeEqual } from "crypto"
+import { createHash, randomUUID } from "crypto"
 import Redis from "ioredis"
 import { REDIS_CLIENT } from "../redis/redis.module"
 
@@ -18,9 +18,6 @@ const authSessionKey = (userId: number, sid: string) =>
 const hashToken = (token: string) =>
   createHash("sha256").update(token).digest("hex")
 
-const hashEquals = (a: string, b: string) =>
-  timingSafeEqual(Buffer.from(a), Buffer.from(b))
-
 // Okta 기본값과 같다. 응답 유실 후 재시도까지만 메우면 되므로 짧게 둔다
 const ROTATION_GRACE_MS = 30_000
 
@@ -36,12 +33,26 @@ export type AuthSessionRecord = {
   lastUsedAt: string
 }
 
-// 세션 확인과 교체를 한 번에 한다. 나눠 보내면 확인 직후 세션이 지워졌을 때 HSET이 세션을 되살린다
+export type RotateResult = "rotated" | "mismatch" | "missing"
+
+// 확인과 교체를 한 스크립트로 한다. 나눠 보내면 그 사이에 같은 직전 RT가 두 번 통하거나,
+// 지워진 세션(로그아웃·비밀번호 변경)을 HSET이 되살린다.
+// 유예 시각은 Redis 시계로 잰다 — 스크립트가 늦게 도착한 만큼 유예가 줄지 않게.
+// HMGET 대신 HGET을 쓰는 건 ioredis-mock이 HMGET의 빈 값을 Lua false로 넘기지 않아서다
+// KEYS[1] 세션 | ARGV 받은 RT 해시, 새 RT 해시, 유예 ms, lastUsedAt, TTL 초
 const ROTATE_SCRIPT = `
 local current = redis.call('HGET', KEYS[1], 'tokenHash')
-if not current then return 0 end
-redis.call('HSET', KEYS[1], 'tokenHash', ARGV[1], 'prevTokenHash', current, 'rotatedAt', ARGV[2], 'lastUsedAt', ARGV[2])
-redis.call('EXPIRE', KEYS[1], ARGV[3])
+local prev = redis.call('HGET', KEYS[1], 'prevTokenHash')
+if not current then return -1 end
+-- 응답 전에 연결이 끊겨 같은 명령이 다시 오면, 이미 바꾼 결과를 그대로 둔다
+if current == ARGV[2] and prev == ARGV[1] then return 1 end
+local t = redis.call('TIME')
+local now = t[1] * 1000 + math.floor(t[2] / 1000)
+local rotatedAt = tonumber(redis.call('HGET', KEYS[1], 'rotatedAt'))
+local inGrace = prev and rotatedAt and now - rotatedAt < tonumber(ARGV[3])
+if current ~= ARGV[1] and not (inGrace and prev == ARGV[1]) then return 0 end
+redis.call('HSET', KEYS[1], 'tokenHash', ARGV[2], 'prevTokenHash', current, 'rotatedAt', now, 'lastUsedAt', ARGV[4])
+redis.call('EXPIRE', KEYS[1], ARGV[5])
 return 1
 `
 
@@ -75,51 +86,30 @@ export class AuthSessionStore {
   }
 
   /**
-   * 세션이 없으면 null, 있으면 RT 일치 여부.
+   * 받은 RT가 맞으면 새 RT로 바꾸고, 바꾸기 전 RT를 직전 RT 자리에 둔다.
    * 교체 직후 ROTATION_GRACE_MS 동안은 직전 RT도 인정한다 (#542) — 서버가 교체를
    * 끝냈는데 응답이 기기에 닿지 못하면 기기에는 직전 RT만 남기 때문이다.
-   */
-  async matches(
-    userId: number,
-    sid: string,
-    refreshToken: string
-  ): Promise<boolean | null> {
-    const [tokenHash, prevTokenHash, rotatedAt] = await this.redis.hmget(
-      authSessionKey(userId, sid),
-      "tokenHash",
-      "prevTokenHash",
-      "rotatedAt"
-    )
-    if (!tokenHash) return null
-
-    const received = hashToken(refreshToken)
-    if (hashEquals(tokenHash, received)) return true
-
-    if (!prevTokenHash || !rotatedAt) return false
-    const inGrace =
-      Date.now() - new Date(rotatedAt).getTime() < ROTATION_GRACE_MS
-    return inGrace && hashEquals(prevTokenHash, received)
-  }
-
-  /**
-   * 현재 RT를 직전 RT 자리로 옮기고 새 RT로 바꾼다. 직전 RT는 한 번 쓰면 다음 교체로 밀려난다.
-   * 세션이 그 사이 지워졌으면(로그아웃·비밀번호 변경) 되살리지 않고 false를 돌려준다.
+   * 직전 RT는 한 번 쓰면 다음 교체로 밀려난다.
    */
   async rotate(
     userId: number,
     sid: string,
-    refreshToken: string,
+    receivedToken: string,
+    newToken: string,
     ttlSeconds: number
-  ): Promise<boolean> {
-    const rotated = await this.redis.eval(
+  ): Promise<RotateResult> {
+    const result = await this.redis.eval(
       ROTATE_SCRIPT,
       1,
       authSessionKey(userId, sid),
-      hashToken(refreshToken),
+      hashToken(receivedToken),
+      hashToken(newToken),
+      ROTATION_GRACE_MS,
       new Date().toISOString(),
       ttlSeconds
     )
-    return rotated === 1
+    if (result === 1) return "rotated"
+    return result === 0 ? "mismatch" : "missing"
   }
 
   async delete(userId: number, sid: string): Promise<void> {

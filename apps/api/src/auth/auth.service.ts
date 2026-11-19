@@ -66,16 +66,18 @@ export class AuthService {
 
   /**
    * 인증된 회원에게만 보낸다 (#528). 없는 주소·미인증·재발송 제한·발송 실패 모두 같은 응답이다 —
-   * 응답이 다르면 그 차이로 가입·인증 여부를 알아낼 수 있다
+   * 응답이 다르면 그 차이로 가입·인증 여부를 알아낼 수 있다. 컨트롤러가 기다리지 않으므로 던지지 않는다
    */
   async requestPasswordReset(email: string) {
-    const user = await this.usersService.findOneByEmail(email)
-    if (!user?.emailVerifiedAt) return
-    await this.emailCodeService
-      .issue("reset", email)
-      .catch((error: Error) =>
-        this.logger.warn(`비밀번호 찾기 인증번호 발송 안 됨: ${error.message}`)
+    try {
+      const user = await this.usersService.findOneByEmail(email)
+      if (!user?.emailVerifiedAt) return
+      await this.emailCodeService.issue("reset", email)
+    } catch (error) {
+      this.logger.warn(
+        `비밀번호 찾기 인증번호 발송 안 됨: ${(error as Error).message}`
       )
+    }
   }
 
   async resetPasswordWithCode({
@@ -260,29 +262,21 @@ export class AuthService {
       throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
-    const matches = await this.authSessionStore.matches(
-      userId,
-      sid,
-      refreshToken
-    )
-    if (matches === null) {
-      throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
-    }
-    if (!matches) {
-      throw new RefreshTokenExpiredError(
-        "리프레시 토큰이 만료되었거나 존재하지 않습니다."
-      )
-    }
-
     const tokens = await this.getTokens(user.id, sid)
-    const rotated = await this.authSessionStore.rotate(
+    const result = await this.authSessionStore.rotate(
       user.id,
       sid,
+      refreshToken,
       tokens.refreshToken,
       this.tokenTtls().refreshToken
     )
-    if (!rotated) {
+    if (result === "missing") {
       throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
+    }
+    if (result === "mismatch") {
+      throw new RefreshTokenExpiredError(
+        "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+      )
     }
     return tokens
   }

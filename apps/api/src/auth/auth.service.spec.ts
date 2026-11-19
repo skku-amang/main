@@ -280,6 +280,39 @@ describe("AuthService", () => {
       ).rejects.toThrow(RefreshTokenExpiredError)
     })
 
+    it("직전 RT로 동시에 두 번 재시도하면 하나만 통한다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      at(1)
+      await service.refreshTokens(1, sid, a.refreshToken)
+      at(2)
+
+      const results = await Promise.allSettled([
+        service.refreshTokens(1, sid, a.refreshToken),
+        service.refreshTokens(1, sid, a.refreshToken)
+      ])
+
+      expect(results.map((r) => r.status).sort()).toEqual([
+        "fulfilled",
+        "rejected"
+      ])
+    })
+
+    it("같은 교체 명령이 Redis에서 두 번 실행돼도 직전 RT로 재시도할 수 있다", async () => {
+      const a = await service.login(loginDto, {})
+      const sid = sidOf(a.refreshToken)
+      const store = module.get(AuthSessionStore)
+      at(1)
+      // 응답 전에 연결이 끊기면 ioredis가 같은 EVAL을 다시 보낸다
+      await store.rotate(1, sid, a.refreshToken, "b", 60)
+      await store.rotate(1, sid, a.refreshToken, "b", 60)
+
+      at(2)
+      await expect(
+        service.refreshTokens(1, sid, a.refreshToken)
+      ).resolves.toHaveProperty("refreshToken")
+    })
+
     it("배포 전에 만든 세션(직전 RT 필드 없음)도 현재 RT로 refresh된다", async () => {
       const login = await service.login(loginDto, {})
       const key = `user:1:auth-session:${sidOf(login.refreshToken)}`
@@ -503,15 +536,15 @@ describe("AuthService", () => {
       await service.requestPasswordReset(loginDto.email)
       const code = sentCode()
       const store = module.get(AuthSessionStore)
-      const matches = store.matches.bind(store)
-      jest.spyOn(store, "matches").mockImplementationOnce(async (...args) => {
-        const matched = await matches(...args)
+      const rotate = store.rotate.bind(store)
+      // 교체 직전에 비밀번호를 바꾼다. 교체까지 가지 않으면 비밀번호가 그대로라 refresh가 성공해 실패한다
+      jest.spyOn(store, "rotate").mockImplementationOnce(async (...args) => {
         await service.resetPasswordWithCode({
           email: loginDto.email,
           code,
           newPassword: NEW_PASSWORD
         })
-        return matched
+        return rotate(...args)
       })
 
       await expect(
