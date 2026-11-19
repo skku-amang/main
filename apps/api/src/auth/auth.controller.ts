@@ -60,8 +60,9 @@ export class AuthController {
 
   @Post("password-reset/request")
   @HttpCode(HttpStatus.OK)
-  async requestPasswordReset(@Body() { email }: PasswordResetRequestDto) {
-    await this.authService.requestPasswordReset(email)
+  requestPasswordReset(@Body() { email }: PasswordResetRequestDto) {
+    // 기다리지 않는다 — 메일을 보내는 시간만큼 응답이 늦어지면 그 차이로 인증 회원인지 알 수 있다
+    void this.authService.requestPasswordReset(email)
   }
 
   @Post("password-reset/confirm")

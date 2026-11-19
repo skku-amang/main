@@ -36,6 +36,7 @@ export const PasswordResetLinkDialog = ({ link, onOpenChange }: Props) => {
 
   const copy = async () => {
     if (!link) return
+    setCopiedUrl(null)
     try {
       await navigator.clipboard.writeText(link.url)
       setCopiedUrl(link.url)
