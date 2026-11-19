@@ -108,14 +108,15 @@ model PushSubscription {
 
 ### 2.1 피드백 시스템 알림 (계획, #897)
 
-[피드백 시스템 설계 §6](feedback-system-design.md#6-알림)의 네 알림. 구현([#897](https://github.com/skku-amang/main/issues/897)) 때 §1 enum·위 표로 옮기고 이 절을 지운다. payload는 초안.
+[피드백 시스템 설계 §6](feedback-system-design.md#6-알림)의 다섯 알림. 구현([#897](https://github.com/skku-amang/main/issues/897)) 때 §1 enum·위 표로 옮기고 이 절을 지운다. payload는 초안.
 
-| 유형                 | emit 지점                                                                   | 수신자                     | payload (초안)                                       | 중복 방지                                                         |
-| -------------------- | --------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
-| `RECORDING_DEADLINE` | 크론(§3.1): 피드백 시작(`feedbackStartAt`) D-3·D-1(KST), 녹음본 없는 팀마다 | 팀장                       | `{ teamId, performanceId, teamName, daysLeft }`      | 날짜 단위 — 오늘 같은 유형이 그 팀에 있으면 skip                  |
-| `FEEDBACK_STARTED`   | 크론(§3.1): `feedbackStartAt`이 지난 뒤 첫 tick                             | 피드백 대상 팀 소속자 전원 | `{ performanceId, performanceName, feedbackEndAt }`  | 공연당 1회 — 같은 `performanceId` 알림이 있으면 skip              |
-| `FEEDBACK_DEADLINE`  | 크론(§3.1): `feedbackEndAt` D-1, 그리고 3시간 전. 미완료 작성자만           | 미완료 작성자              | `{ performanceId, performanceName, remainingCount }` | 최근 6시간 안 같은 `performanceId` 알림이 그 사람에게 있으면 skip |
-| `FEEDBACK_RESULT`    | 확정 API(`decidedAt` 기록) 직후 도메인 이벤트                               | 공연 팀 소속자 전원        | `{ performanceId, performanceName }`                 | 없음 — 되돌린 뒤 재확정하면 다시 보낸다 (피드백 설계 §4.3)        |
+| 유형                    | emit 지점                                                                                                   | 수신자                     | payload (초안)                                                                  | 중복 방지                                                                                                                                       |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RECORDING_DEADLINE`    | 크론(§3.1): 피드백 시작(`feedbackStartAt`) D-3·D-1(KST), 녹음본 없는 팀마다                                 | 팀장                       | `{ teamId, performanceId, teamName, daysLeft }`                                 | 날짜 단위 — 오늘 같은 유형이 그 팀에 있으면 skip                                                                                                |
+| `FEEDBACK_STARTED`      | 크론(§3.1): `feedbackStartAt`이 지난 뒤 첫 tick                                                             | 피드백 대상 팀 소속자 전원 | `{ performanceId, performanceName, feedbackEndAt }`                             | 공연당 1회 — 같은 `performanceId` 알림이 있으면 skip                                                                                            |
+| `FEEDBACK_DEADLINE`     | 크론(§3.1): `feedbackEndAt` D-1, 그리고 3시간 전. 미완료 작성자만                                           | 미완료 작성자              | `{ performanceId, performanceName, remainingCount }`                            | 최근 6시간 안 같은 `performanceId` 알림이 그 사람에게 있으면 skip                                                                               |
+| `FEEDBACK_RESULT`       | 확정 API(`decidedAt` 기록) 직후 도메인 이벤트                                                               | 공연 팀 소속자 전원        | `{ performanceId, performanceName }`                                            | 없음 — 되돌린 뒤 재확정하면 다시 보낸다 (피드백 설계 §4.3)                                                                                      |
+| `STAGE_REQUEST_CHANGED` | `PATCH /teams/:id/stage-request` 직후 도메인 이벤트, 공연 준비(`LINEUP`) 단계이고 셋리스트에 오른 팀일 때만 | 운영진 (고친 사람 제외)    | `{ performanceId, teamId, teamName, songName, changes: [{ field, from, to }] }` | 같은 팀·수신자의 안 읽은 row가 몇 분 안에 있으면 그 row를 고침 (첫 값 유지, 마지막 값 갱신). 푸시는 팀별 `tag`로 다시 보냄 (피드백 설계 §5.5.4) |
 
 ## 3. 발송 파이프라인
 
