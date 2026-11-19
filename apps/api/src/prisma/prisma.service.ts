@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common"
 import { Prisma, PrismaClient } from "@repo/database"
 
-// 노드 재부팅 직후엔 DB가 API보다 늦게 뜬다 (#659). 합계 45초 — liveness probe가 재시작하기(약 60초) 전에 끝나도록
+// 노드 재부팅 직후엔 DB가 API보다 늦게 뜬다 (#659). 대기 합계 45초 — startupProbe 유예(180초) 안에 끝나도록
 const CONNECT_RETRY_DELAYS_MS = [1_000, 2_000, 4_000, 8_000, 15_000, 15_000]
 
 @Injectable()

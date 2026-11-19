@@ -46,6 +46,14 @@ spec:
                   fieldPath: metadata.name
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: service.namespace=amang,deployment.environment.name=$(SENTRY_ENVIRONMENT),service.instance.id=$(POD_NAME)
+          # 재부팅 직후엔 DB 연결을 다시 시도하느라 HTTP 서버가 늦게 뜬다 (#659). 그동안 liveness가 재시작하지 않도록 최대 180초 기다린다
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 36
           livenessProbe:
             httpGet:
               path: /health/live
