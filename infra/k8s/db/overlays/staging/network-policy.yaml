@@ -24,13 +24,6 @@ spec:
           podSelector:
             matchLabels:
               app: api-job
-        # CloudBeaver (DB 관리 UI)
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: cloudbeaver
-          podSelector:
-            matchLabels:
-              app: cloudbeaver
       ports:
         - protocol: TCP
           port: 5432
