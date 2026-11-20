@@ -244,6 +244,29 @@ export class UsersService {
     })
   }
 
+  /**
+   * `verifiedEmail`을 주면 그 주소가 지금도 그 회원의 인증된 주소일 때만 바꾼다 (메일 인증번호로 찾기).
+   * 바꿨으면 true
+   */
+  async setPassword(
+    userId: number,
+    newPassword: string,
+    verifiedEmail?: string
+  ) {
+    const password = await bcrypt.hash(newPassword, 10)
+    const { count } = await this.prisma.user.updateMany({
+      where: {
+        id: userId,
+        ...(verifiedEmail && {
+          email: verifiedEmail,
+          emailVerifiedAt: { not: null }
+        })
+      },
+      data: { password }
+    })
+    return count > 0
+  }
+
   /** 인증번호를 확인한 주소가 지금도 그 회원의 주소일 때만 인증한다 */
   async markEmailVerified(userId: number, email: string) {
     try {

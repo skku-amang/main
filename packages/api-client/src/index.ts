@@ -6,6 +6,9 @@ import {
   CreateSession,
   CreateTeam,
   CreateUser,
+  PasswordResetConfirm,
+  PasswordResetLinkResponse,
+  PasswordResetToken,
   Signup,
   DetailedUser,
   DetailedUserList,
@@ -1092,6 +1095,53 @@ export default class ApiClient {
       | UnprocessableEntityError
       | InternalServerError
     >("/auth/email-code", "POST", { email })
+  }
+
+  /**
+   * 비밀번호 찾기 인증번호 발송 (#528). 인증된 회원에게만 가고, 응답은 항상 같다
+   * @throws {UnprocessableEntityError} 60초 안에 다시 요청했거나 한 시간 한도를 넘음
+   */
+  public requestPasswordReset(email: string) {
+    return this._request<
+      void,
+      ValidationError | UnprocessableEntityError | InternalServerError
+    >("/auth/password-reset/request", "POST", { email })
+  }
+
+  /**
+   * 메일 인증번호로 비밀번호 재설정 (#528)
+   * @throws {ValidationError} 인증번호가 틀리거나 만료됨, 비밀번호 형식 오류
+   */
+  public resetPasswordWithCode(data: PasswordResetConfirm) {
+    return this._request<void, ValidationError | InternalServerError>(
+      "/auth/password-reset/confirm",
+      "POST",
+      data
+    )
+  }
+
+  /**
+   * 운영진이 준 링크로 비밀번호 재설정 (#528)
+   * @throws {ValidationError} 링크가 만료되었거나 이미 사용됨
+   */
+  public resetPasswordWithToken(data: PasswordResetToken) {
+    return this._request<void, ValidationError | InternalServerError>(
+      "/auth/password-reset/token",
+      "POST",
+      data
+    )
+  }
+
+  /**
+   * 비밀번호 재설정 링크 토큰 생성 (관리자용, #528)
+   * @throws {ForbiddenError}
+   * @throws {NotFoundError}
+   */
+  public createPasswordResetLink(userId: number) {
+    return this._request<
+      PasswordResetLinkResponse,
+      ForbiddenError | NotFoundError | InternalServerError
+    >("/auth/password-reset/link", "POST", { userId })
   }
 
   /**

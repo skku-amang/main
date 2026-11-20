@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react"
+import { EllipsisVertical, KeyRound, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 import { CopyRowLinkItem } from "@/app/(admin)/_components/data-table/CopyRowLinkItem"
@@ -23,11 +23,13 @@ import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 interface ColumnCallbacks {
   onEdit: (user: DetailedUser) => void
   onDelete: (user: DetailedUser) => void
+  onPasswordResetLink: (user: DetailedUser) => void
 }
 
 export function getColumns({
   onEdit,
-  onDelete
+  onDelete,
+  onPasswordResetLink
 }: ColumnCallbacks): ColumnDef<DetailedUser>[] {
   return [
     {
@@ -75,6 +77,21 @@ export function getColumns({
           displayValue={ctx.getValue() as string}
         />
       )
+    },
+    {
+      id: "emailVerified",
+      accessorFn: (row) => (row.emailVerifiedAt ? 1 : 0),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="메일 인증" />
+      ),
+      meta: { label: "메일 인증" },
+      cell: ({ row }) =>
+        row.original.emailVerifiedAt ? (
+          <Badge variant="secondary">인증</Badge>
+        ) : (
+          <span className="text-sm text-slate-500">미인증</span>
+        ),
+      size: 80
     },
     {
       accessorKey: "bio",
@@ -156,6 +173,10 @@ export function getColumns({
             <DropdownMenuItem onClick={() => onEdit(row.original)}>
               <Pencil className="mr-2 h-4 w-4" />
               편집
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onPasswordResetLink(row.original)}>
+              <KeyRound className="mr-2 h-4 w-4" />
+              비밀번호 재설정 링크
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-600"

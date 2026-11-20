@@ -5,6 +5,8 @@ import { JwtService } from "@nestjs/jwt"
 import {
   AuthError,
   ConflictError,
+  NotFoundError,
+  ValidationError,
   RefreshTokenExpiredError,
   RefreshTokenNotFoundError,
   UserNotApprovedError
@@ -18,6 +20,7 @@ import { LoginUserDto } from "../users/dto/login-user.dto"
 import { USER_EVENTS, UserSignedUpEvent } from "../users/users.events"
 import { UsersService } from "../users/users.service"
 import { AuthSessionStore } from "./auth-session.store"
+import { PasswordResetTokenStore } from "./password-reset-token.store"
 
 @Injectable()
 export class AuthService {
@@ -29,7 +32,8 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly authSessionStore: AuthSessionStore,
     private readonly eventEmitter: EventEmitter2,
-    private readonly emailCodeService: EmailCodeService
+    private readonly emailCodeService: EmailCodeService,
+    private readonly passwordResetTokenStore: PasswordResetTokenStore
   ) {}
 
   async requestSignupEmailCode(email: string) {
@@ -58,6 +62,77 @@ export class AuthService {
     Sentry.metrics.count("signup.completed", 1, {
       attributes: { provider: "credentials" }
     })
+  }
+
+  /**
+   * 인증된 회원에게만 보낸다 (#528). 없는 주소·미인증·재발송 제한·발송 실패 모두 같은 응답이다 —
+   * 응답이 다르면 그 차이로 가입·인증 여부를 알아낼 수 있다. 컨트롤러가 기다리지 않으므로 던지지 않는다
+   */
+  async requestPasswordReset(email: string) {
+    try {
+      const user = await this.usersService.findOneByEmail(email)
+      if (!user?.emailVerifiedAt) return
+      await this.emailCodeService.issue("reset", email)
+    } catch (error) {
+      this.logger.warn(
+        `비밀번호 찾기 인증번호 발송 안 됨: ${(error as Error).message}`
+      )
+    }
+  }
+
+  async resetPasswordWithCode({
+    email,
+    code,
+    newPassword
+  }: {
+    email: string
+    code: string
+    newPassword: string
+  }) {
+    const user = await this.usersService.findOneByEmail(email)
+    if (!user?.emailVerifiedAt)
+      throw new ValidationError("인증번호가 맞지 않거나 만료되었습니다.")
+    await this.emailCodeService.verify("reset", email, code)
+    // 인증번호를 확인한 주소가 그 사이 바뀌었으면 바꾸지 않는다
+    if (!(await this.replacePassword(user.id, newPassword, email)))
+      throw new ValidationError("인증번호가 맞지 않거나 만료되었습니다.")
+  }
+
+  async createPasswordResetLink(userId: number) {
+    if (!(await this.usersService.findOneById(userId)))
+      throw new NotFoundError(`ID가 ${userId}인 사용자를 찾을 수 없습니다.`)
+    const { token, expiresAt } =
+      await this.passwordResetTokenStore.create(userId)
+    return { token, expiresAt: expiresAt.toISOString() }
+  }
+
+  async resetPasswordWithToken({
+    token,
+    newPassword
+  }: {
+    token: string
+    newPassword: string
+  }) {
+    const userId = await this.passwordResetTokenStore.consume(token)
+    if (userId === null || !(await this.replacePassword(userId, newPassword)))
+      throw new ValidationError(
+        "링크가 만료되었거나 이미 사용되었습니다. 운영진에게 새 링크를 받아주세요."
+      )
+  }
+
+  /** 비밀번호가 새어 나갔을 수 있으니 모든 기기를 로그아웃시킨다. 바꾸지 못했으면 false */
+  private async replacePassword(
+    userId: number,
+    newPassword: string,
+    verifiedEmail?: string
+  ) {
+    const changed = await this.usersService.setPassword(
+      userId,
+      newPassword,
+      verifiedEmail
+    )
+    if (changed) await this.authSessionStore.deleteAllExcept(userId, "")
+    return changed
   }
 
   async login(
@@ -187,27 +262,22 @@ export class AuthService {
       throw new UserNotApprovedError("아직 승인되지 않은 계정입니다.")
     }
 
-    const matches = await this.authSessionStore.matches(
-      userId,
+    const tokens = await this.getTokens(user.id, sid)
+    const result = await this.authSessionStore.rotate(
+      user.id,
       sid,
-      refreshToken
+      refreshToken,
+      tokens.refreshToken,
+      this.tokenTtls().refreshToken
     )
-    if (matches === null) {
+    if (result === "missing") {
       throw new RefreshTokenNotFoundError("리프레시 토큰이 존재하지 않습니다.")
     }
-    if (!matches) {
+    if (result === "mismatch") {
       throw new RefreshTokenExpiredError(
         "리프레시 토큰이 만료되었거나 존재하지 않습니다."
       )
     }
-
-    const tokens = await this.getTokens(user.id, sid)
-    await this.authSessionStore.rotate(
-      user.id,
-      sid,
-      tokens.refreshToken,
-      this.tokenTtls().refreshToken
-    )
     return tokens
   }
 }

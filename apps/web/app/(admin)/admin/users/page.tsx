@@ -17,7 +17,14 @@ import { getSessionDisplayName } from "@/constants/session"
 import { DetailedUser, formatGenerationOrder } from "@repo/shared-types"
 import { ApiError } from "@repo/api-client"
 
+import ROUTES from "@/constants/routes"
+import { apiClient } from "@/lib/apiClient"
+
 import { getColumns } from "./_components/columns"
+import {
+  PasswordResetLink,
+  PasswordResetLinkDialog
+} from "./_components/PasswordResetLinkDialog"
 import { UserFormDialog } from "./_components/UserFormDialog"
 
 export default function UsersAdminPage() {
@@ -31,6 +38,7 @@ export default function UsersAdminPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editing, setEditing] = useState<DetailedUser | null>(null)
   const [deleting, setDeleting] = useState<DetailedUser | null>(null)
+  const [resetLink, setResetLink] = useState<PasswordResetLink | null>(null)
 
   const updateMutation = useUpdateUser()
   const deleteMutation = useDeleteUser()
@@ -92,9 +100,27 @@ export default function UsersAdminPage() {
         onDelete: (user) => {
           setDeleting(user)
           setDeleteOpen(true)
+        },
+        onPasswordResetLink: async (user) => {
+          try {
+            const { token, expiresAt } =
+              await apiClient.createPasswordResetLink(user.id)
+            const url = new URL(ROUTES.PASSWORD_RESET, window.location.origin)
+            url.searchParams.set("token", token)
+            setResetLink({ name: user.name, url: url.toString(), expiresAt })
+          } catch (error) {
+            toast({
+              title: "링크를 만들지 못했습니다.",
+              description:
+                error instanceof ApiError
+                  ? (error.detail ?? error.message)
+                  : (error as Error).message,
+              variant: "destructive"
+            })
+          }
         }
       }),
-    []
+    [toast]
   )
 
   const handleSubmit = (data: {
@@ -182,6 +208,11 @@ export default function UsersAdminPage() {
             options: sessionFilters
           }
         ]}
+      />
+
+      <PasswordResetLinkDialog
+        link={resetLink}
+        onOpenChange={(open) => !open && setResetLink(null)}
       />
 
       <UserFormDialog
