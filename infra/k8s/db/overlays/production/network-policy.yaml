@@ -32,13 +32,6 @@ spec:
         - podSelector:
             matchLabels:
               app: db-backup
-        # CloudBeaver (DB 관리 UI)
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: cloudbeaver
-          podSelector:
-            matchLabels:
-              app: cloudbeaver
         # Grafana (read-only SELECT via grafana_ro 유저, Postgres datasource)
         - namespaceSelector:
             matchLabels:
