@@ -1,3 +1,4 @@
+import { AdminGuard } from "./guards/admin.guard"
 import { Test, TestingModule } from "@nestjs/testing"
 import { Request, Response } from "express"
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "./auth-cookie.util"
@@ -28,7 +29,10 @@ describe("AuthController", () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [{ provide: AuthService, useValue: authService }]
-    }).compile()
+    })
+      .overrideGuard(AdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<AuthController>(AuthController)
   })

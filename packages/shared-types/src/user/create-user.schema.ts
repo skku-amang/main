@@ -9,6 +9,8 @@ import { safeString } from "../constants/sanitization"
 export const passwordField = z
   .string()
   .min(8, { message: "비밀번호는 최소 8자 이상이어야 합니다." })
+  // bcrypt는 앞 72바이트만 쓴다. 허용 문자가 ASCII뿐이라 72자 = 72바이트
+  .max(72, { message: "비밀번호는 72자까지 쓸 수 있습니다." })
   .regex(PASSWORD_REGEX, {
     message: "비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다."
   })

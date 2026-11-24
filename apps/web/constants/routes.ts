@@ -2,6 +2,7 @@ const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   SIGNUP: "/signup",
+  PASSWORD_RESET: "/password-reset",
   ADMIN: {
     INDEX: "/admin",
     USERS: "/admin/users",

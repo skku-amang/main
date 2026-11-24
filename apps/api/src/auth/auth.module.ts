@@ -7,6 +7,7 @@ import { AccessTokenStrategy } from "./strategies/access-token.strategy"
 import { RefreshTokenStrategy } from "./strategies/refresh-token.strategy"
 import { RedisModule } from "../redis/redis.module"
 import { AuthSessionStore } from "./auth-session.store"
+import { PasswordResetTokenStore } from "./password-reset-token.store"
 import { EmailVerificationModule } from "../email-verification/email-verification.module"
 
 @Module({
@@ -20,6 +21,7 @@ import { EmailVerificationModule } from "../email-verification/email-verificatio
   providers: [
     AuthService,
     AuthSessionStore,
+    PasswordResetTokenStore,
     AccessTokenStrategy,
     RefreshTokenStrategy
   ]

@@ -1,5 +1,9 @@
 import { z } from "zod"
-import { CreateUserSchema, emailField } from "./create-user.schema"
+import {
+  CreateUserSchema,
+  emailField,
+  passwordField
+} from "./create-user.schema"
 
 export const EMAIL_CODE_LENGTH = 6
 
@@ -23,3 +27,28 @@ export const EmailCodeConfirmSchema = z.object({
   code: emailCodeField
 })
 export type EmailCodeConfirm = z.infer<typeof EmailCodeConfirmSchema>
+
+export const PasswordResetRequestSchema = EmailCodeRequestSchema
+export type PasswordResetRequest = z.infer<typeof PasswordResetRequestSchema>
+
+export const PasswordResetConfirmSchema = z.object({
+  email: emailField,
+  code: emailCodeField,
+  newPassword: passwordField
+})
+export type PasswordResetConfirm = z.infer<typeof PasswordResetConfirmSchema>
+
+export const PasswordResetTokenSchema = z.object({
+  token: z.string().min(1),
+  newPassword: passwordField
+})
+export type PasswordResetToken = z.infer<typeof PasswordResetTokenSchema>
+
+export const PasswordResetLinkRequestSchema = z.object({
+  userId: z.number().int()
+})
+export type PasswordResetLinkRequest = z.infer<
+  typeof PasswordResetLinkRequestSchema
+>
+
+export type PasswordResetLinkResponse = { token: string; expiresAt: string }
