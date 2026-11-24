@@ -56,3 +56,91 @@ export function busyFlags(
 ): boolean[] {
   return slots.map((slot) => rangeOverlapsBusy(slot, busy, excludeId))
 }
+
+/** 칸 인덱스(양끝 포함). awaitingEnd면 시작만 고른 상태 */
+export type SlotSelection = {
+  start: number
+  end: number
+  awaitingEnd: boolean
+} | null
+export type SlotContext = { slots: TimeSlot[]; busy: boolean[]; now: Date }
+
+const canStart = (i: number, { slots, busy, now }: SlotContext) =>
+  !slots[i]!.nextDay && !busy[i] && slots[i]!.startAt >= now
+
+/** from부터 to까지(양끝 포함) 찬 칸 없이 이어지는지 */
+const reachable = (from: number, to: number, busy: boolean[]) =>
+  from <= to && !busy.slice(from, to + 1).some(Boolean)
+
+export function selectSlot(
+  sel: SlotSelection,
+  index: number,
+  ctx: SlotContext
+): SlotSelection {
+  if (sel?.awaitingEnd) {
+    if (reachable(sel.start, index, ctx.busy))
+      return { start: sel.start, end: index, awaitingEnd: false }
+    if (index < sel.start && canStart(index, ctx))
+      return { start: index, end: index, awaitingEnd: true }
+    return sel
+  }
+  if (canStart(index, ctx))
+    return { start: index, end: index, awaitingEnd: true }
+  // 다음날 칸은 시작이 될 수 없으니, 다 고른 상태라면 끝만 늘린다
+  if (sel && ctx.slots[index]!.nextDay && reachable(sel.start, index, ctx.busy))
+    return { start: sel.start, end: index, awaitingEnd: false }
+  return sel
+}
+
+export function tappableSlots(sel: SlotSelection, ctx: SlotContext): boolean[] {
+  return ctx.slots.map((_, i) => selectSlot(sel, i, ctx) !== sel)
+}
+
+export function selectionRange(
+  sel: NonNullable<SlotSelection>,
+  slots: TimeSlot[]
+): TimeRange {
+  return { startAt: slots[sel.start]!.startAt, endAt: slots[sel.end]!.endAt }
+}
+
+export function selectionFromRange(
+  range: TimeRange,
+  slots: TimeSlot[]
+): SlotSelection {
+  const start = slots.findIndex(
+    (s) => !s.nextDay && s.startAt.getTime() === range.startAt.getTime()
+  )
+  const end = slots.findIndex(
+    (s) => s.endAt.getTime() === range.endAt.getTime()
+  )
+  if (start < 0 || end < start) return null
+  return { start, end, awaitingEnd: false }
+}
+
+export function moveRangeToDate(range: TimeRange, date: Date): TimeRange {
+  const startAt = new Date(date)
+  startAt.setHours(
+    range.startAt.getHours(),
+    range.startAt.getMinutes(),
+    range.startAt.getSeconds(),
+    range.startAt.getMilliseconds()
+  )
+  const length = range.endAt.getTime() - range.startAt.getTime()
+  return { startAt, endAt: new Date(startAt.getTime() + length) }
+}
+
+export type EditPhase = "upcoming" | "ongoing" | "ended"
+
+export function rentalEditPhase(range: TimeRange, now: Date): EditPhase {
+  if (range.startAt > now) return "upcoming"
+  return range.endAt > now ? "ongoing" : "ended"
+}
+
+/** 진행 중인 예약 수정 — 시작은 고정, 끝으로 고를 수 있는 칸 */
+export function endOnlyTappable(fixedStart: Date, ctx: SlotContext): boolean[] {
+  const first = ctx.slots.findIndex((s) => s.endAt > fixedStart)
+  const floor = ctx.now > fixedStart ? ctx.now : fixedStart
+  return ctx.slots.map(
+    (s, i) => first >= 0 && s.endAt > floor && reachable(first, i, ctx.busy)
+  )
+}
