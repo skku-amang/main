@@ -26,7 +26,7 @@ interface WeekCalendarFieldProp {
 const DEFAULT_START = 9
 const DEFAULT_END = 22
 const ROW_H = 42
-const SNAP_MIN = 15
+const SNAP_MIN = 30
 const LONG_PRESS_MS = 400
 // 이만큼 움직이기 전엔 클릭 — 터치는 길게 누르기 전에 움직이면 스크롤로 넘김
 const MOUSE_DRAG_PX = 4

@@ -13,8 +13,5 @@
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils"
-  },
-  "registries": {
-    "@ncdai": "https://chanhdai.com/r/{name}.json"
   }
 }

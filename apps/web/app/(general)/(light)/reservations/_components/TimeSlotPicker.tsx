@@ -40,7 +40,8 @@ export default function TimeSlotPicker({
       `[data-slot-index="${target}"]`
     )
     if (!button) return
-    container.scrollTop = button.offsetTop - container.offsetTop - 8
+    // 목록이 relative라 버튼의 offsetTop은 목록 기준
+    container.scrollTop = button.offsetTop - 8
     scrolled.current = true
   }, [loading, selected, tappable])
 
