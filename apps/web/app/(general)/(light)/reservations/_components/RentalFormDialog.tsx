@@ -347,8 +347,9 @@ function RentalForm({
           <DialogDescription>예약 정보를 입력해주세요</DialogDescription>
         </DialogHeader>
 
-        {/* 가장 넓은 고정 요소(달력) 폭에 맞춤 — 칩 등은 그 안에서 줄바꿈 */}
-        <div className="w-min space-y-5">
+        {/* 가장 넓은 고정 요소(달력) 폭에 맞춤 — 칩 등은 그 안에서 줄바꿈.
+            진행 중·끝난 예약 수정은 달력을 숨기므로 달력 폭(306px)을 최소 폭으로 둔다 */}
+        <div className="w-min min-w-[19.125rem] space-y-5">
           {/* 장비 선택 (여러 장비일 때만 표시, 수정 땐 장비 그대로) */}
           {!editing && equipments.length > 1 && (
             <div className="space-y-1.5">
