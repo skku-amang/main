@@ -210,8 +210,6 @@ function RentalForm({
   const liveSelection =
     selection && !overlaps(selectionRange(selection, slots)) ? selection : null
   const liveKept = keptRange && !overlaps(keptRange) ? keptRange : null
-  // 칸으로 못 나타내는 원래 시각은 칸 위에 따로 보여 준다
-  const showKept = !!liveKept && !liveSelection
 
   const range: TimeRange | null =
     phase === "ended"
@@ -416,7 +414,8 @@ function RentalForm({
                     className="mx-auto rounded-md border [--cell-size:2.5rem]"
                   />
                 )}
-                {showKept && liveKept && (
+                {/* 칸으로 못 나타내는 원래 시각은 칸 위에 따로 보여 준다 */}
+                {liveKept && !liveSelection && (
                   <p className="text-sm text-muted-foreground">
                     지금 {formatRange(liveKept)}
                   </p>
@@ -432,11 +431,6 @@ function RentalForm({
                 {busyError && (
                   <p className="text-sm text-destructive">
                     예약 현황을 못 불러왔어요
-                  </p>
-                )}
-                {range && !showKept && (
-                  <p className="text-center text-sm text-muted-foreground">
-                    {formatRange(range)}
                   </p>
                 )}
               </>

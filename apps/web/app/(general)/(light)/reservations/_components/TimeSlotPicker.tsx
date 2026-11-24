@@ -41,7 +41,7 @@ export default function TimeSlotPicker({
     )
     if (!button) return
     // 목록이 relative라 버튼의 offsetTop은 목록 기준
-    container.scrollTop = button.offsetTop - 8
+    container.scrollTop = button.offsetTop - 4
     scrolled.current = true
   }, [loading, selected, tappable])
 
@@ -51,7 +51,7 @@ export default function TimeSlotPicker({
       role="group"
       aria-label="예약 시간"
       aria-busy={loading}
-      className="relative max-h-64 overflow-y-auto rounded-md border p-2"
+      className="relative max-h-64 overflow-y-auto p-1"
     >
       <div className="grid grid-cols-4 gap-1.5">
         {slots.map((slot, i) => {
