@@ -1,20 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatDuration, minuteOptions, nextFullHour } from "./rental-time"
-
-describe("minuteOptions", () => {
-  it("기본은 15분 단위", () => {
-    expect(minuteOptions()).toEqual([0, 15, 30, 45])
-  })
-  it("15의 배수는 그대로", () => {
-    expect(minuteOptions(30)).toEqual([0, 15, 30, 45])
-  })
-  it("15분 단위가 아닌 값은 끼워 넣음", () => {
-    expect(minuteOptions(2)).toEqual([0, 2, 15, 30, 45])
-  })
-  it("끝쪽 값도 정렬", () => {
-    expect(minuteOptions(47)).toEqual([0, 15, 30, 45, 47])
-  })
-})
+import { formatDuration, nextFullHour } from "./rental-time"
 
 describe("nextFullHour", () => {
   it("14:20 → 15:00", () => {
