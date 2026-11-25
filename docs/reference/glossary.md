@@ -77,20 +77,6 @@
 
 peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 팀 채택 후보에서 페널티. 학술 리뷰·GitHub PR 리뷰의 호혜 메커니즘과 동일. v0.1은 팀 단위 강제.
 
-### 셋리스트 (Setlist)
-
-공연 준비(`LINEUP`) 단계에서 운영진이 순서를 매긴 **곡의 무대 순서**와 1부/2부 구분. 합격 계산과 묶지 않는다 — 후보는 보통 합격 팀이지만 운영진이 빼거나 넣는다. 화면은 곡·팀·세션별 연주자·무대 요청을 표 하나로 보여준다 (예전 엑셀 셋리스트 대체).
-
-- 데이터: `Team.lineupOrder`, `Team.lineupPart`
-- 화면: `/performances/[id]/setlist` (보기), `/admin/performances/[id]/lineup` (순서 편집)
-
-### 무대 요청 (Stage request)
-
-팀이 공연장에 요청하는 **무대 장비 정보** — 오인페(오디오 인터페이스) 사용, 마이크 개수, 동방 악기, 그 밖의 요청사항(이펙터 등). 공연장에서도 바뀌므로 단계와 상관없이 팀 소속자가 언제나 고친다.
-
-- 데이터: `Team.stage*` 필드 ([피드백 시스템 설계 5.5.3](../explanation/design/feedback-system-design.md#553-무대-요청))
-- ⚠️ "의견 보내기"(홈페이지에 대한 건의)와 다르다
-
 ### 의견 보내기 (Suggestion)
 
 사용자가 **홈페이지 자체**에 대해 개발자에게 보내는 버그·건의·칭찬. 팀 피드백과 완전히 다른 기능.
@@ -105,6 +91,26 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
 `PREPARING → RECRUITING → SUBMISSION 🔒팀 → EVALUATION 🔒전부 → DECISION → LINEUP → DONE`. 단계는 저장하지 않고 공연의 날짜 필드에서 계산한다. SUBMISSION(모집 종료) 진입 시 팀 구성이, EVALUATION 진입 시 곡 메타·녹음본까지 freeze. LINEUP = 결과 공개 + 셋리스트 구성. 상세: [피드백 시스템 설계](../explanation/design/feedback-system-design.md#4-공연-단계).
 
 > 코드 식별자(`EVALUATION` 등)는 영문 enum 유지. 한국어 본문은 "피드백 단계" 등 풀어서 사용.
+
+---
+
+## 공연 준비 도메인
+
+본 도메인은 **설계 중**. 피드백 시스템과 별개 — 공연 준비(`LINEUP`) 단계에서 쓰지만 점수·피드백과 무관.
+
+### 셋리스트 (Setlist)
+
+공연 준비(`LINEUP`) 단계에서 운영진이 순서를 매긴 **곡의 무대 순서**와 1부/2부 구분. 합격 계산과 묶지 않는다 — 후보는 보통 합격 팀이지만 운영진이 빼거나 넣는다. 화면은 곡·팀·세션별 연주자·무대 요청을 표 하나로 보여준다 (예전 엑셀 셋리스트 대체).
+
+- 데이터: `Team.lineupOrder`, `Team.lineupPart`
+- 화면: `/performances/[id]/setlist` (보기), `/admin/performances/[id]/lineup` (순서 편집). 상세: [셋리스트 설계](../explanation/design/setlist-design.md)
+
+### 무대 요청 (Stage request)
+
+팀이 공연장에 요청하는 **무대 장비 정보** — 오인페(오디오 인터페이스) 사용, 마이크 개수, 동방 악기, 그 밖의 요청사항(이펙터 등). 공연장에서도 바뀌므로 단계와 상관없이 팀 소속자가 언제나 고친다.
+
+- 데이터: `Team.stage*` 필드 ([셋리스트 설계 4](../explanation/design/setlist-design.md#4-무대-요청))
+- ⚠️ "의견 보내기"(홈페이지에 대한 건의)와 다르다
 
 ---
 
@@ -137,7 +143,7 @@ peer review 패턴. 본인 팀 외 모든 팀에 피드백 미참여 시 본인 
 
 ## 변경 이력
 
-- **2026-11-18**: "셋리스트(Setlist)", "무대 요청(Stage request)" 추가 ([피드백 시스템 설계 5.5](../explanation/design/feedback-system-design.md#55-결과-공개와-셋리스트-공연-준비-단계)).
+- **2026-11-18**: "셋리스트(Setlist)", "무대 요청(Stage request)" 추가 ([셋리스트 설계](../explanation/design/setlist-design.md)).
 - **2026-10-30**: 공연 라이프사이클 6→7단계(`LINEUP` 추가), 단계는 날짜에서 계산, 녹음본 필드 `recordingUrl` ([피드백 시스템 설계](../explanation/design/feedback-system-design.md)).
 - **2026-10-14**: "의견 보내기(Suggestion)" 추가 — 개발자 소통 창구를 피드백 시스템과 어휘 분리 ([#692](https://github.com/skku-amang/main/issues/692)).
 - **2026-05-05**: 본 파일 신설. 피드백 시스템 도메인 추가 (곡/녹음본/피드백/피드백 작성자/Pay-to-vote/공연 라이프사이클). 회장·기장 명확 분리.
