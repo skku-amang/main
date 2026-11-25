@@ -253,12 +253,9 @@ describe("rentalEditPhase", () => {
 })
 
 describe("endOnlyTappable", () => {
-  const ctx = {
-    slots,
-    busy: busyFlags(slots, [{ id: 1, startAt: at(26, 19), endAt: at(26, 20) }]),
-    now: at(26, 15, 10)
-  }
-  const tappable = endOnlyTappable(at(26, 14, 15), ctx)
+  const now = at(26, 15, 10)
+  const busy = [{ id: 1, startAt: at(26, 19), endAt: at(26, 20) }]
+  const tappable = endOnlyTappable(at(26, 14, 15), slots, now, busy)
   it("끝이 지금보다 앞인 칸은 못 누름", () => {
     expect(tappable[28]).toBe(false)
   })
@@ -271,5 +268,15 @@ describe("endOnlyTappable", () => {
   it("찬 칸과 그 너머는 못 고름", () => {
     expect(tappable[38]).toBe(false)
     expect(tappable[40]).toBe(false)
+  })
+  it("고정 시작 전에 끝나는 앞 예약은 같은 칸에 있어도 막지 않음", () => {
+    const before = [{ id: 2, startAt: at(26, 14), endAt: at(26, 14, 15) }]
+    const t = endOnlyTappable(at(26, 14, 15), slots, at(26, 14, 20), before)
+    expect(t[28]).toBe(true)
+    expect(t[31]).toBe(true)
+  })
+  it("수정 중인 자기 예약은 빼고 계산", () => {
+    const own = [{ id: 7, startAt: at(26, 14, 15), endAt: at(26, 16) }]
+    expect(endOnlyTappable(at(26, 14, 15), slots, now, own, 7)[33]).toBe(true)
   })
 })

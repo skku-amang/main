@@ -136,11 +136,25 @@ export function rentalEditPhase(range: TimeRange, now: Date): EditPhase {
   return range.endAt > now ? "ongoing" : "ended"
 }
 
-/** 진행 중인 예약 수정 — 시작은 고정, 끝으로 고를 수 있는 칸 */
-export function endOnlyTappable(fixedStart: Date, ctx: SlotContext): boolean[] {
-  const first = ctx.slots.findIndex((s) => s.endAt > fixedStart)
-  const floor = ctx.now > fixedStart ? ctx.now : fixedStart
-  return ctx.slots.map(
-    (s, i) => first >= 0 && s.endAt > floor && reachable(first, i, ctx.busy)
+/**
+ * 진행 중인 예약 수정 — 시작은 고정, 끝으로 고를 수 있는 칸.
+ * 칸 단위가 아니라 고정 시작부터의 실제 시간으로 겹침을 본다 (시작 전에 끝난 앞 예약은 막지 않음)
+ */
+export function endOnlyTappable(
+  fixedStart: Date,
+  slots: TimeSlot[],
+  now: Date,
+  busy: BusyRange[],
+  excludeId?: number
+): boolean[] {
+  const floor = now > fixedStart ? now : fixedStart
+  return slots.map(
+    (s) =>
+      s.endAt > floor &&
+      !rangeOverlapsBusy(
+        { startAt: fixedStart, endAt: s.endAt },
+        busy,
+        excludeId
+      )
   )
 }

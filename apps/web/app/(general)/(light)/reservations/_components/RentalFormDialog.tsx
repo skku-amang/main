@@ -198,15 +198,14 @@ function RentalForm({
       })),
     [dayRentals]
   )
-  // 현황을 못 불러오면 칸을 다 열어 둔다 — 겹치면 저장할 때 서버가 거절함
-  const busy = busyError
-    ? slots.map(() => false)
-    : busyFlags(slots, busyRanges, editing?.id)
+  // 현황을 못 불러오면 남은 옛 값도 버리고 칸을 다 열어 둔다 — 겹치면 저장할 때 서버가 거절함
+  const liveBusyRanges = busyError ? [] : busyRanges
+  const busy = busyFlags(slots, liveBusyRanges, editing?.id)
   const slotContext = { slots, busy, now: openedAt }
 
   // 날짜·장비를 바꿔 고른 시간이 남의 예약과 겹치게 되면 선택을 비운다
   const overlaps = (r: TimeRange) =>
-    rangeOverlapsBusy(r, busyRanges, editing?.id)
+    rangeOverlapsBusy(r, liveBusyRanges, editing?.id)
   const liveSelection =
     selection && !overlaps(selectionRange(selection, slots)) ? selection : null
   const liveKept = keptRange && !overlaps(keptRange) ? keptRange : null
@@ -226,7 +225,13 @@ function RentalForm({
 
   const tappable =
     phase === "ongoing"
-      ? endOnlyTappable(initialRange.startAt, slotContext)
+      ? endOnlyTappable(
+          initialRange.startAt,
+          slots,
+          openedAt,
+          liveBusyRanges,
+          editing?.id
+        )
       : tappableSlots(liveSelection, slotContext)
   const selected = slots.map((slot, i) =>
     phase === "ongoing"
@@ -516,7 +521,8 @@ function RentalForm({
               type="button"
               className="flex-1"
               onClick={handleSubmit}
-              disabled={isPending}
+              // 현황을 받기 전엔 처음 골라 둔 시간이 남의 예약과 겹치는지 모른다
+              disabled={isPending || busyLoading}
             >
               {isPending ? "저장 중..." : "저장"}
             </Button>
