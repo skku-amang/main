@@ -57,39 +57,31 @@ export function busyFlags(
   return slots.map((slot) => rangeOverlapsBusy(slot, busy, excludeId))
 }
 
-/** 칸 인덱스(양끝 포함). awaitingEnd면 시작만 고른 상태 */
-export type SlotSelection = {
-  start: number
-  end: number
-  awaitingEnd: boolean
-} | null
+/** 고른 칸 인덱스(양끝 포함). 고른 칸은 늘 이어져 있다 */
+export type SlotSelection = { start: number; end: number } | null
 export type SlotContext = { slots: TimeSlot[]; busy: boolean[]; now: Date }
 
 const canStart = (i: number, { slots, busy, now }: SlotContext) =>
-  !slots[i]!.nextDay && !busy[i] && slots[i]!.startAt >= now
+  !!slots[i] && !slots[i].nextDay && !busy[i] && slots[i].startAt >= now
 
-/** from부터 to까지(양끝 포함) 찬 칸 없이 이어지는지 */
-const reachable = (from: number, to: number, busy: boolean[]) =>
-  from <= to && !busy.slice(from, to + 1).some(Boolean)
-
+/** 칸마다 켜고 끈다. 끊긴 예약이 생기지 않게 양 끝에서만 붙이고 뺀다 */
 export function selectSlot(
   sel: SlotSelection,
   index: number,
   ctx: SlotContext
 ): SlotSelection {
-  if (sel?.awaitingEnd) {
-    if (reachable(sel.start, index, ctx.busy))
-      return { start: sel.start, end: index, awaitingEnd: false }
-    if (index < sel.start && canStart(index, ctx))
-      return { start: index, end: index, awaitingEnd: true }
-    return sel
-  }
-  if (canStart(index, ctx))
-    return { start: index, end: index, awaitingEnd: true }
-  // 다음날 칸은 시작이 될 수 없으니, 다 고른 상태라면 끝만 늘린다
-  if (sel && ctx.slots[index]!.nextDay && reachable(sel.start, index, ctx.busy))
-    return { start: sel.start, end: index, awaitingEnd: false }
-  return sel
+  if (!sel) return canStart(index, ctx) ? { start: index, end: index } : sel
+  if (index === sel.start && index === sel.end) return null
+  if (index === sel.start)
+    return canStart(index + 1, ctx) ? { start: index + 1, end: sel.end } : sel
+  if (index === sel.end) return { start: sel.start, end: index - 1 }
+  if (index > sel.start && index < sel.end) return sel
+  if (index === sel.end + 1 && !ctx.busy[index])
+    return { start: sel.start, end: index }
+  if (index === sel.start - 1 && canStart(index, ctx))
+    return { start: index, end: sel.end }
+  // 떨어진 칸은 그 칸부터 새로 고른다
+  return canStart(index, ctx) ? { start: index, end: index } : sel
 }
 
 export function tappableSlots(sel: SlotSelection, ctx: SlotContext): boolean[] {
@@ -114,7 +106,7 @@ export function selectionFromRange(
     (s) => s.endAt.getTime() === range.endAt.getTime()
   )
   if (start < 0 || end < start) return null
-  return { start, end, awaitingEnd: false }
+  return { start, end }
 }
 
 export function moveRangeToDate(range: TimeRange, date: Date): TimeRange {
