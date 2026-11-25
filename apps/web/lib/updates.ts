@@ -59,3 +59,18 @@ export function getUpdates(): UpdatePost[] {
       (a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug)
     )
 }
+
+export function getUpdate(slug: string): UpdatePost | undefined {
+  return getUpdates().find((u) => u.slug === slug)
+}
+
+/** 목록·카드에 넘길 부분만 (본문은 상세에서만) */
+export const toUpdatePreview = ({
+  slug,
+  title,
+  date,
+  href,
+  summary
+}: UpdatePost) => ({ slug, title, date, href, summary })
+
+export type UpdatePreview = ReturnType<typeof toUpdatePreview>

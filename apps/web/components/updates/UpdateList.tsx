@@ -5,22 +5,15 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import ROUTES from "@/constants/routes"
-import type { UpdatePost } from "@/lib/updates"
+import type { UpdatePreview } from "@/lib/updates"
 import { markUpdatesSeen, readUpdatesSeenAt } from "@/lib/updatesSeen"
-
-export type UpdatePreview = Pick<
-  UpdatePost,
-  "slug" | "title" | "date" | "href" | "summary"
->
 
 const formatDate = (date: string) => date.replaceAll("-", ".")
 
-const RecentUpdates = ({ updates }: { updates: UpdatePreview[] }) => {
+const UpdateList = ({ updates }: { updates: UpdatePreview[] }) => {
   // 저장소는 브라우저에만 있으니 그린 뒤에 읽는다 (서버 HTML과 어긋나지 않게)
   const [seenAt, setSeenAt] = useState<string | null | undefined>(undefined)
   useEffect(() => setSeenAt(readUpdatesSeenAt()), [])
-
-  const latest = updates[0]?.date ?? ""
 
   return (
     <ul className="space-y-2">
@@ -29,8 +22,8 @@ const RecentUpdates = ({ updates }: { updates: UpdatePreview[] }) => {
         return (
           <li key={u.slug}>
             <Link
-              href={u.href ?? `${ROUTES.UPDATES}#${u.slug}`}
-              onClick={() => markUpdatesSeen(latest)}
+              href={ROUTES.UPDATES.DETAIL(u.slug)}
+              onClick={() => markUpdatesSeen(u.date)}
               className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="min-w-0 flex-1 space-y-0.5">
@@ -56,4 +49,4 @@ const RecentUpdates = ({ updates }: { updates: UpdatePreview[] }) => {
   )
 }
 
-export default RecentUpdates
+export default UpdateList

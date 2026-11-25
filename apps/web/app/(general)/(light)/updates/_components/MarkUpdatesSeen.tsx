@@ -4,8 +4,8 @@ import { useEffect } from "react"
 
 import { markUpdatesSeen } from "@/lib/updatesSeen"
 
-/** 전체 목록을 열면 홈 카드의 "새로" 표시를 지운다 */
-export default function MarkUpdatesSeen({ latest }: { latest: string }) {
-  useEffect(() => markUpdatesSeen(latest), [latest])
+/** 글을 읽으면 그 날짜까지의 "새로" 표시를 지운다 */
+export default function MarkUpdatesSeen({ date }: { date: string }) {
+  useEffect(() => markUpdatesSeen(date), [date])
   return null
 }
