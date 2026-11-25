@@ -42,6 +42,10 @@ const ROUTES = {
   },
   MEMBER_PROFILE: (userId: number) => `/profiles/${userId}`,
   SUGGESTIONS: "/suggestions",
+  UPDATES: {
+    LIST: "/updates",
+    DETAIL: (slug: string) => `/updates/${encodeURIComponent(slug)}`
+  },
   NOTIFICATIONS: "/notifications",
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",

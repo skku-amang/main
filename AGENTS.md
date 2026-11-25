@@ -20,6 +20,7 @@ AMANG - 성균관대학교 밴드 동아리 관리 시스템. 공연(Performance
 ## Conventions
 
 - **이슈, 브랜치, PR, 커밋**: [CONTRIBUTING.md](CONTRIBUTING.md)의 컨벤션을 따른다.
+- **업데이트 소식**: 부원이 알아챌 기능 추가·수정이면 같은 PR에 글을 쓴다 — [docs/how-to/write-update-post.md](docs/how-to/write-update-post.md)
 
 ## Onboarding
 

@@ -40,6 +40,9 @@ import {
 import { getMyTeams } from "@/lib/team/myTeams"
 import { getSessionsWithMissingMembers } from "@/lib/team/teamSession"
 import { cn } from "@/lib/utils"
+import UpdateList from "@/components/updates/UpdateList"
+import type { UpdatePreview } from "@/lib/updates"
+
 import { isPerformanceRecruiting } from "@repo/shared-types"
 
 const knewave = Knewave({ subsets: ["latin"], weight: ["400"] })
@@ -404,7 +407,7 @@ const Shortcuts = ({ isAdmin }: { isAdmin: boolean }) => {
   )
 }
 
-const HomeDashboard = () => {
+const HomeDashboard = ({ updates }: { updates: UpdatePreview[] }) => {
   const { user, isLoading } = useAuth()
 
   return (
@@ -420,6 +423,11 @@ const HomeDashboard = () => {
       )}
       <SuggestionBanner />
       <Shortcuts isAdmin={!!user?.isAdmin} />
+      {updates.length > 0 && (
+        <Section title="최근 업데이트" moreHref={ROUTES.UPDATES.LIST}>
+          <UpdateList updates={updates} />
+        </Section>
+      )}
     </div>
   )
 }
