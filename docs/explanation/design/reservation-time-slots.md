@@ -27,7 +27,7 @@
 - 운영진 화면의 예약 폼 ([admin/rentals/_components/RentalFormDialog.tsx](<../../../apps/web/app/(admin)/admin/rentals/_components/RentalFormDialog.tsx>)) — 휠을 쓰지 않는 별도 폼이라 그대로 둔다
 - 서버에 30분 단위 검사 추가 — 기존 비정렬 예약(§6)의 제목만 고쳐도 저장이 막히게 된다. 화면에서만 30분으로 고르게 한다
 - 24시간 넘는 예약 — 운영 데이터 567건 중 0건 (2026-11-25), 최장 4시간
-- "최근 업데이트" 글 — [#962](https://github.com/skku-amang/main/issues/962)에서 따로
+- "업데이트 소식" 글 — [#962](https://github.com/skku-amang/main/issues/962)에서 따로
 
 ## 4. 방식 비교
 
