@@ -43,7 +43,7 @@ export default async function UpdateDetailPage({ params }: Props) {
       <MarkUpdatesSeen date={update.date} />
       <article className="mx-auto mb-12 max-w-2xl space-y-4 rounded-xl bg-white p-5 shadow-sm md:p-8">
         <header className="space-y-1">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             {update.date.replaceAll("-", ".")}
           </p>
           <h2 className="text-xl font-semibold">{update.title}</h2>

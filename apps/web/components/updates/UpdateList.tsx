@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 
 import ROUTES from "@/constants/routes"
 import type { UpdatePreview } from "@/lib/updates"
-import { markUpdatesSeen, readUpdatesSeenAt } from "@/lib/updatesSeen"
+import { readUpdatesSeenAt } from "@/lib/updatesSeen"
 
 const formatDate = (date: string) => date.replaceAll("-", ".")
 
@@ -23,7 +23,6 @@ const UpdateList = ({ updates }: { updates: UpdatePreview[] }) => {
           <li key={u.slug}>
             <Link
               href={ROUTES.UPDATES.DETAIL(u.slug)}
-              onClick={() => markUpdatesSeen(u.date)}
               className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="min-w-0 flex-1 space-y-0.5">
@@ -38,7 +37,7 @@ const UpdateList = ({ updates }: { updates: UpdatePreview[] }) => {
                 <p className="line-clamp-1 text-sm text-slate-600">
                   {u.summary}
                 </p>
-                <p className="text-xs text-slate-400">{formatDate(u.date)}</p>
+                <p className="text-xs text-slate-500">{formatDate(u.date)}</p>
               </div>
               <ChevronRight className="size-5 shrink-0 text-slate-400" />
             </Link>
