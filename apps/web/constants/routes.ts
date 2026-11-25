@@ -42,6 +42,7 @@ const ROUTES = {
   },
   MEMBER_PROFILE: (userId: number) => `/profiles/${userId}`,
   SUGGESTIONS: "/suggestions",
+  UPDATES: "/updates",
   NOTIFICATIONS: "/notifications",
   RESERVATION: {
     CLUBROOM: "/reservations/clubroom",
