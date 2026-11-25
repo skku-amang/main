@@ -26,7 +26,7 @@ interface WeekCalendarFieldProp {
 const DEFAULT_START = 9
 const DEFAULT_END = 22
 const ROW_H = 42
-const SNAP_MIN = 15
+const SNAP_MIN = 30
 const LONG_PRESS_MS = 400
 // 이만큼 움직이기 전엔 클릭 — 터치는 길게 누르기 전에 움직이면 스크롤로 넘김
 const MOUSE_DRAG_PX = 4
@@ -135,7 +135,11 @@ function WeekCalendarField({
     const gridStartOf = (d: Dayjs) => d.startOf("day").add(startHour, "hour")
     const gridEndOf = (d: Dayjs) => d.startOf("day").add(endHour + 1, "hour")
     if (drag.mode === "resize") {
-      const minEnd = start.add(SNAP_MIN, "minute")
+      // 칸 단위보다 짧은 기존 예약은 위로 줄여도 원래 길이보다 늘어나지 않게
+      const minEnd = start.add(
+        Math.min(SNAP_MIN, end.diff(start, "minute")),
+        "minute"
+      )
       const maxEnd = gridEndOf(end)
       let newEnd = end.add(minutes, "minute")
       if (newEnd.isBefore(minEnd)) newEnd = minEnd
@@ -158,7 +162,9 @@ function WeekCalendarField({
     // 시작 시각만 그날 보이는 범위 안에 묶고, 길이는 그대로 (밤을 넘기는 예약 허용)
     const day = start.add(days, "day")
     const lo = gridStartOf(day)
-    const hi = gridEndOf(day).subtract(SNAP_MIN, "minute")
+    // 옆 날짜로만 옮길 땐 원래 시각을 지킨다 (23:45 예약이 23:30으로 당겨지지 않게)
+    const snapHi = gridEndOf(day).subtract(SNAP_MIN, "minute")
+    const hi = day.isAfter(snapHi) ? day : snapHi
     let newStart = day.add(minutes, "minute")
     if (newStart.isBefore(lo)) newStart = lo
     if (newStart.isAfter(hi)) newStart = hi

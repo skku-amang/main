@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter, usePathname } from "next/navigation"
 import dayjs, { Dayjs } from "dayjs"
@@ -27,25 +27,36 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/hooks/use-toast"
 import MemberPicker from "@/components/MemberPicker"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { useCreateRental, useUpdateRental } from "@/hooks/api/useRental"
+import {
+  useCreateRental,
+  useRentals,
+  useUpdateRental
+} from "@/hooks/api/useRental"
 import { useUsers } from "@/hooks/api/useUser"
 import {
   Equipment,
+  EditPhase,
   RentalDetail,
+  SlotSelection,
+  TimeRange,
+  buildDaySlots,
+  busyFlags,
+  endOnlyTappable,
   formatDuration,
   formatGenerationOrder,
-  nextFullHour
+  moveRangeToDate,
+  nextFullHour,
+  rangeOverlapsBusy,
+  rentalEditPhase,
+  selectSlot,
+  selectionFromRange,
+  selectionRange,
+  slotQueryRange,
+  tappableSlots
 } from "@repo/shared-types"
-import type { DateRange } from "react-day-picker"
-import TimeWheel from "./TimeWheel"
+import TimeSlotPicker from "./TimeSlotPicker"
 
 const DEFAULT_TITLE = "개인 연습"
-
-/** "HH:mm" 시각을 그 날짜에 붙임 */
-const atTime = (date: Date, time: string) => {
-  const [h, m] = time.split(":").map(Number)
-  return dayjs(date).hour(h!).minute(m!).second(0)
-}
 
 export type RentalFormTarget =
   { mode: "create"; startAt?: Dayjs } | { mode: "edit"; rental: RentalDetail }
@@ -84,24 +95,24 @@ export function useRentalForm() {
   return { target, openCreate, openEdit, close }
 }
 
-const toFields = (d: Dayjs) => ({
-  date: d.startOf("day").toDate(),
-  time: d.format("HH:mm")
-})
-
 /** 폼 처음 값 — 빈 칸은 그 시각부터 1시간, 예약하기 버튼은 다음 정시부터 1시간, 수정은 기존 예약 그대로 */
-function getInitialRange(target: RentalFormTarget) {
+function getInitialRange(target: RentalFormTarget): TimeRange {
   if (target.mode === "edit") {
-    return {
-      start: toFields(dayjs(target.rental.startAt)),
-      end: toFields(dayjs(target.rental.endAt))
-    }
+    return { startAt: target.rental.startAt, endAt: target.rental.endAt }
   }
   const startAt = target.startAt ?? dayjs(nextFullHour(new Date()))
-  return {
-    start: toFields(startAt),
-    end: toFields(startAt.add(1, "hour"))
-  }
+  return { startAt: startAt.toDate(), endAt: startAt.add(1, "hour").toDate() }
+}
+
+const startOfDay = (d: Date) => dayjs(d).startOf("day").toDate()
+
+/** "21:00 ~ 23:00 (2시간)", 끝이 다음날이면 "23:00 ~ 다음날 01:00 (2시간)" */
+function formatRange({ startAt, endAt }: TimeRange) {
+  const start = dayjs(startAt)
+  const end = dayjs(endAt)
+  const endLabel = `${end.isSame(start, "day") ? "" : "다음날 "}${end.format("HH:mm")}`
+  const duration = formatDuration(0, end.diff(start, "minute"))
+  return `${start.format("HH:mm")} ~ ${endLabel}${duration ? ` (${duration})` : ""}`
 }
 
 interface RentalFormDialogProps {
@@ -124,7 +135,12 @@ function RentalForm({
   equipments
 }: RentalFormDialogProps & { target: RentalFormTarget }) {
   const editing = target.mode === "edit" ? target.rental : null
-  const initialRange = getInitialRange(target)
+  // 폼을 연 순간 기준 — 열어 둔 사이에 시각이 바뀌어도 동작은 그대로, 저장은 서버가 판단
+  const [openedAt] = useState(() => new Date())
+  const [initialRange] = useState(() => getInitialRange(target))
+  const phase: EditPhase | "create" = editing
+    ? rentalEditPhase(initialRange, openedAt)
+    : "create"
   const { user } = useAuth()
   const { data: users } = useUsers({ enabled: !!user })
   const createRental = useCreateRental()
@@ -134,9 +150,7 @@ function RentalForm({
   const { toast } = useToast()
 
   const currentUserId = user?.id ?? null
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const disablePastDates = { before: today }
+  const disablePastDates = { before: startOfDay(openedAt) }
 
   // Form state
   const [equipmentId, setEquipmentId] = useState<number | null>(
@@ -151,20 +165,79 @@ function RentalForm({
     }
   }, [equipments, equipmentId])
   const [title, setTitle] = useState(editing?.title ?? DEFAULT_TITLE)
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: initialRange.start.date,
-    to: initialRange.end.date
-  })
-  // 끝 날짜를 안 골랐으면 하루짜리
-  const startDate = dateRange?.from
-  const endDate = dateRange?.to ?? dateRange?.from
-  const [startTime, setStartTime] = useState(initialRange.start.time)
-  const [endTime, setEndTime] = useState(initialRange.end.time)
-  const spanMinutes =
-    startDate && endDate
-      ? atTime(endDate, endTime).diff(atTime(startDate, startTime), "minute")
-      : 0
-  const duration = formatDuration(0, spanMinutes)
+  const [date, setDate] = useState(() => startOfDay(initialRange.startAt))
+  const slots = useMemo(() => buildDaySlots(date), [date])
+  // 칸으로 고른 값. 30분 단위가 아닌 기존 예약은 칸 대신 keptRange로 원래 시각을 지닌다
+  const [selection, setSelection] = useState<SlotSelection>(() =>
+    phase === "create" || phase === "upcoming"
+      ? selectionFromRange(initialRange, slots)
+      : null
+  )
+  const [keptRange, setKeptRange] = useState<TimeRange | null>(() =>
+    phase === "upcoming" && !selectionFromRange(initialRange, slots)
+      ? initialRange
+      : null
+  )
+  // 진행 중인 예약 수정은 시작을 고정하고 끝 칸만 고른다
+  const [endIndex, setEndIndex] = useState<number | null>(null)
+
+  const {
+    data: dayRentals,
+    isLoading: busyLoading,
+    isError: busyError
+  } = useRentals(
+    { equipmentId: equipmentId ?? undefined, ...slotQueryRange(date) },
+    { enabled: !!equipmentId && phase !== "ended" }
+  )
+  const busyRanges = useMemo(
+    () =>
+      (dayRentals ?? []).map((r) => ({
+        id: r.id,
+        startAt: r.startAt,
+        endAt: r.endAt
+      })),
+    [dayRentals]
+  )
+  // 현황을 못 불러오면 남은 옛 값도 버리고 칸을 다 열어 둔다 — 겹치면 저장할 때 서버가 거절함
+  const liveBusyRanges = busyError ? [] : busyRanges
+  const busy = busyFlags(slots, liveBusyRanges, editing?.id)
+  const slotContext = { slots, busy, now: openedAt }
+
+  // 날짜·장비를 바꿔 고른 시간이 남의 예약과 겹치게 되면 선택을 비운다
+  const overlaps = (r: TimeRange) =>
+    rangeOverlapsBusy(r, liveBusyRanges, editing?.id)
+  const liveSelection =
+    selection && !overlaps(selectionRange(selection, slots)) ? selection : null
+  const liveKept = keptRange && !overlaps(keptRange) ? keptRange : null
+
+  const range: TimeRange | null =
+    phase === "ended"
+      ? initialRange
+      : phase === "ongoing"
+        ? {
+            startAt: initialRange.startAt,
+            endAt:
+              endIndex === null ? initialRange.endAt : slots[endIndex]!.endAt
+          }
+        : liveSelection
+          ? selectionRange(liveSelection, slots)
+          : liveKept
+
+  const tappable =
+    phase === "ongoing"
+      ? endOnlyTappable(
+          initialRange.startAt,
+          slots,
+          openedAt,
+          liveBusyRanges,
+          editing?.id
+        )
+      : tappableSlots(liveSelection, slotContext)
+  const selected = slots.map((slot, i) =>
+    phase === "ongoing"
+      ? !!range && slot.endAt > range.startAt && slot.startAt < range.endAt
+      : !!liveSelection && i >= liveSelection.start && i <= liveSelection.end
+  )
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>(
     editing?.users.map((u) => u.id) ?? (currentUserId ? [currentUserId] : [])
   )
@@ -177,56 +250,57 @@ function RentalForm({
   }, [editing, currentUserId, selectedUserIds.length])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
-  // 날짜·시각을 고치면 지난 저장 때의 순서 오류는 지운다 — 고친 뒤에도 남아 걸리는 시간과 같이 보이지 않게
-  const clearOrderError = () =>
+  const clearTimeError = () =>
     setErrors((prev) => {
-      if (!prev.endTime) return prev
+      if (!prev.time) return prev
       const next = { ...prev }
-      delete next.endTime
+      delete next.time
       return next
     })
-  const changeStartTime = (v: string) => {
-    setStartTime(v)
-    clearOrderError()
+  const tapSlot = (index: number) => {
+    if (phase === "ongoing") setEndIndex(index)
+    else {
+      setSelection(selectSlot(liveSelection, index, slotContext))
+      setKeptRange(null)
+    }
+    clearTimeError()
   }
-  const changeEndTime = (v: string) => {
-    setEndTime(v)
-    clearOrderError()
-  }
-  const changeDateRange = (range: DateRange | undefined) => {
-    setDateRange(range)
-    clearOrderError()
+  // 고른 시각·길이를 유지한 채 날짜만 옮긴다. 옮긴 시작이 이미 지났으면 비운다
+  const changeDate = (next: Date | undefined) => {
+    if (!next) return
+    setDate(next)
+    const current = liveSelection
+      ? selectionRange(liveSelection, slots)
+      : liveKept
+    const moved = current && moveRangeToDate(current, next)
+    if (!moved || moved.startAt < openedAt) {
+      setSelection(null)
+      setKeptRange(null)
+      return
+    }
+    const nextSelection = selectionFromRange(moved, buildDaySlots(next))
+    setSelection(nextSelection)
+    setKeptRange(nextSelection ? null : moved)
   }
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!equipmentId) newErrors.equipmentId = "장비를 선택해주세요."
-    if (!startDate) newErrors.startDate = "날짜를 선택해주세요."
+    if (!range) newErrors.time = "시간을 골라주세요."
     if (selectedUserIds.length === 0)
       newErrors.users = "참여자를 최소 1명 선택해주세요."
-
-    if (startDate && endDate) {
-      const start = atTime(startDate, startTime)
-      const end = atTime(endDate, endTime)
-      if (!end.isAfter(start)) {
-        newErrors.endTime = "종료 시간은 시작 시간보다 뒤여야 합니다."
-      }
-    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = () => {
-    if (!validate() || !equipmentId || !startDate || !endDate) return
-
-    const startAt = atTime(startDate, startTime).toDate()
-    const endAt = atTime(endDate, endTime).toDate()
+    if (!validate() || !equipmentId || !range) return
 
     const fields = {
       title: title.trim() || DEFAULT_TITLE,
-      startAt,
-      endAt,
+      startAt: range.startAt,
+      endAt: range.endAt,
       userIds: selectedUserIds
     }
     const callbacks = {
@@ -276,8 +350,9 @@ function RentalForm({
           <DialogDescription>예약 정보를 입력해주세요</DialogDescription>
         </DialogHeader>
 
-        {/* 가장 넓은 고정 요소(달력) 폭에 맞춤 — 칩 등은 그 안에서 줄바꿈 */}
-        <div className="w-min space-y-5">
+        {/* 가장 넓은 고정 요소(달력) 폭에 맞춤 — 칩 등은 그 안에서 줄바꿈.
+            진행 중·끝난 예약 수정은 달력을 숨기므로 달력 폭(306px)을 최소 폭으로 둔다 */}
+        <div className="w-min min-w-[19.125rem] space-y-5">
           {/* 장비 선택 (여러 장비일 때만 표시, 수정 땐 장비 그대로) */}
           {!editing && equipments.length > 1 && (
             <div className="space-y-1.5">
@@ -327,44 +402,47 @@ function RentalForm({
               <span>Date & Time</span>
             </div>
 
-            <div className="space-y-1.5">
-              <Calendar
-                mode="range"
-                // 범위를 다 고른 뒤 다시 누르면 새로 시작 — 하루짜리 예약 날짜를 옮길 때 범위가 늘어나지 않게
-                resetOnSelect
-                selected={dateRange}
-                onSelect={changeDateRange}
-                disabled={disablePastDates}
-                className="mx-auto rounded-md border [--cell-size:2.5rem]"
-              />
-              {errors.startDate && (
-                <p className="text-sm text-destructive">{errors.startDate}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-              <TimeWheel
-                label="시작"
-                value={startTime}
-                onChange={changeStartTime}
-              />
-              <span className="text-muted-foreground text-sm">~</span>
-              <TimeWheel
-                label="종료"
-                value={endTime}
-                onChange={changeEndTime}
-              />
-            </div>
-            <div>
-              {duration && (
-                <p className="text-center text-sm text-muted-foreground">
-                  {duration}
-                </p>
-              )}
-              {errors.endTime && (
-                <p className="text-sm text-destructive">{errors.endTime}</p>
-              )}
-            </div>
+            {phase === "ended" ? (
+              <p className="text-sm">
+                {dayjs(initialRange.startAt).locale("ko").format("M월 D일")}{" "}
+                {formatRange(initialRange)}
+              </p>
+            ) : (
+              <>
+                {phase !== "ongoing" && (
+                  <Calendar
+                    mode="single"
+                    required
+                    selected={date}
+                    onSelect={changeDate}
+                    disabled={disablePastDates}
+                    className="mx-auto rounded-md border [--cell-size:2.5rem]"
+                  />
+                )}
+                {/* 칸으로 못 나타내는 원래 시각은 칸 위에 따로 보여 준다 */}
+                {liveKept && !liveSelection && (
+                  <p className="text-sm text-muted-foreground">
+                    지금 {formatRange(liveKept)}
+                  </p>
+                )}
+                <TimeSlotPicker
+                  slots={slots}
+                  busy={busy}
+                  tappable={tappable}
+                  selected={selected}
+                  onTap={tapSlot}
+                  loading={busyLoading}
+                />
+                {busyError && (
+                  <p className="text-sm text-destructive">
+                    예약 현황을 못 불러왔어요
+                  </p>
+                )}
+              </>
+            )}
+            {errors.time && (
+              <p className="text-sm text-destructive">{errors.time}</p>
+            )}
           </div>
 
           {/* Separator */}
@@ -443,7 +521,8 @@ function RentalForm({
               type="button"
               className="flex-1"
               onClick={handleSubmit}
-              disabled={isPending}
+              // 현황을 받기 전엔 처음 골라 둔 시간이 남의 예약과 겹치는지 모른다
+              disabled={isPending || busyLoading}
             >
               {isPending ? "저장 중..." : "저장"}
             </Button>
