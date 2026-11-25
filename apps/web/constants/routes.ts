@@ -44,7 +44,7 @@ const ROUTES = {
   SUGGESTIONS: "/suggestions",
   UPDATES: {
     LIST: "/updates",
-    DETAIL: (slug: string) => `/updates/${slug}`
+    DETAIL: (slug: string) => `/updates/${encodeURIComponent(slug)}`
   },
   NOTIFICATIONS: "/notifications",
   RESERVATION: {
