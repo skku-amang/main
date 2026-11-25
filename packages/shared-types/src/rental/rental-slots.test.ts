@@ -145,56 +145,70 @@ describe("누르기 규칙", () => {
     })
   })
 
-  describe("selectSlot", () => {
-    it("처음 누른 칸이 시작", () => {
-      expect(selectSlot(null, 42, ctx)).toEqual({
-        start: 42,
-        end: 42,
-        awaitingEnd: true
-      })
+  describe("selectSlot — 칸마다 켜고 끄기", () => {
+    it("처음 누른 칸 하나가 골라짐", () => {
+      expect(selectSlot(null, 42, ctx)).toEqual({ start: 42, end: 42 })
     })
-    it("시작 뒤 칸을 누르면 그 칸까지 끝", () => {
-      const sel = selectSlot(selectSlot(null, 42, ctx), 45, ctx)
-      expect(sel).toEqual({ start: 42, end: 45, awaitingEnd: false })
+    it("고른 칸 바로 뒤를 누르면 붙음 — 1시간 넘게 계속 늘릴 수 있음", () => {
+      let sel = selectSlot(null, 40, ctx)
+      for (const i of [41, 42, 43, 44, 45]) sel = selectSlot(sel, i, ctx)
+      expect(sel).toEqual({ start: 40, end: 45 })
       expect(selectionRange(sel!, slots)).toEqual({
-        startAt: at(26, 21),
+        startAt: at(26, 20),
         endAt: at(26, 23)
       })
     })
-    it("시작 칸을 한 번 더 누르면 30분짜리로 끝", () => {
-      expect(
-        selectSlot({ start: 42, end: 42, awaitingEnd: true }, 42, ctx)
-      ).toEqual({ start: 42, end: 42, awaitingEnd: false })
+    it("고른 칸 바로 앞을 누르면 앞으로 붙음", () => {
+      expect(selectSlot({ start: 42, end: 43 }, 41, ctx)).toEqual({
+        start: 41,
+        end: 43
+      })
     })
-    it("시작 뒤 찬 칸 너머는 끝으로 못 고름", () => {
-      const sel = { start: 34, end: 34, awaitingEnd: true }
-      expect(selectSlot(sel, 40, ctx)).toEqual(sel)
-      const tappable = tappableSlots(sel, ctx)
-      expect(tappable[40]).toBe(false)
-      expect(tappable[37]).toBe(true)
+    it("끝 칸을 누르면 빠짐", () => {
+      expect(selectSlot({ start: 42, end: 45 }, 45, ctx)).toEqual({
+        start: 42,
+        end: 44
+      })
     })
-    it("시작보다 앞 칸을 누르면 새 시작", () => {
-      expect(
-        selectSlot({ start: 42, end: 42, awaitingEnd: true }, 40, ctx)
-      ).toEqual({ start: 40, end: 40, awaitingEnd: true })
+    it("시작 칸을 누르면 빠짐", () => {
+      expect(selectSlot({ start: 42, end: 45 }, 42, ctx)).toEqual({
+        start: 43,
+        end: 45
+      })
     })
-    it("다 고른 뒤 다음날 칸을 누르면 끝만 거기까지", () => {
-      const sel = selectSlot(
-        { start: 42, end: 45, awaitingEnd: false },
-        49,
-        ctx
-      )
-      expect(sel).toEqual({ start: 42, end: 49, awaitingEnd: false })
-      expect(selectionRange(sel!, slots).endAt).toEqual(at(27, 1))
+    it("하나 남은 칸을 누르면 비워짐", () => {
+      expect(selectSlot({ start: 42, end: 42 }, 42, ctx)).toBeNull()
     })
-    it("다 고른 뒤라도 사이에 찬 칸이 있으면 다음날 칸 못 누름", () => {
-      const sel = { start: 34, end: 36, awaitingEnd: false }
-      expect(selectSlot(sel, 49, ctx)).toEqual(sel)
+    it("가운데 칸은 못 뺌 — 끊긴 예약은 없음", () => {
+      const sel = { start: 42, end: 45 }
+      expect(selectSlot(sel, 43, ctx)).toBe(sel)
+      expect(tappableSlots(sel, ctx)[43]).toBe(false)
     })
-    it("다 고른 뒤 그날 칸을 누르면 새 시작", () => {
-      expect(
-        selectSlot({ start: 42, end: 45, awaitingEnd: false }, 31, ctx)
-      ).toEqual({ start: 31, end: 31, awaitingEnd: true })
+    it("떨어진 칸을 누르면 그 칸부터 새로 고름", () => {
+      expect(selectSlot({ start: 42, end: 45 }, 32, ctx)).toEqual({
+        start: 32,
+        end: 32
+      })
+    })
+    it("찬 칸으로는 못 늘림", () => {
+      const sel = { start: 35, end: 37 }
+      expect(selectSlot(sel, 38, ctx)).toBe(sel)
+    })
+    it("지난 칸으로 앞에 붙일 수 없음", () => {
+      const sel = { start: 31, end: 32 }
+      expect(selectSlot(sel, 30, ctx)).toBe(sel)
+    })
+    it("다음날 칸은 바로 뒤일 때만 붙음", () => {
+      expect(selectSlot({ start: 46, end: 47 }, 48, ctx)).toEqual({
+        start: 46,
+        end: 48
+      })
+      const sel = { start: 42, end: 45 }
+      expect(selectSlot(sel, 49, ctx)).toBe(sel)
+    })
+    it("시작 칸을 빼서 다음날부터 시작하게 되면 안 빠짐", () => {
+      const sel = { start: 47, end: 48 }
+      expect(selectSlot(sel, 47, ctx)).toBe(sel)
     })
   })
 })
@@ -203,7 +217,7 @@ describe("selectionFromRange", () => {
   it("칸 경계에 맞으면 그 선택", () => {
     expect(
       selectionFromRange({ startAt: at(26, 21), endAt: at(26, 23) }, slots)
-    ).toEqual({ start: 42, end: 45, awaitingEnd: false })
+    ).toEqual({ start: 42, end: 45 })
   })
   it("30분 단위가 아니면 null", () => {
     expect(
@@ -221,7 +235,7 @@ describe("selectionFromRange", () => {
   it("자정을 넘겨도 다음날 06시 안이면 그 선택", () => {
     expect(
       selectionFromRange({ startAt: at(26, 23), endAt: at(27, 1) }, slots)
-    ).toEqual({ start: 46, end: 49, awaitingEnd: false })
+    ).toEqual({ start: 46, end: 49 })
   })
 })
 
