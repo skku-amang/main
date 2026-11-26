@@ -13,6 +13,6 @@ export const markUpdatesSeen = (date: string) => {
   try {
     if ((readUpdatesSeenAt() ?? "") < date) localStorage.setItem(SEEN_KEY, date)
   } catch {
-    // 저장소를 못 쓰는 브라우저면 "새로" 표시만 남는다
+    // 저장소를 못 쓰는 브라우저면 "New" 표시만 남는다
   }
 }

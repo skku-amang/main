@@ -56,7 +56,7 @@ export default async function UpdateDetailPage({ params }: Props) {
             href={update.href}
             className="inline-flex items-center text-sm font-medium text-primary hover:underline"
           >
-            써 보러 가기
+            사용해 보기
             <ChevronRight className="size-4" />
           </Link>
         )}

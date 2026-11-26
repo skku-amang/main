@@ -30,7 +30,7 @@ const UpdateList = ({ updates }: { updates: UpdatePreview[] }) => {
                   <span className="truncate">{u.title}</span>
                   {isNew && (
                     <span className="shrink-0 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                      새로
+                      New
                     </span>
                   )}
                 </p>

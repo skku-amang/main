@@ -424,7 +424,7 @@ const HomeDashboard = ({ updates }: { updates: UpdatePreview[] }) => {
       <SuggestionBanner />
       <Shortcuts isAdmin={!!user?.isAdmin} />
       {updates.length > 0 && (
-        <Section title="최근 업데이트" moreHref={ROUTES.UPDATES.LIST}>
+        <Section title="업데이트 소식" moreHref={ROUTES.UPDATES.LIST}>
           <UpdateList updates={updates} />
         </Section>
       )}
