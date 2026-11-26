@@ -11,7 +11,7 @@
 
 ```md
 ---
-title: 예약 시간을 30분 칸으로 골라요
+title: 예약 시간을 30분 블럭으로 골라요
 date: 2026-11-25
 href: /reservations/clubroom
 ---
@@ -24,7 +24,7 @@ href: /reservations/clubroom
 ```
 
 - `title`·`date`(YYYY-MM-DD)는 꼭 적는다. 틀리면 빌드가 실패한다 ([lib/updates.ts](../../apps/web/lib/updates.ts))
-- `href`는 상세 페이지의 "써 보러 가기"로 갈 화면. 없으면 빼도 된다
+- `href`는 상세 페이지의 "사용해 보기"로 갈 화면. 없으면 빼도 된다
 - 부원이 읽는 글이라 쉬운 말로, 짧게. 의견을 준 부원이 있으면 고마움도 적는다
 
 ## 2. 사진
@@ -36,4 +36,4 @@ href: /reservations/clubroom
 ## 3. 확인
 
 - 로컬에서 홈 맨 아래 "업데이트 소식" 카드(최신 3개), `/updates` 목록, `/updates/<파일 이름>` 상세에 보이는지 본다
-- 날짜가 마지막으로 읽은 글의 날짜보다 뒤면 카드에 "새 글"이 붙는다 (상세를 열면 그 날짜까지 지워짐). 다시 보려면 브라우저 저장소의 `amang:updates-seen-at`을 지운다
+- 날짜가 마지막으로 읽은 글의 날짜보다 뒤면 카드에 "New"가 붙는다 (상세를 열면 그 날짜까지 지워짐). 다시 보려면 브라우저 저장소의 `amang:updates-seen-at`을 지운다
