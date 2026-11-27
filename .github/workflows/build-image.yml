@@ -77,7 +77,9 @@ jobs:
           tags: |
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ github.sha }}
             ghcr.io/skku-amang/amang-${{ matrix.app.name }}:${{ steps.sortable.outputs.tag }}
-          build-args: ${{ matrix.app.build-args }}
+          build-args: |
+            ${{ matrix.app.build-args }}
+            APP_VERSION=${{ steps.sortable.outputs.tag }}
           # source map은 레지스트리에 올리는 빌드에서만 Sentry로 보낸다. ARG가 아닌 secret이라 이미지에 안 남는다
           secrets: ${{ inputs.push && secrets.SENTRY_AUTH_TOKEN && format('SENTRY_AUTH_TOKEN={0}', secrets.SENTRY_AUTH_TOKEN) || '' }}
           # scope 없으면 matrix 항목끼리 같은 캐시를 덮어쓴다

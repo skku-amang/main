@@ -41,5 +41,8 @@ USER nestjs
 COPY --from=installer /app .
 
 ENV NODE_ENV=production
+# 배포 버전 (이미지 태그 <커밋시각>-<짧은 SHA>). 텔레메트리 app.version으로 보낸다 (src/instrument.ts)
+ARG APP_VERSION
+ENV APP_VERSION=${APP_VERSION}
 EXPOSE 8000
 CMD ["node", "apps/api/dist/main.js"]
