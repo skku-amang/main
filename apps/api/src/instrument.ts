@@ -8,6 +8,7 @@ import {
 } from "@opentelemetry/sdk-metrics"
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base"
 import * as Sentry from "@sentry/nestjs"
+import type { Request } from "express"
 import { nodeProfilingIntegration } from "@sentry/profiling-node"
 import { traceSampleRate } from "./common/trace-sampling"
 import { isHealthCheckPath } from "./health/health-path"
@@ -19,7 +20,20 @@ Sentry.init({
   profilesSampleRate: 1.0,
   enableLogs: true,
 
-  integrations: [nodeProfilingIntegration(), Sentry.pinoIntegration()],
+  integrations: [
+    Sentry.httpIntegration({
+      // Sentry는 서버 스팬 이름을 URL 경로(GET /teams/91)로 짓고 Sentry로 보낼 때만 라우트로 바꾼다.
+      // Tempo로 복제되는 OTel 스팬도 라우트 이름으로 맞춘다. Sentry가 스팬을 끝내는 close 리스너보다 먼저 등록된다
+      incomingRequestSpanHook: (span, request, response) => {
+        response.once("close", () => {
+          const route = (request as Request).route?.path
+          if (route) span.updateName(`${request.method} ${route}`)
+        })
+      }
+    }),
+    nodeProfilingIntegration(),
+    Sentry.pinoIntegration()
+  ],
 
   // Sentry가 만든 OTel 스팬을 Tempo(OTel Collector 경유)로도 복제 전송
   openTelemetrySpanProcessors: process.env.OTEL_EXPORTER_OTLP_ENDPOINT
