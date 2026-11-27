@@ -13,6 +13,17 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node"
 import { traceSampleRate } from "./common/trace-sampling"
 import { isHealthCheckPath } from "./health/health-path"
 
+// Sentry가 service.version을 SDK 버전으로 덮어써서(getSentryResource) 배포 버전은 app.version으로 남긴다.
+// Sentry 트레이스와 OTel 지표 둘 다 초기화 때 OTEL_RESOURCE_ATTRIBUTES를 읽으므로 그 전에 덧붙인다
+if (process.env.APP_VERSION) {
+  process.env.OTEL_RESOURCE_ATTRIBUTES = [
+    process.env.OTEL_RESOURCE_ATTRIBUTES,
+    `app.version=${process.env.APP_VERSION}`
+  ]
+    .filter(Boolean)
+    .join(",")
+}
+
 Sentry.init({
   // kubelet probe 0, 스테이징 k6 봇 5%, 나머지 100% (common/trace-sampling.ts)
   tracesSampler: ({ normalizedRequest, inheritOrSampleWith }) =>
